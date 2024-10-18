@@ -11,9 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ssafy.designsystem.R
+import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.component.Comment
 import com.ssafy.designsystem.component.EditText
 import com.ssafy.designsystem.component.FilledButton
@@ -89,4 +92,10 @@ fun LogInScreen(
             addPhoto = ::println
         )
     }
+}
+
+@Preview(showBackground = true, widthDp = 320)
+@Composable
+fun GreetingPreview() {
+    LogInScreen {}
 }
