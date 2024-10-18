@@ -14,16 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ssafy.designsystem.component.Comment
-import com.ssafy.designsystem.component.EditText
-import com.ssafy.designsystem.component.FilledButton
-import com.ssafy.designsystem.component.List
-import com.ssafy.designsystem.component.NegativeButton
-import com.ssafy.designsystem.component.OutlineButton
-import com.ssafy.designsystem.values.EMAIL
-import com.ssafy.designsystem.values.EMAIL_HINT
 import com.ssafy.designsystem.values.PaddingDefault
-import java.util.Date
 
 @Composable
 fun LogInScreen(
@@ -46,47 +37,5 @@ fun LogInScreen(
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
-//        Image(
-//            painter = painterResource(id = R.drawable.logo),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .aspectRatio(1f)
-//        )
-
-        EditText(
-            title = EMAIL,
-            textHint = EMAIL_HINT,
-            text = uiState.email,
-            onTextChange = viewModel::updateEmail
-        )
-
-        FilledButton(text = "Test", onClick = ::println)
-        NegativeButton(text = "Test", onClick = ::println)
-        OutlineButton(text = "Test", onClick = ::println)
-        Comment(
-            iconUrl = "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-            nickname = "Nickname",
-            date = Date().time,
-            content = "Comment",
-            onMenuClick = ::println
-        )
-        List(
-            title = "List",
-            onTitleChange = ::println,
-            addCard = ::println,
-            addPhoto = ::println
-        )
-
-        Spacer(modifier = Modifier.padding(10.dp))
-
-        List(
-            title = "List",
-            onTitleChange = ::println,
-            isWatching = true,
-            addCard = ::println,
-            addPhoto = ::println
-        )
     }
 }
