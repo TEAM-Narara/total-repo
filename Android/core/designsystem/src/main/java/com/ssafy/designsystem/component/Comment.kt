@@ -21,6 +21,7 @@ import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextSmall
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun Comment(
@@ -49,7 +50,7 @@ fun Comment(
         ) {
             Text(text = nickname, fontSize = TextMedium)
             Text(text = date.formatTimestamp(), fontSize = TextSmall, color = DarkGray)
-            Text(text = content, fontSize = TextMedium)
+            MarkdownText(markdown = content, fontSize = TextMedium)
         }
 
         IconButton(onClick = onMenuClick) {
