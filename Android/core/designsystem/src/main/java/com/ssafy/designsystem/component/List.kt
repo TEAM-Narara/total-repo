@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -31,7 +30,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.ssafy.designsystem.R
-import com.ssafy.designsystem.values.CardWidth
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.ListWidth
@@ -64,7 +62,11 @@ fun List(
             defaultElevation = ElevationDefault
         )
     ) {
-        Column(modifier = modifier.padding(PaddingDefault)) {
+        Column(
+            modifier = modifier
+                .padding(PaddingDefault)
+                .weight(1f, false)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BasicTextField(
                     value = value,
@@ -92,7 +94,7 @@ fun List(
                 }
             }
 
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = CardWidth)) {
+            LazyColumn {
                 items(cardList) { card ->
                     Card(card)
                 }
