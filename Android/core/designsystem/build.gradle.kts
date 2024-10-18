@@ -34,9 +34,6 @@ android {
 }
 
 dependencies {
-    // Coil
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // Compose
     implementation(libs.androidx.lifecycle.runtime.ktx)
