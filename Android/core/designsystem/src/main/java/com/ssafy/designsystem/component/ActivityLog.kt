@@ -11,8 +11,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.designsystem.formatTimestamp
 import com.ssafy.designsystem.values.ACTIVITY_ICON
@@ -40,8 +40,8 @@ fun ActivityLog(
             modifier = modifier.size(IconLarge)
         )
         Column {
-            Text(text = content, fontSize = TextMedium, fontWeight = FontWeight.SemiBold)
-            Text(text = editDate.formatTimestamp(), fontSize = TextSmall)
+            Text(text = content, fontSize = TextMedium)
+            Text(text = editDate.formatTimestamp(), fontSize = TextSmall, color = Color.Gray)
         }
     }
 }
