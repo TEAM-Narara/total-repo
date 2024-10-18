@@ -51,7 +51,7 @@ fun Board(
         Column {
 
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 IconButton(onClick = onMenuClick) {
@@ -62,19 +62,19 @@ fun Board(
                 }
             }
 
-            Spacer(modifier = modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
             Surface(
                 color = White,
                 shape = RoundedCornerShape(RadiusDefault),
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(PaddingSmall)
             ) {
                 Text(
                     text = title,
                     fontWeight = FontWeight.Bold,
-                    modifier = modifier.padding(
+                    modifier = Modifier.padding(
                         horizontal = PaddingDefault,
                         vertical = PaddingXSmall
                     )

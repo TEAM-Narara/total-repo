@@ -39,7 +39,6 @@ import com.ssafy.designsystem.values.SpacerMedium
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.White
 
-// TODO 리스트와 카드에 대한 객체가 나오게 된다면 리스트 객체를 전달해야 함
 @Composable
 fun List(
     title: String,
@@ -63,7 +62,7 @@ fun List(
         )
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(PaddingDefault)
                 .weight(1f, false)
         ) {
@@ -73,7 +72,7 @@ fun List(
                     onValueChange = { newValue ->
                         if (newValue.length <= maxTitleLength) onValueChange(newValue)
                     },
-                    modifier = modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     singleLine = true,
                     textStyle = TextStyle(fontSize = TextMedium),
                     keyboardActions = KeyboardActions(
@@ -87,7 +86,7 @@ fun List(
 
                 if (isWatching) {
                     Image(
-                        modifier = modifier.size(IconMedium),
+                        modifier = Modifier.size(IconMedium),
                         painter = painterResource(id = R.drawable.watch),
                         contentDescription = "watch"
                     )
@@ -100,25 +99,25 @@ fun List(
                 }
             }
 
-            Spacer(modifier = modifier.height(SpacerMedium))
+            Spacer(modifier = Modifier.height(SpacerMedium))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Box(modifier = modifier
+                Box(modifier = Modifier
                     .clickable { addCard() }
                     .weight(1f)
                 ) {
                     Text(
                         text = "+ Add Card", fontSize = TextMedium,
-                        modifier = modifier.padding(vertical = PaddingSmall)
+                        modifier = Modifier.padding(vertical = PaddingSmall)
                     )
                 }
 
-                Box(modifier = modifier.clickable { addPhoto() }) {
+                Box(modifier = Modifier.clickable { addPhoto() }) {
                     Icon(
                         imageVector = Icons.Default.AddPhotoAlternate,
                         contentDescription = "이미지 추가",
-                        modifier = modifier.padding(PaddingSmall)
+                        modifier = Modifier.padding(PaddingSmall)
                     )
                 }
             }

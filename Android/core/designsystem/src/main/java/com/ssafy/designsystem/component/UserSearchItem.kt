@@ -35,7 +35,7 @@ fun UserSearchItem(
     nickname: String,
     email: String,
     userAuth: String,
-    icon: @Composable (Modifier) -> Unit,
+    icon: @Composable () -> Unit,
     changeUserAuth: (String) -> Unit
 ) {
     val (value, onValueChanged) = remember { mutableStateOf(userAuth) }
@@ -49,15 +49,15 @@ fun UserSearchItem(
             .padding(PaddingDefault),
     ) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .size(IconXLarge)
                 .clip(CircleShape)
         ) {
-            icon(modifier)
+            icon()
         }
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(horizontal = PaddingDefault)
                 .weight(1f)
         ) {
@@ -77,7 +77,7 @@ fun UserSearchItem(
         }
 
         Column {
-            Row(modifier = modifier.clickable { setExpanded(true) }) {
+            Row(modifier = Modifier.clickable { setExpanded(true) }) {
                 Text(text = value, fontSize = TextMedium)
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,

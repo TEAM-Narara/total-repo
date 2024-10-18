@@ -24,7 +24,7 @@ import com.ssafy.designsystem.values.TextSmall
 
 @Composable
 fun Comment(
-    icon: @Composable (Modifier) -> Unit,
+    icon: @Composable () -> Unit,
     nickname: String,
     date: Long,
     content: String,
@@ -35,15 +35,15 @@ fun Comment(
     Row(modifier = modifier.fillMaxWidth()) {
 
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .size(IconLarge)
                 .clip(CircleShape)
         ) {
-            icon(modifier)
+            icon()
         }
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .weight(1f)
                 .padding(start = PaddingMedium)
         ) {

@@ -44,7 +44,7 @@ fun EditText(
 
         BasicTextField(
             value = text,
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = onTextChange,
             singleLine = true,
             textStyle = TextStyle(
