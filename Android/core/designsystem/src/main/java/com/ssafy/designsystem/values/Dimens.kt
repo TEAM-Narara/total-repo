@@ -19,6 +19,8 @@ val PaddingXSmall = 4.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
+val PaddingSemiLarge = 20.dp
+val PaddingXLarge = 64.dp
 
 val IconXLarge = 48.dp
 val IconLarge = 36.dp
