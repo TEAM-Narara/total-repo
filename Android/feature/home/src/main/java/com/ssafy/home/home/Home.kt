@@ -37,7 +37,8 @@ fun HomeScreen(
     HomeScreen(
         workSpace = uiState.workSpace,
         moveToBoardScreen = moveToBoardScreen,
-        moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
+        moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
+        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ }
     )
 }
 
@@ -45,7 +46,8 @@ fun HomeScreen(
 private fun HomeScreen(
     workSpace: Any?,
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit
+    moveToCreateNewBoardScreen: () -> Unit,
+    moveToCreateNewWorkSpaceScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -100,7 +102,7 @@ private fun HomeScreen(
         } else {
             HomeEmptyScreen(
                 modifier = Modifier.padding(innerPadding),
-                moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
+                moveToCreateNewWorkSpaceScreen = moveToCreateNewWorkSpaceScreen
             )
         }
     }
@@ -112,6 +114,7 @@ fun GreetingPreview() {
     HomeScreen(
         workSpace = Any(),
         moveToBoardScreen = {},
-        moveToCreateNewBoardScreen = {}
+        moveToCreateNewBoardScreen = {},
+        moveToCreateNewWorkSpaceScreen = {}
     )
 }

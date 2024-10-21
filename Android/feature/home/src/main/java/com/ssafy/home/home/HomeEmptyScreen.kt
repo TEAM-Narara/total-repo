@@ -36,7 +36,7 @@ import com.ssafy.designsystem.values.White
 @Composable
 fun HomeEmptyScreen(
     modifier: Modifier = Modifier,
-    moveToCreateNewBoardScreen: () -> Unit
+    moveToCreateNewWorkSpaceScreen: () -> Unit
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
@@ -82,7 +82,7 @@ fun HomeEmptyScreen(
                         .align(Alignment.BottomEnd)
                         .padding(PaddingDefault)
                         .clickable(
-                            onClick = moveToCreateNewBoardScreen,
+                            onClick = moveToCreateNewWorkSpaceScreen,
                             interactionSource = null,
                             indication = null,
                         )
