@@ -73,6 +73,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version = "2.52" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version = "2.52" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
