@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -31,7 +30,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import com.ssafy.designsystem.R
-import com.ssafy.designsystem.values.CardWidth
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.ListWidth
@@ -41,12 +39,11 @@ import com.ssafy.designsystem.values.SpacerMedium
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.White
 
-// TODO 리스트와 카드에 대한 객체가 나오게 된다면 리스트 객체를 전달해야 함
 @Composable
 fun List(
+    modifier: Modifier = Modifier,
     title: String,
     onTitleChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
     isWatching: Boolean = false,
     addCard: () -> Unit,
     addPhoto: () -> Unit,
@@ -64,14 +61,18 @@ fun List(
             defaultElevation = ElevationDefault
         )
     ) {
-        Column(modifier = modifier.padding(PaddingDefault)) {
+        Column(
+            modifier = Modifier
+                .padding(PaddingDefault)
+                .weight(1f, false)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BasicTextField(
                     value = value,
                     onValueChange = { newValue ->
                         if (newValue.length <= maxTitleLength) onValueChange(newValue)
                     },
-                    modifier = modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     singleLine = true,
                     textStyle = TextStyle(fontSize = TextMedium),
                     keyboardActions = KeyboardActions(
@@ -85,38 +86,38 @@ fun List(
 
                 if (isWatching) {
                     Image(
-                        modifier = modifier.size(IconMedium),
+                        modifier = Modifier.size(IconMedium),
                         painter = painterResource(id = R.drawable.watch),
                         contentDescription = "watch"
                     )
                 }
             }
 
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = CardWidth)) {
+            LazyColumn {
                 items(cardList) { card ->
                     Card(card)
                 }
             }
 
-            Spacer(modifier = modifier.height(SpacerMedium))
+            Spacer(modifier = Modifier.height(SpacerMedium))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Box(modifier = modifier
+                Box(modifier = Modifier
                     .clickable { addCard() }
                     .weight(1f)
                 ) {
                     Text(
                         text = "+ Add Card", fontSize = TextMedium,
-                        modifier = modifier.padding(vertical = PaddingSmall)
+                        modifier = Modifier.padding(vertical = PaddingSmall)
                     )
                 }
 
-                Box(modifier = modifier.clickable { addPhoto() }) {
+                Box(modifier = Modifier.clickable { addPhoto() }) {
                     Icon(
                         imageVector = Icons.Default.AddPhotoAlternate,
                         contentDescription = "이미지 추가",
-                        modifier = modifier.padding(PaddingSmall)
+                        modifier = Modifier.padding(PaddingSmall)
                     )
                 }
             }

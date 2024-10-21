@@ -39,6 +39,10 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
 
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // nav
     implementation(libs.kotlinx.serialization.json)
 

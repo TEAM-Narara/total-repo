@@ -25,8 +25,8 @@ import com.ssafy.designsystem.values.White
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditText(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String,
     text: String = "",
     onTextChange: (String) -> Unit,
     textHint: String = "",
@@ -44,7 +44,7 @@ fun EditText(
 
         BasicTextField(
             value = text,
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = onTextChange,
             singleLine = true,
             textStyle = TextStyle(
