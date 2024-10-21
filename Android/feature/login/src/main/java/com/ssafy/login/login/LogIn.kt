@@ -3,7 +3,6 @@ package com.ssafy.login.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +27,8 @@ import com.ssafy.designsystem.component.FilledButton
 import com.ssafy.designsystem.component.LoginButton
 import com.ssafy.designsystem.component.OutlineButton
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingSemiLarge
+import com.ssafy.designsystem.values.PaddingXLarge
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 
@@ -50,12 +51,11 @@ fun LogInScreen(
             PaddingXSmall
         )
     ) {
-        Spacer(modifier = Modifier.weight(.5f))
         Image(
             painter = painterResource(id = R.drawable.big_logo),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingDefault),
+                .padding(PaddingDefault, PaddingXLarge, PaddingDefault, PaddingDefault),
             contentDescription = "watch",
             contentScale = ContentScale.FillWidth
         )
@@ -77,7 +77,7 @@ fun LogInScreen(
                 .fillMaxWidth()
                 .padding(
                     PaddingZero, PaddingZero, PaddingZero,
-                    PaddingDefault
+                    PaddingSemiLarge
                 )
         )
         FilledButton(onClick = { moveToSignUpScreen() }, text = "로그인")
@@ -105,7 +105,6 @@ fun LogInScreen(
             backColor = Color.Black,
             textColor = Color.White
         )
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
