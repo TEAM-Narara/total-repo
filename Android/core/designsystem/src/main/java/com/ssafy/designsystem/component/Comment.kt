@@ -25,12 +25,12 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun Comment(
+    modifier: Modifier = Modifier,
     icon: @Composable () -> Unit,
     nickname: String,
     date: Long,
     content: String,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
 
     Row(modifier = modifier.fillMaxWidth()) {

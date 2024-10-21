@@ -16,9 +16,9 @@ import com.ssafy.designsystem.values.TextMedium
 
 @Composable
 fun OutlineButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     color: Color = Primary,
     textColor: Color = Primary,
     cornerRadius: Dp = CornerSmall

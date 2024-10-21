@@ -25,8 +25,8 @@ import com.ssafy.designsystem.values.White
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditText(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String,
     text: String = "",
     onTextChange: (String) -> Unit,
     textHint: String = "",

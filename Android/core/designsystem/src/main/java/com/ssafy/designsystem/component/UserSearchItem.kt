@@ -36,9 +36,8 @@ fun UserSearchItem(
     email: String,
     userAuth: String,
     icon: @Composable () -> Unit,
-    changeUserAuth: (String) -> Unit
+    onChangeUserAuth: (String) -> Unit
 ) {
-    val (value, onValueChanged) = remember { mutableStateOf(userAuth) }
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
     val authOptions = listOf("Admin", "Member")
 
@@ -76,55 +75,58 @@ fun UserSearchItem(
             )
         }
 
-        Column {
-            Row(modifier = Modifier.clickable { setExpanded(true) }) {
-                Text(text = value, fontSize = TextMedium)
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "유저 권한 설정"
-                )
-            }
-
-            DropDownMemberAuth(
-                expanded = expanded,
-                setExpanded = setExpanded,
-                authOptions = authOptions,
-                changeUserAuth = changeUserAuth,
-                onValueChanged = onValueChanged
-            )
-        }
+        DropDownMemberAuth(
+            userAuth = userAuth,
+            expanded = expanded,
+            setExpanded = setExpanded,
+            authOptions = authOptions,
+            onChangeUserAuth = onChangeUserAuth
+        )
     }
 }
 
 @Composable
 private fun DropDownMemberAuth(
+    modifier: Modifier = Modifier,
+    userAuth: String,
     expanded: Boolean,
     setExpanded: (Boolean) -> Unit,
     authOptions: List<String>,
-    changeUserAuth: (String) -> Unit,
-    onValueChanged: (String) -> Unit,
+    onChangeUserAuth: (String) -> Unit
 ) {
-    DropdownMenu(
-        containerColor = White,
-        expanded = expanded,
-        onDismissRequest = { setExpanded(false) }
-    ) {
-        authOptions.forEach { option ->
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        text = option,
-                        fontSize = TextMedium,
-                        fontWeight = FontWeight.Normal,
-                    )
-                },
+    val (value, onValueChanged) = remember { mutableStateOf(userAuth) }
 
-                onClick = {
-                    onValueChanged(option)
-                    changeUserAuth(option)
-                    setExpanded(false)
-                }
+    Column(modifier = modifier) {
+        Row(modifier = Modifier.clickable { setExpanded(true) }) {
+            Text(text = value, fontSize = TextMedium)
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "유저 권한 설정"
             )
+        }
+
+        DropdownMenu(
+            containerColor = White,
+            expanded = expanded,
+            onDismissRequest = { setExpanded(false) }
+        ) {
+            authOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = option,
+                            fontSize = TextMedium,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    },
+
+                    onClick = {
+                        onValueChanged(option)
+                        onChangeUserAuth(option)
+                        setExpanded(false)
+                    }
+                )
+            }
         }
     }
 }

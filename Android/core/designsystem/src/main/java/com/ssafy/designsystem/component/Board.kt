@@ -31,8 +31,8 @@ import com.ssafy.designsystem.values.Yellow
 
 @Composable
 fun Board(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String,
     containerColor: Color = Yellow,
     onBoardClick: () -> Unit,
     onMenuClick: () -> Unit

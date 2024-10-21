@@ -16,9 +16,9 @@ import com.ssafy.designsystem.values.White
 
 @Composable
 fun NegativeButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     color: Color = ReversePrimary,
     textColor: Color = White,
     cornerRadius: Dp = CornerSmall

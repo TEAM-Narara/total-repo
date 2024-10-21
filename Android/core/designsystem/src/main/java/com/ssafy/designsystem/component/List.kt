@@ -41,9 +41,9 @@ import com.ssafy.designsystem.values.White
 
 @Composable
 fun List(
+    modifier: Modifier = Modifier,
     title: String,
     onTitleChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
     isWatching: Boolean = false,
     addCard: () -> Unit,
     addPhoto: () -> Unit,
