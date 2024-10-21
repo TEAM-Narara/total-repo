@@ -16,7 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Subject
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.outlined.ChatBubble
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -91,7 +91,7 @@ fun CardItem(
                 }
                 if (description) IconText(icon = Icons.AutoMirrored.Filled.Subject, text = "")
                 if (commentCount != 0) IconText(
-                    icon = Icons.Outlined.ChatBubble,
+                    icon = Icons.Default.ChatBubbleOutline,
                     text = "$commentCount"
                 )
             }
