@@ -17,12 +17,15 @@ val MarginDefault = 16.dp
 
 val PaddingZero = 0.dp
 val PaddingOne = 1.dp
+val PaddingTwo = 2.dp
 val PaddingXSmall = 4.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
+val PaddingSemiLarge = 20.dp
 val PaddingLarge = 24.dp
-val PaddingXLarge = 32.dp
+val PaddingSemiXLarge = 32.dp
+val PaddingXLarge = 64.dp
 
 val IconXLarge = 48.dp
 val IconLarge = 36.dp
@@ -32,8 +35,8 @@ val IconSmall = 18.dp
 val SpacerMedium = 10.dp
 
 val CornerSmall = 5.dp
+val CornerMedium = 8.dp
 val CornerLarge = 12.dp
-
 
 val BorderDefault = 1.dp
 

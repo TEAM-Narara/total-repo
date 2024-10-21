@@ -2,6 +2,7 @@ package com.ssafy.designsystem.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material3.Card
@@ -21,67 +20,52 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.designsystem.R
+import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.ListWidth
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingSmall
-import com.ssafy.designsystem.values.SpacerMedium
+import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.White
 
 @Composable
-fun List(
+fun ListItem(
     modifier: Modifier = Modifier,
     title: String,
     onTitleChange: (String) -> Unit,
     isWatching: Boolean = false,
     addCard: () -> Unit,
     addPhoto: () -> Unit,
-    cardList: List<Any> = emptyList(),
     maxTitleLength: Int = 15,
+    cardList: @Composable () -> Unit = {},
 ) {
-    val (value, onValueChange) = remember { mutableStateOf(title) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
-
     Card(
         modifier = modifier.width(ListWidth),
+        shape = RoundedCornerShape(CornerMedium),
         colors = CardDefaults.cardColors().copy(containerColor = White),
         elevation = CardDefaults.cardElevation(
             defaultElevation = ElevationDefault
-        )
+        ),
     ) {
         Column(
             modifier = Modifier
                 .padding(PaddingDefault)
-                .weight(1f, false)
+                .weight(1f, false),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                BasicTextField(
-                    value = value,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= maxTitleLength) onValueChange(newValue)
-                    },
+                EditableText(
+                    text = title,
+                    onTextChanged = onTitleChange,
                     modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    textStyle = TextStyle(fontSize = TextMedium),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                            onTitleChange(value)
-                        }
-                    )
+                    maxTitleLength = maxTitleLength
                 )
 
                 if (isWatching) {
@@ -93,16 +77,9 @@ fun List(
                 }
             }
 
-            LazyColumn {
-                items(cardList) { card ->
-                    Card(card)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(SpacerMedium))
+            cardList()
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-
                 Box(modifier = Modifier
                     .clickable { addCard() }
                     .weight(1f)
@@ -121,6 +98,26 @@ fun List(
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListItemPreview() {
+    ListItem(
+        title = "title",
+        isWatching = true,
+        onTitleChange = {},
+        addCard = {},
+        addPhoto = {},
+    ) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(PaddingMedium)) {
+            item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
+            items(3) {
+                CardPreview()
+            }
+            item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
         }
     }
 }
