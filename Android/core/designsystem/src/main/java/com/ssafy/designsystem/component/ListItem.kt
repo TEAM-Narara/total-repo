@@ -40,10 +40,10 @@ import com.ssafy.designsystem.values.White
 fun ListItem(
     modifier: Modifier = Modifier,
     title: String,
-    onTitleChange: (String) -> Unit = {},
+    onTitleChange: (String) -> Unit,
     isWatching: Boolean = false,
-    addCard: () -> Unit = {},
-    addPhoto: () -> Unit = {},
+    addCard: () -> Unit,
+    addPhoto: () -> Unit,
     maxTitleLength: Int = 15,
     cardList: @Composable () -> Unit = {},
 ) {
@@ -107,7 +107,10 @@ fun ListItem(
 private fun ListItemPreview() {
     ListItem(
         title = "title",
-        isWatching = true
+        isWatching = true,
+        onTitleChange = {},
+        addCard = {},
+        addPhoto = {},
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(PaddingMedium)) {
             item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
