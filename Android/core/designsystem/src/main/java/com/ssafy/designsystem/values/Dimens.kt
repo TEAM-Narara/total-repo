@@ -27,6 +27,7 @@ val IconSmall = 18.dp
 val SpacerMedium = 10.dp
 
 val CornerSmall = 5.dp
+val CornerMedium = 8.dp
 
 val BorderDefault = 1.dp
 
