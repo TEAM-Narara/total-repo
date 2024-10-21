@@ -5,10 +5,13 @@ import androidx.compose.ui.unit.sp
 
 
 val TextTitle = 28.sp
+val TextXLarge = 20.sp
 val TextLarge = 18.sp
 val TextMedium = 16.sp
 val TextSmall = 14.sp
 val TextXSmall = 12.sp
+
+val LineTitle = 32.sp
 
 val MarginDefault = 16.dp
 
@@ -18,6 +21,8 @@ val PaddingXSmall = 4.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
+val PaddingLarge = 24.dp
+val PaddingXLarge = 32.dp
 
 val IconXLarge = 48.dp
 val IconLarge = 36.dp
@@ -27,6 +32,8 @@ val IconSmall = 18.dp
 val SpacerMedium = 10.dp
 
 val CornerSmall = 5.dp
+val CornerLarge = 12.dp
+
 
 val BorderDefault = 1.dp
 
@@ -34,7 +41,11 @@ val ListWidth = 300.dp
 val CardWidth = 270.dp
 val BoardHeight = 130.dp
 
+val ElevationSmall = 2.dp
+val ElevationMedium = 4.dp
 val ElevationDefault = 6.dp
 
 val RadiusDefault = 8.dp
 val RadiusSMall = 6.dp
+
+val MascotDefault = 116.dp
