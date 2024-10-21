@@ -288,6 +288,7 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,intellij+iml,gradle,java,kotlin,windows,macos,git
 
-# resouce 아래 secret value 삭제
+# secret value 삭제
 src/main/resources/*.yml
 src/main/resources/*.properties
+superboard-secret-value/**
