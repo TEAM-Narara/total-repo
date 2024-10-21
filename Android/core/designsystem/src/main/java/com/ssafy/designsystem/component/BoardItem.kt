@@ -30,7 +30,7 @@ import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.Yellow
 
 @Composable
-fun Board(
+fun BoardItem(
     modifier: Modifier = Modifier,
     title: String,
     containerColor: Color = Yellow,
