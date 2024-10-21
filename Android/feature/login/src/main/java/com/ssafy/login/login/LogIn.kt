@@ -1,12 +1,13 @@
 package com.ssafy.login.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +26,10 @@ import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.EditText
 import com.ssafy.designsystem.component.FilledButton
 import com.ssafy.designsystem.component.LoginButton
-import com.ssafy.designsystem.values.CornerSmall
+import com.ssafy.designsystem.component.OutlineButton
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
-import com.ssafy.designsystem.values.Primary
 
 @Composable
 fun LogInScreen(
@@ -39,18 +39,20 @@ fun LogInScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = PaddingDefault),
+            .padding(horizontal = PaddingDefault)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(
             PaddingXSmall
         )
     ) {
         Spacer(modifier = Modifier.weight(.5f))
         Image(
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(id = R.drawable.big_logo),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(PaddingDefault),
@@ -78,18 +80,8 @@ fun LogInScreen(
                     PaddingDefault
                 )
         )
-        FilledButton(
-            onClick = { moveToSignUpScreen() },
-            text = "로그인"
-        )
-        FilledButton(
-            text = "회원가입",
-            onClick = { moveToSignUpScreen() },
-            color = Color.White,
-            textColor = Primary,
-            cornerRadius = CornerSmall,
-            borderSize=1.dp,
-        )
+        FilledButton(onClick = { moveToSignUpScreen() }, text = "로그인")
+        OutlineButton(text = "회원가입", onClick = { moveToSignUpScreen() })
 
         HorizontalDivider(
             modifier = Modifier

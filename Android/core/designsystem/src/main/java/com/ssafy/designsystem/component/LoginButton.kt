@@ -46,16 +46,15 @@ fun LoginButton(
                         .weight(1.0f)
                 )
             }
-            Spacer(modifier = Modifier.weight(weight = 1.1f))
+            Spacer(modifier = Modifier.weight(weight = .5f))
             Text(
                 text = content,
                 fontSize = TextMedium,
                 color = textColor,
                 modifier = Modifier
-                    .weight(weight = 2.0f)
                     .padding(PaddingTwo)
             )
-            Spacer(modifier = Modifier.weight(weight = 1.1f))
+            Spacer(modifier = Modifier.weight(weight = 1f))
         }
     }
 }
