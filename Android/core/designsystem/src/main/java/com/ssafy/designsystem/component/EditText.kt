@@ -19,6 +19,7 @@ import com.ssafy.designsystem.values.LightGray
 import com.ssafy.designsystem.values.PaddingOne
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingZero
+import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.values.White
 
@@ -39,7 +40,8 @@ fun EditText(
 
         Text(
             text = title,
-            fontSize = TextSmall
+            fontSize = TextSmall,
+            color = Primary
         )
 
         BasicTextField(
