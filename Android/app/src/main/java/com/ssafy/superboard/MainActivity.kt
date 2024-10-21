@@ -8,6 +8,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.superboard.navigation.SuperBoardNavHost
@@ -27,6 +29,13 @@ class MainActivity : ComponentActivity() {
                     SuperBoardApp()
                 }
             }
+        }
+
+        window.apply {
+            statusBarColor = Color.White.toArgb()
+            navigationBarColor = Color.White.toArgb()
+            WindowInsetsControllerCompat(this, decorView).isAppearanceLightStatusBars = true
+            WindowInsetsControllerCompat(this, decorView).isAppearanceLightNavigationBars = true
         }
     }
 
