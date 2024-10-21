@@ -1,17 +1,13 @@
 package com.ssafy.login.login
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,13 +23,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.EditText
+import com.ssafy.designsystem.component.FilledButton
 import com.ssafy.designsystem.component.LoginButton
+import com.ssafy.designsystem.values.CornerSmall
 import com.ssafy.designsystem.values.PaddingDefault
-import com.ssafy.designsystem.values.PaddingTwo
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.Primary
-import com.ssafy.designsystem.values.TextMedium
 
 @Composable
 fun LogInScreen(
@@ -82,29 +78,19 @@ fun LogInScreen(
                     PaddingDefault
                 )
         )
-        Button(
+        FilledButton(
             onClick = { moveToSignUpScreen() },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(Primary)
-        ) {
-            Text(text = "로그인", fontSize = TextMedium, modifier = Modifier.padding(PaddingTwo))
-        }
+            text = "로그인"
+        )
+        FilledButton(
+            text = "회원가입",
+            onClick = { moveToSignUpScreen() },
+            color = Color.White,
+            textColor = Primary,
+            cornerRadius = CornerSmall,
+            borderSize=1.dp,
+        )
 
-        Button(
-            onClick = { moveToSignUpScreen() },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, Primary),
-            colors = ButtonDefaults.outlinedButtonColors(Color.White)
-        ) {
-            Text(
-                text = "회원가입",
-                color = Primary,
-                fontSize = TextMedium,
-                modifier = Modifier.padding(PaddingTwo)
-            )
-        }
         HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
