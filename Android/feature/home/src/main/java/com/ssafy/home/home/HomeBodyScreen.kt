@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.ssafy.designsystem.R
-import com.ssafy.designsystem.component.Board
+import com.ssafy.designsystem.component.BoardItem
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.Yellow
 
@@ -44,7 +44,7 @@ fun HomeBodyScreen(
 
         items(boards.size) {
             // TODO : Board에 대한 정보를 전달합니다.
-            Board(
+            BoardItem(
                 title = "Board $it",
                 onBoardClick = { moveToBoardScreen(it.toLong()) },
                 containerColor = Yellow,
