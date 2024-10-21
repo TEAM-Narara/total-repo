@@ -35,7 +35,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        boards = uiState.boards,
+        workSpace = uiState.workSpace,
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
     )
@@ -43,7 +43,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
-    boards: List<Any>,
+    workSpace: Any?,
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit
 ) {
@@ -62,7 +62,7 @@ private fun HomeScreen(
             )
         },
         floatingActionButton = {
-            if (boards.isNotEmpty()) {
+            if (workSpace != null) {
                 ExtendedFloatingActionButton(
                     containerColor = Primary,
                     contentColor = White,
@@ -89,10 +89,11 @@ private fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        if (boards.isNotEmpty()) {
+        if (workSpace != null) {
             HomeBodyScreen(
                 modifier = Modifier.padding(innerPadding),
-                boards = boards,
+                // TODO : Board에 대한 정보를 전달합니다.
+                boards = List(4) { Any() },
                 spanCount = spanCount,
                 moveToBoardScreen = moveToBoardScreen
             )
@@ -109,7 +110,7 @@ private fun HomeScreen(
 @Composable
 fun GreetingPreview() {
     HomeScreen(
-        boards = List(4) { Any() },
+        workSpace = Any(),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {}
     )
