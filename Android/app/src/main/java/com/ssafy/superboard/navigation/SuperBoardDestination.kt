@@ -28,6 +28,13 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             },
             moveToCreateNewBoardScreen = {
                 // TODO : navigate to create new board screen
+            },
+            moveToLoginScreen = {
+                navController.navigate(LOGIN) {
+                    popUpTo(HOME) {
+                        inclusive = true
+                    }
+                }
             }
         )
     }
