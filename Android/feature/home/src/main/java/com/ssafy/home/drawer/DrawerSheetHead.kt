@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -48,7 +48,7 @@ fun DrawerSheetHead(
                 .align(Alignment.TopEnd)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowForward,
+                imageVector = Icons.AutoMirrored.Default.Logout,
                 tint = White,
                 contentDescription = "로그아웃"
             )
