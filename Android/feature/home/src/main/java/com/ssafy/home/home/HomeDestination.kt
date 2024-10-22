@@ -9,14 +9,16 @@ fun NavGraphBuilder.homeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
-    moveToSettingScreen:()->Unit
+    moveToSettingScreen: () -> Unit,
+    moveToMyCardScreen: () -> Unit
 ) {
     composable(route = HOME) {
         HomeScreen(
             moveToBoardScreen = moveToBoardScreen,
             moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
             moveToLoginScreen = moveToLoginScreen,
-            moveToSettingScreen= moveToSettingScreen
+            moveToSettingScreen = moveToSettingScreen,
+            moveToMyCardScreen = moveToMyCardScreen
         )
     }
 }

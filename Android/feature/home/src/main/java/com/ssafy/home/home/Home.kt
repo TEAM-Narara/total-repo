@@ -2,6 +2,7 @@ package com.ssafy.home.home
 
 import android.app.Activity
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
@@ -31,7 +32,8 @@ fun HomeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
-    moveToSettingScreen: () -> Unit
+    moveToSettingScreen: () -> Unit,
+    moveToMyCardScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalContext.current as? Activity
@@ -47,7 +49,8 @@ fun HomeScreen(
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
         moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
         moveToLoginScreen = moveToLoginScreen,
-        moveToSettingScreen = moveToSettingScreen
+        moveToSettingScreen = moveToSettingScreen,
+        moveToMyCardScreen = moveToMyCardScreen
     )
 }
 
@@ -57,8 +60,9 @@ private fun HomeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToCreateNewWorkSpaceScreen: () -> Unit,
+    moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
-    moveToLoginScreen: () -> Unit
+    moveToMyCardScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -67,6 +71,12 @@ private fun HomeScreen(
 
     val url =
         "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z"
+
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch {
+            drawerState.close()
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -84,7 +94,7 @@ private fun HomeScreen(
                 workspaceList = List(4) { "손오공's workspace" },
                 onAddWorkSpaceClick = { /*TODO*/ },
                 onMyBoardClick = { /*TODO*/ },
-                onMyCardClick = { /*TODO*/ },
+                onMyCardClick = moveToMyCardScreen,
                 onSettingClick = { /*TODO*/ },
                 onLogoutClick = moveToLoginScreen,
                 onWorkSpaceClick = { /*TODO*/ }
@@ -98,7 +108,7 @@ private fun HomeScreen(
                     onDrawerClick = { scope.launch { drawerState.open() } },
                     onSearchClick = { /*TODO*/ },
                     onAlarmClick = { /*TODO*/ },
-                    onMenuClick = { moveToSettingScreen() }
+                    onMenuClick = moveToSettingScreen
                 )
             },
             floatingActionButton = {
@@ -136,6 +146,7 @@ fun GreetingPreview() {
         moveToCreateNewBoardScreen = {},
         moveToCreateNewWorkSpaceScreen = {},
         moveToLoginScreen = {},
-        moveToSettingScreen = {}
+        moveToSettingScreen = {},
+        moveToMyCardScreen = {}
     )
 }
