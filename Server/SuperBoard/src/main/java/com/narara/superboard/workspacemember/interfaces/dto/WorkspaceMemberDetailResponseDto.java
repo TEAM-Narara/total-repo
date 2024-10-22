@@ -1,7 +1,10 @@
 package com.narara.superboard.workspacemember.interfaces.dto;
 
+import lombok.Builder;
+
+@Builder
 public record WorkspaceMemberDetailResponseDto(
-        Long memberId,
+        Long id,
         String email,
         String name,
         String profileImgUrl,

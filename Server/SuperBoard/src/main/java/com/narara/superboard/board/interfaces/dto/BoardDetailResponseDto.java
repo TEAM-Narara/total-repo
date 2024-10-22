@@ -1,7 +1,10 @@
 package com.narara.superboard.board.interfaces.dto;
 
+import lombok.Builder;
+
+@Builder
 public record BoardDetailResponseDto(
-        Long boardId,
+        Long id,
         String name,
         String backgroundType,
         String backgroundValue
