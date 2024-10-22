@@ -35,6 +35,12 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
+    public void deleteWorkSpace(Long workSpaceId) {
+        WorkSpace workSpace = getWorkSpace(workSpaceId);
+        workSpaceRepository.delete(workSpace);
+    }
+
+    @Override
     public WorkSpace getWorkSpace(Long workSpaceId) {
         return workSpaceRepository.findById(workSpaceId)
                 .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));

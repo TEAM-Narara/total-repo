@@ -8,6 +8,7 @@ public interface WorkSpaceService {
 
     void createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto);
     WorkSpace updateWorkSpace(Long workSpaceId, WorkspaceUpdateRequestDto workspaceUpdateRequestDto);
+    void deleteWorkSpace(Long workSpaceId);
     WorkSpace getWorkSpace(Long workSpaceId);
 
 }
