@@ -1,6 +1,8 @@
 package com.narara.superboard.worksapce.service;
 
 
+import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
+import com.narara.superboard.worksapce.interfaces.dto.CreateWorkspaceDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -27,7 +29,7 @@ class WorkSpaceServiceTest {
     void testWorkSpaceEntityCreation(String name, String description) {
         CreateWorkspaceDto createWorkspaceDto = new CreateWorkspaceDto(name, description);
 
-        assertThrows(IllegalArgumentException.class, () -> workSpaceService.createWorkSpace(createWorkspaceDto));
+        assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceService.createWorkSpace(createWorkspaceDto));
     }
 
     @DisplayName("워크스페이스가 정상적으로 생성된다.")
