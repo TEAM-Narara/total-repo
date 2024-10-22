@@ -30,10 +30,10 @@ import java.util.Collections;
                 version = "v1"
         ),
         servers = {
-                @Server(url = "/api", description = "통합 API 서버")
+                @Server(url = "/", description = "통합 API 서버")
         },
         tags = {
-                @Tag(name = "회원 관리"),
+                @Tag(name = "워크스페이스"),
         }
 )
 public class SwaggerConfiguration {
