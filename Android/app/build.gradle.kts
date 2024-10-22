@@ -55,6 +55,7 @@ android {
 dependencies {
     // 기능
     implementation(project(":feature:login"))
+    implementation(project(":feature:board"))
 
     // Hilt
     implementation(libs.hilt.android)
