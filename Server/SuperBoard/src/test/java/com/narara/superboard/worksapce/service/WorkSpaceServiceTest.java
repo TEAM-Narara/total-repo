@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 @DisplayName("워크스페이스 서비스 테스트")
 class WorkSpaceServiceTest {
@@ -28,4 +30,21 @@ class WorkSpaceServiceTest {
         assertThrows(IllegalArgumentException.class, () -> workSpaceService.createWorkSpace(createWorkspaceDto));
     }
 
+    @DisplayName("워크스페이스가 정상적으로 생성된다.")
+    @ParameterizedTest
+    @CsvSource({
+            "'나의 워크 스페이스', '워크스페이스 설명'",
+            "'workspace', '워크스페이스 설명'"
+    })
+    void testSuccessfulWorkSpaceCreation(String name, String description) {
+        // given
+        CreateWorkspaceDto createWorkspaceDto = new CreateWorkspaceDto(name, description);
+
+        // when
+        workSpaceService.createWorkSpace(createWorkspaceDto);
+
+        // then
+        // 메서드가 한 번 호출되었는지 확인
+        verify(workSpaceService, times(1)).createWorkSpace(createWorkspaceDto);
+    }
 }
