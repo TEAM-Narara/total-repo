@@ -2,6 +2,7 @@ package com.narara.superboard.worksapce.service;
 
 
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.worksapce.entity.WorkSpace;
 import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
@@ -10,15 +11,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("워크스페이스 서비스 테스트")
@@ -76,6 +78,33 @@ class WorkSpaceServiceTest {
         assertEquals("WorkSpace", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
 
         verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 확인
+    }
+
+
+    // WorkSpace 객체를 실제로 만들어서 테스트하기 위한 데이터 제공 메서드
+    static Stream<WorkSpace> provideWorkSpaces() {
+        return Stream.of(
+                new WorkSpace(1L, "Workspace 1", "Description 1"),
+                new WorkSpace(2L, "Workspace 2", "Description 2"),
+                new WorkSpace(3L, "Workspace 3", "Description 3")
+        );
+    }
+
+    @DisplayName("워크스페이스를 성공적으로 찾을 수 있는 경우")
+    @ParameterizedTest
+    @MethodSource("provideWorkSpaces")
+    void testGetWorkSpace_Success(WorkSpace workSpace) {
+        // given
+        Long workSpaceId = workSpace.getId();  // WorkSpace의 ID
+        when(workSpaceRepository.findById(workSpaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
+
+        // when
+        WorkSpace result = workSpaceService.getWorkSpace(workSpaceId);  // 실제 getWorkSpace 호출
+
+        // then
+        assertNotNull(result);  // 결과가 null이 아닌지 확인
+        assertEquals(workSpace, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
+        verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 검증
     }
 
 }
