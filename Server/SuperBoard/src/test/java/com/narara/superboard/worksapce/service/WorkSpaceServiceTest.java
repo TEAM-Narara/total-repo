@@ -44,7 +44,7 @@ class WorkSpaceServiceTest {
     }
 
 
-    @DisplayName("워크스페이스가 정상적으로 생성된다.")
+    @DisplayName("워크스페이스가 생성 성공 테스트")
     @ParameterizedTest
     @CsvSource({
             "'나의 워크 스페이스', '워크스페이스 설명'",
@@ -97,6 +97,30 @@ class WorkSpaceServiceTest {
                 () -> assertEquals(newDescription, result.getDescription()),
                 () -> verify(workSpaceRepository).findById(workspaceId)
         );
+    }
+
+    @DisplayName("워크스페이스 삭제 성공 테스트")
+    @Test
+    void deleteWorkSpace_Success() {
+        // Given
+        Long workspaceId = 1L;
+
+        // 가정: 이 ID에 대한 워크스페이스가 존재함
+        WorkSpace mockWorkSpace = WorkSpace.builder()
+                .id(workspaceId)
+                .name("my Workspace")
+                .description("my Description")
+                .build();
+
+        // getWorkSpace 메서드가 워크스페이스를 반환하도록 설정
+        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+
+        // When
+        workSpaceService.deleteWorkSpace(workspaceId);  // deleteWorkSpace 메서드 호출
+
+        // Then
+        verify(workSpaceRepository, times(1)).findById(workspaceId);
+        verify(workSpaceRepository, times(1)).delete(mockWorkSpace);
     }
 
     @DisplayName("워크스페이스를 찾을 수 없는 경우 예외 발생")
