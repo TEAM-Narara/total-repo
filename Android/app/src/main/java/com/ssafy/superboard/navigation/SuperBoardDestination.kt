@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.ssafy.home.home.HOME
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.setting.SETTING
+import com.ssafy.home.setting.settingScreen
 import com.ssafy.login.login.LOGIN
 import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SIGN_UP
@@ -32,6 +34,19 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             moveToLoginScreen = {
                 navController.navigate(LOGIN) {
                     popUpTo(HOME) {
+                        inclusive = true
+                    }
+                }
+            },
+            moveToSettingScreen = {
+                navController.navigate(SETTING)
+            }
+        )
+
+        settingScreen(
+            backHomeScreen = {
+                navController.navigate(HOME) {
+                    popUpTo(navController.graph.startDestinationId) {
                         inclusive = true
                     }
                 }

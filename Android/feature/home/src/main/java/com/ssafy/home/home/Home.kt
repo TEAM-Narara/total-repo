@@ -1,5 +1,6 @@
 package com.ssafy.home.home
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
@@ -10,9 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -25,16 +30,24 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
-    moveToLoginScreen: () -> Unit
+    moveToLoginScreen: () -> Unit,
+    moveToSettingScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val activity = LocalContext.current as? Activity
+    activity?.let {
+        WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            it.window.statusBarColor = Color.White.toArgb()
+        }
+    }
     HomeScreen(
         workSpace = uiState.workSpace,
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
         moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
-        moveToLoginScreen = moveToLoginScreen
+        moveToLoginScreen = moveToLoginScreen,
+        moveToSettingScreen = moveToSettingScreen
     )
 }
 
@@ -44,6 +57,7 @@ private fun HomeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToCreateNewWorkSpaceScreen: () -> Unit,
+    moveToSettingScreen: () -> Unit,
     moveToLoginScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -58,7 +72,13 @@ private fun HomeScreen(
         drawerState = drawerState,
         drawerContent = {
             DrawerSheet(
-                icon = { AsyncImage(model = url, contentDescription = null, contentScale= ContentScale.Crop) },
+                icon = {
+                    AsyncImage(
+                        model = url,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                },
                 nickname = "손오공",
                 email = "monkey@naver.com",
                 workspaceList = List(4) { "손오공's workspace" },
@@ -78,7 +98,7 @@ private fun HomeScreen(
                     onDrawerClick = { scope.launch { drawerState.open() } },
                     onSearchClick = { /*TODO*/ },
                     onAlarmClick = { /*TODO*/ },
-                    onMenuClick = { /*TODO*/ }
+                    onMenuClick = { moveToSettingScreen() }
                 )
             },
             floatingActionButton = {
@@ -115,6 +135,7 @@ fun GreetingPreview() {
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
         moveToCreateNewWorkSpaceScreen = {},
-        moveToLoginScreen = {}
+        moveToLoginScreen = {},
+        moveToSettingScreen = {}
     )
 }
