@@ -52,7 +52,7 @@ class WorkSpaceServiceTest {
     })
     void testSuccessfulWorkSpaceCreation(String name, String description) {
         // given
-        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name, description);
+        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name);
 
         // when
         workSpaceService.createWorkSpace(workspaceCreateDto);
@@ -74,12 +74,12 @@ class WorkSpaceServiceTest {
         WorkSpace existingWorkspace = WorkSpace.builder()
                 .id(workspaceId)
                 .name("기존 워크스페이스")
-                .description("기존 설명")
+//                .description("기존 설명")
                 .build();
 
         WorkspaceUpdateRequestDto updateRequest = WorkspaceUpdateRequestDto.builder()
                 .name(newName)
-                .description(newDescription)
+//                .description(newDescription)
                 .build();
 
 
@@ -94,7 +94,7 @@ class WorkSpaceServiceTest {
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(newName, result.getName()),
-                () -> assertEquals(newDescription, result.getDescription()),
+//                () -> assertEquals(newDescription, result.getDescription()),
                 () -> verify(workSpaceRepository).findById(workspaceId)
         );
     }
@@ -109,7 +109,7 @@ class WorkSpaceServiceTest {
         WorkSpace mockWorkSpace = WorkSpace.builder()
                 .id(workspaceId)
                 .name("my Workspace")
-                .description("my Description")
+//                .description("my Description")
                 .build();
 
         // getWorkSpace 메서드가 워크스페이스를 반환하도록 설정
@@ -145,9 +145,15 @@ class WorkSpaceServiceTest {
     // WorkSpace 객체를 실제로 만들어서 테스트하기 위한 데이터 제공 메서드
     static Stream<WorkSpace> provideWorkSpaces() {
         return Stream.of(
-                new WorkSpace(1L, "Workspace 1", "Description 1"),
-                new WorkSpace(2L, "Workspace 2", "Description 2"),
-                new WorkSpace(3L, "Workspace 3", "Description 3")
+                new WorkSpace(1L, "Workspace 1"
+//                        , "Description 1"
+                ),
+                new WorkSpace(2L, "Workspace 2"
+//                        , "Description 2"
+                ),
+                new WorkSpace(3L, "Workspace 3"
+//                        , "Description 3"
+                )
         );
     }
 

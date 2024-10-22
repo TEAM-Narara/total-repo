@@ -23,19 +23,17 @@ public class WorkSpace {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "description", nullable = true)
-    private String description;
 
     public static WorkSpace createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto) {
         return WorkSpace.builder()
                 .name(workspaceRequestCreateDto.name())
-                .description(workspaceRequestCreateDto.description())
+//                .description(workspaceRequestCreateDto.description())
                 .build();
     }
 
     public WorkSpace updateWorkSpace(WorkspaceUpdateRequestDto workspaceUpdateRequestDto) {
         this.name = workspaceUpdateRequestDto.name();
-        this.description = workspaceUpdateRequestDto.description();
+//        this.description = workspaceUpdateRequestDto.description();
         return this;
     }
 }

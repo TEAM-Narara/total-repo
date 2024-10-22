@@ -30,7 +30,7 @@ class WorkSpaceValidatorTest {
             "'', '워크스페이스 설명'"  // 이름이 빈 문자열인 경우
     })
     void testWorkSpaceEntityCreation(String name, String description) {
-        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name, description);
+        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name);
 
         assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceCreateDto));
     }
@@ -42,7 +42,7 @@ class WorkSpaceValidatorTest {
             "'', '워크스페이스 설명'"  // 이름이 빈 문자열인 경우
     })
     void testWorkSpaceEntityUpdate(String name, String description) {
-        WorkspaceUpdateRequestDto workspaceUpdateRequestDto = new WorkspaceUpdateRequestDto(name, description);
+        WorkspaceUpdateRequestDto workspaceUpdateRequestDto = new WorkspaceUpdateRequestDto(name);
 
         assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto));
     }

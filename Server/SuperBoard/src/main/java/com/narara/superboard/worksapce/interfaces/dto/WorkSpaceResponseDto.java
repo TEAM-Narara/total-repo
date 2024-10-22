@@ -1,4 +1,6 @@
 package com.narara.superboard.worksapce.interfaces.dto;
 
-public record WorkSpaceResponseDto(String name, String description) {
+public record WorkSpaceResponseDto(
+//        String description,
+        String name) {
 }
