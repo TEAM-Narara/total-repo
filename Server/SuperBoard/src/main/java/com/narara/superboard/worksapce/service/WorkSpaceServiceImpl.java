@@ -63,6 +63,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public WorkspaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
         List<Board> BoardList = boardRepository.findByAllWorkspaceId(workSpaceId);
+        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceBoardRepository.findByAllWorkspaceId(workSpaceId);
 
         List<BoardDetailResponseDto> boardDetailResponseDtoList= new ArrayList<>();
 
