@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.sp
 
 
 val TextTitle = 28.sp
+val TextXXLarge = 22.sp
 val TextXLarge = 20.sp
 val TextLarge = 18.sp
 val TextMedium = 16.sp
@@ -27,6 +28,7 @@ val PaddingLarge = 24.dp
 val PaddingSemiXLarge = 32.dp
 val PaddingXLarge = 64.dp
 
+val IconXXLarge = 80.dp
 val IconXLarge = 48.dp
 val IconLarge = 36.dp
 val IconMedium = 24.dp
@@ -52,3 +54,4 @@ val RadiusDefault = 8.dp
 val RadiusSMall = 6.dp
 
 val MascotDefault = 116.dp
+val BoxDefault = 55.dp
