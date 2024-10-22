@@ -5,6 +5,7 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.worksapce.entity.WorkSpace;
 import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,6 +61,42 @@ class WorkSpaceServiceTest {
         // 메서드가 한 번 호출되었는지 확인
         verify(workSpaceValidator, times(1)).validateNameIsPresent(workspaceCreateDto);
         verify(workSpaceRepository, times(1)).save(any());
+    }
+
+    @DisplayName("workspace 이름과 설명 수정 성공")
+    @Test
+    void updateWorkspaceSuccess() {
+        // Given
+        Long workspaceId = 1L;
+        String newName = "새로운 워크스페이스";
+        String newDescription = "새로운 설명";
+
+        WorkSpace existingWorkspace = WorkSpace.builder()
+                .id(workspaceId)
+                .name("기존 워크스페이스")
+                .description("기존 설명")
+                .build();
+
+        WorkspaceUpdateRequestDto updateRequest = WorkspaceUpdateRequestDto.builder()
+                .name(newName)
+                .description(newDescription)
+                .build();
+
+
+//        즉, 기존의 워크스페이스가 존재한다는 시나리오를 시뮬레이션합니다.
+        when(workSpaceRepository.findById(workspaceId))
+                .thenReturn(Optional.of(existingWorkspace));
+
+        // When
+        WorkSpace result = workSpaceService.updateWorkSpace(workspaceId, updateRequest);
+
+        // Then
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(newName, result.getName()),
+                () -> assertEquals(newDescription, result.getDescription()),
+                () -> verify(workSpaceRepository).findById(workspaceId)
+        );
     }
 
     @DisplayName("워크스페이스를 찾을 수 없는 경우 예외 발생")
