@@ -1,6 +1,7 @@
 package com.narara.superboard.worksapce.entity;
 
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,8 +10,8 @@ import lombok.*;
 @Setter(value = AccessLevel.PROTECTED)
 @Table(name = "workspace")
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@Builder
 public class WorkSpace {
 
     @Id
@@ -25,10 +26,16 @@ public class WorkSpace {
     @Column(name = "description", nullable = true)
     private String description;
 
-    public static WorkSpace createWorkSpace(WorkspaceCreateDto workspaceCreateDto) {
+    public static WorkSpace createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto) {
         return WorkSpace.builder()
-                .name(workspaceCreateDto.name())
-                .description(workspaceCreateDto.description())
+                .name(workspaceRequestCreateDto.name())
+                .description(workspaceRequestCreateDto.description())
                 .build();
+    }
+
+    public WorkSpace updateWorkSpace(WorkspaceUpdateRequestDto workspaceUpdateRequestDto) {
+        this.name = workspaceUpdateRequestDto.name();
+        this.description = workspaceUpdateRequestDto.description();
+        return this;
     }
 }
