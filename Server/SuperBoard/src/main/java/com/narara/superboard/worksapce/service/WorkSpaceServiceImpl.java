@@ -2,7 +2,7 @@ package com.narara.superboard.worksapce.service;
 
 import com.narara.superboard.worksapce.entity.WorkSpace;
 import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.worksapce.interfaces.dto.CreateWorkspaceDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceValidator workSpaceValidator;
 
     @Override
-    public void createWorkSpace(CreateWorkspaceDto createWorkspaceDto) {
-        workSpaceValidator.validateCreateDto(createWorkspaceDto);
+    public void createWorkSpace(WorkspaceCreateDto workspaceCreateDto) {
+        workSpaceValidator.validateCreateDto(workspaceCreateDto);
 
-        WorkSpace workSpace = WorkSpace.createWorkSpace(createWorkspaceDto);
+        WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateDto);
         workSpaceRepository.save(workSpace);
     }
 }

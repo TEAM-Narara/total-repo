@@ -1,9 +1,8 @@
 package com.narara.superboard.worksapce.service;
 
-import com.narara.superboard.worksapce.entity.WorkSpace;
-import com.narara.superboard.worksapce.interfaces.dto.CreateWorkspaceDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
 
 public interface WorkSpaceService {
 
-    void createWorkSpace(CreateWorkspaceDto createWorkspaceDto);
+    void createWorkSpace(WorkspaceCreateDto workspaceCreateDto);
 }

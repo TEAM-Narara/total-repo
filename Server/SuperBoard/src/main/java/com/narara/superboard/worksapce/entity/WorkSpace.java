@@ -1,6 +1,6 @@
 package com.narara.superboard.worksapce.entity;
 
-import com.narara.superboard.worksapce.interfaces.dto.CreateWorkspaceDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,10 +25,10 @@ public class WorkSpace {
     @Column(name = "description", nullable = true)
     private String description;
 
-    public static WorkSpace createWorkSpace(CreateWorkspaceDto createWorkspaceDto) {
+    public static WorkSpace createWorkSpace(WorkspaceCreateDto workspaceCreateDto) {
         return WorkSpace.builder()
-                .name(createWorkspaceDto.name())
-                .description(createWorkspaceDto.description())
+                .name(workspaceCreateDto.name())
+                .description(workspaceCreateDto.description())
                 .build();
     }
 }
