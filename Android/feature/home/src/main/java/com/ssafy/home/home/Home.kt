@@ -1,5 +1,6 @@
 package com.ssafy.home.home
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,9 +16,13 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.values.CornerLarge
@@ -30,15 +35,23 @@ import com.ssafy.designsystem.values.White
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit
+    moveToCreateNewBoardScreen: () -> Unit,
+    moveToSettingScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val activity = LocalContext.current as? Activity
+    activity?.let {
+        WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            it.window.statusBarColor = Color.White.toArgb()
+        }
+    }
     HomeScreen(
         workSpace = uiState.workSpace,
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
-        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ }
+        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
+        moveToSettingScreen = moveToSettingScreen
     )
 }
 
@@ -47,7 +60,8 @@ private fun HomeScreen(
     workSpace: Any?,
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
-    moveToCreateNewWorkSpaceScreen: () -> Unit
+    moveToCreateNewWorkSpaceScreen: () -> Unit,
+    moveToSettingScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -60,7 +74,7 @@ private fun HomeScreen(
                 onDrawerClick = { /*TODO*/ },
                 onSearchClick = { /*TODO*/ },
                 onAlarmClick = { /*TODO*/ },
-                onMenuClick = { /*TODO*/ }
+                onMenuClick = { moveToSettingScreen() }
             )
         },
         floatingActionButton = {
@@ -115,6 +129,7 @@ fun GreetingPreview() {
         workSpace = Any(),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
-        moveToCreateNewWorkSpaceScreen = {}
+        moveToCreateNewWorkSpaceScreen = {},
+        moveToSettingScreen = {}
     )
 }

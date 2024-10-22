@@ -7,12 +7,14 @@ const val HOME = "HOME"
 
 fun NavGraphBuilder.homeScreen(
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit
+    moveToCreateNewBoardScreen: () -> Unit,
+    moveToSettingScreen:()->Unit
 ) {
     composable(route = HOME) {
         HomeScreen(
             moveToBoardScreen = moveToBoardScreen,
-            moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
+            moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
+            moveToSettingScreen= moveToSettingScreen
         )
     }
 }
