@@ -1,8 +1,5 @@
 package com.ssafy.home.setting
 
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
@@ -13,36 +10,7 @@ fun NavGraphBuilder.settingScreen(
 ) {
     composable(route = SETTING) {
         HomeSettingScreen(
-            images = listOf(
-                {
-                    Image(
-                        painter = painterResource(id = com.ssafy.designsystem.R.drawable.big_logo),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
-                },
-                {
-                    Image(
-                        painter = painterResource(id = com.ssafy.designsystem.R.drawable.logo_naver),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
-                },
-                {
-                    Image(
-                        painter = painterResource(id = com.ssafy.designsystem.R.drawable.logo_github),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
-                },
-                {
-                    Image(
-                        painter = painterResource(id = com.ssafy.designsystem.R.drawable.logo_naver),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
-                },
-            ),
+            workspaceId = 0,
             backHome = backHomeScreen
         )
     }
