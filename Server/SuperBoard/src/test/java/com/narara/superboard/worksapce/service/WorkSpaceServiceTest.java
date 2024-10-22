@@ -19,7 +19,6 @@ class WorkSpaceServiceTest {
     @InjectMocks
     private WorkSpaceService workSpaceService; // 테스트 대상 클래스
 
-
     @DisplayName("워크스페이스 생성 시, 이름이 없으면 에러가 발생한다.")
     @ParameterizedTest
     @CsvSource({
