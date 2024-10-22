@@ -1,41 +1,19 @@
 package com.ssafy.board
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mohamedrejeb.compose.dnd.drag.DropStrategy
-import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
-import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
-import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
-import com.ssafy.board.components.ListItem
+import com.ssafy.board.components.BoardItem
 import com.ssafy.board.components.TopAppBar
 import com.ssafy.board.data.BoardData
 import com.ssafy.board.data.CardData
 import com.ssafy.board.data.ListData
-import com.ssafy.board.data.ReorderCardData
-import com.ssafy.board.data.toReorderCardData
-import com.ssafy.designsystem.values.CornerMedium
-import com.ssafy.designsystem.values.ElevationLarge
-import com.ssafy.designsystem.values.PaddingDefault
-import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(
@@ -79,8 +57,8 @@ private fun BoardScreen(
             )
         },
     ) { paddingValues ->
-        BoardScreenBody(
-            modifier = Modifier.padding(paddingValues),
+        BoardItem(
+            modifier = Modifier.padding(paddingValues).fillMaxHeight(),
             boardData = uiState.boardData,
             onListTitleChanged = onListTitleChanged,
             onCardReordered = onCardReordered,
@@ -88,9 +66,6 @@ private fun BoardScreen(
         )
     }
 }
-
-@Composable
-private fun BoardScreenBody
 
 @Preview
 @Composable
