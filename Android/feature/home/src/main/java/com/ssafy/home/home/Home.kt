@@ -24,7 +24,8 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit
+    moveToCreateNewBoardScreen: () -> Unit,
+    moveToLoginScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -32,7 +33,8 @@ fun HomeScreen(
         workSpace = uiState.workSpace,
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
-        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ }
+        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
+        moveToLoginScreen = moveToLoginScreen
     )
 }
 
@@ -41,7 +43,8 @@ private fun HomeScreen(
     workSpace: Any?,
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
-    moveToCreateNewWorkSpaceScreen: () -> Unit
+    moveToCreateNewWorkSpaceScreen: () -> Unit,
+    moveToLoginScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -63,7 +66,7 @@ private fun HomeScreen(
                 onMyBoardClick = { /*TODO*/ },
                 onMyCardClick = { /*TODO*/ },
                 onSettingClick = { /*TODO*/ },
-                onLogoutClick = { /*TODO*/ },
+                onLogoutClick = moveToLoginScreen,
                 onWorkSpaceClick = { /*TODO*/ }
             )
         }
@@ -111,6 +114,7 @@ fun GreetingPreview() {
         workSpace = Any(),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
-        moveToCreateNewWorkSpaceScreen = {}
+        moveToCreateNewWorkSpaceScreen = {},
+        moveToLoginScreen = {}
     )
 }

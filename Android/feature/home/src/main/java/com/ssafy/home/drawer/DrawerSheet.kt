@@ -1,8 +1,8 @@
 package com.ssafy.home.drawer
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -70,7 +70,8 @@ fun DrawerSheet(
                 onSheetItemClick = { onMyBoardClick() }
             )
 
-            Box(
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(BoxDefault)
@@ -80,14 +81,12 @@ fun DrawerSheet(
                     text = "Workspaces",
                     fontSize = TextXXLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier.weight(1f)
                 )
 
                 IconButton(
                     onClick = { onAddWorkSpaceClick() },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .then(Modifier.size(IconLarge)),
+                    modifier = Modifier.then(Modifier.size(IconLarge)),
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Workspace 추가")
                 }
@@ -95,6 +94,7 @@ fun DrawerSheet(
 
             workspaceList.forEach { workspace ->
                 SheetItem(
+                    hasDivider = true,
                     sheetIcon = Icons.Default.Groups,
                     sheetName = workspace,
                     onSheetItemClick = { onWorkSpaceClick(workspace) }
@@ -102,12 +102,14 @@ fun DrawerSheet(
             }
 
             SheetItem(
+                hasDivider = true,
                 sheetIcon = Icons.Outlined.EmojiEmotions,
                 sheetName = "My Cards",
                 onSheetItemClick = { onMyCardClick() }
             )
 
             SheetItem(
+                hasDivider = true,
                 sheetIcon = Icons.Default.PersonOutline,
                 sheetName = "회원 정보 수정",
                 onSheetItemClick = { onSettingClick() })
