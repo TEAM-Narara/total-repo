@@ -42,6 +42,9 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             },
             moveToSettingScreen = {
                 navController.navigate(SETTING)
+            },
+            moveToMyCardScreen = {
+                navController.navigate(MY_CARD)
             }
         )
 
@@ -52,9 +55,6 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                         inclusive = true
                     }
                 }
-            },
-            moveToMyCardScreen = {
-                navController.navigate(MY_CARD)
             }
         )
 
