@@ -2,7 +2,7 @@ package com.narara.superboard.worksapce.service;
 
 
 import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,7 @@ class WorkSpaceServiceTest {
     })
     void testSuccessfulWorkSpaceCreation(String name, String description) {
         // given
-        WorkspaceCreateDto workspaceCreateDto = new WorkspaceCreateDto(name, description);
+        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name, description);
 
         // when
         workSpaceService.createWorkSpace(workspaceCreateDto);

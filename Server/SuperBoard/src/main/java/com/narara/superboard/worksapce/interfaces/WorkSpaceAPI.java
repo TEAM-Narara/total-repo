@@ -1,6 +1,6 @@
 package com.narara.superboard.worksapce.interfaces;
 
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceCreateDto;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface WorkSpaceAPI {
 
     @PostMapping()
-    void createWorkSpace(WorkspaceCreateDto workspaceCreateDto);
+    void createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto);
 
 }
