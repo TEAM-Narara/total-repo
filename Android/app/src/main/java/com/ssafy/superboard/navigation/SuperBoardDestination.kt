@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.ssafy.home.home.HOME
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.mycard.MY_CARD
+import com.ssafy.home.mycard.myCardScreen
 import com.ssafy.login.login.LOGIN
 import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SIGN_UP
@@ -35,6 +37,18 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                         inclusive = true
                     }
                 }
+            },
+            moveToMyCardScreen = {
+                navController.navigate(MY_CARD)
+            }
+        )
+
+        myCardScreen(
+            popUpToHome = {
+                navController.popBackStack()
+            },
+            moveToCardScreen = {
+                // TODO : navigate to card screen
             }
         )
     }

@@ -25,7 +25,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
-    moveToLoginScreen: () -> Unit
+    moveToLoginScreen: () -> Unit,
+    moveToMyCardScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -34,7 +35,8 @@ fun HomeScreen(
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
         moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
-        moveToLoginScreen = moveToLoginScreen
+        moveToLoginScreen = moveToLoginScreen,
+        moveToMyCardScreen = moveToMyCardScreen
     )
 }
 
@@ -44,7 +46,8 @@ private fun HomeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToCreateNewWorkSpaceScreen: () -> Unit,
-    moveToLoginScreen: () -> Unit
+    moveToLoginScreen: () -> Unit,
+    moveToMyCardScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -64,7 +67,7 @@ private fun HomeScreen(
                 workspaceList = List(4) { "손오공's workspace" },
                 onAddWorkSpaceClick = { /*TODO*/ },
                 onMyBoardClick = { /*TODO*/ },
-                onMyCardClick = { /*TODO*/ },
+                onMyCardClick = moveToMyCardScreen,
                 onSettingClick = { /*TODO*/ },
                 onLogoutClick = moveToLoginScreen,
                 onWorkSpaceClick = { /*TODO*/ }
@@ -115,6 +118,7 @@ fun GreetingPreview() {
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
         moveToCreateNewWorkSpaceScreen = {},
-        moveToLoginScreen = {}
+        moveToLoginScreen = {},
+        moveToMyCardScreen = {}
     )
 }
