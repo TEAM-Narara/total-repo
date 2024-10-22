@@ -12,6 +12,8 @@ import com.narara.superboard.worksapce.interfaces.dto.WorkspaceDetailResponseDto
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workspacemember.entity.WorkspaceMember;
+import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDetailResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardRepository boardRepository;
-    private final WorkSpaceBoardRepository workSpaceBoardRepository;
+    private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Override
     public void createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto) throws WorkspaceNameNotFoundException {
@@ -63,7 +65,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public WorkspaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
         List<Board> BoardList = boardRepository.findByAllWorkspaceId(workSpaceId);
-        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceBoardRepository.findByAllWorkspaceId(workSpaceId);
+        List<WorkspaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findByAllWorkspaceId(workSpaceId);
 
         List<BoardDetailResponseDto> boardDetailResponseDtoList= new ArrayList<>();
 
