@@ -60,19 +60,23 @@ fun ListItem(
                 .padding(PaddingDefault)
                 .weight(1f, false),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 EditableText(
                     text = title,
                     onTextChanged = onTitleChange,
-                    modifier = Modifier.weight(1f),
                     maxTitleLength = maxTitleLength
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 if (isWatching) {
                     Image(
                         modifier = Modifier.size(IconMedium),
                         painter = painterResource(id = R.drawable.watch),
-                        contentDescription = "watch"
+                        contentDescription = "watch",
                     )
                 }
             }
@@ -80,15 +84,14 @@ fun ListItem(
             cardList()
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier
-                    .clickable { addCard() }
-                    .weight(1f)
-                ) {
+                Box(modifier = Modifier.clickable { addCard() }) {
                     Text(
                         text = "+ Add Card", fontSize = TextMedium,
                         modifier = Modifier.padding(vertical = PaddingSmall)
                     )
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 Box(modifier = Modifier.clickable { addPhoto() }) {
                     Icon(

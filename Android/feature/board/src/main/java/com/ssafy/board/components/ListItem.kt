@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import com.mohamedrejeb.compose.dnd.annotation.ExperimentalDndApi
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
@@ -21,6 +23,8 @@ import com.ssafy.board.data.ListData
 import com.ssafy.board.data.ReorderCardData
 import com.ssafy.board.handleLazyListScroll
 import com.ssafy.designsystem.component.ListItem
+import com.ssafy.designsystem.values.CornerMedium
+import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingXSmall
 import kotlinx.coroutines.launch
@@ -45,30 +49,30 @@ fun ListItem(
 
     ReorderContainer(state = reorderState) {
         ListItem(
-            modifier = modifier
-                .dropTarget(
-                    key = listData.id,
-                    state = reorderState.dndState,
-                    dropAnimationEnabled = false,
-                    onDragEnter = { state ->
-                        collectionState.value = collection.toMutableList().apply {
-                            if (!remove(state.data)) {
-                                cardCollections[state.data.listId]?.let {
-                                    it.value = it.value.toMutableList().apply {
-                                        remove(state.data)
-                                    }
+            modifier = modifier.dropTarget(
+                key = listData.id,
+                state = reorderState.dndState,
+                dropAnimationEnabled = false,
+                onDragEnter = { state ->
+                    collectionState.value = collection.toMutableList().apply {
+                        if (!remove(state.data)) {
+                            cardCollections[state.data.listId]?.let {
+                                it.value = it.value.toMutableList().apply {
+                                    remove(state.data)
                                 }
                             }
-
-                            add(state.data.apply { this.listId = listData.id })
                         }
-                    },
-                    onDrop = { onCardReordered() },
-                ),
+
+                        add(state.data.apply { this.listId = listData.id })
+                    }
+                },
+                onDrop = { onCardReordered() },
+            ),
             title = listData.title,
             onTitleChange = onTitleChange,
             addCard = addCard,
             addPhoto = addPhoto,
+            isWatching = listData.isWatching,
         ) {
             LazyColumn(
                 state = cardLazyListState,
@@ -108,14 +112,20 @@ fun ListItem(
                         },
                         onDrop = { onCardReordered() },
                         draggableContent = {
-                            CardItem(cardData = cardData)
+                            CardItem(
+                                modifier = Modifier.shadow(
+                                    ElevationLarge,
+                                    shape = RoundedCornerShape(CornerMedium),
+                                ),
+                                cardData = cardData,
+                            )
                         }
                     ) {
                         CardItem(
-                            cardData = cardData,
                             modifier = Modifier.graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
                             },
+                            cardData = cardData,
                         )
                     }
                 }

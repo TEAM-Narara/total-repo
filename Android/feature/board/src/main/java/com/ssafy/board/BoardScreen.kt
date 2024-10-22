@@ -5,16 +5,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mohamedrejeb.compose.dnd.drag.DropStrategy
+import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
+import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.components.ListItem
 import com.ssafy.board.components.TopAppBar
@@ -23,7 +32,10 @@ import com.ssafy.board.data.CardData
 import com.ssafy.board.data.ListData
 import com.ssafy.board.data.ReorderCardData
 import com.ssafy.board.data.toReorderCardData
+import com.ssafy.designsystem.values.CornerMedium
+import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.PaddingDefault
+import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(
@@ -38,7 +50,8 @@ fun BoardScreen(
         uiState = uiState,
         onBoardTitleChanged = viewModel::updateBoardTitle,
         onListTitleChanged = viewModel::updateListTitle,
-        onCardReordered = viewModel::updateCard,
+        onCardReordered = viewModel::updateCardOrder,
+        onListReordered = viewModel::updateListOrder,
         popBack = popBack
     )
 }
@@ -50,6 +63,7 @@ private fun BoardScreen(
     onBoardTitleChanged: () -> Unit,
     onListTitleChanged: () -> Unit,
     onCardReordered: () -> Unit,
+    onListReordered: () -> Unit,
     popBack: () -> Unit,
 ) {
     Scaffold(
@@ -70,47 +84,13 @@ private fun BoardScreen(
             boardData = uiState.boardData,
             onListTitleChanged = onListTitleChanged,
             onCardReordered = onCardReordered,
+            onListReordered = onListReordered,
         )
     }
 }
 
 @Composable
-private fun BoardScreenBody(
-    modifier: Modifier = Modifier,
-    boardData: BoardData,
-    onListTitleChanged: () -> Unit,
-    onCardReordered: () -> Unit
-) {
-    val cardDndState = rememberReorderState<ReorderCardData>()
-    val cardCollections = mutableMapOf<String, MutableState<List<ReorderCardData>>>().apply {
-        boardData.listCollection.forEach { listData ->
-            this[listData.id] = remember {
-                mutableStateOf(listData.cardCollection.map {
-                    it.toReorderCardData(listData.id)
-                })
-            }
-        }
-    }
-
-    LazyRow(
-        modifier = modifier.padding(top = PaddingDefault),
-        horizontalArrangement = Arrangement.spacedBy(PaddingDefault)
-    ) {
-        item { Spacer(modifier = Modifier) }
-        items(boardData.listCollection, key = { it.id }) { listData ->
-            ListItem(
-                listData = listData,
-                reorderState = cardDndState,
-                cardCollections = cardCollections,
-                onTitleChange = { onListTitleChanged() },
-                onCardReordered = { onCardReordered() },
-                addCard = { },
-                addPhoto = { },
-            )
-        }
-        item { Spacer(modifier = Modifier) }
-    }
-}
+private fun BoardScreenBody
 
 @Preview
 @Composable
@@ -129,7 +109,8 @@ private fun BoardScreenPreview() {
                                 id = "card $listData$cardData",
                                 title = cardData.toString()
                             )
-                        }
+                        },
+                        isWatching = true
                     )
                 }
             )
@@ -137,6 +118,7 @@ private fun BoardScreenPreview() {
         onBoardTitleChanged = {},
         onListTitleChanged = {},
         onCardReordered = {},
+        onListReordered = {},
         popBack = {}
     )
 }

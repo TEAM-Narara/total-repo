@@ -26,7 +26,8 @@ class BoardViewModel @Inject constructor() : ViewModel() {
                                 id = "card $listData$cardData",
                                 title = cardData.toString(),
                             )
-                        }
+                        },
+                        isWatching = true
                     )
                 }
             )
@@ -35,5 +36,6 @@ class BoardViewModel @Inject constructor() : ViewModel() {
 
     fun updateBoardTitle() {}
     fun updateListTitle() {}
-    fun updateCard() {}
+    fun updateListOrder() {}
+    fun updateCardOrder() {}
 }
