@@ -29,9 +29,14 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public WorkSpace updateWorkSpace(Long workSpaceId, WorkspaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
-        WorkSpace workSpace = workSpaceRepository.findById(workSpaceId)
-                .orElseThrow(() -> new NotFoundEntityException("WorkSpace"));
+        WorkSpace workSpace = getWorkSpace(workSpaceId);
 
         return workSpace.updateWorkSpace(workspaceUpdateRequestDto);
+    }
+
+    @Override
+    public WorkSpace getWorkSpace(Long workSpaceId) {
+        return workSpaceRepository.findById(workSpaceId)
+                .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));
     }
 }
