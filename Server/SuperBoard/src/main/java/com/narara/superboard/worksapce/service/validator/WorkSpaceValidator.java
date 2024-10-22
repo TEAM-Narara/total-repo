@@ -1,8 +1,10 @@
-package com.narara.superboard.worksapce.service;
+package com.narara.superboard.worksapce.service.validator;
 
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
 import com.narara.superboard.worksapce.interfaces.dto.CreateWorkspaceDto;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WorkSpaceValidator {
 
     public void validateCreateDto(CreateWorkspaceDto createWorkspaceDto) {
