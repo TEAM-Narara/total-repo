@@ -6,5 +6,9 @@ import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 
 public interface BoardService {
     BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
+
     Long createBoard(BoardCreateRequestDto boardCreateRequestDto);
+
     Board getBoard(Long boardId);
+
+}
