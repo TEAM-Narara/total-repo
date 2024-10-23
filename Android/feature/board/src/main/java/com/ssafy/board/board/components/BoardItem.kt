@@ -86,7 +86,6 @@ fun BoardItem(
                                 handleLazyListScroll(
                                     lazyListState = listLazyListState,
                                     dropIndex = index,
-                                    indexOffset = 1,
                                     isRow = true
                                 )
                             }

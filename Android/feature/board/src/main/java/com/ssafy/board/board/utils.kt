@@ -6,7 +6,7 @@ import kotlinx.coroutines.coroutineScope
 suspend fun handleLazyListScroll(
     lazyListState: LazyListState,
     dropIndex: Int,
-    indexOffset: Int,
+    indexOffset: Int = 0,
     isRow: Boolean = false,
 ): Unit = coroutineScope {
     val targetIndex = dropIndex + indexOffset
