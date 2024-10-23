@@ -1,4 +1,4 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,9 +18,9 @@ import com.mohamedrejeb.compose.dnd.drop.dropTarget
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
-import com.ssafy.board.data.ListData
-import com.ssafy.board.data.ReorderCardData
-import com.ssafy.board.handleLazyListScroll
+import com.ssafy.board.board.data.ListData
+import com.ssafy.board.board.data.ReorderCardData
+import com.ssafy.board.board.handleLazyListScroll
 import com.ssafy.designsystem.component.ListItem
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
@@ -86,7 +86,7 @@ fun ListItem(
                         state = reorderState,
                         key = cardData.id,
                         data = cardData,
-                        zIndex = 1f,
+                        zIndex = 2f,
                         dropStrategy = DropStrategy.CenterDistance,
                         dragAfterLongPress = true,
                         onDragEnter = { state ->

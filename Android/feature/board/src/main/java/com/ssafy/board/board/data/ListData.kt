@@ -1,4 +1,4 @@
-package com.ssafy.board.data
+package com.ssafy.board.board.data
 
 data class ListData(
     val id: String,

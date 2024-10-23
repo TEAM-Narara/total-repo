@@ -1,4 +1,4 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,12 +22,12 @@ import com.mohamedrejeb.compose.dnd.drag.DropStrategy
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
-import com.ssafy.board.data.BoardData
-import com.ssafy.board.data.CardData
-import com.ssafy.board.data.ListData
-import com.ssafy.board.data.ReorderCardData
-import com.ssafy.board.data.toReorderCardData
-import com.ssafy.board.handleLazyListScroll
+import com.ssafy.board.board.data.BoardData
+import com.ssafy.board.board.data.CardData
+import com.ssafy.board.board.data.ListData
+import com.ssafy.board.board.data.ReorderCardData
+import com.ssafy.board.board.data.toReorderCardData
+import com.ssafy.board.board.handleLazyListScroll
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.PaddingDefault
@@ -71,6 +71,7 @@ fun BoardItem(
                     state = listDndState,
                     key = listData.id,
                     data = listData,
+                    zIndex = 1f,
                     dropStrategy = DropStrategy.CenterDistance,
                     dragAfterLongPress = true,
                     onDragEnter = { state ->

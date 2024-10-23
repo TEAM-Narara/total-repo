@@ -1,4 +1,4 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons

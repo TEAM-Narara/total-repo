@@ -1,4 +1,4 @@
-package com.ssafy.board
+package com.ssafy.board.board
 
 import androidx.compose.foundation.lazy.LazyListState
 import kotlinx.coroutines.coroutineScope

@@ -1,8 +1,8 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.ssafy.board.data.ReorderCardData
+import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.designsystem.component.CardItem
 
 @Composable
