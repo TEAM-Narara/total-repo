@@ -50,5 +50,6 @@ public class CoverValidator {
         }
     }
 
+    // TODO: color는 #FFF 이렇게오고 image는 https로 시작하는지 확인하는 로직 추가
 
 }
