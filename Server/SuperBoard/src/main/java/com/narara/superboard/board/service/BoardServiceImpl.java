@@ -1,9 +1,13 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.entity.Board.BoardBuilder;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastrucutre.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
+import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardValidator boardValidator;
     private final CoverHandler coverHandler;
 
     @Override
@@ -38,5 +43,21 @@ public class BoardServiceImpl implements BoardService {
         return new BoardCollectionResponseDto(boardDetailResponseDtoList);
     }
 
+    @Override
+    public Long createBoard(BoardCreateRequestDto boardCreateRequestDto) {
+        boardValidator.validateNameIsPresent(boardCreateRequestDto);
+        boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
+        boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
+
+        Board board = Board.builder()
+                .cover(boardCreateRequestDto.background())
+                .name(boardCreateRequestDto.name())
+                .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
+                .build();
+
+        Board saveBoard = boardRepository.save(board);
+
+        return saveBoard.getId();
+    }
 
 }
