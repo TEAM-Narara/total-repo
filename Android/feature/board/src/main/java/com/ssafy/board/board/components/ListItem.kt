@@ -86,7 +86,6 @@ fun ListItem(
                         state = reorderState,
                         key = cardData.id,
                         data = cardData,
-                        zIndex = 2f,
                         dropStrategy = DropStrategy.CenterDistance,
                         dragAfterLongPress = true,
                         onDragEnter = { state ->

@@ -21,7 +21,7 @@ import com.ssafy.home.setting.settingScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Board, modifier = modifier) {
+    NavHost(navController = navController, startDestination = Board(0), modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -32,7 +32,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         homeScreen(
             moveToBoardScreen = {
-                navController.navigate(Board)
+                navController.navigate(Board(it))
             },
             moveToCreateNewBoardScreen = {
                 navController.navigate(

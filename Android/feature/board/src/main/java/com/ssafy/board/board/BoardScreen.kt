@@ -33,13 +33,11 @@ fun BoardScreen(
 
     uiState.run {
         when (this) {
-            UiState.Loading -> {
-                BoardLoadingScreen(
-                    modifier = modifier,
-                    popBack = popBack,
-                    onNotificationPressed = navigateToNotificationScreen,
-                )
-            }
+            UiState.Loading -> BoardLoadingScreen(
+                modifier = modifier,
+                popBack = popBack,
+                onNotificationPressed = navigateToNotificationScreen,
+            )
 
             is UiState.Success -> BoardScreen(
                 modifier = modifier,
@@ -54,13 +52,11 @@ fun BoardScreen(
                 popBack = popBack,
             )
 
-            is UiState.Error -> {
-                BoardErrorScreen(
-                    modifier = modifier,
-                    popBack = popBack,
-                    onNotificationPressed = navigateToNotificationScreen,
-                )
-            }
+            is UiState.Error -> BoardErrorScreen(
+                modifier = modifier,
+                popBack = popBack,
+                onNotificationPressed = navigateToNotificationScreen,
+            )
         }
     }
 }
