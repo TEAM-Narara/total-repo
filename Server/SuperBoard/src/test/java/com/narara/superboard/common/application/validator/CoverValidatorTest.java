@@ -81,4 +81,13 @@ class CoverValidatorTest {
         );
     }
 
+    @Test
+    @DisplayName("커버가 유효할 때 예외가 발생하지 않는다")
+    void testValidateCoversNotEmpty() {
+        // 유효한 커버 맵 데이터
+        Map<String, Object> validCover = Map.of("type", "color", "value", "#ffffff");
+
+        // 예외 발생하지 않음
+        coverValidator.validateCoversEmpty(validCover);
+    }
 }
