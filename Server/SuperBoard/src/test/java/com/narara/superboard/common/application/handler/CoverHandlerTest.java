@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 
+@DisplayName("CoverHandler 테스트")
 class CoverHandlerTest {
 
     @InjectMocks
