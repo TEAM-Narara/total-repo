@@ -2,7 +2,7 @@ package com.narara.superboard.board.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.board.service.validator.VisibilityValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,4 +27,10 @@ class VisibilityValidatorTest {
         assertThrows(IllegalArgumentException.class, () -> visibilityValidator.validateVisibilityIsPresent(stringVisibility));
     }
 
+    @ParameterizedTest
+    @DisplayName("유효한 Visibility 값 테스트")
+    @ValueSource(strings = { "PRIVATE", "public", "workspace", "PUBLIC" })
+    void testValidVisibility(String stringVisibility) {
+        assertDoesNotThrow(() -> visibilityValidator.validateVisibilityIsPresent(stringVisibility));
+    }
 }
