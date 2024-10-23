@@ -1,18 +1,17 @@
 package com.narara.superboard.board.service.validator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.common.exception.BoardNameNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,18 +29,18 @@ class BoardValidatorTest {
 
     @DisplayName("생성 DTO에 이름이 없으면 에러가 발생한다.")
     @ParameterizedTest
-    @CsvSource({
-            ", 'PRIVATE', ''{\"type\": \"color\", \"value\": \"#ffffff\"}'",  // 이름이 없는 경우
-            "'', 'WORKSPACE', '{\"type\": \"imageurl\", \"value\": \"https://example.com/image.jpg\"}'"  // 이름이 빈 문자열인 경우
-    })
-    void testBoardEntityCreation(String name, String visibility, String backgroundJson) throws JsonProcessingException {
-        // JSON을 Map으로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> background = objectMapper.readValue(backgroundJson, new TypeReference<Map<String, Object>>() {});
-
+    @MethodSource("provideInvalidBoardData")
+    void testBoardEntityCreation(String name, String visibility, Map<String, Object> background) {
         BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
 
         assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
+    }
+
+    static Stream<Arguments> provideInvalidBoardData() {
+        return Stream.of(
+                Arguments.of(null, "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of("", "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+        );
     }
     
 }
