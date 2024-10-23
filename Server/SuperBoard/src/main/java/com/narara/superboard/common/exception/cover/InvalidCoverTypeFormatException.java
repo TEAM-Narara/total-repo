@@ -1,4 +1,6 @@
-package com.narara.superboard.common.exception;
+package com.narara.superboard.common.exception.cover;
+
+import com.narara.superboard.common.exception.InvalidFormatException;
 
 public class InvalidCoverTypeFormatException extends InvalidFormatException {
 
