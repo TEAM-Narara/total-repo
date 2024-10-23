@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -55,9 +56,9 @@ class CoverHandlerTest {
         // when & then
         doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateCoverTypeIsEmpty(invalidCover);
 
-        assertThrows(NotFoundCoverTypeException.class, () -> {
-            coverHandler.getType(invalidCover);
-        });
+        assertThrows(NotFoundCoverTypeException.class, () ->
+            coverHandler.getType(invalidCover)
+        );
 
         verify(coverValidator, times(1)).validateCoverTypeIsEmpty(invalidCover);
     }
@@ -117,6 +118,35 @@ class CoverHandlerTest {
         verify(coverValidator, times(1)).validateCoversEmpty(validCover);
         verify(coverValidator, times(1)).validateCoverTypeIsEmpty(validCover);
         verify(coverValidator, times(1)).validateCoverTypeIsValid("COLOR");
+    }
+
+    @ParameterizedTest
+    @DisplayName("커버의 값이 없을 때 예외가 발생하는지 테스트")
+    @MethodSource("provideInvalidCoversByInvalidValue")
+    void testGetValueFailure(Map<String, Object> invalidCover) {
+        // given: invalidCover는 "value" 값이 존재하지 않음
+
+        // when: 커버가 비어 있거나 "value" 값이 없을 경우 예외를 던짐
+        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateCoverValueIsEmpty(invalidCover);
+
+        // then: NotFoundCoverValueException이 발생해야 함
+        assertThrows(NotFoundCoverValueException.class, () -> coverHandler.getValue(invalidCover));
+
+        // verify: 필요한 검증 로직
+        verify(coverValidator, times(1)).validateCoversEmpty(invalidCover);
+        verify(coverValidator, times(1)).validateCoverValueIsEmpty(invalidCover);
+    }
+
+    // MethodSource로 제공할 잘못된 Map들
+    static Stream<Map<String, Object>> provideInvalidCoversByInvalidValue() {
+        Map<String, Object> coverWithoutValue = new HashMap<>();
+        coverWithoutValue.put("type", "COLOR");
+
+        Map<String, Object> coverWithNullValue = new HashMap<>();
+        coverWithNullValue.put("type", "IMAGE");
+        coverWithNullValue.put("value", "");
+
+        return Stream.of(coverWithoutValue, coverWithNullValue);
     }
 
 }
