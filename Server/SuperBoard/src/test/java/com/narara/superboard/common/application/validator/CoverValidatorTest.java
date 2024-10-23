@@ -7,6 +7,8 @@ import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,6 +119,29 @@ class CoverValidatorTest {
         return Stream.of(
                 Arguments.of(Map.of("type", "color", "value", "#ffffff")),  // 정상적인 커버 데이터
                 Arguments.of(Map.of("type", "image", "value", "https://example.com/image.jpg"))  // 정상적인 커버 데이터
+        );
+    }
+
+    @DisplayName("커버에 'value'가 없으면 NotFoundCoverValueException 발생")
+    @ParameterizedTest
+    @MethodSource("provideCoversForTest")
+    void testValidateCoverValueIsEmpty(Map<String, Object> cover) {
+        // 예외 발생 여부 테스트
+        assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCoverValueIsEmpty(cover));
+    }
+
+    // 테스트에 사용할 데이터 제공
+    static Stream<Arguments> provideCoversForTest() {
+        // cover에 'value' 키가 없는 경우
+        Map<String, Object> coverWithoutValue = new HashMap<>();
+        coverWithoutValue.put("type", "COLOR");
+
+        // 빈 cover
+        Map<String, Object> emptyCover = new HashMap<>();
+
+        return Stream.of(
+                Arguments.of(coverWithoutValue),
+                Arguments.of(emptyCover)
         );
     }
 }
