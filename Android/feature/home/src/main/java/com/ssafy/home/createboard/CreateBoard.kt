@@ -62,7 +62,8 @@ private fun CreateBoardScreen(
             board = board,
             workSpaceList = workSpaceList,
             background = background,
-            moveToSelectBackgroundScreen = moveToSelectBackgroundScreen
+            moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
+            createBoardClick = { /*TODO 보드 생성 로직 생기면 추가*/ }
         )
     }
 }

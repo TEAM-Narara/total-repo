@@ -12,9 +12,11 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
+import com.ssafy.designsystem.values.Black
 import com.ssafy.designsystem.values.LightGray
 import com.ssafy.designsystem.values.PaddingOne
 import com.ssafy.designsystem.values.PaddingSmall
@@ -31,6 +33,7 @@ fun EditText(
     text: String = "",
     onTextChange: (String) -> Unit,
     textHint: String = "",
+    textColor: Color = Black
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -50,7 +53,8 @@ fun EditText(
             onValueChange = onTextChange,
             singleLine = true,
             textStyle = TextStyle(
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = textColor
             ),
             decorationBox = @Composable { innerTextField ->
                 TextFieldDefaults.DecorationBox(
@@ -74,7 +78,7 @@ fun EditText(
                     ),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = White,
-                        unfocusedContainerColor = White
+                        unfocusedContainerColor = White,
                     )
                 )
             }
