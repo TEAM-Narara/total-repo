@@ -75,7 +75,7 @@ class WorkSpaceMemberServiceImplTest {
     }
 
     @Test
-    @DisplayName("멤버의 워크스페이스 리스트 조회 성공 테스트")
+    @DisplayName("워크스페이스에 권한이 있는 멤버 리스트 조회 성공 테스트")
     void testGetWorkspaceMemberCollectionResponseDtoSuccess() {
         // given
         Long workSpaceId = 1L;
