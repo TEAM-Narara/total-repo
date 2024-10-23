@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
+import com.narara.superboard.common.exception.BoardNameNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,7 +41,7 @@ class BoardValidatorTest {
 
         BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
 
-        assertThrows(WorkspaceNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
+        assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
     }
     
 }
