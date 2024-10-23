@@ -44,6 +44,19 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+test{
+    useJUnitPlatform()
+    // true: 병렬 실행 활성화
+    // false: 순차 실행 (기본값)
+    systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+
+    // SAME_THREAD: 같은 스레드에서 순차 실행
+    // CONCURRENT: 별도 스레드에서 병렬 실행
+    // ISOLATED: 완전히 격리된 환경에서 실행
+    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+    // JVM이 사용 가능한 CPU 코어 수 중 절반을 사용
+    maxParallelForks = (Runtime.runtime.availableProcessors() / 2) ?: 1
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
