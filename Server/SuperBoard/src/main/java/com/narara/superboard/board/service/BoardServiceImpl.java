@@ -1,9 +1,8 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.entity.Board.BoardBuilder;
 import com.narara.superboard.board.enums.Visibility;
-import com.narara.superboard.board.infrastrucutre.BoardRepository;
+import com.narara.superboard.board.infrastrucuture.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;

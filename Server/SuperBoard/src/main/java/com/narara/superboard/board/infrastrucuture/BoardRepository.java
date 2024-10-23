@@ -1,4 +1,4 @@
-package com.narara.superboard.board.infrastrucutre;
+package com.narara.superboard.board.infrastrucuture;
 
 import com.narara.superboard.board.entity.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
