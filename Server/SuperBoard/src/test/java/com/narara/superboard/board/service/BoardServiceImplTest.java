@@ -9,6 +9,7 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.workspace.entity.WorkSpace;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,5 +220,26 @@ class BoardServiceImplTest {
         verify(boardRepository, times(1)).findById(boardId);  // findById가 한 번 호출되었는지 검증
     }
 
+    @DisplayName("보드 삭제 성공 테스트")
+    @Test
+    void deleteBoard_Success() {
+        // Given
+        Long boardId = 1L;
 
+        // 가정: 이 ID에 대한 워크스페이스가 존재함
+        Board mockBoard = Board.builder()
+                .id(boardId)
+                .name("my Board")
+                .build();
+
+        // getBoard 메서드가 워크스페이스를 반환하도록 설정
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
+
+        // When
+        boardService.deleteBoard(boardId);  // deleteBoard 메서드 호출
+
+        // Then
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).delete(mockBoard);
+    }
 }
