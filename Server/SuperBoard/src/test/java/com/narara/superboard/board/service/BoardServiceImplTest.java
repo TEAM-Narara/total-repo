@@ -8,6 +8,9 @@ import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.exception.NotFoundEntityException;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -48,10 +52,10 @@ class BoardServiceImplTest {
     }
 
     @Test
-    @DisplayName("워크스페이스와 관련된 보드에 대한 조회 성공 테스트")
+    @DisplayName("보드와 관련된 보드에 대한 조회 성공 테스트")
     void testGetBoardCollectionResponseDtoSuccess() {
         // given
-        Long workSpaceId = 1L;
+        Long boardId = 1L;
 
         // cover 정보를 담는 Map 객체 생성
         Map<String, Object> cover1 = new HashMap<>();
@@ -68,8 +72,8 @@ class BoardServiceImplTest {
 
         List<Board> mockBoardList = Arrays.asList(mockBoard1, mockBoard2);
 
-        // boardRepository의 findAllByWorkSpaceId 호출 시 mock 데이터를 반환
-        when(boardRepository.findAllByWorkSpaceId(workSpaceId)).thenReturn(mockBoardList);
+        // boardRepository의 findAllByBoardId 호출 시 mock 데이터를 반환
+        when(boardRepository.findAllByBoardId(boardId)).thenReturn(mockBoardList);
 
         // CoverHandler 모킹
         when(coverHandler.getTypeValue(cover1)).thenReturn("COLOR");
@@ -78,7 +82,7 @@ class BoardServiceImplTest {
         when(coverHandler.getValue(cover2)).thenReturn("https://example.com/image.jpg");
 
         // when
-        BoardCollectionResponseDto result = boardService.getBoardCollectionResponseDto(workSpaceId);
+        BoardCollectionResponseDto result = boardService.getBoardCollectionResponseDto(boardId);
 
         // then
         assertEquals(2, result.boardDetailResponseDtoList().size());
@@ -165,5 +169,33 @@ class BoardServiceImplTest {
         verify(boardValidator).validateVisibilityIsValid(requestDto);
         verify(boardValidator).validateVisibilityIsPresent(requestDto);
         verify(boardRepository).save(any(Board.class));
+    }
+
+    @DisplayName("보드를 찾을 수 없는 경우 예외 발생")
+    @Test
+    void testGetBoard_NotFound() {
+        // given
+        Long boardId = 1L;
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                () -> boardService.getBoard(boardId));  // 예외가 발생하는지 확인
+
+        // 추가 검증: 예외 객체에 담긴 ID와 엔티티 타입이 정확한지 확인
+        assertEquals(boardId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
+        assertEquals("Board", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
+
+        verify(boardRepository, times(1)).findById(boardId);  // findById가 한 번 호출되었는지 확인
+    }
+
+
+    // Board 객체를 실제로 만들어서 테스트하기 위한 데이터 제공 메서드
+    static Stream<Board> provideBoards() {
+        return Stream.of(
+                new Board(1L, "Board 1"),
+                new Board(2L, "Board 2"),
+                new Board(3L, "Board 3")
+        );
     }
 }
