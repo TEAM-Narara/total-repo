@@ -26,8 +26,8 @@ public class BoardServiceImpl implements BoardService {
             BoardDetailResponseDto boardDto = BoardDetailResponseDto.builder()
                     .id(board.getId())
                     .name(board.getName())
-                    .backgroundType(board.getBackGroundType())
-                    .backgroundValue(board.getBackGroundValue())
+                    .backgroundType(board.getBackgroundType().getValue())
+                    .backgroundValue(board.getBackgroundValue())
                     .build();
 
             boardDetailResponseDtoList.add(boardDto);
