@@ -23,4 +23,8 @@ public class CoverHandler {
         return CoverType.valueOf(result.toUpperCase());
     }
 
+    public String getTypeValue(Map<String, Object> cover) {
+        return getType(cover).getValue();
+    }
+
 }
