@@ -2,11 +2,13 @@ package com.ssafy.board
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
-const val BOARD = "BOARD"
+@Serializable
+object Board
 
 fun NavGraphBuilder.boardScreen(popBack: () -> Unit) {
-    composable(route = BOARD) {
+    composable<Board> {
         BoardScreen(
             popBack = popBack
         )

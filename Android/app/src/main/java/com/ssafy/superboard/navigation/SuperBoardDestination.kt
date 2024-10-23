@@ -1,5 +1,15 @@
 package com.ssafy.superboard.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import com.ssafy.login.login.LogIn
+import com.ssafy.login.login.loginScreen
+import com.ssafy.login.signup.SignUp
+import com.ssafy.login.signup.signupScreen
+import com.ssafy.board.boardScreen
+import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
@@ -7,22 +17,16 @@ import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
 import com.ssafy.home.setting.Setting
 import com.ssafy.home.setting.settingScreen
-import com.ssafy.login.login.LogIn
-import com.ssafy.login.login.loginScreen
-import com.ssafy.login.signup.SignUp
-import com.ssafy.login.signup.signupScreen
-import com.ssafy.board.BOARD
-import com.ssafy.board.boardScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = LOGIN, modifier = modifier) {
+    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
-            navController.navigate(SIGN_UP)
+            navController.navigate(SignUp)
         })
 
         signupScreen(moveToLogInScreen = {
-            navController.navigate(LOGIN)
+            navController.navigate(LogIn)
         })
 
         homeScreen(
