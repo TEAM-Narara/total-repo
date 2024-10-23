@@ -8,6 +8,7 @@ import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -59,4 +60,9 @@ public class BoardServiceImpl implements BoardService {
         return saveBoard.getId();
     }
 
+    @Override
+    public Board getBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "Board"));
+    }
 }
