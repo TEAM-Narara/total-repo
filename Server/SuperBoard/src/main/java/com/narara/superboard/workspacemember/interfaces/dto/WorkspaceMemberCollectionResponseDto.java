@@ -6,6 +6,6 @@ import java.util.List;
 
 @Builder
 public record WorkspaceMemberCollectionResponseDto(
-        List<WorkspaceMemberDetailResponseDto> workspaceMemberList
+        List<WorkSpaceMemberDetailResponseDto> workspaceMemberList
 ) {
 }
