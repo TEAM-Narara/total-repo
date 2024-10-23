@@ -1,5 +1,6 @@
 package com.narara.superboard.board.interfaces.dto;
 
-public interface BoardNameHolder {
+public interface BoardCoreHolder {
     String name();
+    String visibility();
 }

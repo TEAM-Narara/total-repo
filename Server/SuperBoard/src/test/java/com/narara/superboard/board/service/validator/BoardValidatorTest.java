@@ -1,7 +1,8 @@
 package com.narara.superboard.board.service.validator;
 
+import com.narara.superboard.board.exception.BoardVisibilityNotFoundException;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.common.exception.BoardNameNotFoundException;
+import com.narara.superboard.board.exception.BoardNameNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
