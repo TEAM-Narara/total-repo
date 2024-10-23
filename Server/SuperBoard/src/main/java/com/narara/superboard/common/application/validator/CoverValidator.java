@@ -36,4 +36,10 @@ public class CoverValidator {
             throw new NotFoundException("커버");
         }
     }
+
+    public void validateCoverTypeIsEmpty(Map<String, Object> cover) {
+        if (!cover.containsKey("type")) {
+            throw new NotFoundCoverTypeException();
+        }
+    }
 }
