@@ -1,5 +1,6 @@
 package com.narara.superboard.board.service.validator;
 
+import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
 import com.narara.superboard.board.exception.BoardVisibilityNotFoundException;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.exception.BoardNameNotFoundException;
@@ -57,6 +58,22 @@ class BoardValidatorTest {
         return Stream.of(
                 Arguments.of("날아라 보드", null, Map.of("type", "color", "value", "#ffffff")),
                 Arguments.of("나의 보드", " ", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+        );
+    }
+
+    @DisplayName("생성 DTO에 잘못된 가시성 정보가 있으면 에러가 발생한다.")
+    @ParameterizedTest
+    @MethodSource("provideInvalidBoardDataByInvalidVisibility")
+    void testBoardEntityCreationByInvalidVisibility(String name, String visibility, Map<String, Object> background) {
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
+
+        assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardValidator.validateVisibilityIsValid(boardCreateDto));
+    }
+
+    static Stream<Arguments> provideInvalidBoardDataByInvalidVisibility() {
+        return Stream.of(
+                Arguments.of("날아라 보드", "COCOBALL", Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of("나의 보드", "TOSS", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
 }
