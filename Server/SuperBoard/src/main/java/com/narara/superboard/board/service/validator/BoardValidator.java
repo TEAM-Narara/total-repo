@@ -22,7 +22,7 @@ public class BoardValidator {
         }
     }
 
-    public void isValidVisibility(BoardCoreHolder boardNameHolder) {
+    public void validateVisibilityIsValid(BoardCoreHolder boardNameHolder) {
         try {
             String visibility = boardNameHolder.visibility();
             Visibility.valueOf(visibility.toUpperCase());
