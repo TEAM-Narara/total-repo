@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.values.Primary
 
 @Composable
-fun CreateBoard(
+fun CreateBoardScreen(
     viewModel: CreateBoardViewModel = hiltViewModel(),
     workspaceList: List<String>,
     popBackToHome: () -> Unit,
@@ -24,7 +24,7 @@ fun CreateBoard(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    CreateBoard(
+    CreateBoardScreen(
         board = uiState.board,
         workSpaceList = workspaceList,
         background = uiState.background,
@@ -34,7 +34,7 @@ fun CreateBoard(
 }
 
 @Composable
-private fun CreateBoard(
+private fun CreateBoardScreen(
     // UI STATE의 board, workSpaceList, background를 받아옴
     board: Any,
     workSpaceList: List<Any>,
@@ -70,7 +70,7 @@ private fun CreateBoard(
 @Composable
 @Preview
 private fun CreateBoardPreview() {
-    CreateBoard(
+    CreateBoardScreen(
         board = Any(),
         workSpaceList = List(4) { "테스트-$it" },
         background = Any(),

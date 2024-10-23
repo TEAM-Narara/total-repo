@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.ssafy.home.createboard.CreateBoard
-import com.ssafy.home.createboard.createBoard
+import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
 import com.ssafy.home.mycard.MyCard
@@ -33,7 +33,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 // TODO : navigate to board screen
             },
             moveToCreateNewBoardScreen = {
-                navController.navigate(CreateBoard(workspaceList = listOf("workspace1", "workspace2")))
+                navController.navigate(
+                    CreateBoard(
+                        workspaceList = listOf(
+                            "workspace1",
+                            "workspace2"
+                        )
+                    )
+                )
             },
             moveToLoginScreen = {
                 navController.navigate(LogIn) {
@@ -67,7 +74,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        createBoard(
+        createBoardScreen(
             popBackToHome = navController::popBackStack,
             moveToSelectBackgroundScreen = {
                 // TODO : navigate to select background screen

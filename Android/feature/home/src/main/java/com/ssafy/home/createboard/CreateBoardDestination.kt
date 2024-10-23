@@ -11,14 +11,14 @@ data class CreateBoard(
     val workspaceList: List<String>,
 )
 
-fun NavGraphBuilder.createBoard(
+fun NavGraphBuilder.createBoardScreen(
     popBackToHome: () -> Unit,
     moveToSelectBackgroundScreen: () -> Unit
 ) {
     composable<CreateBoard> { backStackEntry ->
         val createBoard: CreateBoard = backStackEntry.toRoute()
 
-        CreateBoard(
+        CreateBoardScreen(
             workspaceList = createBoard.workspaceList,
             popBackToHome = popBackToHome,
             moveToSelectBackgroundScreen = moveToSelectBackgroundScreen
