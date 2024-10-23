@@ -2,6 +2,7 @@ package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.common.constant.enums.CoverType;
+import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,8 +23,8 @@ public class Board {
     private String name;  // 이름
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "background", columnDefinition = "jsonb")
-    private Map<String, Object> background;  // 배경 (JSON)
+    @Column(name = "cover", columnDefinition = "jsonb")
+    private Map<String, Object> cover;  // 배경 (JSON)
 
     @Column(name = "visibility", nullable = false, length = 50)
     private Visibility visibility;  // 가시성 (WORKSPACE, PRIVATE)
@@ -38,22 +39,45 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 키
 
-    public Background getBackgroundInfo() {
-        return new Background(background);
-    }
+    // JPA가 관리하지 않도록 transient로 선언
+    @Transient
+    private Cover cachedCover;
 
-    public CoverType getBackgroundType() {
-        //        return "mysql -> postgresql ";
-        if (background == null || !background.containsKey("type")) {
-            return null;
+    // 엔티티가 처음 생성될 때, Cover 객체를 생성해 둡니다.
+    @PostLoad
+    @PostPersist
+    private void initializeCover() {
+        if (cover == null) {
+            this.cachedCover = null;
+        } else {
+            this.cachedCover = new Cover(cover);
         }
-        String result = background.get("type").toString();
-        return CoverType.valueOf(result.toUpperCase()); // 일치할 경우, 해당 enum 상수를 반환
     }
 
-    public String getBackgroundValue() {
+    // 이후 get 메소드에서 이 캐시된 Cover 객체를 재사용합니다.
+    public Cover getCoverInfo() {
+        if (cachedCover == null) {
+            if (cover == null) {
+                throw new NotFoundException("Board", "background");
+            }
+            this.cachedCover = new Cover(cover);
+        }
+        return cachedCover;
+    }
+
+    public CoverType getCoverType() {
+        //        return "mysql -> postgresql ";
+        return getCoverInfo().getType();
+    }
+
+    public String getCoverTypeValue() {
+        //        return "mysql -> postgresql ";
+        return getCoverInfo().getTypeValue();
+    }
+
+    public String getCoverValue() {
 //        return "mysql -> postgresql ";
-        return background != null ? background.get("value").toString() : null;
+        return getCoverInfo().getValue();
     }
 
     public void increaseVersion() {
