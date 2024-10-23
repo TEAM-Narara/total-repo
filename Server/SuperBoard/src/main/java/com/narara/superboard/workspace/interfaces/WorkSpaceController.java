@@ -1,7 +1,7 @@
-package com.narara.superboard.workSpace.interfaces;
+package com.narara.superboard.workspace.interfaces;
 
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
-import com.narara.superboard.workSpace.service.WorkSpaceService;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.service.WorkSpaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 

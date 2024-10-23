@@ -1,4 +1,4 @@
-package com.narara.superboard.workSpace.interfaces.dto;
+package com.narara.superboard.workspace.interfaces.dto;
 
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;

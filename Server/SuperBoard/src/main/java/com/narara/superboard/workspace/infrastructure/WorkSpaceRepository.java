@@ -1,6 +1,6 @@
-package com.narara.superboard.workSpace.infrastructure;
+package com.narara.superboard.workspace.infrastructure;
 
-import com.narara.superboard.workSpace.entity.WorkSpace;
+import com.narara.superboard.workspace.entity.WorkSpace;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WorkSpaceRepository extends JpaRepository<WorkSpace, Long> {

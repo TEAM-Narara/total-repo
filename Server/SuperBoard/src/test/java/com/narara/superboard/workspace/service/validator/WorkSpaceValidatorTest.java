@@ -1,8 +1,8 @@
-package com.narara.superboard.workSpace.service.validator;
+package com.narara.superboard.workspace.service.validator;
 
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

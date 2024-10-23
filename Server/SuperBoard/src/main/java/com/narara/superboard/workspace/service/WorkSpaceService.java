@@ -1,9 +1,9 @@
-package com.narara.superboard.workSpace.service;
+package com.narara.superboard.workspace.service;
 
-import com.narara.superboard.workSpace.entity.WorkSpace;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceDetailResponseDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 
 public interface WorkSpaceService {
 

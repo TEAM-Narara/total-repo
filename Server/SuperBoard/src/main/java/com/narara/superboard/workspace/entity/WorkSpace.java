@@ -1,8 +1,8 @@
-package com.narara.superboard.workSpace.entity;
+package com.narara.superboard.workspace.entity;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
 import lombok.*;

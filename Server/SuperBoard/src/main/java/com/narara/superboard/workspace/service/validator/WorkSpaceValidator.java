@@ -1,7 +1,7 @@
-package com.narara.superboard.workSpace.service.validator;
+package com.narara.superboard.workspace.service.validator;
 
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceNameHolder;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
 import org.springframework.stereotype.Component;
 
 @Component

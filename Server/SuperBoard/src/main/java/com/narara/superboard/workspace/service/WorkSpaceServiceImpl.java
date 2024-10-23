@@ -1,15 +1,15 @@
-package com.narara.superboard.workSpace.service;
+package com.narara.superboard.workspace.service;
 
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
-import com.narara.superboard.workSpace.entity.WorkSpace;
-import com.narara.superboard.workSpace.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceDetailResponseDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
-import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
-import com.narara.superboard.workSpace.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
