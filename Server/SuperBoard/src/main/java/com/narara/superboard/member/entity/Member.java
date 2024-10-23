@@ -1,6 +1,6 @@
 package com.narara.superboard.member.entity;
 
-import com.narara.superboard.workspacemember.entity.WorkspaceMember;
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,8 +14,8 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -24,5 +24,5 @@ public class Member {
     private String profileImgUrl;
 
     @OneToMany(mappedBy = "member")
-    private List<WorkspaceMember> workspaceMemberList;
+    private List<WorkSpaceMember> workspaceMemberList;
 }
