@@ -1,9 +1,12 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastrucutre.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
+import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class BoardServiceImplTest {
@@ -27,6 +34,10 @@ class BoardServiceImplTest {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private BoardValidator boardValidator;
+
 
     @Mock
     private CoverHandler coverHandler;
@@ -83,5 +94,47 @@ class BoardServiceImplTest {
         assertEquals("보드 2", board2.name());
         assertEquals("IMAGE", board2.backgroundType());
         assertEquals("https://example.com/image.jpg", board2.backgroundValue());
+    }
+
+    @Test
+    @DisplayName("보드 생성 성공 테스트")
+    void testCreateBoardSuccess() {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> background = new HashMap<>();
+        background.put("type", "COLOR");
+        background.put("value", "#ffffff");
+
+        BoardCreateRequestDto boardCreateRequestDto = new BoardCreateRequestDto(
+                "보드 이름",
+                "PRIVATE",
+                background
+        );
+
+        Board savedBoard = Board.builder()
+                .id(boardId)
+                .cover(background)
+                .name("보드 이름")
+                .visibility(Visibility.PRIVATE)
+                .build();
+
+
+        // Mocking: 검증 로직을 모킹
+        doNothing().when(boardValidator).validateNameIsPresent(boardCreateRequestDto);
+        doNothing().when(boardValidator).validateVisibilityIsValid(boardCreateRequestDto);
+        doNothing().when(boardValidator).validateVisibilityIsPresent(boardCreateRequestDto);
+
+        // Mocking: boardRepository.save 호출 시 저장된 board 객체 반환
+        when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
+
+        // when
+        Long savedBoardId = boardService.createBoard(boardCreateRequestDto);
+
+        // then
+        assertEquals(boardId, savedBoardId);
+        verify(boardValidator, times(1)).validateNameIsPresent(boardCreateRequestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsValid(boardCreateRequestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsPresent(boardCreateRequestDto);
+        verify(boardRepository, times(1)).save(any(Board.class));
     }
 }
