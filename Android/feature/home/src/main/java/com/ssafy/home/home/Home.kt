@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit,
+    moveToCreateNewBoardScreen: (List<String>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
     moveToMyCardScreen: () -> Unit
@@ -58,7 +58,7 @@ fun HomeScreen(
 private fun HomeScreen(
     workSpace: Any?,
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: () -> Unit,
+    moveToCreateNewBoardScreen: (List<String>) -> Unit,
     moveToCreateNewWorkSpaceScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
@@ -114,7 +114,12 @@ private fun HomeScreen(
             floatingActionButton = {
                 if (workSpace != null) {
                     AddNewBoardFloatingButton(
-                        moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
+                        moveToCreateNewBoardScreen = {
+                            moveToCreateNewBoardScreen(
+                                // TODO : WorkSpaceList에 대한 DTO 변경 필요
+                                List(4) { "workspace-$it" }
+                            )
+                        }
                     )
                 }
             }

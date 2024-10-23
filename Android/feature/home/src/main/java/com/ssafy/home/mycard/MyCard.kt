@@ -16,7 +16,7 @@ import com.ssafy.designsystem.values.Primary
 @Composable
 fun MyCardScreen(
     viewModel: MyCardViewModel = hiltViewModel(),
-    popUpToHome: () -> Unit,
+    popBackToHome: () -> Unit,
     moveToCardScreen: (Any) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -24,7 +24,7 @@ fun MyCardScreen(
     MyCardScreen(
         // TODO : BoardList의 타입이 지정되면 수정
         boardList = uiState.boards,
-        popUpToHome = popUpToHome,
+        popBackToHome = popBackToHome,
         // TODO : Card에 대한 타입이 지정되면 수정
         moveToCardScreen = moveToCardScreen
     )
@@ -33,11 +33,11 @@ fun MyCardScreen(
 @Composable
 private fun MyCardScreen(
     boardList: List<Any>,
-    popUpToHome: () -> Unit,
+    popBackToHome: () -> Unit,
     moveToCardScreen: (Any) -> Unit
 ) {
     Scaffold(
-        topBar = { MyCardTopBar(onNavigateClick = popUpToHome) }
+        topBar = { MyCardTopBar(onNavigateClick = popBackToHome) }
     ) { innerPadding ->
 
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -62,7 +62,7 @@ private fun MyCardScreen(
 @Preview
 private fun MyCardScreenPreview() {
     MyCardScreen(
-        popUpToHome = {},
+        popBackToHome = {},
         moveToCardScreen = {}
     )
 }
