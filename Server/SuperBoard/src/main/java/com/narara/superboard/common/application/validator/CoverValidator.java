@@ -4,6 +4,7 @@ import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -42,4 +43,12 @@ public class CoverValidator {
             throw new NotFoundCoverTypeException();
         }
     }
+
+    public void validateCoverValueIsEmpty(Map<String, Object> cover) {
+        if (!cover.containsKey("value")) {
+            throw new NotFoundCoverValueException();
+        }
+    }
+
+
 }
