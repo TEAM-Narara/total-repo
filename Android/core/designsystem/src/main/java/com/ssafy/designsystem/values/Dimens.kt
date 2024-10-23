@@ -49,6 +49,7 @@ val BoardHeight = 130.dp
 val ElevationSmall = 2.dp
 val ElevationMedium = 4.dp
 val ElevationDefault = 6.dp
+val ElevationLarge = 20.dp
 
 val RadiusDefault = 8.dp
 val RadiusSMall = 6.dp
