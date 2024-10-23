@@ -4,5 +4,5 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class HomeUiState(
-    val workSpace: Any? = null
+    val workSpace: Any? = Any()
 )

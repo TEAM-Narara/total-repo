@@ -2,13 +2,15 @@ package com.ssafy.home.setting
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
-const val SETTING = "SETTING"
+@Serializable
+object Setting
 
 fun NavGraphBuilder.settingScreen(
     backHomeScreen: () -> Unit
 ) {
-    composable(route = SETTING) {
+    composable<Setting> {
         HomeSettingScreen(
             workspaceId = 0,
             backHome = backHomeScreen

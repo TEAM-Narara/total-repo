@@ -2,16 +2,18 @@ package com.ssafy.home.mycard
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
-const val MY_CARD = "MY_CARD"
+@Serializable
+object MyCard
 
 fun NavGraphBuilder.myCardScreen(
-    popUpToHome: () -> Unit,
+    popBackToHome: () -> Unit,
     moveToCardScreen: (Any) -> Unit
 ) {
-    composable(route = MY_CARD) {
+    composable<MyCard> {
         MyCardScreen(
-            popUpToHome = popUpToHome,
+            popBackToHome = popBackToHome,
             moveToCardScreen = moveToCardScreen
         )
     }
