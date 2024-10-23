@@ -130,7 +130,6 @@ class CoverValidatorTest {
         assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCoverValueIsEmpty(cover));
     }
 
-    // 테스트에 사용할 데이터 제공
     static Stream<Arguments> provideCoversForTest() {
         // cover에 'value' 키가 없는 경우
         Map<String, Object> coverWithoutValue = new HashMap<>();
@@ -142,6 +141,30 @@ class CoverValidatorTest {
         return Stream.of(
                 Arguments.of(coverWithoutValue),
                 Arguments.of(emptyCover)
+        );
+    }
+
+    @DisplayName("커버에 'value'가 있을 경우 예외가 발생하지 않음")
+    @ParameterizedTest
+    @MethodSource("provideValidCoversForTest")
+    void testValidateCoverValueIsNotEmpty(Map<String, Object> cover) {
+        // 예외가 발생하지 않는지 테스트
+        assertDoesNotThrow(() -> coverValidator.validateCoverValueIsEmpty(cover));
+    }
+
+    static Stream<Arguments> provideValidCoversForTest() {
+        // cover에 'value' 키가 있는 경우
+        Map<String, Object> validCoverWithColor = new HashMap<>();
+        validCoverWithColor.put("type", "COLOR");
+        validCoverWithColor.put("value", "#ffffff");
+
+        Map<String, Object> validCoverWithImage = new HashMap<>();
+        validCoverWithImage.put("type", "IMAGE");
+        validCoverWithImage.put("value", "https://example.com/image.jpg");
+
+        return Stream.of(
+                Arguments.of(validCoverWithColor),
+                Arguments.of(validCoverWithImage)
         );
     }
 }
