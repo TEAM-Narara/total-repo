@@ -59,8 +59,11 @@ fun BoardItem(
     }
 
     // TODO : card의 onLongPressed가 내려오는 문제 해결
-    ReorderContainer(state = listDndState, modifier = modifier.padding(vertical = PaddingDefault)) {
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(PaddingDefault)) {
+    ReorderContainer(state = listDndState) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
+            modifier = modifier.padding(vertical = PaddingDefault)
+        ) {
             item { Spacer(modifier = Modifier) }
             items(listCollection, key = { it.id }) { listData ->
                 ReorderableItem(
