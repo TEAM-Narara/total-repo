@@ -8,14 +8,26 @@ import java.util.EnumSet;
 
 public class CoverValidator {
 
-    public void validateCoverTypeIsValid(CoverType coverType) {
-        // CoverType이 미리 정의된 유효한 값에 포함되는지 확인
-        boolean isValid = EnumSet.allOf(CoverType.class).contains(coverType);
+    public void validateCoverTypeIsValid(String coverTypeValue) {
+        // 1. coverTypeValue가 null인 경우 예외 발생
+        if (coverTypeValue == null || coverTypeValue.isEmpty()) {
+            throw new IllegalArgumentException("CoverType value cannot be null or empty.");
+        }
 
-        // 유효하지 않으면 예외 발생
+        // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
+        boolean isValid = false;
+        for (CoverType type : CoverType.values()) {
+            if (type.getValue().equals(coverTypeValue)) {
+                isValid = true;
+                break;
+            }
+        }
+
+        // 3. 유효하지 않으면 예외 발생
         if (!isValid) {
-            throw new InvalidCoverTypeFormatException();
+            throw new IllegalArgumentException("Invalid CoverType value: " + coverTypeValue);
         }
     }
+
 
 }
