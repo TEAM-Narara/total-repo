@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
@@ -50,6 +51,14 @@ class CoverValidatorTest {
         assertThrows(InvalidCoverTypeFormatException.class, () -> {
             coverValidator.validateCoverTypeIsValid("INVALID_TYPE");
         });
+    }
+
+    @ParameterizedTest
+    @EnumSource(CoverType.class) // CoverType Enum의 모든 값을 테스트
+    @DisplayName("유효한 커버 타입일 경우 예외 발생하지 않음")
+    void testValidCoverType(CoverType coverType) {
+        // 유효한 커버 타입 값이 전달될 때 예외가 발생하지 않는지 테스트
+        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(coverType.getValue()));
     }
 
 }
