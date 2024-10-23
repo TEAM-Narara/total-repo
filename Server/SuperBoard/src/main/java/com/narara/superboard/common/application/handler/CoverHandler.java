@@ -27,4 +27,10 @@ public class CoverHandler {
         return getType(cover).getValue();
     }
 
+    public String getValue(Map<String, Object> cover) {
+        coverValidator.validateCoversEmpty(cover);
+        coverValidator.validateCoverValueIsEmpty(cover);
+
+        return cover.get("value").toString();
+    }
 }
