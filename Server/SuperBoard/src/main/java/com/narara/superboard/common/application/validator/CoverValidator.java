@@ -3,7 +3,9 @@ package com.narara.superboard.common.application.validator;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CoverValidator {
 
     public void validateCoverTypeIsValid(String coverTypeValue) {
