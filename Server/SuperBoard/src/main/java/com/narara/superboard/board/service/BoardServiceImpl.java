@@ -4,6 +4,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastrucutre.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.common.application.handler.CoverHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final CoverHandler coverHandler;
 
     @Override
     public BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId) {
@@ -26,8 +28,8 @@ public class BoardServiceImpl implements BoardService {
             BoardDetailResponseDto boardDto = BoardDetailResponseDto.builder()
                     .id(board.getId())
                     .name(board.getName())
-                    .backgroundType(board.getCoverTypeValue())
-                    .backgroundValue(board.getCoverValue())
+                    .backgroundType(coverHandler.getTypeValue(board.getCover()))
+                    .backgroundValue(coverHandler.getValue(board.getCover()))
                     .build();
 
             boardDetailResponseDtoList.add(boardDto);
@@ -35,5 +37,6 @@ public class BoardServiceImpl implements BoardService {
 
         return new BoardCollectionResponseDto(boardDetailResponseDtoList);
     }
+
 
 }
