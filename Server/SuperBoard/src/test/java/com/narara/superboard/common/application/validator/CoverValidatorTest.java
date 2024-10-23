@@ -105,4 +105,18 @@ class CoverValidatorTest {
                 Arguments.of(Map.of("value", "#ffffff"))  // 'type' 키가 없는 경우
         );
     }
+
+    @DisplayName("커버에 'type'이 있을 때 예외가 발생하지 않는다")
+    @ParameterizedTest
+    @MethodSource("provideValidCoverData")
+    void testValidateCoverTypeIsNotEmpty(Map<String, Object> cover) {
+        coverValidator.validateCoverTypeIsEmpty(cover);  // 예외 발생하지 않음
+    }
+
+    static Stream<Arguments> provideValidCoverData() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "color", "value", "#ffffff")),  // 정상적인 커버 데이터
+                Arguments.of(Map.of("type", "image", "value", "https://example.com/image.jpg"))  // 정상적인 커버 데이터
+        );
+    }
 }
