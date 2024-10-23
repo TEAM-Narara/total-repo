@@ -54,4 +54,9 @@ public class Board {
         this.name = name;
         this.cover = cover;
     }
+
+    public Board(Long id, String name){
+        this.id = id;
+        this.name = name;
+    }
 }
