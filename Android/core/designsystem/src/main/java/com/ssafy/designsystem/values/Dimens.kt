@@ -55,3 +55,5 @@ val RadiusSMall = 6.dp
 
 val MascotDefault = 116.dp
 val BoxDefault = 55.dp
+
+val BackgroundMini = 33.dp
