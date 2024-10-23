@@ -1,17 +1,15 @@
 package com.narara.superboard.common.application.validator;
 
 import com.narara.superboard.common.constant.enums.CoverType;
-import com.narara.superboard.common.exception.InvalidCoverTypeFormatException;
-
-import java.util.EnumSet;
-
+import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 
 public class CoverValidator {
 
     public void validateCoverTypeIsValid(String coverTypeValue) {
         // 1. coverTypeValue가 null인 경우 예외 발생
         if (coverTypeValue == null || coverTypeValue.isEmpty()) {
-            throw new IllegalArgumentException("CoverType value cannot be null or empty.");
+            throw new NotFoundCoverTypeException();
         }
 
         // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
@@ -25,7 +23,7 @@ public class CoverValidator {
 
         // 3. 유효하지 않으면 예외 발생
         if (!isValid) {
-            throw new IllegalArgumentException("Invalid CoverType value: " + coverTypeValue);
+            throw new InvalidCoverTypeFormatException();
         }
     }
 
