@@ -1,8 +1,7 @@
 package com.ssafy.board.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,8 +24,8 @@ import com.ssafy.board.handleLazyListScroll
 import com.ssafy.designsystem.component.ListItem
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
+import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingMedium
-import com.ssafy.designsystem.values.PaddingXSmall
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalDndApi::class)
@@ -40,6 +39,7 @@ fun ListItem(
     onCardReordered: () -> Unit = {},
     addCard: () -> Unit = {},
     addPhoto: () -> Unit = {},
+    onDragEnter: () -> Unit = {},
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
@@ -64,6 +64,8 @@ fun ListItem(
                         }
 
                         add(state.data.apply { this.listId = listData.id })
+
+                        onDragEnter()
                     }
                 },
                 onDrop = { onCardReordered() },
@@ -77,8 +79,8 @@ fun ListItem(
             LazyColumn(
                 state = cardLazyListState,
                 verticalArrangement = Arrangement.spacedBy(PaddingMedium),
+                contentPadding = PaddingValues(vertical = PaddingDefault)
             ) {
-                item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
                 items(collection, key = { it.id }) { cardData ->
                     ReorderableItem(
                         state = reorderState,
@@ -109,6 +111,8 @@ fun ListItem(
                                         indexOffset = 1,
                                     )
                                 }
+
+                                onDragEnter()
                             }
                         },
                         onDrop = { onCardReordered() },
@@ -130,7 +134,6 @@ fun ListItem(
                         )
                     }
                 }
-                item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
             }
         }
     }

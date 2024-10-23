@@ -1,7 +1,7 @@
 package com.ssafy.board.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -63,15 +63,14 @@ fun BoardItem(
         LazyRow(
             state = listLazyListState,
             horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
-            modifier = modifier.padding(vertical = PaddingDefault)
+            modifier = modifier.padding(vertical = PaddingDefault),
+            contentPadding = PaddingValues(horizontal = PaddingDefault)
         ) {
-            item { Spacer(modifier = Modifier) }
             items(listCollection, key = { it.id }) { listData ->
                 ReorderableItem(
                     state = listDndState,
                     key = listData.id,
                     data = listData,
-                    zIndex = 1f,
                     dropStrategy = DropStrategy.CenterDistance,
                     dragAfterLongPress = true,
                     onDragEnter = { state ->
@@ -117,7 +116,6 @@ fun BoardItem(
                     )
                 }
             }
-            item { Spacer(modifier = Modifier) }
         }
     }
 }
