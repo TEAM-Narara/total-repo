@@ -74,5 +74,48 @@ class WorkSpaceMemberServiceImplTest {
         verify(workSpaceMemberRepository, times(1)).findAllByMemberId(memberId);
     }
 
+    @Test
+    @DisplayName("멤버의 워크스페이스 리스트 조회 성공 테스트")
+    void testGetWorkspaceMemberCollectionResponseDtoSuccess() {
+        // given
+        Long workSpaceId = 1L;
 
+        // Mock된 Member와 WorkSpaceMember 데이터 설정
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "http://profile1.img");
+        Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "http://profile2.img");
+
+
+        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, "ADMIN");
+        WorkSpaceMember mockWorkSpaceMember2 = new WorkSpaceMember(mockMember2, "MEMBER");
+
+        List<WorkSpaceMember> mockWorkSpaceMemberList = List.of(mockWorkSpaceMember1, mockWorkSpaceMember2);
+
+        // when: workSpaceMemberRepository의 동작을 정의
+        when(workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId)).thenReturn(mockWorkSpaceMemberList);
+
+        // when: 서비스 메서드 호출
+        WorkspaceMemberCollectionResponseDto result = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+
+        // then: 결과 검증
+        assertEquals(2, result.workspaceMemberList().size());
+
+        // 첫 번째 멤버에 대한 검증
+        WorkSpaceMemberDetailResponseDto firstMember = result.workspaceMemberList().get(0);
+        assertEquals(1L, firstMember.memberId());
+        assertEquals("user1@example.com", firstMember.memberEmail());
+        assertEquals("닉네임1", firstMember.memberNickname());
+        assertEquals("http://profile1.img", firstMember.memberProfileImgUrl());
+        assertEquals("ADMIN", firstMember.authority());
+
+        // 두 번째 멤버에 대한 검증
+        WorkSpaceMemberDetailResponseDto secondMember = result.workspaceMemberList().get(1);
+        assertEquals(2L, secondMember.memberId());
+        assertEquals("user2@example.com", secondMember.memberEmail());
+        assertEquals("닉네임2", secondMember.memberNickname());
+        assertEquals("http://profile2.img", secondMember.memberProfileImgUrl());
+        assertEquals("MEMBER", secondMember.authority());
+
+        // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
+        verify(workSpaceMemberRepository, times(1)).findAllByWorkSpaceId(workSpaceId);
+    }
 }
