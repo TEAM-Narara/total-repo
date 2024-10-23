@@ -4,6 +4,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastrucutre.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.common.application.handler.CoverHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ class BoardServiceImplTest {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private CoverHandler coverHandler;
 
     @BeforeEach
     void setUp() {
@@ -55,6 +59,12 @@ class BoardServiceImplTest {
 
         // boardRepository의 findAllByWorkSpaceId 호출 시 mock 데이터를 반환
         when(boardRepository.findAllByWorkSpaceId(workSpaceId)).thenReturn(mockBoardList);
+
+        // CoverHandler 모킹
+        when(coverHandler.getTypeValue(cover1)).thenReturn("COLOR");
+        when(coverHandler.getTypeValue(cover2)).thenReturn("IMAGE");
+        when(coverHandler.getValue(cover1)).thenReturn("#ffffff");
+        when(coverHandler.getValue(cover2)).thenReturn("https://example.com/image.jpg");
 
         // when
         BoardCollectionResponseDto result = boardService.getBoardCollectionResponseDto(workSpaceId);
