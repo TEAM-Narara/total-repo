@@ -118,7 +118,6 @@ class BoardServiceImplTest {
                 .visibility(Visibility.PRIVATE)
                 .build();
 
-
         // Mocking: 검증 로직을 모킹
         doNothing().when(boardValidator).validateNameIsPresent(boardCreateRequestDto);
         doNothing().when(boardValidator).validateVisibilityIsValid(boardCreateRequestDto);
@@ -136,5 +135,35 @@ class BoardServiceImplTest {
         verify(boardValidator, times(1)).validateVisibilityIsValid(boardCreateRequestDto);
         verify(boardValidator, times(1)).validateVisibilityIsPresent(boardCreateRequestDto);
         verify(boardRepository, times(1)).save(any(Board.class));
+    }
+
+    @Test
+    @DisplayName("background가 null인 경우에도 보드 생성 성공")
+    void createBoard_WhenBackgroundIsNull_ThenSuccess() {
+        // given
+        String name = "테스트 보드";
+        Map<String, Object> background = null;
+        String visibility = "PUBLIC";
+
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(name, visibility, background);
+
+        Board expectedBoard = Board.builder()
+                .cover(background)
+                .name(name)
+                .visibility(Visibility.PUBLIC)
+                .id(1L)
+                .build();
+
+        // when
+        when(boardRepository.save(any(Board.class))).thenReturn(expectedBoard);
+
+        // then
+        Long boardId = boardService.createBoard(requestDto);
+
+        assertEquals(1L, boardId);
+        verify(boardValidator).validateNameIsPresent(requestDto);
+        verify(boardValidator).validateVisibilityIsValid(requestDto);
+        verify(boardValidator).validateVisibilityIsPresent(requestDto);
+        verify(boardRepository).save(any(Board.class));
     }
 }
