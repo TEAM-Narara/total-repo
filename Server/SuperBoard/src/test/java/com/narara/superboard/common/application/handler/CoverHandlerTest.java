@@ -149,4 +149,19 @@ class CoverHandlerTest {
         return Stream.of(coverWithoutValue, coverWithNullValue);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideValidCovers")
+    @DisplayName("커버의 값이 정상적으로 반환되는지 테스트")
+    void testGetValueSuccess(Map<String, Object> validCover) {
+        // when: CoverValidator 내부 호출에 대해 아무런 동작을 설정하지 않음 (실제로는 호출되지만, 별도 설정 필요 없음)
+        doNothing().when(coverValidator).validateCoversEmpty(validCover);
+        doNothing().when(coverValidator).validateCoverValueIsEmpty(validCover);
+
+        // then: CoverHandler의 getValue 메서드가 커버의 값을 제대로 반환하는지 검증
+        String result = coverHandler.getValue(validCover);
+        assertEquals(validCover.get("value"), result);
+        verify(coverValidator, times(1)).validateCoversEmpty(validCover);
+        verify(coverValidator, times(1)).validateCoverValueIsEmpty(validCover);
+    }
+
 }
