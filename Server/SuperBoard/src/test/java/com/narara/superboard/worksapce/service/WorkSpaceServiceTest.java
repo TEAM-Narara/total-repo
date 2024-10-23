@@ -1,12 +1,19 @@
 package com.narara.superboard.worksapce.service;
 
 
+import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
+import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.worksapce.entity.WorkSpace;
 import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.worksapce.interfaces.dto.WorkspaceDetailResponseDto;
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
 import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
 import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDetailResponseDto;
+import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -30,6 +38,12 @@ class WorkSpaceServiceTest {
     // 실제 테스트 대상 객체를 생성하고 초기화할 때 사용
     @InjectMocks
     private WorkSpaceServiceImpl workSpaceService; // 테스트 대상 클래스
+
+    @Mock
+    private BoardService boardService;
+
+    @Mock
+    private WorkSpaceMemberService workSpaceMemberService;
 
     @Mock
     private WorkSpaceRepository workSpaceRepository; // 의존성을 Mocking
@@ -173,5 +187,87 @@ class WorkSpaceServiceTest {
         assertEquals(workSpace, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
         verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 검증
     }
+
+
+    @Test
+    @DisplayName("워크스페이스 상세 조회 성공 테스트")
+    void testGetWorkspaceDetailSuccess() {
+        // given
+        Long workspaceId = 1L;
+
+        WorkSpace mockWorkSpace =  new WorkSpace(workspaceId, "시현의 워크스페이스");
+        BoardCollectionResponseDto mockBoardCollectionResponseDto = createMockBoardCollection();
+        WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto = createMockMemberCollection();
+
+        // Mocking: repository, boardService, workSpaceMemberService, workSpaceValidator 동작 설정
+        mockDependencies(workspaceId, mockWorkSpace, mockBoardCollectionResponseDto, mockMemberCollectionResponseDto);
+
+        // when
+        WorkspaceDetailResponseDto result = workSpaceService.getWorkspaceDetail(workspaceId);
+
+        // then
+        assertWorkspaceDetail(result, mockWorkSpace, mockBoardCollectionResponseDto, mockMemberCollectionResponseDto);
+    }
+
+    private BoardCollectionResponseDto createMockBoardCollection() {
+        return BoardCollectionResponseDto.builder()
+                .boardDetailResponseDtoList(List.of(
+                        BoardDetailResponseDto.builder()
+                                .id(1L)
+                                .name("나의 보드1")
+                                .backgroundType("COLOR")
+                                .backgroundValue("#fffffff")
+                                .build(),
+                        BoardDetailResponseDto.builder()
+                                .id(2L)
+                                .name("나의 보드2")
+                                .backgroundType("IMAGE")
+                                .backgroundValue("https!!~~~")
+                                .build()
+                ))
+                .build();
+    }
+
+    private WorkspaceMemberCollectionResponseDto createMockMemberCollection() {
+        return WorkspaceMemberCollectionResponseDto.builder()
+                .workspaceMemberList(List.of(
+                        WorkspaceMemberDetailResponseDto.builder()
+                                .memberId(1L)
+                                .memberEmail("asdf@eawefsdz")
+                                .memberName("조시현")
+                                .memberProfileImgUrl("http~~")
+                                .authority("ADMIN")
+                                .build(),
+                        WorkspaceMemberDetailResponseDto.builder()
+                                .memberId(2L)
+                                .memberEmail("qwer@eawefsdz")
+                                .memberName("주효림")
+                                .memberProfileImgUrl("http~~")
+                                .authority("MEMBER")
+                                .build()
+                ))
+                .build();
+    }
+
+    private void mockDependencies(Long workspaceId, WorkSpace mockWorkSpace,
+                                  BoardCollectionResponseDto mockBoardCollectionResponseDto,
+                                  WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto) {
+        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+        when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(mockBoardCollectionResponseDto);
+        when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
+    }
+
+    private void assertWorkspaceDetail(WorkspaceDetailResponseDto result, WorkSpace mockWorkSpace,
+                                       BoardCollectionResponseDto mockBoardCollectionResponseDto,
+                                       WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto) {
+        assertEquals(mockWorkSpace.getId(), result.workSpaceId());
+        assertEquals(mockWorkSpace.getName(), result.name());
+        assertEquals(mockBoardCollectionResponseDto, result.boardList());
+        assertEquals(mockMemberCollectionResponseDto, result.workspaceMemberList());
+
+        // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
+        verify(workSpaceValidator, times(1)).validateNameIsPresent(result);
+    }
+
 
 }
