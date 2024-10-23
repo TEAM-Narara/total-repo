@@ -1,38 +1,29 @@
 package com.ssafy.board
 
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 suspend fun handleLazyListScroll(
     lazyListState: LazyListState,
     dropIndex: Int,
+    indexOffset: Int,
+    isRow: Boolean = false,
 ): Unit = coroutineScope {
-    val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
-    val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
+    val targetIndex = dropIndex + indexOffset
 
-    // Workaround to fix scroll issue when dragging the first item
-    if (dropIndex == 0 || dropIndex == 1) {
-        launch {
-            lazyListState.scrollToItem(firstVisibleItemIndex, firstVisibleItemScrollOffset)
-        }
+    val viewportSize = if (isRow) {
+        lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
+    } else {
+        lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
     }
 
-    // Animate scroll when entering the first or last item
-    val lastVisibleItemIndex =
-        lazyListState.firstVisibleItemIndex + lazyListState.layoutInfo.visibleItemsInfo.lastIndex
+    val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == targetIndex }
+    val itemSize = itemInfo?.size ?: 0
 
-    val firstVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return@coroutineScope
-    val scrollAmount = firstVisibleItem.size * 2f
+    val centerOffset = (viewportSize - itemSize) / 2
 
-    if (dropIndex <= firstVisibleItemIndex + 1) {
-        launch {
-            lazyListState.animateScrollBy(-scrollAmount)
-        }
-    } else if (dropIndex == lastVisibleItemIndex) {
-        launch {
-            lazyListState.animateScrollBy(scrollAmount)
-        }
-    }
+    lazyListState.animateScrollToItem(
+        index = targetIndex,
+        scrollOffset = -centerOffset,
+    )
 }

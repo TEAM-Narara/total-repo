@@ -1,6 +1,6 @@
 package com.ssafy.board
 
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -58,7 +58,7 @@ private fun BoardScreen(
         },
     ) { paddingValues ->
         BoardItem(
-            modifier = Modifier.padding(paddingValues).fillMaxHeight(),
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
             boardData = uiState.boardData,
             onListTitleChanged = onListTitleChanged,
             onCardReordered = onCardReordered,

@@ -39,7 +39,7 @@ fun BoardItem(
     boardData: BoardData,
     onListTitleChanged: () -> Unit,
     onListReordered: () -> Unit,
-    onCardReordered: () -> Unit
+    onCardReordered: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -61,6 +61,7 @@ fun BoardItem(
     // TODO : card의 onLongPressed가 내려오는 문제 해결
     ReorderContainer(state = listDndState) {
         LazyRow(
+            state = listLazyListState,
             horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
             modifier = modifier.padding(vertical = PaddingDefault)
         ) {
@@ -85,6 +86,8 @@ fun BoardItem(
                                 handleLazyListScroll(
                                     lazyListState = listLazyListState,
                                     dropIndex = index,
+                                    indexOffset = 1,
+                                    isRow = true
                                 )
                             }
                         }

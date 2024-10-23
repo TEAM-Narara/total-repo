@@ -106,6 +106,7 @@ fun ListItem(
                                     handleLazyListScroll(
                                         lazyListState = cardLazyListState,
                                         dropIndex = index,
+                                        indexOffset = 1,
                                     )
                                 }
                             }
