@@ -13,6 +13,7 @@ fun NavGraphBuilder.boardScreen(
     popBack: () -> Unit,
     navigateToFilterScreen: () -> Unit,
     navigateToNotificationScreen: () -> Unit,
+    navigateToBoardMenuScreen: () -> Unit,
 ) {
     composable<Board> { backStackEntry ->
         val board: Board = backStackEntry.toRoute()
@@ -24,7 +25,7 @@ fun NavGraphBuilder.boardScreen(
             popBack = popBack,
             navigateToFilterScreen = navigateToFilterScreen,
             navigateToNotificationScreen = navigateToNotificationScreen,
-            navigateToNotificationScreen = navigateToNotificationScreen,
+            navigateToBoardMenuScreen = navigateToBoardMenuScreen,
         )
     }
 }

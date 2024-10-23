@@ -87,6 +87,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             popBack = navController::popBackStack,
             navigateToFilterScreen = {},
             navigateToNotificationScreen = {},
+            navigateToBoardMenuScreen = {}
         )
     }
 }

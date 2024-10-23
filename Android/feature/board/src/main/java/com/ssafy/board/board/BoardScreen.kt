@@ -27,6 +27,7 @@ fun BoardScreen(
     popBack: () -> Unit,
     navigateToFilterScreen: () -> Unit,
     navigateToNotificationScreen: () -> Unit,
+    navigateToBoardMenuScreen: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -49,7 +50,7 @@ fun BoardScreen(
                 onListReordered = viewModel::updateListOrder,
                 onFilterPressed = navigateToFilterScreen,
                 onNotificationPressed = navigateToNotificationScreen,
-                onMorePressed = {},
+                onMorePressed = navigateToBoardMenuScreen,
                 popBack = popBack,
             )
 
