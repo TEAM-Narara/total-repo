@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -73,7 +76,7 @@ class BoardServiceImplTest {
         List<Board> mockBoardList = Arrays.asList(mockBoard1, mockBoard2);
 
         // boardRepository의 findAllByBoardId 호출 시 mock 데이터를 반환
-        when(boardRepository.findAllByBoardId(boardId)).thenReturn(mockBoardList);
+        when(boardRepository.findAllByWorkSpaceId(boardId)).thenReturn(mockBoardList);
 
         // CoverHandler 모킹
         when(coverHandler.getTypeValue(cover1)).thenReturn("COLOR");
@@ -198,4 +201,23 @@ class BoardServiceImplTest {
                 new Board(3L, "Board 3")
         );
     }
+
+    @DisplayName("보드를 성공적으로 찾을 수 있는 경우")
+    @ParameterizedTest
+    @MethodSource("provideBoards")
+    void testGetBoard_Success(Board board) {
+        // given
+        Long boardId = board.getId();  // Board의 ID
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));  // 정상적으로 Board가 반환되는 상황 설정
+
+        // when
+        Board result = boardService.getBoard(boardId);  // 실제 getBoard 호출
+
+        // then
+        assertNotNull(result);  // 결과가 null이 아닌지 확인
+        assertEquals(board, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
+        verify(boardRepository, times(1)).findById(boardId);  // findById가 한 번 호출되었는지 검증
+    }
+
+
 }
