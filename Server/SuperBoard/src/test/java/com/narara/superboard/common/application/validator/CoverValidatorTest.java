@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -89,5 +90,19 @@ class CoverValidatorTest {
 
         // 예외 발생하지 않음
         coverValidator.validateCoversEmpty(validCover);
+    }
+
+    @DisplayName("커버에 'type'이 없으면 NotFoundCoverTypeException이 발생한다")
+    @ParameterizedTest
+    @MethodSource("provideInvalidCoverDataByInvalidType")
+    void testValidateCoverTypeIsEmpty(Map<String, Object> cover) {
+        assertThrows(NotFoundCoverTypeException.class, () -> coverValidator.validateCoverTypeIsEmpty(cover));
+    }
+
+    static Stream<Arguments> provideInvalidCoverDataByInvalidType() {
+        return Stream.of(
+                Arguments.of(Map.of()),  // 빈 맵
+                Arguments.of(Map.of("value", "#ffffff"))  // 'type' 키가 없는 경우
+        );
     }
 }
