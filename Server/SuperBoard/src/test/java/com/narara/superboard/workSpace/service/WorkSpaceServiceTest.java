@@ -1,18 +1,18 @@
-package com.narara.superboard.worksapce.service;
+package com.narara.superboard.workSpace.service;
 
 
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.worksapce.entity.WorkSpace;
-import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceDetailResponseDto;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
-import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workSpace.entity.WorkSpace;
+import com.narara.superboard.workSpace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceDetailResponseDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workSpace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDetailResponseDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -64,9 +64,11 @@ class WorkSpaceServiceTest {
             "'나의 워크 스페이스', '워크스페이스 설명'",
             "'workspace', '워크스페이스 설명'"
     })
-    void testSuccessfulWorkSpaceCreation(String name, String description) {
+    void testSuccessfulWorkSpaceCreation(String name
+//                                         String description
+    ) {
         // given
-        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name);
+        WorkSpaceRequestCreateDto workspaceCreateDto = new WorkSpaceRequestCreateDto(name);
 
         // when
         workSpaceService.createWorkSpace(workspaceCreateDto);
@@ -83,7 +85,7 @@ class WorkSpaceServiceTest {
         // Given
         Long workspaceId = 1L;
         String newName = "새로운 워크스페이스";
-        String newDescription = "새로운 설명";
+//        String newDescription = "새로운 설명";
 
         WorkSpace existingWorkspace = WorkSpace.builder()
                 .id(workspaceId)
@@ -91,7 +93,7 @@ class WorkSpaceServiceTest {
 //                .description("기존 설명")
                 .build();
 
-        WorkspaceUpdateRequestDto updateRequest = WorkspaceUpdateRequestDto.builder()
+        WorkSpaceUpdateRequestDto updateRequest = WorkSpaceUpdateRequestDto.builder()
                 .name(newName)
 //                .description(newDescription)
                 .build();
@@ -203,7 +205,7 @@ class WorkSpaceServiceTest {
         mockDependencies(workspaceId, mockWorkSpace, mockBoardCollectionResponseDto, mockMemberCollectionResponseDto);
 
         // when
-        WorkspaceDetailResponseDto result = workSpaceService.getWorkspaceDetail(workspaceId);
+        WorkSpaceDetailResponseDto result = workSpaceService.getWorkspaceDetail(workspaceId);
 
         // then
         assertWorkspaceDetail(result, mockWorkSpace, mockBoardCollectionResponseDto, mockMemberCollectionResponseDto);
@@ -231,17 +233,17 @@ class WorkSpaceServiceTest {
     private WorkspaceMemberCollectionResponseDto createMockMemberCollection() {
         return WorkspaceMemberCollectionResponseDto.builder()
                 .workspaceMemberList(List.of(
-                        WorkspaceMemberDetailResponseDto.builder()
+                        WorkSpaceMemberDetailResponseDto.builder()
                                 .memberId(1L)
                                 .memberEmail("asdf@eawefsdz")
-                                .memberName("조시현")
+                                .memberNickname("조시현")
                                 .memberProfileImgUrl("http~~")
                                 .authority("ADMIN")
                                 .build(),
-                        WorkspaceMemberDetailResponseDto.builder()
+                        WorkSpaceMemberDetailResponseDto.builder()
                                 .memberId(2L)
                                 .memberEmail("qwer@eawefsdz")
-                                .memberName("주효림")
+                                .memberNickname("주효림")
                                 .memberProfileImgUrl("http~~")
                                 .authority("MEMBER")
                                 .build()
@@ -257,7 +259,7 @@ class WorkSpaceServiceTest {
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
     }
 
-    private void assertWorkspaceDetail(WorkspaceDetailResponseDto result, WorkSpace mockWorkSpace,
+    private void assertWorkspaceDetail(WorkSpaceDetailResponseDto result, WorkSpace mockWorkSpace,
                                        BoardCollectionResponseDto mockBoardCollectionResponseDto,
                                        WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto) {
         assertEquals(mockWorkSpace.getId(), result.workSpaceId());

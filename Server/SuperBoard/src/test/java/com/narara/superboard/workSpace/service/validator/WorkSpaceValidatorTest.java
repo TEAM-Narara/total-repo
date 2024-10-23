@@ -1,8 +1,8 @@
-package com.narara.superboard.worksapce.service.validator;
+package com.narara.superboard.workSpace.service.validator;
 
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,7 +30,7 @@ class WorkSpaceValidatorTest {
             "'', '워크스페이스 설명'"  // 이름이 빈 문자열인 경우
     })
     void testWorkSpaceEntityCreation(String name, String description) {
-        WorkspaceRequestCreateDto workspaceCreateDto = new WorkspaceRequestCreateDto(name);
+        WorkSpaceRequestCreateDto workspaceCreateDto = new WorkSpaceRequestCreateDto(name);
 
         assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceCreateDto));
     }
@@ -42,7 +42,7 @@ class WorkSpaceValidatorTest {
             "'', '워크스페이스 설명'"  // 이름이 빈 문자열인 경우
     })
     void testWorkSpaceEntityUpdate(String name, String description) {
-        WorkspaceUpdateRequestDto workspaceUpdateRequestDto = new WorkspaceUpdateRequestDto(name);
+        WorkSpaceUpdateRequestDto workspaceUpdateRequestDto = new WorkSpaceUpdateRequestDto(name);
 
         assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto));
     }

@@ -1,15 +1,15 @@
-package com.narara.superboard.worksapce.service;
+package com.narara.superboard.workSpace.service;
 
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
-import com.narara.superboard.worksapce.entity.WorkSpace;
-import com.narara.superboard.worksapce.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceDetailResponseDto;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceRequestCreateDto;
-import com.narara.superboard.worksapce.interfaces.dto.WorkspaceUpdateRequestDto;
-import com.narara.superboard.worksapce.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workSpace.entity.WorkSpace;
+import com.narara.superboard.workSpace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceDetailResponseDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workSpace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workSpace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceMemberService workSpaceMemberService;
 
     @Override
-    public void createWorkSpace(WorkspaceRequestCreateDto workspaceRequestCreateDto) throws WorkspaceNameNotFoundException {
+    public void createWorkSpace(WorkSpaceRequestCreateDto workspaceRequestCreateDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceRequestCreateDto);
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceRequestCreateDto);
@@ -35,7 +35,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
-    public WorkSpace updateWorkSpace(Long workSpaceId, WorkspaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
+    public WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
         WorkSpace workSpace = getWorkSpace(workSpaceId);
@@ -56,7 +56,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
-    public WorkspaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
+    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
 
         BoardCollectionResponseDto boardCollectionResponseDto =
@@ -64,7 +64,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkspaceMemberCollectionResponseDto workspaceMemberCollectionResponseDto =
                 workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
 
-        WorkspaceDetailResponseDto workspaceDetailResponseDto = WorkspaceDetailResponseDto.builder()
+        WorkSpaceDetailResponseDto workspaceDetailResponseDto = WorkSpaceDetailResponseDto.builder()
                 .workSpaceId(workSpace.getId())
                 .name(workSpace.getName())
                 .boardList(boardCollectionResponseDto)
