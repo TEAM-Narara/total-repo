@@ -59,17 +59,15 @@ fun CreateBoardBody(
         DropDownText(
             title = "워크 스페이스",
             dropdownList = workSpaceList.map { it.toString() },
-            text = workSpace,
-            onTextChange = setWorkSpace,
-            textColor = Primary
+            initItem = workSpace,
+            onItemChange = setWorkSpace,
         )
 
         DropDownText(
             title = "공개 범위",
             dropdownList = visibleList,
-            text = visibleScope,
-            onTextChange = setVisibleScope,
-            textColor = Primary
+            initItem = visibleScope,
+            onItemChange = setVisibleScope,
         )
 
         Row(

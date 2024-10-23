@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.designsystem.values.Black
 import com.ssafy.designsystem.values.PaddingOne
@@ -27,13 +28,14 @@ import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.values.White
 
 @Composable
-fun DropDownText(
+fun <T> DropDownText(
     modifier: Modifier = Modifier,
     title: String,
-    dropdownList: List<String>,
-    text: String,
-    onTextChange: (String) -> Unit,
-    textColor: Color = Black
+    dropdownList: List<T>,
+    initItem: T,
+    onItemChange: (T) -> Unit,
+    textColor: Color = Black,
+    dropdownItemToText: (T) -> String = { it -> it.toString() }
 ) {
     val (isExpanded, setExpanded) = remember { mutableStateOf(false) }
 
@@ -54,7 +56,7 @@ fun DropDownText(
             .padding(vertical = PaddingSmall)
         ) {
             Text(
-                text = text,
+                text = dropdownItemToText(initItem),
                 fontSize = TextMedium,
                 modifier = Modifier.weight(1f),
                 color = textColor
@@ -75,9 +77,15 @@ fun DropDownText(
         ) {
             dropdownList.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(text = item) },
+                    text = {
+                        Text(
+                            text = dropdownItemToText(item),
+                            fontSize = TextMedium,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    },
                     onClick = {
-                        onTextChange(item)
+                        onItemChange(item)
                         setExpanded(false)
                     }
                 )
@@ -92,7 +100,7 @@ fun DropDownTextPreview() {
     DropDownText(
         title = "워크 스페이스",
         dropdownList = listOf("workspace1", "workspace2", "workspace3"),
-        text = "workspace1",
-        onTextChange = {}
+        initItem = "workspace1",
+        onItemChange = {}
     )
 }
