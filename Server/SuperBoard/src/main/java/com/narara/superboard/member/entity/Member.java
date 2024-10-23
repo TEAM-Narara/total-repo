@@ -2,6 +2,7 @@ package com.narara.superboard.member.entity;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
@@ -25,4 +26,12 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<WorkSpaceMember> workspaceMemberList;
+
+
+    public Member(Long id, String nickname, String email, String profileImgUrl) {
+        this.id = id;
+        this.nickname = nickname;
+        this.email = email;
+        this.profileImgUrl = profileImgUrl;
+    }
 }

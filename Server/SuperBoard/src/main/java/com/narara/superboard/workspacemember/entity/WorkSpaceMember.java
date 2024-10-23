@@ -31,4 +31,12 @@ public class WorkSpaceMember {
     @Column(name = "authority", nullable = false, length = 50)
     private String authority;  // 권한 (ADMIN, MEMBER)
 
+    public WorkSpaceMember(WorkSpace workSpace) {
+        this.workSpace = workSpace;
+    }
+
+    public WorkSpaceMember(Member member, String authority) {
+        this.member = member;
+        this.authority = authority;
+    }
 }
