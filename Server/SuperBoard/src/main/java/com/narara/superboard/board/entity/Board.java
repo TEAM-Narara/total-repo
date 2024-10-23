@@ -5,7 +5,10 @@ import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -13,6 +16,9 @@ import java.util.Map;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "board")
 public class Board {
     @Id
@@ -82,5 +88,11 @@ public class Board {
 
     public void increaseVersion() {
         this.version += 1;
+    }
+
+    public Board(Long id, String name, Map<String, Object> cover) {
+        this.id = id;
+        this.name = name;
+        this.cover = cover;
     }
 }
