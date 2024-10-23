@@ -29,18 +29,33 @@ class BoardValidatorTest {
 
     @DisplayName("생성 DTO에 이름이 없으면 에러가 발생한다.")
     @ParameterizedTest
-    @MethodSource("provideInvalidBoardData")
-    void testBoardEntityCreation(String name, String visibility, Map<String, Object> background) {
+    @MethodSource("provideInvalidBoardDataByNoName")
+    void testBoardEntityCreationByName(String name, String visibility, Map<String, Object> background) {
         BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
 
         assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
     }
 
-    static Stream<Arguments> provideInvalidBoardData() {
+    static Stream<Arguments> provideInvalidBoardDataByNoName() {
         return Stream.of(
                 Arguments.of(null, "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
                 Arguments.of("", "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
-    
+
+    @DisplayName("생성 DTO에 가시성 정보가 없으면 에러가 발생한다.")
+    @ParameterizedTest
+    @MethodSource("provideInvalidBoardDataByNoVisibility")
+    void testBoardEntityCreationByVisibility(String name, String visibility, Map<String, Object> background) {
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
+
+        assertThrows(BoardVisibilityNotFoundException.class, () -> boardValidator.validateVisibilityIsPresent(boardCreateDto));
+    }
+
+    static Stream<Arguments> provideInvalidBoardDataByNoVisibility() {
+        return Stream.of(
+                Arguments.of("날아라 보드", null, Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of("나의 보드", " ", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+        );
+    }
 }
