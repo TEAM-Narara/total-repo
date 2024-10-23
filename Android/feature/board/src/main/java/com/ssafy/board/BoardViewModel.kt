@@ -21,7 +21,7 @@ class BoardViewModel @Inject constructor() : ViewModel() {
                     ListData(
                         id = "list $listData",
                         title = listData.toString(),
-                        cardCollection = (1..10).map { cardData ->
+                        cardCollection = (1..3).map { cardData ->
                             CardData(
                                 id = "card $listData$cardData",
                                 title = cardData.toString(),

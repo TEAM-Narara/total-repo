@@ -81,7 +81,9 @@ fun ListItem(
                 }
             }
 
-            cardList()
+            Box(modifier = Modifier.weight(1f, fill = false)) {
+                cardList()
+            }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.clickable { addCard() }) {
