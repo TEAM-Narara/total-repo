@@ -1,7 +1,7 @@
 package com.narara.superboard.workspace.entity;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
@@ -33,9 +33,9 @@ public class WorkSpace {
     @OneToMany(mappedBy = "workSpace")
     private List<Board> boardList;
 
-    public static WorkSpace createWorkSpace(WorkSpaceRequestCreateDto workspaceRequestCreateDto) {
+    public static WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         return WorkSpace.builder()
-                .name(workspaceRequestCreateDto.name())
+                .name(workspaceCreateRequestDto.name())
 //                .description(workspaceRequestCreateDto.description())
                 .build();
     }

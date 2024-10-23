@@ -8,7 +8,7 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceRequestCreateDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
@@ -68,7 +68,7 @@ class WorkSpaceServiceTest {
 //                                         String description
     ) {
         // given
-        WorkSpaceRequestCreateDto workspaceCreateDto = new WorkSpaceRequestCreateDto(name);
+        WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
 
         // when
         workSpaceService.createWorkSpace(workspaceCreateDto);
