@@ -261,7 +261,7 @@ class BoardServiceImplTest {
     }
 
     @ParameterizedTest
-    @DisplayName("보드 수정 시 이름이 존재하지 않으면 NotFoundException 발생 테스트")
+    @DisplayName("[ADMIN] 보드 수정 시 이름이 존재하지 않으면 NotFoundException 발생 테스트")
     @CsvSource({
             "'', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'",  // 이름이 빈 값인 경우
             "null, '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'"  // 이름이 null인 경우
@@ -286,7 +286,7 @@ class BoardServiceImplTest {
     }
 
     @ParameterizedTest
-    @DisplayName("보드 수정 시 가시성이 존재하지 않으면 NotFoundException 발생 테스트")
+    @DisplayName("[ADMIN] 보드 수정 시 가시성이 존재하지 않으면 NotFoundException 발생 테스트")
     @CsvSource({
             "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', ''",  // 가시성이 빈 값인 경우
             "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'null'"  // 가시성이 null인 경우
@@ -311,7 +311,7 @@ class BoardServiceImplTest {
     }
 
     @ParameterizedTest
-    @DisplayName("보드 수정 시 가시성이 적절하지 않으면 NotFoundException 발생 테스트")
+    @DisplayName("[ADMIN] 보드 수정 시 가시성이 적절하지 않으면 NotFoundException 발생 테스트")
     @CsvSource({
             "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'INVALID'",  // 가시성이 빈 값인 경우
             "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'NULL'"  // 가시성이 null인 경우
@@ -338,7 +338,7 @@ class BoardServiceImplTest {
 
 
     @Test
-    @DisplayName("[ADMIN] 보드 수정 시 커버가 존재하는데, 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생")
+    @DisplayName("보드 수정 시 커버가 존재하는데, 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생")
     void testUpdateBoard_MissingCoverType() {
         // given
         Long boardId = 1L;
@@ -358,7 +358,7 @@ class BoardServiceImplTest {
     }
 
     @Test
-    @DisplayName("[ADMIN] 보드 수정 시 커버가 존재하는데, 커버에 value 필드가 없으면 NotFoundCoverValueException 발생")
+    @DisplayName("보드 수정 시 커버가 존재하는데, 커버에 value 필드가 없으면 NotFoundCoverValueException 발생")
     void testUpdateBoard_MissingCoverValue() {
         // given
         Long boardId = 1L;
@@ -427,5 +427,45 @@ class BoardServiceImplTest {
 
         // 보드 수정 로직이 호출되었는지 확인
         verify(board, times(1)).updateBoardByAdmin(requestDto);
+    }
+
+    @Test
+    @DisplayName("보드 수정 시 커버가 존재하는데, 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생 (by Member)")
+    void testUpdateBoardByMember_MissingCoverType() {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> coverWithoutType = new HashMap<>();
+        coverWithoutType.put("value", "#ffffff");  // type 필드 없음
+
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutType, "PRIVATE");
+
+        // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
+        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
+
+        // when & then: 예외가 발생하는지 확인
+        assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoardByMember(boardId, requestDto));
+
+        // verify: coverValidator가 호출되었는지 확인
+        verify(coverValidator, times(1)).validateContainCover(requestDto);
+    }
+
+    @Test
+    @DisplayName("보드 수정 시 커버가 존재하는데, 커버에 value 필드가 없으면 NotFoundCoverValueException 발생 (by Member)")
+    void testUpdateBoardByMember_MissingCoverValue() {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> coverWithoutValue = new HashMap<>();
+        coverWithoutValue.put("type", "COLOR");  // value 필드 없음
+
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutValue, "PRIVATE");
+
+        // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
+        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
+
+        // when & then: 예외가 발생하는지 확인
+        assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoardByMember(boardId, requestDto));
+
+        // verify: coverValidator가 호출되었는지 확인
+        verify(coverValidator, times(1)).validateContainCover(requestDto);
     }
 }
