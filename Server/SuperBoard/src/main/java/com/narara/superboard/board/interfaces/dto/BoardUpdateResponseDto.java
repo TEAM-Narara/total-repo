@@ -1,6 +1,5 @@
 package com.narara.superboard.board.interfaces.dto;
 
-import java.util.List;
 import java.util.Map;
 
 public record BoardUpdateResponseDto(
