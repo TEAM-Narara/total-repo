@@ -3,6 +3,7 @@ package com.narara.superboard.common.application.validator;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.common.exception.authority.InvalidAuthorityFormatException;
 import com.narara.superboard.common.exception.authority.NotFoundAuthorityException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,10 +14,14 @@ import org.mockito.InjectMocks;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("AuthorityValidator 테스트")
-class AuthorityValidatorTest implements MockSuperBoardUnitTests {
+class AuthorityValidatorTest {
 
-    @InjectMocks
     private AuthorityValidator authorityValidator;
+
+    @BeforeEach
+    public void setUp() {
+        authorityValidator = new AuthorityValidator();
+    }
 
     @Test
     @DisplayName("유효하지 않은 권한 값 전달 시 InvalidAuthorityFormatException 발생")
