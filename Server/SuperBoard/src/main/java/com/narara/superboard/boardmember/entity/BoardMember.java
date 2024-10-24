@@ -39,7 +39,7 @@ public class BoardMember {
     @Column(name = "authority", nullable = false, length = 50)
     private Authority authority;  // 권한 (ADMIN, MEMBER)
 
-    @Column(name = "is_alert", nullable = false, columnDefinition = "false")
+    @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
     public BoardMember(Board board) {
@@ -49,5 +49,9 @@ public class BoardMember {
     public BoardMember(Member member, Authority authority) {
         this.member = member;
         this.authority = authority;
+    }
+
+    public void changeIsAlert() {
+        this.isAlert = !isAlert;
     }
 }
