@@ -33,4 +33,19 @@ class AuthorityValidatorTest {
         // when & then
         assertThrows(InvalidAuthorityFormatException.class, () -> authorityValidator.validateAuthorityTypeIsValid(invalidAuthority));
     }
+
+    @ParameterizedTest
+    @DisplayName("비어있는 권한 타입이 전달될 경우 NotFoundAuthorityException 예외 발생")
+    @CsvSource({
+            "'',",    // 빈 문자열
+            "null"    // null 값
+    })
+    void testValidateAuthorityTypeIsValidFailure(String invalidAuthority) {
+        // 권한 값이 null인 경우 처리
+        String authority = "null".equals(invalidAuthority) ? null : invalidAuthority;
+
+        // NotFoundAuthorityException 예외 발생 검증
+        assertThrows(NotFoundAuthorityException.class, () -> authorityValidator.validateAuthorityTypeIsValid(authority));
+    }
+
 }
