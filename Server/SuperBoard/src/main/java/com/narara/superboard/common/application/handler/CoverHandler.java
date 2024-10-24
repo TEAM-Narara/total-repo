@@ -20,11 +20,11 @@ public class CoverHandler {
 
         coverValidator.validateCoverTypeIsValid(result);
 
-        return CoverType.valueOf(result.toUpperCase());
+        return CoverType.fromString(result.toUpperCase());
     }
 
     public String getTypeValue(Map<String, Object> cover) {
-        return getType(cover).getValue();
+        return getType(cover).toString();
     }
 
     public String getValue(Map<String, Object> cover) {

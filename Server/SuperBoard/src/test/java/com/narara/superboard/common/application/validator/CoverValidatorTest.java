@@ -59,7 +59,7 @@ class CoverValidatorTest implements MockSuperBoardUnitTests {
     @DisplayName("유효한 커버 타입일 경우 예외 발생하지 않음")
     void testValidCoverType(CoverType coverType) {
         // 유효한 커버 타입 값이 전달될 때 예외가 발생하지 않는지 테스트
-        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(coverType.getValue()));
+        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(coverType.toString()));
     }
 
     @DisplayName("커버가 null이거나 비어 있을 때 NotFoundException이 발생한다")

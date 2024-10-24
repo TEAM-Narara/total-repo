@@ -53,7 +53,7 @@ public class Board {
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = boardUpdateRequestDto.background();
         this.name = boardUpdateRequestDto.name();
-        this.visibility = Visibility.fromString(boardUpdateRequestDto.visibility());
+        this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         return this;
     }
     public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
