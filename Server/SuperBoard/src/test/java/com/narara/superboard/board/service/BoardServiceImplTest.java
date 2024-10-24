@@ -8,8 +8,10 @@ import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
+import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.Optional;
@@ -48,6 +50,9 @@ class BoardServiceImplTest {
 
     @Mock
     private CoverValidator coverValidator;
+
+    @Mock
+    private NameValidator nameValidator;
 
     @Mock
     private CoverHandler coverHandler;
@@ -465,4 +470,23 @@ class BoardServiceImplTest {
         // verify: coverValidator가 호출되었는지 확인
         verify(coverValidator, times(1)).validateContainCover(requestDto);
     }
+
+    @Test
+    @DisplayName("보드 수정 시 보드 이름이 존재하지 않으면 NotFoundNameException 발생 (by Member)")
+    void testUpdateBoardByMember_NameNotFoundException() {
+        // given
+        Long boardId = 1L;
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto(null, Map.of("type", "COLOR", "value", "#ffffff"));
+
+        // Mock: 이름이 없는 경우 예외를 발생시키도록 설정
+        doThrow(new NotFoundNameException("보드")).when(nameValidator).validateNameIsEmpty(requestDto);
+
+        // when & then: 이름이 없을 때 NotFoundNameException이 발생하는지 확인
+        assertThrows(NotFoundNameException.class, () -> boardService.updateBoardByMember(boardId, requestDto));
+
+        // verify: 이름 검증이 호출되었는지 확인
+        verify(nameValidator, times(1)).validateNameIsEmpty(requestDto);
+    }
+
+
 }
