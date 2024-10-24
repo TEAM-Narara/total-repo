@@ -3,10 +3,14 @@ package com.ssafy.board.board.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -29,8 +33,12 @@ import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.board.board.data.toReorderCardData
 import com.ssafy.board.board.handleLazyListScroll
 import com.ssafy.designsystem.values.CornerMedium
+import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.ElevationLarge
+import com.ssafy.designsystem.values.ListWidth
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.designsystem.values.White
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,6 +48,7 @@ fun BoardItem(
     onListTitleChanged: () -> Unit,
     onListReordered: () -> Unit,
     onCardReordered: () -> Unit,
+    addList: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -71,7 +80,6 @@ fun BoardItem(
                     state = listDndState,
                     key = listData.id,
                     data = listData,
-                    zIndex = 1f,
                     dropStrategy = DropStrategy.CenterDistance,
                     dragAfterLongPress = true,
                     onDragEnter = { state ->
@@ -86,7 +94,6 @@ fun BoardItem(
                                 handleLazyListScroll(
                                     lazyListState = listLazyListState,
                                     dropIndex = index,
-                                    isRow = true
                                 )
                             }
                         }
@@ -116,6 +123,22 @@ fun BoardItem(
                     )
                 }
             }
+
+            item {
+                Card(
+                    modifier = Modifier.width(ListWidth),
+                    shape = RoundedCornerShape(CornerMedium),
+                    colors = CardDefaults.cardColors().copy(containerColor = White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = ElevationDefault),
+                    onClick = addList
+                ) {
+                    Text(
+                        text = "+ Add List",
+                        modifier = Modifier.padding(PaddingDefault),
+                        fontSize = TextMedium,
+                    )
+                }
+            }
         }
     }
 }
@@ -127,7 +150,7 @@ private fun BoardItemPreview() {
         boardData = BoardData(
             id = "board 1",
             title = "title",
-            listCollection = (1..3).map { listData ->
+            listCollection = (1..1).map { listData ->
                 ListData(
                     id = "list $listData",
                     title = listData.toString(),
@@ -143,6 +166,7 @@ private fun BoardItemPreview() {
         ),
         onListTitleChanged = { },
         onListReordered = { },
-        onCardReordered = { }
+        onCardReordered = { },
+        addList = {}
     )
 }

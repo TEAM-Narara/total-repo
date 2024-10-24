@@ -52,4 +52,5 @@ class BoardViewModel @Inject constructor() : ViewModel() {
     fun updateListTitle() {}
     fun updateListOrder() {}
     fun updateCardOrder() {}
+    fun addList() {}
 }

@@ -50,6 +50,7 @@ fun BoardScreen(
                 onNotificationPressed = navigateToNotificationScreen,
                 onMorePressed = navigateToBoardMenuScreen,
                 popBack = popBack,
+                addList = viewModel::addList,
             )
 
             is UiState.Error -> BoardErrorScreen(
@@ -58,6 +59,45 @@ fun BoardScreen(
                 onNotificationPressed = navigateToNotificationScreen,
             )
         }
+    }
+}
+
+
+@Composable
+private fun BoardScreen(
+    modifier: Modifier = Modifier,
+    boardData: BoardData,
+    onBoardTitleChanged: () -> Unit,
+    onListTitleChanged: () -> Unit,
+    onCardReordered: () -> Unit,
+    onListReordered: () -> Unit,
+    onFilterPressed: () -> Unit,
+    onNotificationPressed: () -> Unit,
+    onMorePressed: () -> Unit,
+    popBack: () -> Unit,
+    addList: () -> Unit,
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = boardData.title,
+                onBackPressed = popBack,
+                onBoardTitleChanged = { onBoardTitleChanged() },
+                onFilterPressed = onFilterPressed,
+                onNotificationPressed = onNotificationPressed,
+                onMorePressed = onMorePressed,
+            )
+        },
+    ) { paddingValues ->
+        BoardItem(
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            boardData = boardData,
+            onListTitleChanged = onListTitleChanged,
+            onCardReordered = onCardReordered,
+            onListReordered = onListReordered,
+            addList = addList,
+        )
     }
 }
 
@@ -119,44 +159,6 @@ fun BoardErrorScreen(
     }
 }
 
-@Composable
-private fun BoardScreen(
-    modifier: Modifier = Modifier,
-    boardData: BoardData,
-    onBoardTitleChanged: () -> Unit,
-    onListTitleChanged: () -> Unit,
-    onCardReordered: () -> Unit,
-    onListReordered: () -> Unit,
-    onFilterPressed: () -> Unit,
-    onNotificationPressed: () -> Unit,
-    onMorePressed: () -> Unit,
-    popBack: () -> Unit,
-) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = boardData.title,
-                onBackPressed = popBack,
-                onBoardTitleChanged = { onBoardTitleChanged() },
-                onFilterPressed = onFilterPressed,
-                onNotificationPressed = onNotificationPressed,
-                onMorePressed = onMorePressed,
-            )
-        },
-    ) { paddingValues ->
-        BoardItem(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            boardData = boardData,
-            onListTitleChanged = onListTitleChanged,
-            onCardReordered = onCardReordered,
-            onListReordered = onListReordered,
-        )
-    }
-}
-
 @Preview
 @Composable
 private fun BoardScreenPreview() {
@@ -185,7 +187,8 @@ private fun BoardScreenPreview() {
         onFilterPressed = {},
         onNotificationPressed = {},
         onMorePressed = {},
-        popBack = {}
+        popBack = {},
+        addList = {}
     )
 }
 
