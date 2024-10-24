@@ -19,12 +19,14 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class BoardServiceImplTest {
 
     @InjectMocks
@@ -68,11 +71,6 @@ class BoardServiceImplTest {
      */
     @Mock
     private Board board;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);  // Mockito 초기화
-    }
 
     @Test
     @DisplayName("보드와 관련된 보드에 대한 조회 성공 테스트")
@@ -488,5 +486,56 @@ class BoardServiceImplTest {
         verify(nameValidator, times(1)).validateNameIsEmpty(requestDto);
     }
 
+    @ParameterizedTest
+    @DisplayName("아카이브된 보드 리스트 조회 성공 테스트")
+    @CsvSource({
+            "1",
+            "2"
+    })
+    void testGetArchivedBoards_Success(Long workspaceId) {
+        // given: 모킹된 아카이브된 보드 리스트 생성
+        List<Board> archivedBoards = Arrays.asList(
+                Board.builder().id(1L).name("Board 1").isArchived(true).build(),
+                Board.builder().id(2L).name("Board 2").isArchived(true).build()
+        );
+
+        // Mock: boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue 호출 시 모킹된 보드 리스트 반환
+        when(boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId)).thenReturn(archivedBoards);
+
+        // when: 아카이브된 보드 리스트 조회
+        List<Board> result = boardService.getArchivedBoards(workspaceId);
+
+        // then: 반환된 리스트가 모킹된 보드 리스트와 동일한지 확인
+        assertEquals(archivedBoards.size(), result.size());
+        assertEquals(archivedBoards.get(0).getName(), result.get(0).getName());
+        assertEquals(archivedBoards.get(1).getName(), result.get(1).getName());
+        verify(boardRepository, times(1)).findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
+    }
+
+
+    @ParameterizedTest
+    @DisplayName("보드 아카이브 상태 변경 성공 테스트")
+    @CsvSource({
+            "1, true",
+            "2, false"
+    })
+    void testUpdateArchiveStatus_Success(Long boardId, boolean isArchived) {
+        // given: 보드 모킹
+        Board board = Board.builder()
+                .id(boardId)
+                .name("Test Board")
+                .isArchived(false)
+                .build();
+
+        // Mock: getBoard 호출 시 모킹된 보드 반환
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // when: 보드 아카이브 상태 변경
+        boardService.updateArchiveStatus(boardId, isArchived);
+
+        // then: 보드의 아카이브 상태가 변경된 값인지 확인
+        assertEquals(isArchived, board.getIsArchived());
+        verify(boardRepository, times(1)).findById(boardId);
+    }
 
 }
