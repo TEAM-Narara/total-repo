@@ -4,10 +4,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
 import com.narara.superboard.board.infrastrucuture.BoardRepository;
-import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
@@ -437,7 +434,7 @@ class BoardServiceImplTest {
         Map<String, Object> coverWithoutType = new HashMap<>();
         coverWithoutType.put("value", "#ffffff");  // type 필드 없음
 
-        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutType, "PRIVATE");
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutType);
 
         // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
@@ -457,7 +454,7 @@ class BoardServiceImplTest {
         Map<String, Object> coverWithoutValue = new HashMap<>();
         coverWithoutValue.put("type", "COLOR");  // value 필드 없음
 
-        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutValue, "PRIVATE");
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutValue);
 
         // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
