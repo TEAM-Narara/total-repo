@@ -48,4 +48,11 @@ class AuthorityValidatorTest {
         assertThrows(NotFoundAuthorityException.class, () -> authorityValidator.validateAuthorityTypeIsValid(authority));
     }
 
+    @ParameterizedTest
+    @DisplayName("유효한 권한 타입이 전달될 경우 예외 발생하지 않음")
+    @ValueSource(strings = {"ADMIN", "MEMBER"})
+    void testValidateAuthorityTypeIsValidSuccess(String validAuthority) {
+        // 그린사이클: 유효한 권한 값일 때 예외가 발생하지 않음
+        assertDoesNotThrow(() -> authorityValidator.validateAuthorityTypeIsValid(validAuthority));
+    }
 }
