@@ -1,5 +1,6 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
@@ -85,8 +86,8 @@ class WorkSpaceMemberServiceImplTest {
         Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "http://profile2.img");
 
 
-        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, "ADMIN");
-        WorkSpaceMember mockWorkSpaceMember2 = new WorkSpaceMember(mockMember2, "MEMBER");
+        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
+        WorkSpaceMember mockWorkSpaceMember2 = new WorkSpaceMember(mockMember2, Authority.MEMBER);
 
         List<WorkSpaceMember> mockWorkSpaceMemberList = List.of(mockWorkSpaceMember1, mockWorkSpaceMember2);
 

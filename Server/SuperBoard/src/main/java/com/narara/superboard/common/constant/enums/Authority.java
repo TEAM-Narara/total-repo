@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Authority {
     ADMIN("ADMIN"),
-    USER("USER");
+    MEMBER("MEMBER");
 
     private final String value;
 }

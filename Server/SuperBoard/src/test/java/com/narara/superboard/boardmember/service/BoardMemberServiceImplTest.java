@@ -10,6 +10,7 @@ import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
 
@@ -50,8 +51,8 @@ class BoardMemberServiceImplTest {
         Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "http://profile2.img");
 
 
-        BoardMember mockBoardMember1 = new BoardMember(mockMember1, "ADMIN");
-        BoardMember mockBoardMember2 = new BoardMember(mockMember2, "MEMBER");
+        BoardMember mockBoardMember1 = new BoardMember(mockMember1, Authority.ADMIN);
+        BoardMember mockBoardMember2 = new BoardMember(mockMember2, Authority.MEMBER);
 
         List<BoardMember> mockBoardMemberList = List.of(mockBoardMember1, mockBoardMember2);
 

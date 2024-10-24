@@ -1,6 +1,7 @@
 package com.narara.superboard.boardmember.entity;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,13 +37,16 @@ public class BoardMember {
     private Board board;  // 워크스페이스 ID
 
     @Column(name = "authority", nullable = false, length = 50)
-    private String authority;  // 권한 (ADMIN, MEMBER)
+    private Authority authority;  // 권한 (ADMIN, MEMBER)
+
+    @Column(name = "is_alert", nullable = false, columnDefinition = "false")
+    private boolean isAlert;
 
     public BoardMember(Board board) {
         this.board = board;
     }
 
-    public BoardMember(Member member, String authority) {
+    public BoardMember(Member member, Authority authority) {
         this.member = member;
         this.authority = authority;
     }
