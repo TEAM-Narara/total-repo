@@ -3,13 +3,11 @@ package com.narara.superboard.board.service;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastrucuture.BoardRepository;
-import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
+import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
+    private final NameValidator nameValidator;
 
     private final CoverHandler coverHandler;
 
@@ -89,6 +88,19 @@ public class BoardServiceImpl implements BoardService {
         Board board = getBoard(boardId);
 
         return board.updateBoardByAdmin(boardUpdateRequestDto);
+    }
+
+    @Override
+    public Board updateBoardByMember(Long boardId, BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
+        nameValidator.validateNameIsEmpty(boardUpdateByMemberRequestDto);
+
+        if (boardUpdateByMemberRequestDto.cover() != null) {
+            coverValidator.validateContainCover(boardUpdateByMemberRequestDto);
+        }
+
+        Board board = getBoard(boardId);
+
+        return board.updateBoardByMember(boardUpdateByMemberRequestDto);
     }
 
 

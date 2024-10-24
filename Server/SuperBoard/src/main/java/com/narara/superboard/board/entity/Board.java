@@ -1,6 +1,7 @@
 package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
+import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -52,7 +53,12 @@ public class Board {
         this.visibility = Visibility.fromString(boardUpdateRequestDto.visibility());
         return this;
     }
+    public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
+        this.cover = boardUpdateByMemberRequestDto.background();
+        this.name = boardUpdateByMemberRequestDto.name();
+        return this;
 
+    }
     public void increaseVersion() {
         this.version += 1;
     }
@@ -67,4 +73,6 @@ public class Board {
         this.id = id;
         this.name = name;
     }
+
+
 }
