@@ -83,7 +83,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
 
         // then: CoverHandler의 getType 메서드가 제대로 커버 타입을 반환하는지 검증
         CoverType result = coverHandler.getType(validCover);
-        assertEquals(CoverType.valueOf(type.toUpperCase()), result);
+        assertEquals(CoverType.fromString(type.toUpperCase()), result);
 
         // 검증: 메서드들이 한 번씩 호출되었는지 확인
         verify(coverValidator, times(1)).validateCoversEmpty(validCover);
@@ -106,7 +106,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
 
         // then
         String result = coverHandler.getTypeValue(validCover);
-        assertEquals(CoverType.COLOR.getValue(), result);  // CoverType.COLOR의 value와 동일한지 확인
+        assertEquals(CoverType.COLOR.toString(), result);  // CoverType.COLOR의 value와 동일한지 확인
 
         // 메서드가 제대로 호출되었는지 검증
         verify(coverValidator, times(1)).validateCoversEmpty(validCover);

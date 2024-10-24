@@ -25,7 +25,7 @@ public class BoardValidator {
     public void validateVisibilityIsValid(BoardCoreHolder boardCoreHolder) {
         try {
             String visibility = boardCoreHolder.visibility();
-            Visibility.valueOf(visibility.toUpperCase());
+            Visibility.fromString(visibility.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BoardInvalidVisibilityFormatException();
         }

@@ -15,7 +15,7 @@ public class AuthorityValidator {
         // 2. 주어진 값이 유효한 authority의 value와 일치하는지 확인
         boolean isValid = false;
         for (Authority authority : Authority.values()) {
-            if (authority.getValue().equals(authorityValue)) {
+            if (authority.toString().equals(authorityValue)) {
                 isValid = true;
                 break;
             }
