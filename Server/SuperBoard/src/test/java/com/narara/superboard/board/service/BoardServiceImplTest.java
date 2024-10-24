@@ -268,5 +268,30 @@ class BoardServiceImplTest {
         verify(boardValidator, times(0)).validateVisibilityIsPresent(requestDto); // 호출되지 않음
     }
 
+    @ParameterizedTest
+    @DisplayName("보드 수정 시 가시성이 존재하지 않으면 NotFoundException 발생 테스트")
+    @CsvSource({
+            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', ''",  // 가시성이 빈 값인 경우
+            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'null'"  // 가시성이 null인 경우
+    })
+    void testUpdateBoard_VisibilityInvalidValue(String name, String backgroundJson, String visibility) {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
+
+        // 요청 DTO 생성
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, background, visibility);
+
+        // Mocking: validateVisibilityIsPresent 호출 시 예외 발생 설정
+        doThrow(new NotFoundException("Board", "visibility")).when(boardValidator).validateVisibilityIsPresent(requestDto);
+
+        // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
+        assertThrows(NotFoundException.class, () -> boardService.updateBoard(boardId, requestDto));
+
+        // 검증: 가시성 검증이 호출되었는지 확인
+        verify(boardValidator, times(1)).validateNameIsPresent(requestDto); // 호출된 후 호출됨.
+        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+    }
+
 
 }
