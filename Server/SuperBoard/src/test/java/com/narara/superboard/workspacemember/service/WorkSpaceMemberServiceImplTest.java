@@ -1,5 +1,6 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -10,12 +11,10 @@ import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("WorkSpaceMemberServiceImpl 대한 Test")
-class WorkSpaceMemberServiceImplTest {
+class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private WorkSpaceMemberServiceImpl workSpaceMemberService;
@@ -32,12 +31,6 @@ class WorkSpaceMemberServiceImplTest {
     private WorkSpaceMemberRepository workSpaceMemberRepository;
     @Mock
     private WorkSpaceValidator workSpaceValidator;
-
-    @BeforeEach
-    void setUp() {
-        // Mockito가 Mock 객체를 초기화
-        MockitoAnnotations.openMocks(this);
-    }
 
 
     @Test

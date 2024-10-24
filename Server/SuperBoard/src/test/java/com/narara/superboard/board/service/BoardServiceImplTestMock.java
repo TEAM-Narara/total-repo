@@ -1,5 +1,6 @@
 package com.narara.superboard.board.service;
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
@@ -16,17 +17,13 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class BoardServiceImplTest {
+class BoardServiceImplTestMock implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private BoardServiceImpl boardService;

@@ -1,11 +1,11 @@
 package com.narara.superboard.boardmember.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -15,15 +15,13 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @DisplayName("BoardMemberServiceImpl 대한 Test")
-class BoardMemberServiceImplTest {
+class BoardMemberServiceImplTestMock implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private BoardMemberServiceImpl boardMemberService;
@@ -32,12 +30,6 @@ class BoardMemberServiceImplTest {
     private BoardMemberRepository boardMemberRepository;
     @Mock
     private BoardValidator boardValidator;
-
-    @BeforeEach
-    void setUp() {
-        // Mockito가 Mock 객체를 초기화
-        MockitoAnnotations.openMocks(this);
-    }
 
 
     @Test

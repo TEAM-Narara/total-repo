@@ -5,8 +5,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
@@ -14,29 +14,22 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 
 @DisplayName("CoverHandler 테스트")
-class CoverHandlerTest {
+class CoverHandlerTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private CoverHandler coverHandler;
 
     @Mock
     private CoverValidator coverValidator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     // MethodSource로 Map 데이터를 제공
     static Stream<Map<String, Object>> provideInvalidCovers() {

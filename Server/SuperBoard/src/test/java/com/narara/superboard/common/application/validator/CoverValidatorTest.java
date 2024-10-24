@@ -3,6 +3,7 @@ package com.narara.superboard.common.application.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
@@ -11,29 +12,20 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 
 
 @DisplayName("CoverValidator 테스트")
-class CoverValidatorTest {
+class CoverValidatorTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private CoverValidator coverValidator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);  // Mockito 초기화
-    }
 
     @Test
     @DisplayName("커버 타입이 null일 경우 NotFoundCoverTypeException 발생")
