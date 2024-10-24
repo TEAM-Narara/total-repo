@@ -527,7 +527,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
 
         // when: 보드 아카이브 상태 변경
-        boardService.updateArchiveStatus(boardId);
+        boardService.changeArchiveStatus(boardId);
 
         // then: 보드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, board.getIsArchived());
