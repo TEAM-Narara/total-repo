@@ -28,7 +28,7 @@ public class CoverValidator {
         // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
         boolean isValid = false;
         for (CoverType type : CoverType.values()) {
-            if (type.getValue().equals(coverTypeValue)) {
+            if (type.toString().equals(coverTypeValue)) {
                 isValid = true;
                 break;
             }

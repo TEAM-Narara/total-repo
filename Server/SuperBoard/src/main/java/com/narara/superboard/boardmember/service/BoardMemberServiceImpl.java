@@ -32,7 +32,7 @@ public class BoardMemberServiceImpl implements BoardMemberService{
                             .memberEmail(boardMember.getMember().getEmail())
                             .memberNickname(boardMember.getMember().getNickname())
                             .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
-                            .authority(boardMember.getAuthority().getValue())
+                            .authority(boardMember.getAuthority().toString())
                             .build();
 
             boardDetailResponseDtoList.add(boardMemberDetailResponseDto);
