@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * 3. 코드 간결화: 반복적인 Mockito 설정을 추상화하여 코드가 더 깔끔해짐.
  * </p>
  */
+// @Mock으로 선언된 필드를 자동으로 모킹(Mock) 객체로 초기화합니다.
 @ExtendWith(MockitoExtension.class)
 public interface MockSuperBoardUnitTests {
 }
