@@ -1,6 +1,7 @@
 package com.narara.superboard.workspace.service;
 
 
+import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("워크스페이스 서비스 테스트")
-class WorkSpaceServiceTest {
+class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     // 실제 테스트 대상 객체를 생성하고 초기화할 때 사용
     @InjectMocks
@@ -50,12 +51,6 @@ class WorkSpaceServiceTest {
 
     @Mock
     private WorkSpaceValidator workSpaceValidator; // 의존성을 Mocking
-
-    @BeforeEach
-    void setUp() {
-        // Mockito가 Mock 객체를 초기화
-        MockitoAnnotations.openMocks(this);
-    }
 
 
     @DisplayName("워크스페이스가 생성 성공 테스트")
