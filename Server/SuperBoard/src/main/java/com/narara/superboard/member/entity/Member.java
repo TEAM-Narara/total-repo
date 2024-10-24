@@ -3,12 +3,15 @@ package com.narara.superboard.member.entity;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id
@@ -23,6 +26,9 @@ public class Member {
 
     @Column(name = "profile_img_url")
     private String profileImgUrl;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
     @OneToMany(mappedBy = "member")
     private List<WorkSpaceMember> workspaceMemberList;
