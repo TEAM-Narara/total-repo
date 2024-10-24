@@ -103,5 +103,17 @@ public class BoardServiceImpl implements BoardService {
         return board.updateBoardByMember(boardUpdateByMemberRequestDto);
     }
 
+    // 아카이브된 보드 리스트 조회
+    @Override
+    public List<Board> getArchivedBoards(Long workspaceId) {
+        return boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
+    }
+
+    // 보드 아카이브 상태 변경
+    @Override
+    public void updateArchiveStatus(Long boardId, boolean isArchived) {
+        Board board = getBoard(boardId);
+        board.changeArchiveStatus(isArchived);
+    }
 
 }
