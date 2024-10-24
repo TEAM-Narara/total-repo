@@ -6,10 +6,11 @@ import com.narara.superboard.board.infrastrucuture.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.workspace.entity.WorkSpace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +23,15 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardValidator boardValidator;
+    private final CoverValidator coverValidator;
+
     private final CoverHandler coverHandler;
 
     @Override
     public BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId) {
         List<Board> BoardList = boardRepository.findAllByWorkSpaceId(workSpaceId);
 
-        List<BoardDetailResponseDto> boardDetailResponseDtoList= new ArrayList<>();
+        List<BoardDetailResponseDto> boardDetailResponseDtoList = new ArrayList<>();
 
         for (Board board : BoardList) {
             BoardDetailResponseDto boardDto = BoardDetailResponseDto.builder()
@@ -72,4 +75,21 @@ public class BoardServiceImpl implements BoardService {
         Board board = getBoard(boardId);
         boardRepository.delete(board);
     }
+
+    @Override
+    public Board updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
+        boardValidator.validateNameIsPresent(boardUpdateRequestDto);
+        boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
+        boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
+
+        if (boardUpdateRequestDto.cover() != null) {
+            coverValidator.validateContainCover(boardUpdateRequestDto);
+        }
+
+        Board board = getBoard(boardId);
+
+        return board.updateBoardByAdmin(boardUpdateRequestDto);
+    }
+
+
 }

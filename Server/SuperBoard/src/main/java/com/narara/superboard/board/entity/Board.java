@@ -1,6 +1,7 @@
 package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
+import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -44,6 +45,13 @@ public class Board {
     @JoinColumn(name = "workspace_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 키
+
+    public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
+        this.cover = boardUpdateRequestDto.background();
+        this.name = boardUpdateRequestDto.name();
+        this.visibility = Visibility.fromString(boardUpdateRequestDto.visibility());
+        return this;
+    }
 
     public void increaseVersion() {
         this.version += 1;
