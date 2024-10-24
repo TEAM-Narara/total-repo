@@ -44,16 +44,16 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
-                )
-                // jwt 관련 설정
-                .addFilterBefore(JwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(), JwtAuthenticationFilter.getClass()) // 토큰 예외 핸들링
-
-                // 인증 예외 핸들링
-                .exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
+                );
+//                // jwt 관련 설정
+//                .addFilterBefore(JwtAuthenticationFilter,
+//                UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthenticationFilter(), JwtAuthenticationFilter.getClass()) // 토큰 예외 핸들링
+//
+//                // 인증 예외 핸들링
+//                .exceptionHandling((exceptions) -> exceptions
+//                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+//                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }
