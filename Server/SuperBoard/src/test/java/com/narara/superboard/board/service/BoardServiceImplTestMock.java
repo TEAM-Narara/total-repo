@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class BoardServiceImplTestMock implements MockSuperBoardUnitTests {
+class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private BoardServiceImpl boardService;
@@ -520,17 +520,17 @@ class BoardServiceImplTestMock implements MockSuperBoardUnitTests {
         Board board = Board.builder()
                 .id(boardId)
                 .name("Test Board")
-                .isArchived(false)
+                .isArchived(isArchived)
                 .build();
 
         // Mock: getBoard 호출 시 모킹된 보드 반환
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
 
         // when: 보드 아카이브 상태 변경
-        boardService.updateArchiveStatus(boardId, isArchived);
+        boardService.updateArchiveStatus(boardId);
 
         // then: 보드의 아카이브 상태가 변경된 값인지 확인
-        assertEquals(isArchived, board.getIsArchived());
+        assertEquals(!isArchived, board.getIsArchived());
         verify(boardRepository, times(1)).findById(boardId);
     }
 

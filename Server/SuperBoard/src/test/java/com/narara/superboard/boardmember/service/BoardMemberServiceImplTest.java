@@ -21,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 @DisplayName("BoardMemberServiceImpl 대한 Test")
-class BoardMemberServiceImplTestMock implements MockSuperBoardUnitTests {
+class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private BoardMemberServiceImpl boardMemberService;

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("보드 검증 테스트")
-class BoardValidatorTestMock implements MockSuperBoardUnitTests {
+class BoardValidatorTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private BoardValidator boardValidator;
