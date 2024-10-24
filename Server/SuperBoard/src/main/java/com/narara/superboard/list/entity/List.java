@@ -1,6 +1,7 @@
 package com.narara.superboard.list.entity;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +20,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "list")
 public class List {
 
@@ -32,20 +37,27 @@ public class List {
     @Column(name = "name", nullable = false)
     private String name;  // 이름
 
-    @Column(name = "order", nullable = false, columnDefinition = "bigint default 0")
+    @Column(name = "order", nullable = false)
     private Long order;  // 보드 내 순서
 
     @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 0")
     private Long lastCardOrder;  // 리스트 내 마지막 카드 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isArchived = false;  // 아카이브 여부 (기본값: false)
+    private Boolean isArchived;  // 아카이브 여부 (기본값: false)
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isDeleted = false;  // 삭제 여부 (기본값: false)
+    private Boolean isDeleted;  // 삭제 여부 (기본값: false)
 
     @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
     private Long version;  // 버전
+
+    public static List createList(ListCreateRequestDto listCreateRequestDto, Long lastListOrder) {
+        return List.builder()
+                .name(listCreateRequestDto.listName())
+                .order(lastListOrder)
+                .build();
+    }
 
     public void increaseVersion() {
         this.version += 1;
