@@ -30,4 +30,14 @@ class LastOrderValidatorTest{
 
         assertEquals("보드에서 리스트의 마지막 순서값을 DB 내에서 찾을 수 없습니다.", exception.getMessage());
     }
+
+    @DisplayName("리스트의 마지막 순서 값이 있으면 정상 작동")
+    @Test
+    public void testCheckValidLastOrder_Success() {
+        // 성공 로직: lastOrder가 null이 아닐 때 예외가 발생하지 않음
+        Long validLastOrder = 1L;
+
+        // 예외가 발생하지 않으므로 assertThrows는 사용하지 않음
+        assertDoesNotThrow(() -> lastOrderValidator.checkValidListLastOrder(validLastOrder));
+    }
 }
