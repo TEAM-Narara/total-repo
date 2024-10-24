@@ -47,4 +47,7 @@ public class List {
     @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
     private Long version;  // 버전
 
+    public void increaseVersion() {
+        this.version += 1;
+    }
 }
