@@ -164,14 +164,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // given
         String name = "테스트 보드";
         Map<String, Object> background = null;
-        String visibility = "PUBLIC";
+        String visibility = "WORKSPACE";
 
         BoardCreateRequestDto requestDto = new BoardCreateRequestDto(name, visibility, background);
 
         Board expectedBoard = Board.builder()
                 .cover(background)
                 .name(name)
-                .visibility(Visibility.PUBLIC)
+                .visibility(Visibility.WORKSPACE)
                 .id(1L)
                 .build();
 

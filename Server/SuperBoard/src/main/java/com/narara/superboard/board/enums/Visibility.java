@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Visibility {
     PRIVATE("private"),
-    PUBLIC("workspace");
+    WORKSPACE("workspace");
 
     private final String value;
 
