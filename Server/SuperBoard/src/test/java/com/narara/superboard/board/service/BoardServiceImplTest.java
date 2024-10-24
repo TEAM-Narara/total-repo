@@ -300,7 +300,7 @@ class BoardServiceImplTest {
 
 
     @Test
-    @DisplayName("보드 수정 시 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생")
+    @DisplayName("[ADMIN] 보드 수정 시 커버가 존재하는데, 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생")
     void testUpdateBoard_MissingCoverType() {
         // given
         Long boardId = 1L;
@@ -320,7 +320,7 @@ class BoardServiceImplTest {
     }
 
     @Test
-    @DisplayName("보드 수정 시 커버에 value 필드가 없으면 NotFoundCoverValueException 발생")
+    @DisplayName("[ADMIN] 보드 수정 시 커버가 존재하는데, 커버에 value 필드가 없으면 NotFoundCoverValueException 발생")
     void testUpdateBoard_MissingCoverValue() {
         // given
         Long boardId = 1L;
