@@ -9,8 +9,11 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
+import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -46,6 +49,8 @@ class BoardServiceImplTest {
     @Mock
     private BoardValidator boardValidator;
 
+    @Mock
+    private CoverValidator coverValidator;
 
     @Mock
     private CoverHandler coverHandler;
@@ -291,6 +296,47 @@ class BoardServiceImplTest {
         // 검증: 가시성 검증이 호출되었는지 확인
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto); // 호출된 후 호출됨.
         verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+    }
+
+
+    @Test
+    @DisplayName("보드 수정 시 커버에 type 필드가 없으면 NotFoundCoverTypeException 발생")
+    void testUpdateBoard_MissingCoverType() {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> coverWithoutType = new HashMap<>();
+        coverWithoutType.put("value", "#ffffff");  // type 필드 없음
+
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", coverWithoutType, "PRIVATE");
+
+        // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
+        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
+
+        // when & then: 예외가 발생하는지 확인
+        assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoard(boardId, requestDto));
+
+        // verify: coverValidator가 호출되었는지 확인
+        verify(coverValidator, times(1)).validateContainCover(requestDto);
+    }
+
+    @Test
+    @DisplayName("보드 수정 시 커버에 value 필드가 없으면 NotFoundCoverValueException 발생")
+    void testUpdateBoard_MissingCoverValue() {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> coverWithoutValue = new HashMap<>();
+        coverWithoutValue.put("type", "COLOR");  // value 필드 없음
+
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", coverWithoutValue, "PRIVATE");
+
+        // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
+        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
+
+        // when & then: 예외가 발생하는지 확인
+        assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoard(boardId, requestDto));
+
+        // verify: coverValidator가 호출되었는지 확인
+        verify(coverValidator, times(1)).validateContainCover(requestDto);
     }
 
 
