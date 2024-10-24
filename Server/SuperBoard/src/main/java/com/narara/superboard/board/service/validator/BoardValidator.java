@@ -16,15 +16,15 @@ public class BoardValidator {
         }
     }
 
-    public void validateVisibilityIsPresent(BoardCoreHolder boardNameHolder) {
-        if (boardNameHolder.visibility() == null || boardNameHolder.visibility().trim().isEmpty()) {
+    public void validateVisibilityIsPresent(BoardCoreHolder boardCoreHolder) {
+        if (boardCoreHolder.visibility() == null || boardCoreHolder.visibility().trim().isEmpty()) {
             throw new BoardVisibilityNotFoundException();
         }
     }
 
-    public void validateVisibilityIsValid(BoardCoreHolder boardNameHolder) {
+    public void validateVisibilityIsValid(BoardCoreHolder boardCoreHolder) {
         try {
-            String visibility = boardNameHolder.visibility();
+            String visibility = boardCoreHolder.visibility();
             Visibility.valueOf(visibility.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BoardInvalidVisibilityFormatException();
