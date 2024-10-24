@@ -34,12 +34,12 @@ fun ListItem(
     modifier: Modifier = Modifier,
     listData: ListData,
     reorderState: ReorderState<ReorderCardData>,
-    cardCollections: Map<String, MutableState<List<ReorderCardData>>>,
+    cardCollections: Map<Long, MutableState<List<ReorderCardData>>>,
     onTitleChange: (String) -> Unit = {},
     onCardReordered: () -> Unit = {},
     addCard: () -> Unit = {},
     addPhoto: () -> Unit = {},
-    onDragEnter: () -> Unit = {},
+    onListChanged: (Long) -> Unit = {},
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
@@ -65,7 +65,7 @@ fun ListItem(
 
                         add(state.data.apply { this.listId = listData.id })
 
-                        onDragEnter()
+                        onListChanged(listData.id)
                     }
                 },
                 onDrop = { onCardReordered() },
@@ -87,7 +87,6 @@ fun ListItem(
                         key = cardData.id,
                         data = cardData,
                         dropStrategy = DropStrategy.CenterDistance,
-                        dragAfterLongPress = true,
                         onDragEnter = { state ->
                             collectionState.value = collection.toMutableList().apply {
                                 val index = indexOf(cardData)
@@ -102,6 +101,7 @@ fun ListItem(
                                 }
 
                                 add(index, state.data.apply { this.listId = listData.id })
+                                onListChanged(listData.id)
 
                                 scope.launch {
                                     handleLazyListScroll(
@@ -109,8 +109,6 @@ fun ListItem(
                                         dropIndex = index,
                                     )
                                 }
-
-                                onDragEnter()
                             }
                         },
                         onDrop = { onCardReordered() },

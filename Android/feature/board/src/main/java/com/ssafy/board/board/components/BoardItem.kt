@@ -52,12 +52,12 @@ fun BoardItem(
 ) {
     val scope = rememberCoroutineScope()
 
-    val listDndState = rememberReorderState<ListData>()
+    val listDndState = rememberReorderState<ListData>(dragAfterLongPress = true)
     var listCollection by remember { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
     val cardDndState = rememberReorderState<ReorderCardData>()
-    val cardCollections = mutableMapOf<String, MutableState<List<ReorderCardData>>>().apply {
+    val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
         boardData.listCollection.forEach { listData ->
             this[listData.id] = remember {
                 mutableStateOf(listData.cardCollection.map {
@@ -81,7 +81,6 @@ fun BoardItem(
                     key = listData.id,
                     data = listData,
                     dropStrategy = DropStrategy.CenterDistance,
-                    dragAfterLongPress = true,
                     onDragEnter = { state ->
                         listCollection = listCollection.toMutableList().apply {
                             val index = indexOf(listData)
@@ -120,6 +119,14 @@ fun BoardItem(
                         onCardReordered = { onCardReordered() },
                         addCard = { },
                         addPhoto = { },
+                        onListChanged = { listId ->
+                            scope.launch {
+                                handleLazyListScroll(
+                                    lazyListState = listLazyListState,
+                                    dropIndex = listCollection.indexOfFirst { it.id == listId },
+                                )
+                            }
+                        }
                     )
                 }
             }
@@ -152,11 +159,11 @@ private fun BoardItemPreview() {
             title = "title",
             listCollection = (1..1).map { listData ->
                 ListData(
-                    id = "list $listData",
+                    id = listData.toLong(),
                     title = listData.toString(),
                     cardCollection = (1..3).map { cardData ->
                         CardData(
-                            id = "card $listData$cardData",
+                            id = (listData * 100 + cardData).toLong(),
                             title = cardData.toString()
                         )
                     },

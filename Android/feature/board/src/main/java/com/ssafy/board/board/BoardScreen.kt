@@ -166,14 +166,14 @@ private fun BoardScreenPreview() {
         boardData = BoardData(
             id = "board 1",
             title = "title",
-            listCollection = (1..10).map { listData ->
+            listCollection = (1..1).map { listData ->
                 ListData(
-                    id = "list $listData",
+                    id = listData.toLong(),
                     title = listData.toString(),
                     cardCollection = (1..3).map { cardData ->
                         CardData(
-                            id = "card $listData$cardData",
-                            title = cardData.toString(),
+                            id = (listData * 100 + cardData).toLong(),
+                            title = cardData.toString()
                         )
                     },
                     isWatching = true

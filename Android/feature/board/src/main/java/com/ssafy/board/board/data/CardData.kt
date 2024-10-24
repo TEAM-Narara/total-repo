@@ -1,17 +1,17 @@
 package com.ssafy.board.board.data
 
 data class CardData(
-    val id: String,
+    val id: Long,
     val title: String,
 )
 
 data class ReorderCardData(
-    val id: String,
+    val id: Long,
     val title: String,
-    var listId: String? = null
+    var listId: Long? = null
 )
 
-fun CardData.toReorderCardData(listId: String? = null) = ReorderCardData(
+fun CardData.toReorderCardData(listId: Long? = null) = ReorderCardData(
     id = id,
     title = title,
     listId = listId
