@@ -6,10 +6,18 @@ import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatExcept
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.Map;
+
+import com.narara.superboard.common.interfaces.dto.CoverHolder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CoverValidator {
+
+    public void validateContainCover(CoverHolder cover) {
+        validateCoversEmpty(cover.cover());
+        validateCoverTypeIsEmpty(cover.cover());
+        validateCoverValueIsEmpty(cover.cover());
+    }
 
     public void validateCoverTypeIsValid(String coverTypeValue) {
         // 1. coverTypeValue가 null인 경우 예외 발생
