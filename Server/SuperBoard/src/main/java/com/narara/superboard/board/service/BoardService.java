@@ -23,6 +23,6 @@ public interface BoardService {
 
     List<Board> getArchivedBoards(Long workspaceId);
 
-    void updateArchiveStatus(Long boardId, boolean isArchived);
+    void changeArchiveStatus(Long boardId);
 
 }

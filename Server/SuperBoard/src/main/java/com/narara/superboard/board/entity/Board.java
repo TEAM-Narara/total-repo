@@ -40,7 +40,7 @@ public class Board {
     @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 0")
     private Long lastListOrder;  // 보드 내 마지막 리스트 순서
 
-    @Column(name = "is_archived", nullable = false, columnDefinition = "false")
+    @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;  // 버전
 
     @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
@@ -63,8 +63,8 @@ public class Board {
 
     }
 
-    public void changeArchiveStatus(boolean isArchived) {
-        this.isArchived = isArchived;
+    public void changeArchiveStatus() {
+        this.isArchived = !isArchived;
     }
 
     public void increaseVersion() {

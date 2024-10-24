@@ -111,9 +111,9 @@ public class BoardServiceImpl implements BoardService {
 
     // 보드 아카이브 상태 변경
     @Override
-    public void updateArchiveStatus(Long boardId, boolean isArchived) {
+    public void changeArchiveStatus(Long boardId) {
         Board board = getBoard(boardId);
-        board.changeArchiveStatus(isArchived);
+        board.changeArchiveStatus();
     }
 
 }
