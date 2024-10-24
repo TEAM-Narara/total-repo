@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -83,48 +82,45 @@ fun UpdateProfileScreen(
         ) {
             Text(text = "프로필 사진", fontWeight = FontWeight.Bold, fontSize = TextMedium)
 
-            Row() {
-                Spacer(modifier = Modifier.weight(1f))
-                Box {
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Box(
+                    modifier = Modifier
+                        .height(IconLegendLarge)
+                        .clip(CircleShape)
+                        .aspectRatio(1f)
+                ) {
+                    AsyncImage(
+                        model = url,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .height(IconLegendLarge)
+                        .aspectRatio(1f)
+                        .padding(PaddingXSemiLarge)
+                ) {
                     Box(
                         modifier = Modifier
-                            .height(IconLegendLarge)
+                            .align(Alignment.BottomEnd)
+                            .size(IconLarge)
+                            .shadow(elevation = PaddingSmall, shape = CircleShape)
                             .clip(CircleShape)
-                            .aspectRatio(1f)
+                            .background(Color.White)
+                            .padding(PaddingSmall)
                     ) {
-                        AsyncImage(
-                            model = url,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.Crop
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Camera",
+                            modifier = Modifier
+                                .size(IconMedium)
+                                .align(Alignment.Center),
+                            tint = Color.Black
                         )
                     }
-                    Box(
-                        modifier = Modifier
-                            .height(IconLegendLarge)
-                            .aspectRatio(1f)
-                            .padding(PaddingXSemiLarge)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(IconLarge)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                                .padding(PaddingSmall)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CameraAlt,
-                                contentDescription = "Camera",
-                                modifier = Modifier
-                                    .size(IconMedium)
-                                    .align(Alignment.Center),
-                                tint = Color.Black
-                            )
-                        }
-                    }
                 }
-                Spacer(modifier = Modifier.weight(1f))
             }
             EditText(
                 title = "닉네임",
