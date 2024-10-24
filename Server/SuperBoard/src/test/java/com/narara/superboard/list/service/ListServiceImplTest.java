@@ -2,6 +2,7 @@ package com.narara.superboard.list.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -14,9 +15,11 @@ import com.narara.superboard.board.infrastrucuture.BoardRepository;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundNameException;
+import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -79,4 +82,40 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
     }
 
+
+    @Test
+    @DisplayName("리스트 생성 성공 테스트")
+    void testCreateListSuccess() {
+        // given
+        Long boardId = 1L;
+        String listName = "Valid List Name";
+        Long lastListOrder = 10L;
+
+        // Mocking ListCreateRequestDto
+        ListCreateRequestDto requestDto = new ListCreateRequestDto(boardId, listName);
+
+        // Mocking Board entity
+        Board board = mock(Board.class);
+        when(board.getLastListOrder()).thenReturn(lastListOrder);
+        when(boardRepository.getReferenceById(boardId)).thenReturn(board);
+
+        // Mocking List entity
+        List savedList = mock(List.class);
+        when(savedList.getId()).thenReturn(1L);
+        when(listRepository.save(any(List.class))).thenReturn(savedList);
+
+        // Mocking NameValidator and LastOrderValidator behavior
+        doNothing().when(nameValidator).validateListNameIsEmpty(requestDto);
+        doNothing().when(lastOrderValidator).checkValidListLastOrder(lastListOrder);
+
+        // when
+        List resultList = listService.createList(requestDto);
+
+        // then
+        assertEquals(savedList.getId(), resultList.getId());
+        verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
+        verify(lastOrderValidator, times(1)).checkValidListLastOrder(lastListOrder);
+        verify(boardRepository, times(1)).getReferenceById(boardId);
+        verify(listRepository, times(1)).save(any(List.class));
+    }
 }
