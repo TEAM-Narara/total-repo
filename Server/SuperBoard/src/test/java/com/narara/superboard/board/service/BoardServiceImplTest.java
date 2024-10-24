@@ -6,9 +6,11 @@ import com.narara.superboard.board.infrastrucuture.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
+import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,10 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BoardServiceImplTest {
 
@@ -242,4 +242,31 @@ class BoardServiceImplTest {
         verify(boardRepository, times(1)).findById(boardId);
         verify(boardRepository, times(1)).delete(mockBoard);
     }
+
+    @ParameterizedTest
+    @DisplayName("보드 수정 시 이름이 존재하지 않으면 NotFoundException 발생 테스트")
+    @CsvSource({
+            "'', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'",  // 이름이 빈 값인 경우
+            "null, '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'"  // 이름이 null인 경우
+    })
+    void testUpdateBoard_NameInvalidValue(String name, String backgroundJson, String visibility) {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
+
+        // 요청 DTO 생성
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, background, visibility);
+
+        // Mocking: validateNameIsPresent 호출 시 예외 발생 설정
+        doThrow(new NotFoundException("Board", "name")).when(boardValidator).validateNameIsPresent(requestDto);
+
+        // when & then: 이름 값이 없을 때 예외가 발생하는지 확인
+        assertThrows(NotFoundException.class, () -> boardService.updateBoard(boardId, requestDto));
+
+        // 검증: 이름 검증이 호출되었는지 확인
+        verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
+        verify(boardValidator, times(0)).validateVisibilityIsPresent(requestDto); // 호출되지 않음
+    }
+
+
 }
