@@ -37,8 +37,8 @@ public class List {
     @Column(name = "name", nullable = false)
     private String name;  // 이름
 
-    @Column(name = "order", nullable = false)
-    private Long order;  // 보드 내 순서
+    @Column(name = "my_order", nullable = false)
+    private Long myOrder;  // 보드 내 순서
 
     @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 0")
     private Long lastCardOrder;  // 리스트 내 마지막 카드 순서
@@ -55,7 +55,7 @@ public class List {
     public static List createList(ListCreateRequestDto listCreateRequestDto, Long lastListOrder) {
         return List.builder()
                 .name(listCreateRequestDto.listName())
-                .order(lastListOrder)
+                .myOrder(lastListOrder)
                 .build();
     }
 
