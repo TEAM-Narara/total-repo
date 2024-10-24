@@ -48,4 +48,19 @@ class NameValidatorTest {
         // then
         assertThrows(NotFoundNameException.class, () -> nameValidator.validateNameIsEmpty(nameHolder));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'ValidName'",    // 유효한 이름
+            "'Another ValidName'"  // 또 다른 유효한 이름
+    })
+    @DisplayName("이름이 유효할 경우 예외가 발생하지 않음")
+    void testValidateNameIsEmpty_Success(String validName) {
+        // given
+        Mockito.when(nameHolder.name()).thenReturn(validName);
+
+        // then: 예외가 발생하지 않음
+        assertDoesNotThrow(() -> nameValidator.validateNameIsEmpty(nameHolder));
+    }
+
 }
