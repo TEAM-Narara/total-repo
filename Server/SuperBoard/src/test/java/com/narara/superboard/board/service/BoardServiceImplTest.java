@@ -15,7 +15,6 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
-import com.narara.superboard.workspace.entity.WorkSpace;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +54,18 @@ class BoardServiceImplTest {
 
     @Mock
     private CoverHandler coverHandler;
+
+    /**
+     * 가상의 객체
+     * 주로 단위 테스트에서 의존성을 격리하고 특정 메서드의 동작을 시뮬레이션하는 데 사용됩니다.
+     * 실제 로직 실행을 방지, 메서드 호출 검증, 메서드 동작을 제어
+     *
+     * new Board()는
+     * 실제 로직을 테스트할 때 사용되는 실제 객체 생성 방법
+     * 메서드 호출 검증 불가능, 메서드 동작을 제어 불가능
+     */
+    @Mock
+    private Board board;
 
     @BeforeEach
     void setUp() {
@@ -367,4 +378,54 @@ class BoardServiceImplTest {
     }
 
 
+    @ParameterizedTest
+    @DisplayName("보드 수정 성공 테스트")
+    @CsvSource({
+            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'",   // 정상 케이스
+            "'Another Board Name', '{\"type\":\"IMAGE\",\"value\":\"https://example.com/image.jpg\"}', 'PRIVATE'",  // 이미지 커버 케이스
+            "'Valid Board Name', '', 'WORKSPACE'",   // 커버가 null인 경우
+            "'Board with Empty Cover', '{\"type\":\"COLOR\"}', 'WORKSPACE'",   // 커버에 값이 빠져있는 경우
+            "'Final Test Board', '{\"type\":\"IMAGE\",\"value\":\"https://example.com/final.jpg\"}', 'PRIVATE'"  // 다른 가시성 및 이미지 커버
+    })
+    void testUpdateBoard_Success(String name, String coverJson, String visibility) {
+        // given
+        Long boardId = 1L;
+        Map<String, Object> cover = coverJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
+
+        // BoardUpdateRequestDto 생성
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, cover, visibility);
+
+        // 보드 데이터 모킹 설정 (모의 객체 반환하게 설정)
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(board.updateBoardByAdmin(any(BoardUpdateRequestDto.class))).thenReturn(board);
+
+        // Validator 메서드 호출 시 아무 일도 하지 않도록 설정 (성공 시나리오)
+        doNothing().when(boardValidator).validateNameIsPresent(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsValid(requestDto);
+
+        // 커버가 있을 때만 검증하도록 설정
+        if (cover != null) {
+            doNothing().when(coverValidator).validateContainCover(requestDto);
+        }
+
+        // when
+        Board updatedBoard = boardService.updateBoard(boardId, requestDto);
+
+        // then
+        assertEquals(board, updatedBoard);  // 업데이트된 보드가 원래 보드와 동일해야 함
+        verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
+
+        // 커버가 존재하는 경우에만 커버 검증 호출 확인
+        if (cover != null) {
+            verify(coverValidator, times(1)).validateContainCover(requestDto);
+        } else {
+            verify(coverValidator, never()).validateContainCover(requestDto);
+        }
+
+        // 보드 수정 로직이 호출되었는지 확인
+        verify(board, times(1)).updateBoardByAdmin(requestDto);
+    }
 }
