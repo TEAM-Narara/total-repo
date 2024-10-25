@@ -5,10 +5,14 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -18,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@DisplayName("")
+@DisplayName("카드 서비스에 대한 단위 테스트")
 class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
@@ -70,5 +74,26 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(cardName, result.getName());
         verify(nameValidator, times(1)).validateCardNameIsEmpty(cardCreateRequestDto);
         verify(cardRepository, times(1)).save(any(Card.class));
+    }
+
+    @ParameterizedTest
+    @DisplayName("리스트가 존재하지 않을 때 실패")
+    @org.junit.jupiter.params.provider.ValueSource(longs = {0L, 2L})
+    void shouldFailWhenListNotFound(Long listId) {
+        // given
+        String cardName = "Test Card";
+        CardCreateRequestDto cardCreateRequestDto = new CardCreateRequestDto(listId, cardName);
+
+        // Mocking listRepository to return an empty Optional (리스트가 존재하지 않음)
+        when(listRepository.findById(listId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotFoundEntityException.class, () -> {
+            cardService.createCard(cardCreateRequestDto);
+        });
+
+        // 검증: listRepository.findById가 1번 호출되었는지 확인
+        verify(listRepository, times(1)).findById(listId);
+        verifyNoMoreInteractions(cardRepository); // cardRepository는 호출되지 않아야 함
     }
 }
