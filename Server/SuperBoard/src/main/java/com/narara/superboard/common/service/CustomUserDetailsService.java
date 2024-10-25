@@ -58,11 +58,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // 워크스페이스와 보드에서의 권한을 가져옴
         List<GrantedAuthority> workspaceAuthorities = member.getWorkspaceMemberList().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_WORKSPACE_" + role.getAuthority().toUpperCase() + "_ID_" + role.getWorkSpace().getId()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_WORKSPACE_" + role.getAuthority() + "_ID_" + role.getWorkSpace().getId()))
                 .collect(Collectors.toList());
 
         List<GrantedAuthority> boardAuthorities = member.getBoardMemberList().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_BOARD_" + role.getAuthority().toUpperCase() + "_ID_" + role.getBoard().getId()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_BOARD_" + role.getAuthority() + "_ID_" + role.getBoard().getId()))
                 .collect(Collectors.toList());
 
         // 두 리스트를 결합하여 반환
