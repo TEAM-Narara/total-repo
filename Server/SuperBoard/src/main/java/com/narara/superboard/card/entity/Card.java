@@ -52,9 +52,10 @@ public class Card {
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived = false;
 
-    public static Card createCard(CardCreateRequestDto cardCreateRequestDto) {
+    public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
+                .list(list)
                 .build();
     }
 }
