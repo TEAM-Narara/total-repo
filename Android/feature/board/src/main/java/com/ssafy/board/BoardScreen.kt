@@ -14,18 +14,24 @@ import com.ssafy.board.components.TopAppBar
 import com.ssafy.board.data.BoardData
 import com.ssafy.board.data.CardData
 import com.ssafy.board.data.ListData
+import com.ssafy.model.search.SearchParameters
 
 @Composable
 fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
+    searchParameters: SearchParameters,
     popBack: () -> Unit,
+    moveToBoardSearch: (SearchParameters) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BoardScreen(
         modifier = modifier,
         uiState = uiState,
+        onFilterPressed = { /*moveToBoardSearch(viewModel.searchParameters)*/
+            moveToBoardSearch(SearchParameters())
+        },
         onBoardTitleChanged = viewModel::updateBoardTitle,
         onListTitleChanged = viewModel::updateListTitle,
         onCardReordered = viewModel::updateCardOrder,
@@ -38,6 +44,7 @@ fun BoardScreen(
 private fun BoardScreen(
     modifier: Modifier = Modifier,
     uiState: BoardUiState,
+    onFilterPressed: () -> Unit,
     onBoardTitleChanged: () -> Unit,
     onListTitleChanged: () -> Unit,
     onCardReordered: () -> Unit,
@@ -51,7 +58,7 @@ private fun BoardScreen(
                 title = uiState.boardData.title,
                 onBackPressed = popBack,
                 onBoardTitleChanged = { onBoardTitleChanged() },
-                onFilterPressed = {},
+                onFilterPressed = onFilterPressed,
                 onNotificationPressed = {},
                 onMorePressed = {},
             )
@@ -94,6 +101,7 @@ private fun BoardScreenPreview() {
         onListTitleChanged = {},
         onCardReordered = {},
         onListReordered = {},
-        popBack = {}
+        popBack = {},
+        onFilterPressed = {}
     )
 }
