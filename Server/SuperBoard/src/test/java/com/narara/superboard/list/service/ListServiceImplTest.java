@@ -222,4 +222,24 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(list, times(1)).changeListIsArchived(); // 리스트 아카이브 변경 호출 확인
         assertEquals(list, updatedList); // 반환된 리스트가 같은지 확인
     }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("보드가 존재하지 않을 때 예외 발생")
+    void testGetArchivedListBoardNotFound(Long boardId) {
+        // given
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            listService.getArchivedList(boardId);
+        });
+
+        // then
+        assertEquals(exception.getMessage(), "해당하는 보드(이)가 존재하지 않습니다. 보드ID: " + boardId);
+
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(listRepository, never()).findByBoardAndIsArchived(any(Board.class), anyBoolean());
+    }
+
 }
