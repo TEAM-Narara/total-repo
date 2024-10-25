@@ -8,10 +8,9 @@ public interface JwtTokenProvider {
     String generateRefreshToken(Authentication authentication);
     Authentication getAuthentication(String token);
     boolean validateToken(String token);
-    Long getMemberIDFromToken(String token);
+    Long getMemberIdFromToken(String token);
     String resolveAccessToken(HttpServletRequest request);
     String resolveRefreshToken(HttpServletRequest request);
     boolean isTokenExpired(String token);
     String refreshAccessToken(String accessToken);
-
 }

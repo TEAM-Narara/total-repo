@@ -172,7 +172,7 @@ class JwtTokenProviderTest {
     @Test
     void testGetUserIDFromToken_ExpiredToken() {
         assertThrows(JwtException.class, () -> {
-            jwtTokenProvider.getMemberIDFromToken(expiredToken);
+            jwtTokenProvider.getMemberIdFromToken(expiredToken);
         });
     }
 
