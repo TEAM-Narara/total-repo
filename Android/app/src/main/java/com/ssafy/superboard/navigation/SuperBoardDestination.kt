@@ -4,11 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.ssafy.login.login.LogIn
-import com.ssafy.login.login.loginScreen
-import com.ssafy.login.signup.SignUp
-import com.ssafy.login.signup.signupScreen
+import com.ssafy.board.Board
 import com.ssafy.board.boardScreen
+import com.ssafy.board.search.BoardSearch
+import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
@@ -17,10 +16,15 @@ import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
 import com.ssafy.home.setting.Setting
 import com.ssafy.home.setting.settingScreen
+import com.ssafy.login.login.LogIn
+import com.ssafy.login.login.loginScreen
+import com.ssafy.login.signup.SignUp
+import com.ssafy.login.signup.signupScreen
+import com.ssafy.model.search.SearchParameters
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
+    NavHost(navController = navController, startDestination = Board(), modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -45,7 +49,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             },
             moveToLoginScreen = {
                 navController.navigate(LogIn) {
-                    popUpTo(Home) {
+                    popUpTo(navController.graph.id) {
                         inclusive = true
                     }
                 }
@@ -61,7 +65,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         settingScreen(
             backHomeScreen = {
                 navController.navigate(Home) {
-                    popUpTo(navController.graph.startDestinationId) {
+                    popUpTo(navController.graph.id) {
                         inclusive = true
                     }
                 }
@@ -82,8 +86,27 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardScreen(popBack = {
-            navController.popBackStack()
-        })
+        boardScreen(
+            popBack = {
+                navController.popBackStack()
+            },
+            moveToBoardSearch = { searchParameters: SearchParameters ->
+                navController.navigate(BoardSearch(searchParameters))
+            }
+        )
+
+        boardSearchScreen(
+            popBackToBoardScreen = {
+                navController.popBackStack()
+            },
+
+            popBackToBoardScreenWithParams = { boardSearch: BoardSearch, params: SearchParameters ->
+                navController.navigate(Board(params)) {
+                    popUpTo(boardSearch) {
+                        inclusive = true
+                    }
+                }
+            }
+        )
     }
 }
