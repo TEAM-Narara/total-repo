@@ -31,45 +31,42 @@ class BoardSearchViewModel @Inject constructor() : ViewModel() {
 
             DueDate.DUE_IN_THE_NEXT_DAY -> {
                 dueDateMap[dueDate]?.let { paramInfo ->
-                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected).apply {
+                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected)
 
-                        if (!isSelected) return@let
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK] = it.copy(isSelected = false)
-                        }
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH] = it.copy(isSelected = false)
-                        }
+                    if (paramInfo.isSelected) return@let
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK] = it.copy(isSelected = false)
+                    }
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH] = it.copy(isSelected = false)
                     }
                 }
             }
 
             DueDate.DUE_IN_THE_NEXT_WEEK -> {
                 dueDateMap[dueDate]?.let { paramInfo ->
-                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected).apply {
+                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected)
 
-                        if (!isSelected) return@let
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY] = it.copy(isSelected = false)
-                        }
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH] = it.copy(isSelected = false)
-                        }
+                    if (paramInfo.isSelected) return@let
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY] = it.copy(isSelected = false)
+                    }
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_MONTH] = it.copy(isSelected = false)
                     }
                 }
             }
 
             DueDate.DUE_IN_THE_NEXT_MONTH -> {
                 dueDateMap[dueDate]?.let { paramInfo ->
-                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected).apply {
+                    dueDateMap[dueDate] = paramInfo.copy(isSelected = !paramInfo.isSelected)
 
-                        if (!isSelected) return@let
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY] = it.copy(isSelected = false)
-                        }
-                        dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK]?.let {
-                            dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK] = it.copy(isSelected = false)
-                        }
+                    if (paramInfo.isSelected) return@let
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_DAY] = it.copy(isSelected = false)
+                    }
+                    dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK]?.let {
+                        dueDateMap[DueDate.DUE_IN_THE_NEXT_WEEK] = it.copy(isSelected = false)
                     }
                 }
             }
