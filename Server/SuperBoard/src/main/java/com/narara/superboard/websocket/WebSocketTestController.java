@@ -4,6 +4,7 @@ import com.narara.superboard.websocket.interfaces.dto.WebSocketBodyDto;
 import com.narara.superboard.websocket.interfaces.dto.WebSocketTestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -33,10 +34,12 @@ public class WebSocketTestController {
      *   }
      * }
      */
-    @MessageMapping("/test/update")
-    @SendTo("/topic/test")
-    public WebSocketTestDto testWebsocket(WebSocketBodyDto request,
+    @MessageMapping("/test/update/{boardId}")
+    @SendTo("/topic/test/{boardId}")
+    public WebSocketTestDto testWebsocket(@DestinationVariable Long boardId, WebSocketBodyDto request,
                                           SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+        log.info("boardId: " + boardId);
+        Long a = 123L;
 
         // 헤더에서 Authorization 토큰 가져오기 @TODO 로그인 연결 시 삭제
         String authorization = headerAccessor.getFirstNativeHeader("Authorization");
