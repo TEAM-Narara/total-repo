@@ -1,17 +1,10 @@
 package com.narara.superboard.list.entity;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +27,9 @@ public class List {
     @JoinColumn(name = "board_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;  // 보드 키
+
+    @OneToMany(mappedBy = "list")
+    private java.util.List<Card> cardCollection;
 
     @Column(name = "name", nullable = false)
     private String name;  // 이름
