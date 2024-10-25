@@ -23,7 +23,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("워크스페이스 서비스 테스트")
+@DisplayName("워크스페이스 서비스에 대한 단위 테스트")
 class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     // 실제 테스트 대상 객체를 생성하고 초기화할 때 사용

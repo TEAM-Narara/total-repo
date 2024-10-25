@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("보드 서비스에 대한 단위 테스트")
 class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks

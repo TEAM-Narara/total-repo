@@ -12,4 +12,10 @@ public class NameValidator {
             throw new NotFoundNameException("보드");
         }
     }
+
+    public void validateListNameIsEmpty(NameHolder nameHolder) {
+        if (nameHolder.name() == null || nameHolder.name().isEmpty()) {
+            throw new NotFoundNameException("리스트");
+        }
+    }
 }

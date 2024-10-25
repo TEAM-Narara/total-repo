@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("WorkSpaceMemberServiceImpl 대한 Test")
+@DisplayName("워크스페이스의 멤버에 대한 단위 테스트")
 class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks

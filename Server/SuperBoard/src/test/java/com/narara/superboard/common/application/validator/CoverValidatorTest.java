@@ -12,20 +12,24 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 
 
-@DisplayName("CoverValidator 테스트")
-class CoverValidatorTest implements MockSuperBoardUnitTests {
+@DisplayName("커버 검증에 대한 단위 테스트")
+class CoverValidatorTest {
 
-    @InjectMocks
     private CoverValidator coverValidator;
+
+    @BeforeEach
+    public void setUp() {
+        coverValidator = new CoverValidator();
+    }
 
     @Test
     @DisplayName("커버 타입이 null일 경우 NotFoundCoverTypeException 발생")
