@@ -9,4 +9,6 @@ public interface ListService {
     List updateList(Long listId, ListUpdateRequestDto listUpdateRequestDto);
     List getList(Long listId);
     List changeListIsArchived(Long listId);
+    java.util.List<List> getArchivedList(Long listId);
+
 }

@@ -56,4 +56,12 @@ public class ListServiceImpl implements ListService{
         list.changeListIsArchived();
         return list;
     }
+
+    @Override
+    public java.util.List<List> getArchivedList(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
+
+        return listRepository.findByBoardAndIsArchived(board, true);
+    }
 }
