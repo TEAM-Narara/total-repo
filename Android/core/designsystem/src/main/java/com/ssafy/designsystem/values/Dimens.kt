@@ -23,12 +23,15 @@ val PaddingXSmall = 4.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
+val PaddingXSemiLarge = 16.dp
 val PaddingSemiLarge = 20.dp
 val PaddingLarge = 24.dp
 val PaddingSemiXLarge = 32.dp
 val PaddingXLarge = 64.dp
 
+val IconLegendLarge = 200.dp
 val IconXXLarge = 80.dp
+val IconCircleLarge = 50.dp
 val IconXLarge = 48.dp
 val IconLarge = 36.dp
 val IconMedium = 24.dp
@@ -45,6 +48,7 @@ val BorderDefault = 1.dp
 val ListWidth = 300.dp
 val CardWidth = 270.dp
 val BoardHeight = 130.dp
+val BoardWidth = 160.dp
 
 val ElevationSmall = 2.dp
 val ElevationMedium = 4.dp

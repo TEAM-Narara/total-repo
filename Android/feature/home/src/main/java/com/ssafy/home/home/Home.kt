@@ -33,7 +33,9 @@ fun HomeScreen(
     moveToCreateNewBoardScreen: (List<String>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
-    moveToMyCardScreen: () -> Unit
+    moveToMyCardScreen: () -> Unit,
+    moveToUpdateProfile: () -> Unit,
+    moveToSearchScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalContext.current as? Activity
@@ -50,7 +52,9 @@ fun HomeScreen(
         moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
         moveToLoginScreen = moveToLoginScreen,
         moveToSettingScreen = moveToSettingScreen,
-        moveToMyCardScreen = moveToMyCardScreen
+        moveToMyCardScreen = moveToMyCardScreen,
+        moveToUpdateProfile = moveToUpdateProfile,
+        moveToSearchScreen = moveToSearchScreen,
     )
 }
 
@@ -62,7 +66,9 @@ private fun HomeScreen(
     moveToCreateNewWorkSpaceScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
-    moveToMyCardScreen: () -> Unit
+    moveToMyCardScreen: () -> Unit,
+    moveToUpdateProfile: () -> Unit,
+    moveToSearchScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -95,7 +101,7 @@ private fun HomeScreen(
                 onAddWorkSpaceClick = { /*TODO*/ },
                 onMyBoardClick = { /*TODO*/ },
                 onMyCardClick = moveToMyCardScreen,
-                onSettingClick = { /*TODO*/ },
+                onSettingClick = moveToUpdateProfile,
                 onLogoutClick = moveToLoginScreen,
                 onWorkSpaceClick = { /*TODO*/ }
             )
@@ -106,7 +112,7 @@ private fun HomeScreen(
             topBar = {
                 MainTopBar(
                     onDrawerClick = { scope.launch { drawerState.open() } },
-                    onSearchClick = { /*TODO*/ },
+                    onSearchClick = { moveToSearchScreen() },
                     onAlarmClick = { /*TODO*/ },
                     onMenuClick = moveToSettingScreen
                 )
@@ -152,6 +158,8 @@ fun GreetingPreview() {
         moveToCreateNewWorkSpaceScreen = {},
         moveToLoginScreen = {},
         moveToSettingScreen = {},
-        moveToMyCardScreen = {}
+        moveToMyCardScreen = {},
+        moveToUpdateProfile = {},
+        moveToSearchScreen = {}
     )
 }

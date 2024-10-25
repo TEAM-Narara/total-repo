@@ -14,6 +14,8 @@ import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
+import com.ssafy.home.search.SearchWorkspace
+import com.ssafy.home.search.searchWorkspaceScreen
 import com.ssafy.home.setting.Setting
 import com.ssafy.home.setting.settingScreen
 import com.ssafy.login.login.LogIn
@@ -21,6 +23,8 @@ import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.home.update.UpdateProfile
+import com.ssafy.home.update.updateProfileScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -59,6 +63,12 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             },
             moveToMyCardScreen = {
                 navController.navigate(MyCard)
+            },
+            moveToUpdateProfile = {
+                navController.navigate(UpdateProfile)
+            },
+            moveToSearchScreen = {
+                navController.navigate(SearchWorkspace)
             }
         )
 
@@ -84,6 +94,13 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             moveToSelectBackgroundScreen = {
                 // TODO : navigate to select background screen
             }
+        )
+
+        updateProfileScreen(backHomeScreen = { navController.popBackStack() })
+
+        searchWorkspaceScreen(
+            onBackPressed = { navController.popBackStack() },
+            moveToCardScreen = {}
         )
 
         boardScreen(

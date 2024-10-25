@@ -13,7 +13,9 @@ fun NavGraphBuilder.homeScreen(
     moveToCreateNewBoardScreen: (List<String>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
-    moveToMyCardScreen: () -> Unit
+    moveToMyCardScreen: () -> Unit,
+    moveToUpdateProfile: () -> Unit,
+    moveToSearchScreen: () -> Unit
 ) {
     composable<Home> {
         HomeScreen(
@@ -21,7 +23,9 @@ fun NavGraphBuilder.homeScreen(
             moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
             moveToLoginScreen = moveToLoginScreen,
             moveToSettingScreen = moveToSettingScreen,
-            moveToMyCardScreen = moveToMyCardScreen
+            moveToMyCardScreen = moveToMyCardScreen,
+            moveToUpdateProfile = moveToUpdateProfile,
+            moveToSearchScreen = moveToSearchScreen
         )
     }
 }
