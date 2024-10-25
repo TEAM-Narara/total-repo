@@ -179,5 +179,28 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(nameValidator, never()).validateListNameIsEmpty(any());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"New Valid Name"})
+    @DisplayName("리스트 업데이트 시 검증 성공 테스트")
+    void testUpdateListValidationSuccess(String newName) {
+        // given
+        Long listId = 1L;
+        ListUpdateRequestDto requestDto = ListUpdateRequestDto.builder()
+                .listId(listId)
+                .listName(newName)
+                .build();
 
+        // Mocking List entity
+        List list = mock(List.class);
+        when(listRepository.findById(listId)).thenReturn(Optional.of(list));
+
+        // when
+        List updatedList = listService.updateList(listId, requestDto);
+
+        // then
+        verify(listRepository, times(1)).findById(listId);
+        verify(list, times(1)).updateList(requestDto);
+        verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
+        assertEquals(list, updatedList);
+    }
 }
