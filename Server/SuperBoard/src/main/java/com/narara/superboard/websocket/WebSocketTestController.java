@@ -15,6 +15,24 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @RequiredArgsConstructor
 @Controller
 public class WebSocketTestController {
+    /*
+     * <request> /app/test/update
+     * {
+     *   "cardId" 1,
+     *   "title" "바꿀 타이틀",
+     *   "description": "바꿀 description"
+     * }
+     *
+     * <response> /topic/test 를 구독하는 모든 사용자들에게
+     * {
+     *   "type": "UPDATE",
+     *   "response": {
+     *     "id": 1,
+     *     "title": "바뀐 타이틀",
+     *     "description" "바뀐 내용"
+     *   }
+     * }
+     */
     @MessageMapping("/test/update")
     @SendTo("/topic/test")
     public WebSocketTestDto testWebsocket(WebSocketBodyDto request,
