@@ -125,7 +125,35 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("IMAGE", board2.backgroundType());
         assertEquals("https://example.com/image.jpg", board2.backgroundValue());
     }
-    
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("워크스페이스 ID가 존재하지 않을 때 예외 발생")
+    void shouldThrowNotFoundEntityExceptionWhenWorkspaceIdNotFound(Long workspaceId) {
+        // given
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
+
+        // Mocking workspaceRepository to return empty Optional
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            boardService.createBoard(requestDto);
+        });
+
+        assertEquals("워크스페이스가 존재하지 않습니다.", exception.getMessage());
+        verify(workspaceRepository, times(1)).findById(workspaceId);
+    }
+
+
+
+    static Stream<Arguments> provideBoardCreateRequestData() {
+        return Stream.of(
+                Arguments.of(1L, "보드 이름1", "COLOR", "#ffffff", "PRIVATE"),
+                Arguments.of(2L, "보드 이름2", "GRADIENT", "#123456", "PUBLIC")
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provideBoardCreateRequestData")
     @DisplayName("워크스페이스 ID가 존재할 때 보드 생성 성공 테스트")
