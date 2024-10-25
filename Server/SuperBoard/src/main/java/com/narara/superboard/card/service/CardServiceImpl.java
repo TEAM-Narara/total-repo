@@ -34,4 +34,10 @@ public class CardServiceImpl implements CardService {
         return cardRepository.save(card);
     }
 
+    @Override
+    public Card getCard(Long cardId) {
+        return cardRepository.findById(cardId)
+                .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
+    }
+
 }
