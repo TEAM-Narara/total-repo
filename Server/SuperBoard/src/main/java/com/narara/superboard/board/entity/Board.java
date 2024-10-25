@@ -3,9 +3,9 @@ package com.narara.superboard.board.entity;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,7 +50,7 @@ public class Board {
     private WorkSpace workSpace;  // 워크스페이스 키
 
     @OneToMany(mappedBy = "board")
-    private List<com.narara.superboard.list.entity.List> listCollection;  // 보드 키
+    private java.util.List<List> listCollection;  // 보드 키
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = boardUpdateRequestDto.background();
