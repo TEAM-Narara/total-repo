@@ -34,7 +34,8 @@ fun HomeScreen(
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
     moveToMyCardScreen: () -> Unit,
-    moveToUpdateProfile: () -> Unit
+    moveToUpdateProfile: () -> Unit,
+    moveToSearchScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalContext.current as? Activity
@@ -52,7 +53,8 @@ fun HomeScreen(
         moveToLoginScreen = moveToLoginScreen,
         moveToSettingScreen = moveToSettingScreen,
         moveToMyCardScreen = moveToMyCardScreen,
-        moveToUpdateProfile = moveToUpdateProfile
+        moveToUpdateProfile = moveToUpdateProfile,
+        moveToSearchScreen = moveToSearchScreen,
     )
 }
 
@@ -65,7 +67,8 @@ private fun HomeScreen(
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
     moveToMyCardScreen: () -> Unit,
-    moveToUpdateProfile: () -> Unit
+    moveToUpdateProfile: () -> Unit,
+    moveToSearchScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -109,7 +112,7 @@ private fun HomeScreen(
             topBar = {
                 MainTopBar(
                     onDrawerClick = { scope.launch { drawerState.open() } },
-                    onSearchClick = { /*TODO*/ },
+                    onSearchClick = { moveToSearchScreen() },
                     onAlarmClick = { /*TODO*/ },
                     onMenuClick = moveToSettingScreen
                 )
@@ -156,6 +159,7 @@ fun GreetingPreview() {
         moveToLoginScreen = {},
         moveToSettingScreen = {},
         moveToMyCardScreen = {},
-        moveToUpdateProfile = {}
+        moveToUpdateProfile = {},
+        moveToSearchScreen = {}
     )
 }
