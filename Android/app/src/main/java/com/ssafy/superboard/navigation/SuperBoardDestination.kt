@@ -23,7 +23,7 @@ import com.ssafy.login.signup.signupScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
+    NavHost(navController = navController, startDestination = Board(0), modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })

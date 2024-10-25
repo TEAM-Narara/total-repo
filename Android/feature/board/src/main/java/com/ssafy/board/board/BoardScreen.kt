@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +45,6 @@ import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,15 +58,6 @@ fun BoardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
-
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        scope.launch {
-            delay(4000)
-            viewModel.setBoardId(1)
-        }
-    }
 
     Scaffold(
         modifier = modifier,
@@ -85,7 +74,7 @@ fun BoardScreen(
     ) { paddingValues ->
         boardData?.let {
             BoardScreen(
-                modifier = modifier.padding(paddingValues),
+                modifier = Modifier.padding(paddingValues),
                 boardData = it,
                 onListTitleChanged = viewModel::updateListTitle,
                 onCardReordered = viewModel::updateCardOrder,

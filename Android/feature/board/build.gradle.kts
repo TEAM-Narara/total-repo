@@ -74,4 +74,5 @@ dependencies {
 
     implementation(libs.material.icons.extended)
     implementation(libs.compose.dnd)
+    implementation(libs.androidx.material)
 }
