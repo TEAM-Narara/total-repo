@@ -91,7 +91,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
 
         // Mocking NameValidator and LastOrderValidator behavior
         doNothing().when(nameValidator).validateListNameIsEmpty(requestDto);
-        doNothing().when(lastOrderValidator).checkValidListLastOrder(lastListOrder);
+        doNothing().when(lastOrderValidator).checkValidListLastOrder(board);
 
         // when
         List resultList = listService.createList(requestDto);
@@ -99,7 +99,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         // then
         assertEquals(savedList.getId(), resultList.getId());
         verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
-        verify(lastOrderValidator, times(1)).checkValidListLastOrder(lastListOrder);
+        verify(lastOrderValidator, times(1)).checkValidListLastOrder(board);
         verify(boardRepository, times(1)).getReferenceById(boardId);
         verify(listRepository, times(1)).save(any(List.class));
     }
