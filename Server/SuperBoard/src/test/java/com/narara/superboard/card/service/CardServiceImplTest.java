@@ -7,13 +7,11 @@ import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -123,4 +121,26 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         verify(cardRepository, times(1)).findById(cardId);
     }
 
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("카드 조회 성공 테스트")
+    void testGetCardSuccess(Long cardId) {
+        // given
+        Card card = Card.builder()
+                .id(cardId)
+                .name("Test Card")
+                .build();
+
+        // Mocking: 카드가 존재하는 경우
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+
+        // when
+        Card result = cardService.getCard(cardId);
+
+        // then
+        assertNotNull(result);
+        assertEquals(cardId, result.getId());
+        assertEquals("Test Card", result.getName());
+        verify(cardRepository, times(1)).findById(cardId);
+    }
 }
