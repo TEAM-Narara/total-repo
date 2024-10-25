@@ -12,9 +12,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
-import com.mohamedrejeb.compose.dnd.annotation.ExperimentalDndApi
+import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
-import com.mohamedrejeb.compose.dnd.drop.dropTarget
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
@@ -28,7 +27,6 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingMedium
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalDndApi::class)
 @Composable
 fun ListItem(
     modifier: Modifier = Modifier,
@@ -49,27 +47,7 @@ fun ListItem(
 
     ReorderContainer(state = reorderState) {
         ListItem(
-            modifier = modifier.dropTarget(
-                key = listData.id,
-                state = reorderState.dndState,
-                dropAnimationEnabled = false,
-                onDragEnter = { state ->
-                    collectionState.value = collection.toMutableList().apply {
-                        if (!remove(state.data)) {
-                            cardCollections[state.data.listId]?.let {
-                                it.value = it.value.toMutableList().apply {
-                                    remove(state.data)
-                                }
-                            }
-                        }
-
-                        add(state.data.apply { this.listId = listData.id })
-
-                        onListChanged(listData.id)
-                    }
-                },
-                onDrop = { onCardReordered() },
-            ),
+            modifier = modifier,
             title = listData.title,
             onTitleChange = onTitleChange,
             addCard = addCard,
@@ -112,20 +90,14 @@ fun ListItem(
                             }
                         },
                         onDrop = { onCardReordered() },
-                        draggableContent = {
-                            CardItem(
-                                modifier = Modifier.shadow(
-                                    ElevationLarge,
-                                    shape = RoundedCornerShape(CornerMedium),
-                                ),
-                                cardData = cardData,
-                            )
-                        }
                     ) {
                         CardItem(
                             modifier = Modifier.graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
-                            },
+                            }.shadow(
+                                if (isDragging) ElevationLarge else 0.dp,
+                                shape = RoundedCornerShape(CornerMedium),
+                            ),
                             cardData = cardData,
                         )
                     }

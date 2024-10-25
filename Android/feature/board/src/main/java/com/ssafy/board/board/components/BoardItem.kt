@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
@@ -31,7 +32,7 @@ import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ListData
 import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.board.board.data.toReorderCardData
-import com.ssafy.board.board.handleLazyListScroll
+import com.ssafy.board.board.handleLazyListScrollToCenter
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.ElevationLarge
@@ -56,7 +57,7 @@ fun BoardItem(
     var listCollection by remember { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
-    val cardDndState = rememberReorderState<ReorderCardData>()
+    val cardDndState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
     val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
         boardData.listCollection.forEach { listData ->
             this[listData.id] = remember {
@@ -90,7 +91,7 @@ fun BoardItem(
                             add(index, state.data)
 
                             scope.launch {
-                                handleLazyListScroll(
+                                handleLazyListScrollToCenter(
                                     lazyListState = listLazyListState,
                                     dropIndex = index,
                                 )
@@ -98,20 +99,14 @@ fun BoardItem(
                         }
                     },
                     onDrop = { onListReordered() },
-                    draggableContent = {
-                        ListItem(
-                            modifier = Modifier.shadow(
-                                ElevationLarge,
-                                shape = RoundedCornerShape(CornerMedium),
-                            ),
-                            listData = listData,
-                            reorderState = cardDndState,
-                            cardCollections = cardCollections,
-                        )
-                    }
                 ) {
                     ListItem(
-                        modifier = Modifier.graphicsLayer { alpha = if (isDragging) 0f else 1f },
+                        modifier = Modifier
+                            .graphicsLayer { alpha = if (isDragging) 0f else 1f }
+                            .shadow(
+                                if (isDragging) ElevationLarge else 0.dp,
+                                shape = RoundedCornerShape(CornerMedium),
+                            ),
                         listData = listData,
                         reorderState = cardDndState,
                         cardCollections = cardCollections,
@@ -121,7 +116,7 @@ fun BoardItem(
                         addPhoto = { },
                         onListChanged = { listId ->
                             scope.launch {
-                                handleLazyListScroll(
+                                handleLazyListScrollToCenter(
                                     lazyListState = listLazyListState,
                                     dropIndex = listCollection.indexOfFirst { it.id == listId },
                                 )
