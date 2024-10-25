@@ -4,6 +4,7 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
+import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundNameException;
@@ -32,6 +33,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     private NameValidator nameValidator;
 
     @Mock
+    private LastOrderValidator lastOrderValidator;
+
+    @Mock
     private ListRepository listRepository;
 
     @InjectMocks
@@ -49,6 +53,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         List list = List.builder()
                 .id(1L)
                 .name("Test List")
+                .lastCardOrder(0L)
                 .build();
 
         when(listRepository.findById(1L)).thenReturn(Optional.ofNullable(list));
@@ -60,11 +65,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .list(list)
                 .build();
 
-        // Mocking: 검증 로직을 모킹
+        // Mocking: 이름 검증 로직
         doNothing().when(nameValidator).validateCardNameIsEmpty(cardCreateRequestDto);
 
-        // Mocking: cardRepository.save 호출 시 저장된 card 객체 반환
+        // Mocking: 카드 저장 시 호출되는 로직
         when(cardRepository.save(any(Card.class))).thenReturn(savedCard);
+
+        // Mocking: 카드의 마지막 순서 검증 로직이 정상적으로 동작하는지 확인 (예외 발생하지 않도록 설정)
+        doNothing().when(lastOrderValidator).checkValidCardLastOrder(list);
 
         // when
         Card result = cardService.createCard(cardCreateRequestDto);
