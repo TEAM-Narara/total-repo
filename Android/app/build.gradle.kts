@@ -58,6 +58,9 @@ dependencies {
     implementation(project(":feature:board"))
     implementation(project(":feature:home"))
 
+    // DTO
+    implementation(project(":core:model"))
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
