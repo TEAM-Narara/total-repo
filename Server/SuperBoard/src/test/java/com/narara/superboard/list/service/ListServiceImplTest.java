@@ -23,6 +23,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 @DisplayName("ListServiceImpl 테스트")
@@ -242,4 +244,73 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(listRepository, never()).findByBoardAndIsArchived(any(Board.class), anyBoolean());
     }
 
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("아카이브된 리스트가 없을 때 빈 리스트 반환")
+    void testGetArchivedListNoArchivedLists(Long boardId) {
+        // given
+        Board board = mock(Board.class);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // 리스트가 비어있는 경우를 처리
+        when(listRepository.findByBoardAndIsArchived(board, true)).thenReturn(Collections.emptyList());
+
+        // when
+        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+
+        // then
+        assertNotNull(archivedLists);
+        assertTrue(archivedLists.isEmpty());
+
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("아카이브된 리스트가 있을 때 단일 리스트 조회 성공")
+    void testGetArchivedListSuccess_SingleItem(Long boardId) {
+        // given
+        Board board = mock(Board.class);
+        List archivedList = mock(List.class); // 단일 리스트를 모킹
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(listRepository.findByBoardAndIsArchived(board, true))
+                .thenReturn(Collections.singletonList(archivedList)); // 단일 아카이브 리스트 반환
+
+        // when
+        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+
+        // then
+        assertNotNull(archivedLists);
+        assertEquals(1, archivedLists.size()); // 리스트에 하나의 아카이브된 항목이 있는지 확인
+        assertEquals(archivedList, archivedLists.get(0));
+
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+    }
+
+    @Test
+    @DisplayName("아카이브된 리스트가 여러 개 있을 때 조회 성공")
+    void testGetArchivedListSuccess_MultipleItems() {
+        // given
+        Long boardId = 1L;
+        Board board = mock(Board.class);
+        List archivedList1 = mock(List.class);
+        List archivedList2 = mock(List.class);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(listRepository.findByBoardAndIsArchived(board, true))
+                .thenReturn(Arrays.asList(archivedList1, archivedList2)); // 두 개의 아카이브 리스트 반환
+
+        // when
+        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+
+        // then
+        assertNotNull(archivedLists);
+        assertEquals(2, archivedLists.size()); // 리스트에 두 개의 아카이브된 항목이 있는지 확인
+        assertEquals(archivedList1, archivedLists.get(0));
+        assertEquals(archivedList2, archivedLists.get(1));
+
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+    }
 }
