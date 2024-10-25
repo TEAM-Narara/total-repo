@@ -4,21 +4,30 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.list.entity.List;
+import com.narara.superboard.list.infrastrucure.ListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CardServiceImpl implements CardService{
+public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
+    private final ListRepository listRepository;
+
+
     private final NameValidator nameValidator;
 
     @Override
-    public Card creadCard(CardCreateRequestDto cardCreateRequestDto) {
+    public Card createCard(CardCreateRequestDto cardCreateRequestDto) {
         nameValidator.validateCardNameIsEmpty(cardCreateRequestDto);
 
-        Card card = Card.createCard(cardCreateRequestDto);
+        List list = listRepository.findById(cardCreateRequestDto.listId())
+                .orElseThrow(() -> new NotFoundEntityException(cardCreateRequestDto.listId(), "리스트"));
+
+        Card card = Card.createCard(cardCreateRequestDto, list);
         return cardRepository.save(card);
     }
 
