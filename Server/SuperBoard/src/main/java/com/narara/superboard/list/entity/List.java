@@ -49,10 +49,11 @@ public class List {
     @Column(name = "card_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long cardOrderVersion;  // 버전
 
-    public static List createList(ListCreateRequestDto listCreateRequestDto, Long lastListOrder) {
+    public static List createList(ListCreateRequestDto listCreateRequestDto, Board board) {
         return List.builder()
                 .name(listCreateRequestDto.listName())
-                .myOrder(lastListOrder)
+                .board(board)
+                .myOrder(board.getLastListOrder() +1)
                 .build();
     }
 
