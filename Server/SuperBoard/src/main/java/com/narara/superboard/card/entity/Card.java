@@ -56,6 +56,7 @@ public class Card {
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
+                .myOrder(list.getLastCardOrder() + 1)
                 .build();
     }
 }
