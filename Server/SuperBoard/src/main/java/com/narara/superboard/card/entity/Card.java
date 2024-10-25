@@ -1,5 +1,6 @@
 package com.narara.superboard.card.entity;
 
+import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,5 +51,11 @@ public class Card {
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived = false;
+
+    public static Card createCard(CardCreateRequestDto cardCreateRequestDto) {
+        return Card.builder()
+                .name(cardCreateRequestDto.cardName())
+                .build();
+    }
 }
 
