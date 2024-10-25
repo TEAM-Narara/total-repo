@@ -1,6 +1,7 @@
 package com.narara.superboard.workspace.service.validator;
 
-import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
+import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.workspace.exception.WorkspaceNameNotFoundException;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,15 +14,10 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("워크스페이스 검증 테스트")
-class WorkSpaceValidatorTest {
+class WorkSpaceValidatorTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private WorkSpaceValidator workSpaceValidator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);  // Mockito 초기화
-    }
 
     @DisplayName("생성 DTO에 이름이 없으면 에러가 발생한다.")
     @ParameterizedTest

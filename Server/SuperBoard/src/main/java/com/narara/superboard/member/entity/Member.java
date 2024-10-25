@@ -37,7 +37,6 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<BoardMember> boardMemberList;
 
-
     public Member(Long id, String nickname, String email, String profileImgUrl) {
         this.id = id;
         this.nickname = nickname;

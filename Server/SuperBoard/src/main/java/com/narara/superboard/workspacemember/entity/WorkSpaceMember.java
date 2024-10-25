@@ -1,5 +1,6 @@
 package com.narara.superboard.workspacemember.entity;
 
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
@@ -29,13 +30,13 @@ public class WorkSpaceMember {
     private WorkSpace workSpace;  // 워크스페이스 ID
 
     @Column(name = "authority", nullable = false, length = 50)
-    private String authority;  // 권한 (ADMIN, MEMBER)
+    private Authority authority;  // 권한 (ADMIN, MEMBER)
 
     public WorkSpaceMember(WorkSpace workSpace) {
         this.workSpace = workSpace;
     }
 
-    public WorkSpaceMember(Member member, String authority) {
+    public WorkSpaceMember(Member member, Authority authority) {
         this.member = member;
         this.authority = authority;
     }

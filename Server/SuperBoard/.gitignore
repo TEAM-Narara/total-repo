@@ -292,3 +292,5 @@ gradle-app.setting
 src/main/resources/*.yml
 src/main/resources/*.properties
 superboard-secret-value/**
+application.yml
+application.properties
