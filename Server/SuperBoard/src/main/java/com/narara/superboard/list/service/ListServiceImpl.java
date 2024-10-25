@@ -49,4 +49,11 @@ public class ListServiceImpl implements ListService{
         return listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
     }
+
+    @Override
+    public List changeListIsArchived(Long listId) {
+        List list = getList(listId);
+        list.changeListIsArchived();
+        return list;
+    }
 }

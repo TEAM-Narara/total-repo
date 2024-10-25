@@ -8,4 +8,5 @@ public interface ListService {
     List createList(ListCreateRequestDto listCreateRequestDto);
     List updateList(Long listId, ListUpdateRequestDto listUpdateRequestDto);
     List getList(Long listId);
+    List changeListIsArchived(Long listId);
 }

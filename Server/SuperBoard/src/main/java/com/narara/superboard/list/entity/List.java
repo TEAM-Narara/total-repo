@@ -68,4 +68,7 @@ public class List {
         this.version += 1;
     }
 
+    public void changeListIsArchived() {
+        this.isArchived = !isArchived;
+    }
 }
