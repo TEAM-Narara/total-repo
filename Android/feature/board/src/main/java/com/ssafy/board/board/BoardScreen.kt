@@ -1,24 +1,53 @@
 package com.ssafy.board.board
 
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ssafy.board.board.components.BoardItem
+import com.mohamedrejeb.compose.dnd.drag.DropStrategy
+import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
+import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
+import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
+import com.ssafy.board.board.components.AddListButton
+import com.ssafy.board.board.components.ListItem
 import com.ssafy.board.board.components.TopAppBar
 import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ListData
-import com.ssafy.ui.uistate.UiState
+import com.ssafy.board.board.data.ReorderCardData
+import com.ssafy.board.board.data.toReorderCardData
+import com.ssafy.designsystem.values.CornerMedium
+import com.ssafy.designsystem.values.ElevationLarge
+import com.ssafy.designsystem.values.Gray
+import com.ssafy.designsystem.values.PaddingDefault
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(
@@ -30,35 +59,56 @@ fun BoardScreen(
     navigateToBoardMenuScreen: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val boardData by viewModel.boardData.collectAsStateWithLifecycle()
 
-    uiState.run {
-        when (this) {
-            UiState.Loading -> BoardLoadingScreen(
-                modifier = modifier,
-                popBack = popBack,
-                onNotificationPressed = navigateToNotificationScreen,
-            )
+    val scope = rememberCoroutineScope()
 
-            is UiState.Success -> BoardScreen(
-                modifier = modifier,
-                boardData = this.data,
-                onBoardTitleChanged = viewModel::updateBoardTitle,
-                onListTitleChanged = viewModel::updateListTitle,
-                onCardReordered = viewModel::updateCardOrder,
-                onListReordered = viewModel::updateListOrder,
+    LaunchedEffect(Unit) {
+        scope.launch {
+            delay(4000)
+            viewModel.setBoardId(1)
+        }
+    }
+
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = boardData?.title ?: "",
+                onBackPressed = popBack,
+                onBoardTitleChanged = { viewModel.updateBoardTitle() },
                 onFilterPressed = navigateToFilterScreen,
                 onNotificationPressed = navigateToNotificationScreen,
                 onMorePressed = navigateToBoardMenuScreen,
-                popBack = popBack,
-                addList = viewModel::addList,
             )
-
-            is UiState.Error -> BoardErrorScreen(
-                modifier = modifier,
-                popBack = popBack,
-                onNotificationPressed = navigateToNotificationScreen,
+        },
+    ) { paddingValues ->
+        boardData?.let {
+            BoardScreen(
+                modifier = modifier.padding(paddingValues),
+                boardData = it,
+                onListTitleChanged = viewModel::updateListTitle,
+                onCardReordered = viewModel::updateCardOrder,
+                onListReordered = viewModel::updateListOrder,
+                addList = viewModel::addList,
+                addCard = viewModel::addCard,
+                addPhoto = viewModel::addPhoto
             )
         }
+    }
+
+    if (uiState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize().background(Gray.copy(alpha = 0.7f))) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    }
+
+    if (uiState.isError && uiState.errorMessage != null) {
+        Toast.makeText(
+            LocalContext.current,
+            uiState.errorMessage,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
 
@@ -67,94 +117,91 @@ fun BoardScreen(
 private fun BoardScreen(
     modifier: Modifier = Modifier,
     boardData: BoardData,
-    onBoardTitleChanged: () -> Unit,
     onListTitleChanged: () -> Unit,
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
-    onFilterPressed: () -> Unit,
-    onNotificationPressed: () -> Unit,
-    onMorePressed: () -> Unit,
-    popBack: () -> Unit,
     addList: () -> Unit,
+    addCard: () -> Unit,
+    addPhoto: () -> Unit,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = boardData.title,
-                onBackPressed = popBack,
-                onBoardTitleChanged = { onBoardTitleChanged() },
-                onFilterPressed = onFilterPressed,
-                onNotificationPressed = onNotificationPressed,
-                onMorePressed = onMorePressed,
-            )
-        },
-    ) { paddingValues ->
-        BoardItem(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
-            boardData = boardData,
-            onListTitleChanged = onListTitleChanged,
-            onCardReordered = onCardReordered,
-            onListReordered = onListReordered,
-            addList = addList,
-        )
-    }
-}
+    val scope = rememberCoroutineScope()
 
-@Composable
-fun BoardLoadingScreen(
-    modifier: Modifier = Modifier,
-    popBack: () -> Unit,
-    onNotificationPressed: () -> Unit
-) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = "",
-                onBackPressed = popBack,
-                onBoardTitleChanged = { },
-                onFilterPressed = { },
-                onNotificationPressed = onNotificationPressed,
-                onMorePressed = { },
-            )
-        },
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    val listDndState = rememberReorderState<ListData>(dragAfterLongPress = true)
+    var listCollection by remember { mutableStateOf(boardData.listCollection) }
+    val listLazyListState = rememberLazyListState()
+
+    val cardDndState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
+    val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
+        boardData.listCollection.forEach { listData ->
+            this[listData.id] = remember {
+                mutableStateOf(listData.cardCollection.map {
+                    it.toReorderCardData(listData.id)
+                })
+            }
         }
     }
-}
 
-@Composable
-fun BoardErrorScreen(
-    modifier: Modifier = Modifier,
-    popBack: () -> Unit,
-    onNotificationPressed: () -> Unit
-) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = "",
-                onBackPressed = popBack,
-                onBoardTitleChanged = { },
-                onFilterPressed = { },
-                onNotificationPressed = onNotificationPressed,
-                onMorePressed = { },
-            )
-        },
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
+    // TODO : card의 onLongPressed가 내려오는 문제 해결
+    ReorderContainer(state = listDndState) {
+        LazyRow(
+            state = listLazyListState,
+            horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
+            modifier = modifier.padding(vertical = PaddingDefault),
+            contentPadding = PaddingValues(horizontal = PaddingDefault)
         ) {
-            Text(text = "Error", modifier = Modifier.align(Alignment.Center))
+            items(listCollection, key = { it.id }) { listData ->
+                ReorderableItem(
+                    state = listDndState,
+                    key = listData.id,
+                    data = listData,
+                    dropStrategy = DropStrategy.CenterDistance,
+                    onDragEnter = { state ->
+                        listCollection = listCollection.toMutableList().apply {
+                            val index = indexOf(listData)
+                            if (index == -1) return@apply
+
+                            remove(state.data)
+                            add(index, state.data)
+
+                            scope.launch {
+                                handleLazyListScrollToCenter(
+                                    lazyListState = listLazyListState,
+                                    dropIndex = index,
+                                )
+                            }
+                        }
+                    },
+                    onDrop = { onListReordered() },
+                ) {
+                    ListItem(
+                        modifier = Modifier
+                            .graphicsLayer { alpha = if (isDragging) 0f else 1f }
+                            .shadow(
+                                if (isDragging) ElevationLarge else 0.dp,
+                                shape = RoundedCornerShape(CornerMedium),
+                            ),
+                        listData = listData,
+                        reorderState = cardDndState,
+                        cardCollections = cardCollections,
+                        onTitleChange = { onListTitleChanged() },
+                        onCardReordered = { onCardReordered() },
+                        addCard = addCard,
+                        addPhoto = addPhoto,
+                        onListChanged = { listId ->
+                            scope.launch {
+                                handleLazyListScrollToCenter(
+                                    lazyListState = listLazyListState,
+                                    dropIndex = listCollection.indexOfFirst { it.id == listId },
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+
+            item {
+                AddListButton(onClick = addList)
+            }
         }
     }
 }
@@ -164,7 +211,7 @@ fun BoardErrorScreen(
 private fun BoardScreenPreview() {
     BoardScreen(
         boardData = BoardData(
-            id = "board 1",
+            id = 1,
             title = "title",
             listCollection = (1..1).map { listData ->
                 ListData(
@@ -180,32 +227,11 @@ private fun BoardScreenPreview() {
                 )
             }
         ),
-        onBoardTitleChanged = {},
         onListTitleChanged = {},
         onCardReordered = {},
         onListReordered = {},
-        onFilterPressed = {},
-        onNotificationPressed = {},
-        onMorePressed = {},
-        popBack = {},
-        addList = {}
-    )
-}
-
-@Preview
-@Composable
-private fun BoardLoadingScreenPreview() {
-    BoardLoadingScreen(
-        onNotificationPressed = {},
-        popBack = {}
-    )
-}
-
-@Preview
-@Composable
-private fun BoardErrorScreenPreview() {
-    BoardErrorScreen(
-        onNotificationPressed = {},
-        popBack = {}
+        addList = {},
+        addCard = {},
+        addPhoto = {}
     )
 }
