@@ -43,4 +43,9 @@ public class Member {
         this.email = email;
         this.profileImgUrl = profileImgUrl;
     }
+
+    // RefreshToken을 업데이트하는 메서드
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 }
