@@ -9,6 +9,8 @@ import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,9 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final BoardValidator boardValidator;
+    private final WorkSpaceRepository workspaceRepository;
+
+        private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
     private final NameValidator nameValidator;
 
@@ -52,10 +56,14 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
 
+        WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
+                .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
+
         Board board = Board.builder()
                 .cover(boardCreateRequestDto.background())
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
+                .workSpace(workSpace)
                 .build();
 
         Board saveBoard = boardRepository.save(board);

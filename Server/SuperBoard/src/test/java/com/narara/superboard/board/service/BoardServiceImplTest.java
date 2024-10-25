@@ -17,11 +17,16 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -44,6 +49,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private WorkSpaceRepository workspaceRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -118,56 +126,90 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("https://example.com/image.jpg", board2.backgroundValue());
     }
 
-    @Test
-    @DisplayName("보드 생성 성공 테스트")
-    void testCreateBoardSuccess() {
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("워크스페이스 ID가 존재하지 않을 때 예외 발생")
+    void shouldThrowNotFoundEntityExceptionWhenWorkspaceIdNotFound(Long workspaceId) {
         // given
-        Long boardId = 1L;
-        Map<String, Object> background = new HashMap<>();
-        background.put("type", "COLOR");
-        background.put("value", "#ffffff");
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
 
-        BoardCreateRequestDto boardCreateRequestDto = new BoardCreateRequestDto(
-                "보드 이름",
-                "PRIVATE",
+        // Mocking workspaceRepository to return empty Optional
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            boardService.createBoard(requestDto);
+        });
+
+        assertEquals("워크스페이스가 존재하지 않습니다.", exception.getMessage());
+        verify(workspaceRepository, times(1)).findById(workspaceId);
+    }
+
+
+
+    static Stream<Arguments> provideBoardCreateRequestData() {
+        return Stream.of(
+                Arguments.of(1L, "보드 이름1", "COLOR", "#ffffff", "PRIVATE"),
+                Arguments.of(2L, "보드 이름2", "GRADIENT", "#123456", "PUBLIC")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBoardCreateRequestData")
+    @DisplayName("워크스페이스 ID가 존재할 때 보드 생성 성공 테스트")
+    void testCreateBoardWhenWorkspaceIdExists(Long workspaceId, String name, String backgroundType, String backgroundValue, String visibility) {
+        // given
+        Map<String, Object> background = new HashMap<>();
+        background.put("type", backgroundType);
+        background.put("value", backgroundValue);
+
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(
+                workspaceId,
+                name,
+                visibility,
                 background
         );
 
+        WorkSpace workspace = new WorkSpace();
         Board savedBoard = Board.builder()
-                .id(boardId)
+                .id(workspaceId)
                 .cover(background)
-                .name("보드 이름")
-                .visibility(Visibility.PRIVATE)
+                .name(name)
+                .visibility(Visibility.fromString(visibility))
+                .workSpace(workspace)
                 .build();
 
         // Mocking: 검증 로직을 모킹
-        doNothing().when(boardValidator).validateNameIsPresent(boardCreateRequestDto);
-        doNothing().when(boardValidator).validateVisibilityIsValid(boardCreateRequestDto);
-        doNothing().when(boardValidator).validateVisibilityIsPresent(boardCreateRequestDto);
+        doNothing().when(boardValidator).validateNameIsPresent(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsValid(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
 
-        // Mocking: boardRepository.save 호출 시 저장된 board 객체 반환
+        // Mocking: workspaceRepository와 boardRepository의 반환값 설정
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.of(workspace));
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
 
         // when
-        Long savedBoardId = boardService.createBoard(boardCreateRequestDto);
+        Long savedBoardId = boardService.createBoard(requestDto);
 
         // then
-        assertEquals(boardId, savedBoardId);
-        verify(boardValidator, times(1)).validateNameIsPresent(boardCreateRequestDto);
-        verify(boardValidator, times(1)).validateVisibilityIsValid(boardCreateRequestDto);
-        verify(boardValidator, times(1)).validateVisibilityIsPresent(boardCreateRequestDto);
+        assertEquals(workspaceId, savedBoardId);
+        verify(workspaceRepository, times(1)).findById(workspaceId);
         verify(boardRepository, times(1)).save(any(Board.class));
+        verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
     }
 
     @Test
     @DisplayName("background가 null인 경우에도 보드 생성 성공")
     void createBoard_WhenBackgroundIsNull_ThenSuccess() {
         // given
+        Long workspaceId = 1L;
         String name = "테스트 보드";
         Map<String, Object> background = null;
         String visibility = "WORKSPACE";
 
-        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(name, visibility, background);
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
 
         Board expectedBoard = Board.builder()
                 .cover(background)
