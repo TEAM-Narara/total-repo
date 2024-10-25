@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #messageArea {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>웹소켓 테스트</h2>
+
+    <div class="form-group">
+        <label for="endPoint">/app을 포함한 url:</label>
+        <input type="text" id="endPoint" required>
+    </div>
+
+    <div class="form-group">
+        <label for="jwtToken">JWT Token(Bearer는 자동 포함됨):</label>
+        <input type="text" id="jwtToken" required>
+    </div>
+
+    <div class="form-group">
+        <label for="body">body:</label>
+        <textarea id="body" required  style="height: 300px"></textarea>
+    </div>
+
+    <button onclick="sendHttp()">전송</button>
+
+    <div id="messageArea">
+        <h3>response:</h3>
+        <div id="messages"></div>
+    </div>
+</div>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+
+        // JWT 토큰 가져오기
+        const jwtToken = document.getElementById('jwtToken').value;
+        const headers = {
+            'Authorization': 'Bearer ' + jwtToken
+        };
+
+        // STOMP 클라이언트 디버그 로그 활성화
+        // stompClient.debug = function(str) {
+        //     console.log(str);
+        // };
+
+        stompClient.connect(headers, function(frame) {
+            console.log('Connected: ' + frame);
+
+            // /topic/cards 구독
+            stompClient.subscribe('/topic/test', function(response) {
+                console.log('Received:', response.body);
+                try {
+                    const message = JSON.parse(response.body);
+                    displayMessage(message);
+                } catch (error) {
+                    console.error('Error parsing message:', error);
+                }
+            });
+        }, function(error) {
+            console.log('Connection error:', error);
+            setTimeout(connect, 5000);  // 5초 후 재연결 시도
+        });
+    }
+
+    function sendHttp() {
+        if (!stompClient || !stompClient.connected) {
+            alert('서버와 연결되어 있지 않습니다. 페이지를 새로고침해주세요.');
+            return;
+        }
+
+        const endPoint = document.getElementById('endPoint').value;
+        const jwtToken = document.getElementById('jwtToken').value;
+        const body = document.getElementById('body').value;
+
+        if (!endPoint || !jwtToken || !body) {
+            alert('모든 필드를 입력해주세요.');
+            return;
+        }
+
+        let request;
+        try {
+            request = JSON.parse(body);
+        } catch (error) {
+            alert('Body JSON 형식이 올바르지 않습니다.');
+            return;
+        }
+
+        const headers = {
+            'Authorization': 'Bearer ' + jwtToken
+        };
+
+        console.log('Sending:', request);
+        stompClient.send(endPoint, headers, JSON.stringify(request));
+    }
+
+    function displayMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.style.marginBottom = '10px';
+
+        let content = '<strong>수신된 메시지:</strong><br>';
+        content += `타입: ${message.type || 'N/A'}<br>`;
+
+        // response가 존재하면, JSON을 문자열로 변환하여 출력
+        if (message.response) {
+            content += `<strong>body:</strong><br><pre>${JSON.stringify(message.response, null, 2)}</pre>`;
+        } else {
+            content += '정보 없음<br>';
+        }
+
+        content += '<hr>';
+
+        messageElement.innerHTML = content;
+        messagesDiv.insertBefore(messageElement, messagesDiv.firstChild);
+    }
+
+    // 페이지 로드 시 연결
+    window.onload = function() {
+        // JWT 토큰이 입력된 후에만 연결하도록 변경
+        document.getElementById('jwtToken').addEventListener('change', function() {
+            if (this.value) {
+                connect();
+            }
+        });
+    };
+</script>
+</body>
+</html>
