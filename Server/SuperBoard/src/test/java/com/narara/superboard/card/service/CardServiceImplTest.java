@@ -117,7 +117,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
             cardService.getCard(cardId);
         });
 
-        assertEquals("카드 ID " + cardId + "에 해당하는 카드가 존재하지 않습니다.", exception.getMessage());
+        assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
         verify(cardRepository, times(1)).findById(cardId);
     }
 
