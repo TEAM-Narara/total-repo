@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-@DisplayName("ListServiceImpl 테스트")
+@DisplayName("리스트 서비스에 대한 단위 테스트")
 class ListServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
@@ -176,7 +176,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
             listService.updateList(listId, requestDto);
         });
 
-        assertEquals("리스트 ID " + listId + "에 해당하는 엔티티를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("해당하는 리스트(이)가 존재하지 않습니다. 리스트ID: " + listId, exception.getMessage());
         verify(listRepository, times(1)).findById(listId);
         verify(nameValidator, never()).validateListNameIsEmpty(any());
     }

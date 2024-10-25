@@ -1,6 +1,5 @@
 package com.narara.superboard.common.application.validator;
 
-import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.common.exception.authority.InvalidAuthorityFormatException;
 import com.narara.superboard.common.exception.authority.NotFoundAuthorityException;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,11 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("AuthorityValidator 테스트")
+@DisplayName("권한 검증에 대한 단위 테스트")
 class AuthorityValidatorTest {
 
     private AuthorityValidator authorityValidator;

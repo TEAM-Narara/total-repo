@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("마지막 순서에 대해서 검증해주는 검증기의 테스트")
+@DisplayName("마지막 순서 검증에 대한 단위 테스트")
 class LastOrderValidatorTest{
 
     private LastOrderValidator lastOrderValidator;

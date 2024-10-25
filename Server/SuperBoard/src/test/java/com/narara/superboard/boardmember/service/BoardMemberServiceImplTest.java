@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-@DisplayName("BoardMemberServiceImpl 대한 Test")
+@DisplayName("보드의 멤버 서비스에 대한 단위 테스트")
 class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks

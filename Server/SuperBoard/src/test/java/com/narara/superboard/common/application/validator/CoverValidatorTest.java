@@ -19,10 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 
 
-@DisplayName("CoverValidator 테스트")
+@DisplayName("커버 검증에 대한 단위 테스트")
 class CoverValidatorTest {
 
     private CoverValidator coverValidator;

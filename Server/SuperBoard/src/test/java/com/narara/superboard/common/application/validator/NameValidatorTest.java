@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("NameValidator 테스트")
+@DisplayName("이름 검증에 대한 단위 테스트")
 class NameValidatorTest {
 
     /**
