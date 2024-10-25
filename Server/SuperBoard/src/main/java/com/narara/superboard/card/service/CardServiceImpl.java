@@ -3,6 +3,7 @@ package com.narara.superboard.card.service;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
+import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
@@ -19,6 +20,7 @@ public class CardServiceImpl implements CardService {
 
 
     private final NameValidator nameValidator;
+    private final LastOrderValidator lastOrderValidator;
 
     @Override
     public Card createCard(CardCreateRequestDto cardCreateRequestDto) {
@@ -26,6 +28,7 @@ public class CardServiceImpl implements CardService {
 
         List list = listRepository.findById(cardCreateRequestDto.listId())
                 .orElseThrow(() -> new NotFoundEntityException(cardCreateRequestDto.listId(), "리스트"));
+        lastOrderValidator.checkValidCardLastOrder(list);
 
         Card card = Card.createCard(cardCreateRequestDto, list);
         return cardRepository.save(card);
