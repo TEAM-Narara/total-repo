@@ -59,5 +59,9 @@ public class Card {
                 .myOrder(list.getLastCardOrder() + 1)
                 .build();
     }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
 
