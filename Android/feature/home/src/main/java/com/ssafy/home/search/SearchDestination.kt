@@ -5,14 +5,14 @@ import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Search
+object SearchWorkspace
 
-fun NavGraphBuilder.searchScreen(
+fun NavGraphBuilder.searchWorkspaceScreen(
     onBackPressed: () -> Unit,
     moveToCardScreen: (Any) -> Unit
 ) {
-    composable<Search> {
-        SearchScreen(
+    composable<SearchWorkspace> {
+        SearchWorkspaceScreen(
             List(10) { Any() },
             onBackPressed,
             moveToCardScreen

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ssafy.designsystem.R
@@ -41,14 +42,16 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingSemiLarge
 import com.ssafy.designsystem.values.PaddingSmall
+import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
+import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.Transparent
 import com.ssafy.designsystem.values.Yellow
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(
+fun SearchWorkspaceScreen(
     boardList: List<Any>,
     onBackPressed: () -> Unit,
     moveToCardScreen: (Any) -> Unit
@@ -95,7 +98,14 @@ fun SearchScreen(
             thickness = 1.dp,
             color = Color.Gray
         )
-        Text(text = "Board", modifier = Modifier.padding(PaddingSmall))
+        Text(
+            text = "Board",
+            fontWeight = FontWeight.Bold,
+            fontSize = TextMedium,
+            modifier = Modifier
+                .padding(PaddingSmall)
+                .padding(top = PaddingXSmall)
+        )
         LazyRow(
             modifier = Modifier
                 .background(color = Transparent),
@@ -113,7 +123,14 @@ fun SearchScreen(
                 )
             }
         }
-        Text(text = "Card", modifier = Modifier.padding(PaddingSmall))
+        Text(
+            text = "Card",
+            fontWeight = FontWeight.Bold,
+            fontSize = TextMedium,
+            modifier = Modifier
+                .padding(PaddingSmall)
+                .padding(top = PaddingDefault)
+        )
         LazyRow(
             modifier = Modifier
                 .background(color = Transparent),
@@ -166,7 +183,7 @@ fun SearchScreen(
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
-    SearchScreen(
+    SearchWorkspaceScreen(
         List(10) { Any() },
         {},
         {}
