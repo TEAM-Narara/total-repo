@@ -28,6 +28,7 @@ import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.component.IconButton
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.model.search.DueDate
 import com.ssafy.model.search.Label
 import com.ssafy.model.search.SearchParameters
@@ -82,7 +83,9 @@ private fun BoardSearchScreen(
             EditableText(
                 text = parameters.searchedText,
                 onTextChanged = updateSearchText,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .padding(start = PaddingSmall)
+                    .weight(1f),
                 maxTitleLength = 40,
             )
 
