@@ -40,4 +40,10 @@ public class CardServiceImpl implements CardService {
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
+    @Override
+    public void deleteCard(Long cardId) {
+        Card card = getCard(cardId);
+        cardRepository.delete(card);
+    }
+
 }

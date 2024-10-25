@@ -6,4 +6,5 @@ import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 public interface CardService {
     Card createCard(CardCreateRequestDto cardCreateRequestDto);
     Card getCard(Long cardId);
+    void deleteCard(Long cardId);
 }
