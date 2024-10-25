@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,4 +63,19 @@ class NameValidatorTest {
         assertDoesNotThrow(() -> nameValidator.validateNameIsEmpty(nameHolder));
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("카드 이름이 비어있거나 null일 때 예외 발생")
+    void shouldFailWhenCardNameIsEmptyOrNull(String cardName) {
+        // given
+        NameHolder nameHolder = () -> cardName;
+
+        // when & then
+        NotFoundNameException exception = assertThrows(NotFoundNameException.class, () -> {
+            nameValidator.validateCardNameIsEmpty(nameHolder);
+        });
+
+        // then
+        assertEquals("카드의 이름(이)가 존재하지 않습니다. 이름(을)를 작성해주세요.", exception.getMessage());
+    }
 }
