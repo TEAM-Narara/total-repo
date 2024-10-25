@@ -43,7 +43,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public void deleteCard(Long cardId) {
         Card card = getCard(cardId);
-        cardRepository.delete(card);
+        card.delete();
     }
 
 }
