@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -104,4 +105,22 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         verify(listRepository, times(1)).findById(listId);
         verifyNoMoreInteractions(cardRepository); // cardRepository는 호출되지 않아야 함
     }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("카드 조회 실패 테스트")
+    void testGetCardFailure(Long cardId) {
+        // given
+        // Mocking: 카드가 존재하지 않는 경우
+        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            cardService.getCard(cardId);
+        });
+
+        assertEquals("카드 ID " + cardId + "에 해당하는 카드가 존재하지 않습니다.", exception.getMessage());
+        verify(cardRepository, times(1)).findById(cardId);
+    }
+
 }
