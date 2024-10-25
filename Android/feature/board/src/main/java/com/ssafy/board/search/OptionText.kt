@@ -20,6 +20,7 @@ import coil3.compose.AsyncImage
 import com.ssafy.board.search.dto.IconType
 import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.IconMedium
+import com.ssafy.designsystem.values.PaddingSemiSmall
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.RadiusSMall
@@ -44,6 +45,7 @@ fun OptionText(
         DrawIcon(iconType = startIcon, size = IconLarge)
         Text(
             text = content,
+            color = getContrastingTextColor(backGroundColor),
             fontSize = TextMedium,
             modifier = Modifier.padding(vertical = PaddingXSmall, horizontal = PaddingSmall)
         )
@@ -75,11 +77,17 @@ private fun DrawIcon(iconType: IconType, size: Dp) {
                     .size(size)
                     .clip(CircleShape)
                     .background(color = iconType.backgroundColor)
-                    .padding(PaddingXSmall),
+                    .padding(PaddingSemiSmall),
             )
         }
 
         IconType.None -> {}
     }
+}
 
+private fun getContrastingTextColor(backgroundColor: Color): Color {
+    if (backgroundColor == Transparent) return Color.Black
+
+    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
+    return if (brightness > 384) Color.Black else Color.White
 }

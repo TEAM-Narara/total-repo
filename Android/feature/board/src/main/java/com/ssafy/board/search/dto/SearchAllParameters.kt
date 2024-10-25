@@ -1,12 +1,15 @@
 package com.ssafy.board.search.dto
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.LabelOff
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.ssafy.designsystem.values.Gray
+import com.ssafy.designsystem.values.LabelRed
+import com.ssafy.designsystem.values.LabelYellow
 import com.ssafy.designsystem.values.Transparent
 import com.ssafy.model.search.DueDate
 import com.ssafy.model.search.Label
@@ -52,14 +55,14 @@ data class SearchAllParameters(
         DueDate.OVERDUE to ParamsInfo(
             startIcon = IconType.Vector(
                 image = Icons.Default.AccessTime,
-                backgroundColor = Color.Red,
+                backgroundColor = LabelRed,
             ),
             isSelected = false
         ),
         DueDate.DUE_IN_THE_NEXT_DAY to ParamsInfo(
             startIcon = IconType.Vector(
                 image = Icons.Default.AccessTime,
-                backgroundColor = Color.Yellow,
+                backgroundColor = LabelYellow,
             ),
             isSelected = false
         ),
@@ -83,7 +86,7 @@ data class SearchAllParameters(
             color = Transparent.toArgb().toLong()
         ) to ParamsInfo(
             startIcon = IconType.Vector(
-                image = Icons.Default.CalendarMonth,
+                image = Icons.AutoMirrored.Outlined.LabelOff,
                 backgroundColor = Gray,
             ),
             isSelected = false
