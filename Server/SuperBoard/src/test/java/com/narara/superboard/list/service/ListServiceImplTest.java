@@ -2,22 +2,19 @@ package com.narara.superboard.list.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastrucuture.BoardRepository;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,6 +22,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import java.util.Optional;
 
 @DisplayName("ListServiceImpl 테스트")
 class ListServiceImplTest implements MockSuperBoardUnitTests {
@@ -43,22 +42,6 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private ListServiceImpl listService;
-
-//    @ParameterizedTest
-//    @NullAndEmptySource
-//    @ValueSource(strings = {"  ", "\t", "\n"})
-//    void shouldFailWhenListNameIsEmpty(String listName) {
-//        // given
-//        ListCreateRequestDto requestDto = new ListCreateRequestDto(1L, listName);
-//
-//        // when & then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-//            listService.createList(requestDto);
-//        });
-//
-//        assertEquals("List name must not be empty", exception.getMessage());
-//        verify(nameValidator).validateNameIsEmpty(requestDto);
-//    }
 
     @ParameterizedTest
     @NullAndEmptySource
@@ -118,4 +101,34 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(boardRepository, times(1)).getReferenceById(boardId);
         verify(listRepository, times(1)).save(any(List.class));
     }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("리스트 이름이 비어있을 때 실패")
+    void testUpdateListFailureEmptyName(String emptyName) {
+        // given
+        Long listId = 1L;
+        ListUpdateRequestDto requestDto = ListUpdateRequestDto.builder()
+                .listId(listId)
+                .listName(emptyName)
+                .build();
+
+        // Mocking List entity
+        List list = mock(List.class);
+        when(listRepository.findById(listId)).thenReturn(Optional.of(list));
+
+        // Mocking: 리스트 이름이 비어있을 때 예외 발생
+        doThrow(new IllegalArgumentException("리스트 이름이 비어있습니다."))
+                .when(nameValidator).validateListNameIsEmpty(requestDto);
+
+        // when & then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            listService.updateList(listId, requestDto);
+        });
+
+        assertEquals("리스트 이름이 비어있습니다.", exception.getMessage());
+        verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
+        verify(list, never()).updateList(requestDto);
+    }
+
 }
