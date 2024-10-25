@@ -1,5 +1,6 @@
 package com.narara.superboard.member.entity;
 
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<WorkSpaceMember> workspaceMemberList;
+
+    @OneToMany(mappedBy = "member")
+    private List<BoardMember> boardMemberList;
 
 
     public Member(Long id, String nickname, String email, String profileImgUrl) {

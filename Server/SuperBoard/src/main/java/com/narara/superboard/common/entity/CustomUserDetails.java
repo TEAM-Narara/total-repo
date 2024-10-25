@@ -1,11 +1,13 @@
 package com.narara.superboard.common.entity;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
+    @Getter
     private Long userId; // 사용자 ID
     private Collection<? extends GrantedAuthority> authorities; // 권한 목록
 
@@ -14,9 +16,6 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
