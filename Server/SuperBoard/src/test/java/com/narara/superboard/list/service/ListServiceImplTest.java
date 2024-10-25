@@ -155,4 +155,29 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
         assertEquals(list, updatedList);
     }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("리스트 ID가 존재하지 않을 때 실패")
+    void testUpdateListFailureListNotFound(Long listId) {
+        // given
+        ListUpdateRequestDto requestDto = ListUpdateRequestDto.builder()
+                .listId(listId)
+                .listName("Valid Name")
+                .build();
+
+        // Mocking: 리스트를 찾지 못했을 때 예외 발생
+        when(listRepository.findById(listId)).thenReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            listService.updateList(listId, requestDto);
+        });
+
+        assertEquals("리스트 ID " + listId + "에 해당하는 엔티티를 찾을 수 없습니다.", exception.getMessage());
+        verify(listRepository, times(1)).findById(listId);
+        verify(nameValidator, never()).validateListNameIsEmpty(any());
+    }
+
+
 }
