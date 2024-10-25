@@ -2,6 +2,7 @@ package com.narara.superboard.list.entity;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -59,7 +60,12 @@ public class List {
                 .build();
     }
 
+    public void updateList(ListUpdateRequestDto listUpdateRequestDto) {
+        this.name = listUpdateRequestDto.listName();
+    }
+
     public void increaseVersion() {
         this.version += 1;
     }
+
 }
