@@ -48,6 +48,7 @@ val BorderDefault = 1.dp
 val ListWidth = 300.dp
 val CardWidth = 270.dp
 val BoardHeight = 130.dp
+val BoardWidth = 160.dp
 
 val ElevationSmall = 2.dp
 val ElevationMedium = 4.dp
