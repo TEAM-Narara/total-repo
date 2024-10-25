@@ -203,4 +203,23 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
         assertEquals(list, updatedList);
     }
+
+    @Test
+    @DisplayName("리스트 아카이브 상태 변경 성공")
+    void testChangeListIsArchivedSuccess() {
+        // given
+        Long listId = 1L;
+        List list = mock(List.class);
+
+        // Mocking the repository behavior
+        when(listRepository.findById(listId)).thenReturn(Optional.of(list));
+
+        // when
+        List updatedList = listService.changeListIsArchived(listId);
+
+        // then
+        verify(listRepository, times(1)).findById(listId);
+        verify(list, times(1)).changeListIsArchived(); // 리스트 아카이브 변경 호출 확인
+        assertEquals(list, updatedList); // 반환된 리스트가 같은지 확인
+    }
 }
