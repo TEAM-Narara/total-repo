@@ -42,8 +42,8 @@ public class Board {
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;  // 버전
 
-    @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
-    private Long version;  // 버전
+    @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
+    private Long listOrderVersion;  // 버전
 
     @JoinColumn(name = "workspace_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -70,7 +70,7 @@ public class Board {
     }
 
     public void increaseVersion() {
-        this.version += 1;
+        this.listOrderVersion += 1;
     }
 
     public Board(Long id, String name, Map<String, Object> cover) {

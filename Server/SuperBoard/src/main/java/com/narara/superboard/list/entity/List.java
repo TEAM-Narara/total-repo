@@ -50,8 +50,8 @@ public class List {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
     private Boolean isDeleted;  // 삭제 여부 (기본값: false)
 
-    @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
-    private Long version;  // 버전
+    @Column(name = "card_order_version", nullable = false, columnDefinition = "bigint default 0")
+    private Long cardOrderVersion;  // 버전
 
     public static List createList(ListCreateRequestDto listCreateRequestDto, Long lastListOrder) {
         return List.builder()
@@ -64,8 +64,8 @@ public class List {
         this.name = listUpdateRequestDto.listName();
     }
 
-    public void increaseVersion() {
-        this.version += 1;
+    public void increaseCardOrderVersion() {
+        this.cardOrderVersion += 1;
     }
 
     public void changeListIsArchived() {
