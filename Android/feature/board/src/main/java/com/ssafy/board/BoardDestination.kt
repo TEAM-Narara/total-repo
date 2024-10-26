@@ -15,6 +15,7 @@ data class Board(
 
 fun NavGraphBuilder.boardScreen(
     popBack: () -> Unit,
+    moveBoardSetting: () -> Unit,
     moveToBoardSearch: (SearchParameters) -> Unit
 ) {
     composable<Board>(
@@ -24,9 +25,10 @@ fun NavGraphBuilder.boardScreen(
         val searchParameters = board.searchParameters
 
         BoardScreen(
-            searchParameters = searchParameters,
             popBack = popBack,
-            moveToBoardSearch = moveToBoardSearch
+            moveToBoardSearch = moveToBoardSearch,
+            moveBoardSetting = moveBoardSetting,
+            searchParameters = searchParameters,
         )
     }
 }
