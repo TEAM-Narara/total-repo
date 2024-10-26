@@ -7,10 +7,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 object Board
 
-fun NavGraphBuilder.boardScreen(popBack: () -> Unit) {
+fun NavGraphBuilder.boardScreen(popBack: () -> Unit, moveBoardSetting: () -> Unit) {
     composable<Board> {
         BoardScreen(
-            popBack = popBack
+            popBack = popBack,
+            moveBoardSetting = moveBoardSetting
         )
     }
 }

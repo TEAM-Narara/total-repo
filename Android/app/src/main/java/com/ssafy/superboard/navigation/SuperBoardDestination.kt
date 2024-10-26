@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.ssafy.board.boardMenu.BoardMenu
+import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
@@ -24,7 +26,7 @@ import com.ssafy.login.signup.signupScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
+    NavHost(navController = navController, startDestination = BoardMenu, modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -92,9 +94,11 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardScreen(popBack = {
-            navController.popBackStack()
-        })
+        boardScreen(
+            popBack = { navController.popBackStack() },
+            moveBoardSetting = { navController.navigate(BoardMenu) })
+
+        boardMenuScreen(popBack = { navController.popBackStack() })
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
 
