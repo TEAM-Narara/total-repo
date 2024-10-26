@@ -34,6 +34,7 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 //테스트마다 랜덤포트 사용
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,6 +63,10 @@ public class WebSocketEndpointTest {
         MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
         messageConverter.setPrettyPrint(false);
         this.stompClient.setMessageConverter(messageConverter);
+        // Heartbeat 간격 설정 (선택적)
+        this.stompClient.setDefaultHeartbeat(new long[]{0, 0}); // heartbeat 비활성화
+        // 또는 더 긴 간격으로 설정
+        // this.stompClient.setDefaultHeartbeat(new long[]{10000, 10000}); // 10초 간격
 
         // 메시지 큐 초기화
         this.blockingQueue = new LinkedBlockingQueue<>();
@@ -132,6 +137,76 @@ public class WebSocketEndpointTest {
                 () -> assertEquals("UPDATE", response.type(), "응답 타입이 UPDATE여야 합니다."),
                 () -> assertEquals(requestDto, response.response(), "요청과 응답의 내용이 일치해야 합니다.")
         );
+    }
+
+    @Test
+    @DisplayName("구독하지 않은 메시지를 수신하지 않는지 테스트")
+    void testNoSubscriptionMessage() throws InterruptedException {
+        // Given
+        long subscribedBoardId = 1L;
+        long unsubscribedBoardId = 2L;
+        WebSocketBodyDto requestDto = new WebSocketBodyDto(1L, "테스트 제목", "테스트 내용");
+        String jwt = "test-jwt-token";
+
+        // When: boardId 1에 대해서만 Topic 구독
+        StompFrameHandler frameHandler = new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return WebSocketTestDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                logger.info(() -> "받은 메시지: " + payload);
+                if (payload != null) {  // heartbeat는 null payload를 가질 수 있음
+                    blockingQueue.offer((WebSocketTestDto) payload);
+                }
+            }
+        };
+
+        // boardId 1에 대해 구독
+        stompSession.subscribe(
+                WEBSOCKET_TOPIC.replace("{boardId}", String.valueOf(subscribedBoardId)),
+                frameHandler
+        );
+
+        // 구독하지 않은 boardId 2로 메시지 전송
+        StompHeaders headers = new StompHeaders();
+        headers.add("Authorization", jwt);
+        headers.setDestination(WEBSOCKET_SEND_URL.replace("{boardId}", String.valueOf(unsubscribedBoardId)));
+        stompSession.send(headers, requestDto);
+
+        // Then: 지정된 시간 동안 실제 메시지 수신 대기
+        WebSocketTestDto response = waitForMessage(5, TimeUnit.SECONDS);
+        assertNull(response, "구독하지 않은 토픽의 메시지는 수신되지 않아야 합니다");
+
+        // 구독한 boardId로 메시지 전송 테스트
+        headers.setDestination(WEBSOCKET_SEND_URL.replace("{boardId}", String.valueOf(subscribedBoardId)));
+        stompSession.send(headers, requestDto);
+
+        WebSocketTestDto subscribedResponse = waitForMessage(5, TimeUnit.SECONDS);
+
+        assertAll(
+                () -> assertNotNull(subscribedResponse, "구독한 토픽의 메시지는 정상적으로 수신되어야 합니다"),
+                () -> assertEquals("UPDATE", subscribedResponse.type(), "구독한 토픽의 메시지는 UPDATE 타입이어야 합니다"),
+                () -> assertEquals(requestDto, subscribedResponse.response(), "구독한 토픽의 메시지 내용이 일치해야 합니다")
+        );
+    }
+
+    // Heartbeat 메시지를 필터링하고 실제 메시지만 기다리는 헬퍼 메소드
+    private WebSocketTestDto waitForMessage(long timeout, TimeUnit unit) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
+        long timeoutInMillis = unit.toMillis(timeout);
+
+        while (System.currentTimeMillis() - startTime < timeoutInMillis) {
+            WebSocketTestDto message = blockingQueue.poll(timeoutInMillis - (System.currentTimeMillis() - startTime),
+                    TimeUnit.MILLISECONDS);
+
+            if (message != null) {
+                return message;
+            }
+        }
+        return null;  // 타임아웃 동안 메시지를 받지 못함
     }
 
     @AfterEach
