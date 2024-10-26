@@ -20,6 +20,7 @@ val PaddingZero = 0.dp
 val PaddingOne = 1.dp
 val PaddingTwo = 2.dp
 val PaddingXSmall = 4.dp
+val PaddingSemiSmall = 5.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
