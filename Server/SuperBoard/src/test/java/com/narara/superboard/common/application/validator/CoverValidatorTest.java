@@ -217,5 +217,32 @@ class CoverValidatorTest {
         assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCardCover(requestDto));
     }
 
+    // 유효하지 않은 type 값 케이스
+    private static Stream<Arguments> provideInvalidTypeCases() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "INVALID_TYPE", "value", "#FFFFFF")),
+                Arguments.of(Map.of("type", "WRONG_IMAGE", "value", "https://example.com/image.png")),
+                Arguments.of(Map.of("type", "UNKNOWN", "value", "linear-gradient(#e66465, #9198e5)"))
+        );
+    }
+
+
+    // 실패 테스트: type이 유효하지 않은 경우
+    @ParameterizedTest
+    @MethodSource("provideInvalidTypeCases")
+    @DisplayName("실패 케이스: cover의 'type'이 유효하지 않은 경우 InvalidCoverTypeFormatException 발생")
+    void validateCardCover_Failure_InvalidType(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
+    }
 
 }
