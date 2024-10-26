@@ -4,14 +4,20 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
+import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,6 +36,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private NameValidator nameValidator;
+
+    @Mock
+    private CoverValidator coverValidator;
 
     @Mock
     private LastOrderValidator lastOrderValidator;
@@ -142,5 +151,65 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(cardId, result.getId());
         assertEquals("Test Card", result.getName());
         verify(cardRepository, times(1)).findById(cardId);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideValidUpdateCardCases")
+    @DisplayName("카드 수정에 대한 Card의 다양한 필드 업데이트 성공 테스트")
+    void updateCardSuccess(CardUpdateRequestDto requestDto, String expectedName, String expectedDescription, Map<String, Object> expectedCover, Long expectedStartAt, Long expectedEndAt) {
+        // given - 필요한 메서드에서만 Card 객체 생성
+        Card card = Card.builder()
+                .name("Existing Name")
+                .build();
+
+        // when
+        Card updatedCard = card.updateCard(requestDto);
+
+        // then
+        assertEquals(expectedName, updatedCard.getName());
+        assertEquals(expectedDescription, updatedCard.getDescription());
+        assertEquals(expectedCover, updatedCard.getCover());
+        assertEquals(expectedStartAt, updatedCard.getStartAt());
+        assertEquals(expectedEndAt, updatedCard.getEndAt());
+    }
+
+    private static Stream<Arguments> provideValidUpdateCardCases() {
+        return Stream.of(
+                // 모든 필드가 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto("Updated Name", "Updated Description", 1633024800000L, 1633111200000L, Map.of("type", "COLOR", "value", "#FFFFFF")),
+                        "Updated Name", "Updated Description", Map.of("type", "COLOR", "value", "#FFFFFF"), 1633024800000L, 1633111200000L
+                ),
+                // 이름과 설명만 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto("Updated Name Only", "Updated Description Only", null, null, null),
+                        "Updated Name Only", "Updated Description Only", null, null, null
+                ),
+                // 시작 날짜와 종료 날짜만 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto(null, null, 1633204800000L, 1633301200000L, null),
+                        "Existing Name", null, null, 1633204800000L, 1633301200000L
+                ),
+                // 커버만 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto(null, null, null, null, Map.of("type", "IMAGE", "value", "https://example.com/image.png")),
+                        "Existing Name", null, Map.of("type", "IMAGE", "value", "https://example.com/image.png"), null, null
+                ),
+                // 이름이 비어 있는 경우 기존 이름 유지
+                Arguments.of(
+                        new CardUpdateRequestDto("   ", "Description Updated", null, null, null),
+                        "Existing Name", "Description Updated", null, null, null
+                ),
+                // 설명만 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto(null, "Updated Description Only", null, null, null),
+                        "Existing Name", "Updated Description Only", null, null, null
+                ),
+                // 시작 날짜만 업데이트된 경우
+                Arguments.of(
+                        new CardUpdateRequestDto(null, null, 1633024800000L, null, null),
+                        "Existing Name", null, null, 1633024800000L, null
+                )
+        );
     }
 }
