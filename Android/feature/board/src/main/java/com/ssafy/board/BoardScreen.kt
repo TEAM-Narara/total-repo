@@ -20,6 +20,7 @@ fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
     popBack: () -> Unit,
+    moveBoardSetting: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -30,7 +31,8 @@ fun BoardScreen(
         onListTitleChanged = viewModel::updateListTitle,
         onCardReordered = viewModel::updateCardOrder,
         onListReordered = viewModel::updateListOrder,
-        popBack = popBack
+        popBack = popBack,
+        moveBoardSetting = moveBoardSetting
     )
 }
 
@@ -43,6 +45,7 @@ private fun BoardScreen(
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
     popBack: () -> Unit,
+    moveBoardSetting: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -53,12 +56,14 @@ private fun BoardScreen(
                 onBoardTitleChanged = { onBoardTitleChanged() },
                 onFilterPressed = {},
                 onNotificationPressed = {},
-                onMorePressed = {},
+                onMorePressed = { moveBoardSetting() },
             )
         },
     ) { paddingValues ->
         BoardItem(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             boardData = uiState.boardData,
             onListTitleChanged = onListTitleChanged,
             onCardReordered = onCardReordered,
@@ -94,6 +99,7 @@ private fun BoardScreenPreview() {
         onListTitleChanged = {},
         onCardReordered = {},
         onListReordered = {},
-        popBack = {}
+        popBack = {},
+        moveBoardSetting = {}
     )
 }
