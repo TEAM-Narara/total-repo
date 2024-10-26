@@ -1,6 +1,7 @@
 package com.narara.superboard.card.entity;
 
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
+import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -60,8 +61,29 @@ public class Card {
                 .build();
     }
 
+    public Card updateCard(CardUpdateRequestDto requestDto) {
+        // 공백이면 기존 꺼 그대로 쓰게 설정.
+        if (requestDto.name() != null && !requestDto.name().isBlank()) {
+            this.name = requestDto.name();
+        }
+        if (requestDto.description() != null) {
+            this.description = requestDto.description();
+        }
+        if (requestDto.cover() != null) {
+            this.cover = requestDto.cover();
+        }
+        if (requestDto.startAt() != null) {
+            this.startAt = requestDto.startAt();
+        }
+        if (requestDto.endAt() != null) {
+            this.endAt = requestDto.endAt();
+        }
+        return this;
+    }
+
     public void delete() {
         this.isDeleted = true;
     }
+
 }
 
