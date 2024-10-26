@@ -1,4 +1,4 @@
-package com.narara.superboard.websocket;
+package com.narara.superboard.websocket.interfaces;
 
 import com.narara.superboard.websocket.interfaces.dto.WebSocketBodyDto;
 import com.narara.superboard.websocket.interfaces.dto.WebSocketTestDto;
