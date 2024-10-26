@@ -272,5 +272,21 @@ class CoverValidatorTest {
         // when & then
         assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
     }
-    
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("성공 케이스: cover이 없는 경우")
+    void validateCardCover_NullCover(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
+    }
 }
