@@ -20,6 +20,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 
 
 @DisplayName("커버 검증에 대한 단위 테스트")
@@ -245,4 +247,30 @@ class CoverValidatorTest {
         assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
     }
 
+    // 유효한 cover 케이스
+    private static Stream<Arguments> provideValidCoverCases() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "COLOR", "value", "#FFFFFF")),
+                Arguments.of(Map.of("type", "IMAGE", "value", "https://example.com/image.png"))
+//                Arguments.of(Map.of("type", "GRADIENT", "value", "linear-gradient(#e66465, #9198e5)"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideValidCoverCases")
+    @DisplayName("성공 케이스: cover의 'type'과 'value'가 올바른 경우")
+    void validateCardCover_Success(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
+    }
+    
 }
