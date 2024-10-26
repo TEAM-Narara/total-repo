@@ -55,6 +55,7 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateNameIsPresent(boardCreateRequestDto);
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
+        // TODO: background가 존재하면 background에 대한 검증 추가하기
 
         WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
