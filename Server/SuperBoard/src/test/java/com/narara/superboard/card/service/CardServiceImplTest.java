@@ -11,12 +11,15 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -212,4 +215,78 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 )
         );
     }
+
+    @ParameterizedTest
+    @DisplayName("보드 ID를 기준으로 아카이브된 카드 리스트 조회 성공")
+    @ValueSource(longs = {1L, 2L})
+    void testGetArchivedCardList_Success(Long boardId) {
+        // given: 보드에 속한 리스트와 카드들을 모킹
+        List list1 = List.builder().id(1L).name("List 1").build();
+        List list2 = List.builder().id(2L).name("List 2").build();
+
+        Card card1 = Card.builder().id(1L).name("Archived Card 1").isArchived(true).build();
+        Card card2 = Card.builder().id(2L).name("Archived Card 2").isArchived(true).build();
+
+        // 리스트와 아카이브된 카드 설정
+        when(listRepository.findAllByBoardId(boardId)).thenReturn(Arrays.asList(list1, list2));
+        when(cardRepository.findAllByListAndIsArchivedTrue(list1)).thenReturn(Collections.singletonList(card1));
+        when(cardRepository.findAllByListAndIsArchivedTrue(list2)).thenReturn(Collections.singletonList(card2));
+
+        // when: 아카이브된 카드 리스트 조회
+        java.util.List<Card> result = cardService.getArchivedCardList(boardId);
+
+        // then: 반환된 카드 리스트가 예상대로 모킹된 카드들과 일치하는지 확인
+        assertEquals(2, result.size());
+        assertTrue(result.contains(card1));
+        assertTrue(result.contains(card2));
+
+        verify(listRepository, times(1)).findAllByBoardId(boardId);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list1);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list2);
+    }
+
+    @Test
+    @DisplayName("보드 ID가 유효하지만 리스트에 아카이브된 카드가 없는 경우")
+    void testGetArchivedCardList_EmptyArchivedCards() {
+        // given: 보드에 속한 리스트가 있지만 아카이브된 카드가 없는 경우
+        Long boardId = 1L;
+        List list = List.builder().id(1L).name("List 1").build();
+
+        when(listRepository.findAllByBoardId(boardId)).thenReturn(Collections.singletonList(list));
+        when(cardRepository.findAllByListAndIsArchivedTrue(list)).thenReturn(Collections.emptyList());
+
+        // when: 아카이브된 카드 리스트 조회
+        java.util.List<Card> result = cardService.getArchivedCardList(boardId);
+
+        // then: 빈 리스트가 반환되는지 확인
+        assertTrue(result.isEmpty());
+        verify(listRepository, times(1)).findAllByBoardId(boardId);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list);
+    }
+
+    @ParameterizedTest
+    @DisplayName("카드 아카이브 상태 변경 성공 테스트")
+    @CsvSource({
+            "1, true",
+            "2, false"
+    })
+    void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) {
+        // given: 카드 모킹
+        Card card = Card.builder()
+                .id(cardId)
+                .name("Test Card")
+                .isArchived(isArchived)
+                .build();
+
+        // Mock: getCard 호출 시 모킹된 카드 반환
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+
+        // when: 카드 아카이브 상태 변경
+        cardService.changeArchiveStatusByCard(cardId);
+
+        // then: 카드의 아카이브 상태가 변경된 값인지 확인
+        assertEquals(!isArchived, card.getIsArchived());
+        verify(cardRepository, times(1)).findById(cardId);
+    }
+
 }
