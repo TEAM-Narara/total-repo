@@ -11,6 +11,7 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastrucure.ListRepository;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +62,14 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public java.util.List<Card> getArchivedCardList(Long boardId) {
-        return cardRepository.findAllByBoardIdAndIsArchivedTrue(boardId);
+        java.util.List<List> allListByBoard = listRepository.findAllByBoardId(boardId);
+        java.util.List<Card> cardCollection = new ArrayList<>();
+
+        for (List list : allListByBoard) {
+            cardCollection.addAll(cardRepository.findAllByListAndIsArchivedTrue(list));
+        }
+
+        return cardCollection;
     }
 
     @Override
