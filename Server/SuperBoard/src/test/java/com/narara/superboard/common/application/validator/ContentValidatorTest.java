@@ -6,6 +6,7 @@ import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
@@ -30,4 +31,13 @@ class ContentValidatorTest {
         assertThrows(NotFoundContentException.class, () -> contentValidator.validateReplyContentIsEmpty(requestDto));
     }
 
+    @Test
+    @DisplayName("내용이 정상적으로 존재할 때 예외가 발생하지 않음")
+    void shouldNotThrowExceptionWhenContentIsValid() {
+        // given
+        ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(1L, "Content");
+
+        // then
+        assertDoesNotThrow(() -> contentValidator.validateReplyContentIsEmpty(requestDto));
+    }
 }
