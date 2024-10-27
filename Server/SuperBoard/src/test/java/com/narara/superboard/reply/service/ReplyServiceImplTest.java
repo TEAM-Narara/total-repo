@@ -134,4 +134,26 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertThrows(NotFoundContentException.class, () -> replyService.updateReply(1L, requestDto));
     }
 
+    @Test
+    @DisplayName("댓글 업데이트 성공 테스트")
+    void updateReply_ShouldUpdateReplySuccessfully() {
+        // given
+        Long replyId = 1L;
+        String updatedContent = "Updated Reply Content";
+        ReplyUpdateRequestDto requestDto = new ReplyUpdateRequestDto(updatedContent);
+
+        Reply existingReply = Reply.builder()
+                .id(replyId)
+                .content("Original Content")
+                .build();
+
+        when(replyRepository.findById(replyId)).thenReturn(Optional.of(existingReply));
+
+        // when
+        Reply updatedReply = replyService.updateReply(replyId, requestDto);
+
+        // then
+        assertEquals(updatedContent, updatedReply.getContent());
+        verify(replyRepository, times(1)).findById(replyId);
+    }
 }
