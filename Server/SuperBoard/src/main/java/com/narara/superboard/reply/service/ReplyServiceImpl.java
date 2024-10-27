@@ -49,4 +49,10 @@ public class ReplyServiceImpl implements ReplyService{
         return reply.updateReply(replyUpdateRequestDto);
     }
 
+    @Override
+    public void deleteReply(Long replyId) {
+        Reply reply = getReply(replyId);
+        replyRepository.delete(reply);
+    }
+
 }

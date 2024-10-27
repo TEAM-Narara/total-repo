@@ -8,4 +8,5 @@ public interface ReplyService {
     Reply createReply(ReplyCreateRequestDto replyCreateRequestDto);
     Reply getReply(Long replyId);
     Reply updateReply(Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto);
+    void deleteReply(Long replyId);
 }
