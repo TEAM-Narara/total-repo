@@ -6,6 +6,7 @@ import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.reply.entity.Reply;
+import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CardRepository cardRepository;
+
+    @Mock
+    private ReplyRepository replyRepository;
 
     @Test
     @DisplayName("댓글 생성시, 카드가 존재하지 않을 때 NotFoundEntityException 발생")
@@ -67,4 +71,22 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         verify(cardRepository, times(1)).findById(requestDto.cardId());
     }
 
+    @Test
+    @DisplayName("존재하지 않는 Reply ID로 조회 시 NotFoundEntityException 발생")
+    void shouldThrowExceptionWhenReplyNotFound() {
+        // given
+        Long nonExistentReplyId = 1L;
+
+        // Mocking: Reply가 존재하지 않도록 설정
+        when(replyRepository.findById(nonExistentReplyId)).thenReturn(Optional.empty());
+
+        // then: 예외 발생 확인
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
+                () -> replyService.getReply(nonExistentReplyId)
+        );
+        assertEquals("해당하는 댓글(이)가 존재하지 않습니다. 댓글ID: " + nonExistentReplyId, exception.getMessage());
+
+        verify(replyRepository, times(1)).findById(nonExistentReplyId);
+    }
 }
