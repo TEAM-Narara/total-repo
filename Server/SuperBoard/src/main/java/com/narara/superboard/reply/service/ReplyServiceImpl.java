@@ -8,6 +8,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,4 +56,11 @@ public class ReplyServiceImpl implements ReplyService{
         replyRepository.delete(reply);
     }
 
+    @Override
+    public List<Reply> getRepliesByCardId(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
+
+        return replyRepository.findAllByCard(card);
+    }
 }
