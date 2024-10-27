@@ -7,6 +7,7 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
+import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,16 @@ public class ReplyServiceImpl implements ReplyService{
         Reply reply = Reply.createReply(replyCreateRequestDto, card);
 
         return replyRepository.save(reply);
+    }
+
+    @Override
+    public Reply getReply(Long replyId) {
+        return replyRepository.findById(replyId)
+                .orElseThrow(() -> new NotFoundEntityException(replyId, "댓글"));
+    }
+
+    @Override
+    public Reply updateReply(Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
+        return null;
     }
 }
