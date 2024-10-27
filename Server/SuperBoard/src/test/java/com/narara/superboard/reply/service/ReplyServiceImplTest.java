@@ -182,4 +182,21 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         verify(replyRepository, times(1)).findById(replyId);  // findById가 1번 호출되었는지 확인
     }
 
+    @Test
+    @DisplayName("카드 ID로 카드가 존재하지 않을 때 NotFoundEntityException 발생")
+    void shouldThrowExceptionWhenCardNotFound() {
+        // given: cardId로 카드가 존재하지 않도록 설정
+        Long cardId = 1L;
+        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+
+        // when & then: 예외가 발생하는지 확인
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
+                () -> replyService.getRepliesByCardId(cardId)
+        );
+
+        assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
+        verify(cardRepository, times(1)).findById(cardId);
+        verify(replyRepository, never()).findAllByCard(any(Card.class));
+    }
 }
