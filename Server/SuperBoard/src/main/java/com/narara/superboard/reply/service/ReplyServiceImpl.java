@@ -40,6 +40,13 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Reply updateReply(Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
-        return null;
+        contentValidator.validateReplyContentIsEmpty(replyUpdateRequestDto);
+
+        // 기존 댓글이 존재하는지 확인
+        Reply reply = getReply(replyId);
+
+        // 댓글 내용 업데이트
+        return reply.updateReply(replyUpdateRequestDto);
     }
+
 }

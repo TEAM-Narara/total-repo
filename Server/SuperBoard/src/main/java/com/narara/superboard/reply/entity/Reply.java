@@ -2,6 +2,7 @@ package com.narara.superboard.reply.entity;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
+import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,5 +43,10 @@ public class Reply {
                 .content(replyCreateRequestDto.content())
                 .card(card)
                 .build();
+    }
+
+    public Reply updateReply(ReplyUpdateRequestDto replyUpdateRequestDto) {
+        this.content = replyUpdateRequestDto.content();
+        return this;
     }
 }
