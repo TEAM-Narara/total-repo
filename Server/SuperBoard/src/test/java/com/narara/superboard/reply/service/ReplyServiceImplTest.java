@@ -159,4 +159,27 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(updatedContent, updatedReply.getContent());
         verify(replyRepository, times(1)).findById(replyId);
     }
+
+    @Test
+    @DisplayName("댓글 삭제 성공 테스트")
+    void shouldDeleteReplySuccessfully() {
+        // given
+        Long replyId = 1L;
+        Reply reply = Reply.builder()
+                .id(replyId)
+                .content("This is a test reply")
+                .build();
+
+        // Mocking: getReply가 호출될 때 reply 객체를 반환하도록 설정
+        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+
+        // when
+        replyService.deleteReply(replyId);
+
+        // then
+        // delete 메서드가 올바르게 호출되었는지 확인
+        verify(replyRepository, times(1)).delete(reply);
+        verify(replyRepository, times(1)).findById(replyId);  // findById가 1번 호출되었는지 확인
+    }
+
 }
