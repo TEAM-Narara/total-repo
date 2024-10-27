@@ -85,5 +85,8 @@ public class Card {
         this.isDeleted = true;
     }
 
+    public void changeArchiveStatus() {
+        this.isArchived = !isArchived;
+    }
 }
 

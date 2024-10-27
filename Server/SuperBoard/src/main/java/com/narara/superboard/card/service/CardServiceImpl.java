@@ -1,5 +1,6 @@
 package com.narara.superboard.card.service;
 
+import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
@@ -56,6 +57,17 @@ public class CardServiceImpl implements CardService {
         coverValidator.validateCardCover(cardUpdateRequestDto);
 
         return card.updateCard(cardUpdateRequestDto);
+    }
+
+    @Override
+    public java.util.List<Card> getArchivedCardList(Long boardId) {
+        return cardRepository.findAllByBoardIdAndIsArchivedTrue(boardId);
+    }
+
+    @Override
+    public void changeArchiveStatusByCard(Long cardId) {
+        Card card = getCard(cardId);
+        card.changeArchiveStatus();
     }
 
 }
