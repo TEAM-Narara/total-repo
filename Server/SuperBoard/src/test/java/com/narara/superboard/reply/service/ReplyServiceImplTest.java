@@ -63,18 +63,21 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         // Mocking: 검증 로직을 모킹
         doNothing().when(contentValidator).validateReplyContentIsEmpty(requestDto);
         when(cardRepository.findById(requestDto.cardId())).thenReturn(Optional.of(card));
+        when(replyRepository.save(any(Reply.class))).thenReturn(expectedReply);  // Mocking save 결과
 
         // when
         Reply result = replyService.createReply(requestDto);
 
         // then
-        assertNotNull(result);
+        assertNotNull(result);  // result가 null이 아님을 확인
         assertEquals(expectedReply.getContent(), result.getContent());
         assertEquals(expectedReply.getCard(), result.getCard());
 
         verify(contentValidator, times(1)).validateReplyContentIsEmpty(requestDto);
         verify(cardRepository, times(1)).findById(requestDto.cardId());
+        verify(replyRepository, times(1)).save(any(Reply.class));
     }
+
 
     @Test
     @DisplayName("존재하지 않는 Reply ID로 조회 시 NotFoundEntityException 발생")
