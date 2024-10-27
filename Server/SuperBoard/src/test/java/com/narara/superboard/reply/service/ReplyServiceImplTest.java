@@ -10,6 +10,9 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -198,5 +201,51 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
         verify(cardRepository, times(1)).findById(cardId);
         verify(replyRepository, never()).findAllByCard(any(Card.class));
+    }
+
+    @Test
+    @DisplayName("카드에 댓글이 없을 때 빈 리스트 반환")
+    void shouldReturnEmptyListWhenNoRepliesForCard() {
+        // given
+        Long cardId = 1L;
+        Card card = Card.builder().id(cardId).name("Test Card").build();
+
+        // Mocking
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(replyRepository.findAllByCard(card)).thenReturn(Collections.emptyList());
+
+        // when
+        List<Reply> replies = replyService.getRepliesByCardId(cardId);
+
+        // then
+        assertTrue(replies.isEmpty(), "댓글 리스트가 비어 있어야 합니다.");
+        verify(cardRepository, times(1)).findById(cardId);
+        verify(replyRepository, times(1)).findAllByCard(card);
+    }
+
+    @Test
+    @DisplayName("카드에 두 개 이상의 댓글이 있을 때 리스트 반환")
+    void shouldReturnRepliesListWhenRepliesExistForCard() {
+        // given
+        Long cardId = 1L;
+        Card card = Card.builder().id(cardId).name("Test Card").build();
+
+        Reply reply1 = Reply.builder().id(1L).content("First reply").card(card).build();
+        Reply reply2 = Reply.builder().id(2L).content("Second reply").card(card).build();
+        List<Reply> replyList = Arrays.asList(reply1, reply2);
+
+        // Mocking
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(replyRepository.findAllByCard(card)).thenReturn(replyList);
+
+        // when
+        List<Reply> replies = replyService.getRepliesByCardId(cardId);
+
+        // then
+        assertEquals(2, replies.size(), "댓글 리스트 크기는 2여야 합니다.");
+        assertEquals("First reply", replies.get(0).getContent());
+        assertEquals("Second reply", replies.get(1).getContent());
+        verify(cardRepository, times(1)).findById(cardId);
+        verify(replyRepository, times(1)).findAllByCard(card);
     }
 }
