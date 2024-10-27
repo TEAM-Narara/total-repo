@@ -89,4 +89,28 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
         verify(replyRepository, times(1)).findById(nonExistentReplyId);
     }
+
+    @Test
+    @DisplayName("존재하는 Reply ID로 조회 시 성공적으로 Reply 반환")
+    void shouldReturnReplyWhenReplyExists() {
+        // given
+        Long replyId = 1L;
+        Reply reply = Reply.builder()
+                .id(replyId)
+                .content("This is a test reply.")
+                .build();
+
+        // Mocking: Reply가 존재하도록 설정
+        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+
+        // when
+        Reply result = replyService.getReply(replyId);
+
+        // then
+        assertNotNull(result);
+        assertEquals(replyId, result.getId());
+        assertEquals("This is a test reply.", result.getContent());
+
+        verify(replyRepository, times(1)).findById(replyId);
+    }
 }
