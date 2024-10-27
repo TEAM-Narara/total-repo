@@ -4,12 +4,17 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastrucuture.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
+import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
+import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -113,4 +118,20 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
         verify(replyRepository, times(1)).findById(replyId);
     }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "\t", "\n"})
+    @DisplayName("내용이 비어있을 때 ContentNotFoundException 발생")
+    void shouldThrowExceptionWhenContentIsEmpty(String invalidContent) {
+        // given
+        ReplyUpdateRequestDto requestDto = new ReplyUpdateRequestDto(invalidContent);
+
+        // Mocking: contentValidator가 예외를 던지도록 설정
+        doThrow(new NotFoundContentException("댓글")).when(contentValidator).validateReplyContentIsEmpty(requestDto);
+
+        // then
+        assertThrows(NotFoundContentException.class, () -> replyService.updateReply(1L, requestDto));
+    }
+
 }
