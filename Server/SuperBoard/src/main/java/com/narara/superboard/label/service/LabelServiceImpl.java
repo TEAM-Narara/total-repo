@@ -47,4 +47,11 @@ public class LabelServiceImpl implements LabelService {
 
         return label.updateLabel(updateLabelRequestDto);
     }
+
+    @Override
+    public void deleteLabel(Long labelId) {
+        Label label = getLabel(labelId);
+        labelRepository.delete(label);
+    }
+
 }

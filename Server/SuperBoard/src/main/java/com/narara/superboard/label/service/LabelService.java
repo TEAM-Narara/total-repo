@@ -9,4 +9,5 @@ public interface LabelService {
     Label createLabel(Long boardId, LabelCreateRequestDto createLabelRequestDto);
     Label getLabel(Long boardId);
     Label updateLabel(Long labelId, LabelUpdateRequestDto updateLabelRequestDto);
+    void deleteLabel(Long labelId);
 }
