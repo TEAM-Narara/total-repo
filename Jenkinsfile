@@ -11,11 +11,18 @@ pipeline {
                     env.BRANCH_NAME = branch
                     echo "Checking out branch: ${branch}" // 변경된 브랜치 표시
                     // GitLab에서 코드 클론 (서브모듈 포함)
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "${branch}"]], // 변경된 브랜치를 지정
-                        extensions: [[$class: 'SubmoduleOption', parentCredentials: true, recursiveSubmodules: true, trackingSubmodules: true]],
-                        userRemoteConfigs: [[credentialsId: 'gitlabId', url: 'https://lab.ssafy.com/s11-final/S11P31S107.git']]
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: "${branch}"]],
+                        extensions: [
+                            [$class: 'SubmoduleOption',
+                            parentCredentials: true,
+                            recursiveSubmodules: true,
+                            trackingSubmodules: true]
+                        ],
+                        userRemoteConfigs: [[
+                            credentialsId: 'gitlabId',
+                            url: 'https://lab.ssafy.com/s11-final/S11P31S107.git'
+                        ]]
                     ])
                 }
             }
