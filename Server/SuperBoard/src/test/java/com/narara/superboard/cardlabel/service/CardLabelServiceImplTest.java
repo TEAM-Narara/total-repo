@@ -107,6 +107,29 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     @Test
+    @DisplayName("실패 테스트: CardLabel이 이미 존재할 때 EntityAlreadyExistsException 발생")
+    void createCardLabel_CardLabelAlreadyExists() {
+        // given
+        Card card = Card.builder().id(1L).build();
+        Label label = Label.builder().id(1L).build();
+
+        // CardLabel이 이미 존재하는 경우를 모킹
+        CardLabel existingCardLabel = CardLabel.createCardLabel(card, label);
+        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.of(existingCardLabel));
+
+        // then
+        assertThrows(EntityAlreadyExistsException.class, () -> {
+            cardLabelService.createCardLabel(card, label);
+        });
+
+        // 검증: CardLabel이 이미 존재하므로 저장(save) 호출이 발생하지 않음
+        verify(cardLabelRepository, times(1)).findByCardAndLabel(card, label);
+        verify(cardLabelRepository, never()).save(any(CardLabel.class));
+        verify(cardLabelValidator, times(1)).validateMismatchBoard(card, label);
+    }
+
+
+    @Test
     @DisplayName("성공 테스트: 동일한 보드에 속하는 Card와 Label로 CardLabel 생성")
     void createCardLabel_Success() {
         // given
