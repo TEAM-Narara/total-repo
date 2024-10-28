@@ -1,7 +1,7 @@
 package com.narara.superboard.label.entity;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.label.service.CreateLabelRequestDto;
+import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +32,7 @@ public class Label {
     private Long color;  // 색상
 
 
-    public static Label createLabel(Board board, CreateLabelRequestDto createLabelRequestDto) {
+    public static Label createLabel(Board board, LabelCreateRequestDto createLabelRequestDto) {
         return Label.builder()
                 .board(board)
                 .name(createLabelRequestDto.name())

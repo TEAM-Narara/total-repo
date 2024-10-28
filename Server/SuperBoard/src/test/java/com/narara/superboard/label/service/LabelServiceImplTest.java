@@ -7,6 +7,8 @@ import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
+import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
+import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +41,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
     void shouldThrowExceptionWhenBoardNotFound() {
         // given
         Long nonExistentBoardId = 1L;
-        CreateLabelRequestDto requestDto = new CreateLabelRequestDto("Test Label", 0xFFFFFF00L);
+        LabelCreateRequestDto requestDto = new LabelCreateRequestDto("Test Label", 0xFFFFFF00L);
 
         // Mocking: Board가 존재하지 않도록 설정
         when(boardRepository.findById(nonExistentBoardId)).thenReturn(Optional.empty());
@@ -59,7 +61,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("유효하지 않은 색상으로 인해 예외 발생")
     void shouldThrowExceptionWhenInvalidColor(Long color) {
         // given
-        CreateLabelRequestDto requestDto = new CreateLabelRequestDto("Test Label", color);
+        LabelCreateRequestDto requestDto = new LabelCreateRequestDto("Test Label", color);
 
         // Mocking: colorValidator가 유효하지 않은 색상에 대해 예외를 던지도록 설정
         doThrow(new IllegalArgumentException("Invalid color format")).when(colorValidator).validateLabelColor(requestDto);
@@ -73,7 +75,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
     void shouldCreateLabelSuccessfullyWhenValidDataIsGiven() {
         // given
         Long boardId = 1L;
-        CreateLabelRequestDto requestDto = new CreateLabelRequestDto("Test Label", 0xFFFFFF00L);
+        LabelCreateRequestDto requestDto = new LabelCreateRequestDto("Test Label", 0xFFFFFF00L);
         Board board = Board.builder().id(boardId).name("Test Board").build();
         Label expectedLabel = Label.builder().id(1L).name(requestDto.name()).color(requestDto.color()).board(board).build();
 
