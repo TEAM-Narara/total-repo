@@ -3,6 +3,7 @@ package com.ssafy.board.boardMenu
 import android.app.Activity
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -31,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import com.ssafy.board.components.BoardMemberItem
@@ -40,7 +40,6 @@ import com.ssafy.board.components.MenuHorizontalDivider
 import com.ssafy.board.data.HistoryData
 import com.ssafy.board.getIcon
 import com.ssafy.designsystem.component.ActivityLog
-import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.values.ImageSmall
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingXSmall
@@ -71,6 +70,14 @@ fun BoardMenuScreen(
             isAppearanceLightStatusBars = false
             it.window.statusBarColor = Primary.toArgb()
         }
+    }
+    val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+    if (showDialog) {
+        VisibilityDialog(
+            onDismiss = { setShowDialog(false) },
+            visibility = visibility,
+            onVisibilityChange
+        )
     }
     Scaffold(
         containerColor = White,
@@ -160,15 +167,16 @@ fun BoardMenuScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(PaddingXSmall),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(PaddingDefault, PaddingZero)
+                    modifier = Modifier
+                        .padding(PaddingDefault, PaddingZero)
                 ) {
                     Text(text = "Visibility", fontSize = TextMedium, color = Primary)
-                    EditableText(
-                        text = visibility,
-                        onTextChanged = { newName: String -> onVisibilityChange(newName) },
-                        modifier = Modifier.weight(1f),
-                        alignStyle = TextAlign.End
+                    Spacer(
+                        modifier = Modifier.weight(1f)
                     )
+                    Text(text = visibility, modifier = Modifier.clickable(onClick = {
+                        setShowDialog(true)
+                    }))
                 }
             }
             item {
