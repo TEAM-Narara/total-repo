@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ListData
+import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay

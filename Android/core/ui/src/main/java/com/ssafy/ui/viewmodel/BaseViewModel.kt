@@ -1,4 +1,4 @@
-package com.ssafy.board.board
+package com.ssafy.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.ssafy.ui.uistate.UiState

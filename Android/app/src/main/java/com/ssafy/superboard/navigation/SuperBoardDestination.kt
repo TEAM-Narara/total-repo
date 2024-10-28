@@ -27,10 +27,12 @@ import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.notification.notification.Notification
+import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
+    NavHost(navController = navController, startDestination = Notification, modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -134,6 +136,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                     BoardMenu(boardId, workspaceId)
                 )
             }
+        )
+
+        notificationScreen(
+            popBack = navController::popBackStack,
         )
     }
 }
