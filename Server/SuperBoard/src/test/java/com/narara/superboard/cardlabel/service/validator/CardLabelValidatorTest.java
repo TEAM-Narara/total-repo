@@ -37,4 +37,24 @@ class CardLabelValidatorTest {
         // when & then
         assertThrows(MismatchedBoardException.class, () -> cardLabelValidator.validateMismatchBoard(card, label));
     }
+
+    @Test
+    @DisplayName("Card와 Label이 동일한 Board에 속해 있을 때 예외가 발생하지 않음")
+    void validateMismatchBoard_Success() {
+        // given
+        Board board = mock(Board.class);
+        when(board.getId()).thenReturn(1L);
+
+        List list = mock(List.class);
+        when(list.getBoard()).thenReturn(board);
+
+        Card card = mock(Card.class);
+        when(card.getList()).thenReturn(list);
+
+        Label label = mock(Label.class);
+        when(label.getBoard()).thenReturn(board);
+
+        // when & then
+        assertDoesNotThrow(() -> cardLabelValidator.validateMismatchBoard(card, label));
+    }
 }
