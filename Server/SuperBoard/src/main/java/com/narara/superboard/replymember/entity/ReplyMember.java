@@ -35,10 +35,11 @@ public class ReplyMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Reply reply;  // 워크스페이스 ID
 
-    public ReplyMember createReplyMember(Reply reply, Member member){
-        this.member = member;
-        this.reply = reply;
-        return this;
+    public static ReplyMember createReplyMember(Reply reply, Member member){
+        return ReplyMember.builder()
+                .reply(reply)
+                .member(member)
+                .build();
     }
 
     public ReplyMember(Reply reply) {

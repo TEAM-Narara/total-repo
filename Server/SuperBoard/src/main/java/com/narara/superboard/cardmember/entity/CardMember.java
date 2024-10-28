@@ -39,10 +39,11 @@ public class CardMember {
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
-    public CardMember createCardMember(Card card, Member member){
-        this.member = member;
-        this.card = card;
-        return this;
+    public static CardMember createCardMember(Card card, Member member){
+        return CardMember.builder()
+                .member(member)
+                .card(card)
+                .build();
     }
 
     public CardMember(Card card) {

@@ -1,8 +1,6 @@
 package com.narara.superboard.boardmember.entity;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.card.entity.Card;
-import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.Column;
@@ -44,11 +42,12 @@ public class BoardMember {
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
-    public BoardMember createBoardMemberByAdmin(Board board, Member member){
-        this.member = member;
-        this.board = board;
-        this.authority = Authority.ADMIN;
-        return this;
+    public static BoardMember createBoardMemberByAdmin(Board board, Member member){
+        return BoardMember.builder()
+                .board(board)
+                .member(member)
+                .authority(Authority.ADMIN)
+                .build();
     }
 
     public BoardMember(Board board) {

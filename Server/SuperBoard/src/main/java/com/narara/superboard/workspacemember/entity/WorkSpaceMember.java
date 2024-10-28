@@ -38,11 +38,12 @@ public class WorkSpaceMember {
         this.workSpace = workSpace;
     }
 
-    public WorkSpaceMember createWorkspaceMemberByAdmin(WorkSpace workSpace, Member member){
-        this.member = member;
-        this.workSpace = workSpace;
-        this.authority = Authority.ADMIN;
-        return this;
+    public static WorkSpaceMember createWorkspaceMemberByAdmin(WorkSpace workSpace, Member member){
+        return WorkSpaceMember.builder()
+                .member(member)
+                .workSpace(workSpace)
+                .authority(Authority.ADMIN)
+                .build();
     }
 
     public WorkSpaceMember(Member member, Authority authority) {
