@@ -17,7 +17,7 @@ pipeline {
         stage('Verify Submodule') {
             steps {
                 // 서브모듈 디렉토리의 파일이 잘 클론되었는지 확인
-                dir('Server/submodule') {
+                dir('Server/SuperBoard/s107-secret-value') {
                     sh 'ls -la'
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
         // 백엔드 빌드 단계
         stage('BE-Build') {
             steps {
-                dir("./Server") {
+                dir("./Server/SuperBoard") {
                     // Gradle 빌드 실행
                     sh 'chmod +x ./gradlew'
                     sh './gradlew clean build'
@@ -37,7 +37,7 @@ pipeline {
         // 백엔드 Docker 이미지 빌드 및 컨테이너 실행
         stage('Build BE Docker Image') {
             steps {
-                dir("./Server") {
+                dir("./Server/SuperBoard") {
                     sh 'docker build -t total-sever .'
                 }
             }
