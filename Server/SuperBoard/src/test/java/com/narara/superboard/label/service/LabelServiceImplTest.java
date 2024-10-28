@@ -1,9 +1,11 @@
 package com.narara.superboard.label.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,34 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
         // then
         assertThrows(IllegalArgumentException.class, () -> labelService.createLabel(1L, requestDto));
+    }
+
+    @Test
+    @DisplayName("성공 테스트: 유효한 보드와 색상으로 라벨 생성 성공")
+    void shouldCreateLabelSuccessfullyWhenValidDataIsGiven() {
+        // given
+        Long boardId = 1L;
+        CreateLabelRequestDto requestDto = new CreateLabelRequestDto("Test Label", 0xFFFFFF00L);
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+        Label expectedLabel = Label.builder().id(1L).name(requestDto.name()).color(requestDto.color()).board(board).build();
+
+        // Mocking: 검증 로직을 모킹
+        doNothing().when(colorValidator).validateLabelColor(requestDto);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(labelRepository.save(any(Label.class))).thenReturn(expectedLabel);
+
+        // when
+        Label result = labelService.createLabel(boardId, requestDto);
+
+        // then
+        assertNotNull(result);
+        assertEquals(expectedLabel.getName(), result.getName());
+        assertEquals(expectedLabel.getColor(), result.getColor());
+        assertEquals(expectedLabel.getBoard(), result.getBoard());
+
+        verify(colorValidator, times(1)).validateLabelColor(requestDto);
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(labelRepository, times(1)).save(any(Label.class));
     }
 
 }
