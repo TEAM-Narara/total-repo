@@ -1,5 +1,6 @@
 package com.ssafy.designsystem.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.designsystem.formatTimestamp
 import com.ssafy.designsystem.values.ACTIVITY_ICON
 import com.ssafy.designsystem.values.IconLarge
-import com.ssafy.designsystem.values.PaddingXSmall
+import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextSmall
@@ -32,7 +34,8 @@ fun ActivityLog(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(PaddingZero, PaddingXSmall)
+            .padding(PaddingDefault, PaddingZero),
+        horizontalArrangement = Arrangement.spacedBy(PaddingSmall)
     ) {
         Icon(
             imageVector = icon,

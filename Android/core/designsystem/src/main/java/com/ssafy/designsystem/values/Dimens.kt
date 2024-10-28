@@ -38,6 +38,8 @@ val IconLarge = 36.dp
 val IconMedium = 24.dp
 val IconSmall = 18.dp
 
+val ImageSmall = 40.dp
+
 val SpacerMedium = 10.dp
 
 val CornerSmall = 5.dp
