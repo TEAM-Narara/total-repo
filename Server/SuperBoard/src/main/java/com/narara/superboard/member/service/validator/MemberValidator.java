@@ -4,6 +4,7 @@ import com.narara.superboard.member.exception.*;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
 import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
+import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -24,8 +25,14 @@ public class MemberValidator {
         validatePassword(memberLoginRequestDto.password());
     }
 
+    // 이메일 인증 유효성 검증
+    public void verifyEmailCodeValidate(VerifyEmailCodeRequestDto verifyEmailCodeRequestDto){
+        validateEmail(verifyEmailCodeRequestDto.email());
+        validateVerificationCode(verifyEmailCodeRequestDto.code());
+    }
+
     // 이메일 검증
-    private void validateEmail(String email) {
+    public void validateEmail(String email) {
         if(!StringUtils.hasText(email)) {
             throw new MemberEmailNotFoundException();
         }
@@ -36,20 +43,27 @@ public class MemberValidator {
     }
 
     // 닉네임 검증
-    private void validateNickname(String nickname) {
+    public void validateNickname(String nickname) {
         if(!StringUtils.hasText(nickname)) {
             throw new MemberNicknameNotFoundException();
         }
     }
 
     // 비밀번호 검증
-    private void validatePassword(String password) {
+    public void validatePassword(String password) {
         if(!StringUtils.hasText(password)) {
             throw new MemberPasswordNotFoundException();
         }
 
         if (password.length() < 4 || password.length() > 30) {
             throw new MemberInvalidPasswordFormatException();
+        }
+    }
+
+    // 인증 코드 검증
+    public void validateVerificationCode(String code) {
+        if(!StringUtils.hasText(code)) {
+            throw new MemberVerificationCodeNotFoundException();
         }
     }
 
