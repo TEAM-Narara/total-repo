@@ -123,23 +123,6 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             moveToCardScreen = {}
         )
 
-        boardScreen(
-            popBack = {
-                navController.popBackStack()
-            },
-            moveBoardSetting = { menuID: Long, workspaceId: Long ->
-                navController.navigate(
-                    BoardMenu(
-                        menuID,
-                        workspaceId
-                    )
-                )
-            },
-            moveToBoardSearch = { searchParameters: SearchParameters ->
-                navController.navigate(BoardSearch(searchParameters))
-            }
-        )
-
         boardSearchScreen(
             popBackToBoardScreen = {
                 navController.popBackStack()
