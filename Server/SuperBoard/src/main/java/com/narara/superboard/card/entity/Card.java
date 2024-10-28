@@ -48,10 +48,10 @@ public class Card {
     private Long myOrder;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isDeleted = false;
+    private Boolean isDeleted;
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isArchived = false;
+    private Boolean isArchived;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         return Card.builder()
