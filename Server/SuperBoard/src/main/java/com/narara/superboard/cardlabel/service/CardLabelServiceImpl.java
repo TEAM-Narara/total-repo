@@ -19,13 +19,6 @@ public class CardLabelServiceImpl implements CardLabelService {
 
     private final CardLabelValidator cardLabelValidator;
 
-    @Override
-    public CardLabel createCardLabel(Card card, Label label) {
-        cardLabelValidator.validateMismatchBoard(card, label);
-
-        return cardLabelRepository.findByCardAndLabel(card, label)
-                .orElseGet(() -> cardLabelRepository.save(CardLabel.createCardLabel(card, label)));
-    }
 
     @Override
     public CardLabel changeCardLabelIsActivated(Card card, Label label) {
@@ -38,4 +31,15 @@ public class CardLabelServiceImpl implements CardLabelService {
         return cardLabel.get().changeIsActivated();
     }
 
+    @Override
+    public CardLabel createCardLabel(Card card, Label label) {
+        cardLabelValidator.validateMismatchBoard(card, label);
+
+        Optional<CardLabel> cardLabel = cardLabelRepository.findByCardAndLabel(card, label);
+        if (cardLabel.isPresent()){
+            throw new EntityAlreadyExistsException("카드의 라벨");
+        }
+
+        return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
+    }
 }
