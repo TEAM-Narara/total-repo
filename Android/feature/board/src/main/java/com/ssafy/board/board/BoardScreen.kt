@@ -45,14 +45,16 @@ import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.model.search.SearchParameters
 import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
+    searchParameters: SearchParameters,
     popBack: () -> Unit,
-    navigateToFilterScreen: () -> Unit,
+    navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: () -> Unit,
 ) {
@@ -66,9 +68,9 @@ fun BoardScreen(
                 title = boardData?.title ?: "",
                 onBackPressed = popBack,
                 onBoardTitleChanged = { viewModel.updateBoardTitle() },
-                onFilterPressed = navigateToFilterScreen,
+                onFilterPressed = { navigateToFilterScreen(searchParameters) },
                 onNotificationPressed = navigateToNotificationScreen,
-                onMorePressed = navigateToBoardMenuScreen,
+                onMorePressed = {navigateToBoardMenuScreen()},
             )
         },
     ) { paddingValues ->
@@ -87,7 +89,9 @@ fun BoardScreen(
     }
 
     if (uiState.isLoading) {
-        Box(modifier = Modifier.fillMaxSize().background(Gray.copy(alpha = 0.7f))) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Gray.copy(alpha = 0.7f))) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }

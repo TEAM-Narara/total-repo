@@ -4,18 +4,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.ssafy.model.search.SearchParameters
+import com.ssafy.ui.safetype.SearchParametersType
 import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
 
 @Serializable
-data class Board(val boardId: Long)
+data class Board(
+    val boardId: Long,
+    val searchParameters: SearchParameters = SearchParameters()
+)
 
 fun NavGraphBuilder.boardScreen(
     popBack: () -> Unit,
-    navigateToFilterScreen: () -> Unit,
+    navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
-    navigateToBoardMenuScreen: () -> Unit,
+    navigateToBoardMenuScreen: (Long, Long) -> Unit,
 ) {
-    composable<Board> { backStackEntry ->
+    composable<Board>(
+        mapOf(typeOf<SearchParameters>() to SearchParametersType)
+    ) { backStackEntry ->
         val board: Board = backStackEntry.toRoute()
         val viewModel: BoardViewModel = hiltViewModel<BoardViewModel>().apply {
             setBoardId(board.boardId)
@@ -23,9 +31,10 @@ fun NavGraphBuilder.boardScreen(
         BoardScreen(
             viewModel = viewModel,
             popBack = popBack,
+            searchParameters = board.searchParameters,
             navigateToFilterScreen = navigateToFilterScreen,
             navigateToNotificationScreen = navigateToNotificationScreen,
-            navigateToBoardMenuScreen = navigateToBoardMenuScreen,
+            navigateToBoardMenuScreen = { navigateToBoardMenuScreen(board.boardId, 0L) },
         )
     }
 }

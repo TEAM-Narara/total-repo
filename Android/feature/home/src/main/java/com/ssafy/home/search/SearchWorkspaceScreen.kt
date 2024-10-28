@@ -15,9 +15,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +48,6 @@ import com.ssafy.designsystem.values.Transparent
 import com.ssafy.designsystem.values.Yellow
 import java.util.Date
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchWorkspaceScreen(
     boardList: List<Any>,
@@ -71,7 +69,7 @@ fun SearchWorkspaceScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.Default.ArrowBack,
                 contentDescription = "뒤로 아이콘",
                 onClick = onBackPressed
             )

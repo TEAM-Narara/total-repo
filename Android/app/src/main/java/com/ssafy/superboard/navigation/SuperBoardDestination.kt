@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.ssafy.board.Board
+import com.ssafy.board.board.Board
+import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.boardMenuScreen
-import com.ssafy.board.boardScreen
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.home.createboard.CreateBoard
@@ -98,22 +98,6 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardScreen(
-            popBack = { navController.popBackStack() },
-            moveBoardSetting = { menuID: Long, workspaceId: Long ->
-                navController.navigate(
-                    BoardMenu(
-                        menuID,
-                        workspaceId
-                    )
-                )
-            },
-            moveToBoardSearch = { searchParameters: SearchParameters ->
-                navController.navigate(
-                    BoardSearch(searchParameters)
-                )
-            })
-
         boardMenuScreen(popBack = { navController.popBackStack() })
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
@@ -129,11 +113,26 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             },
 
             popBackToBoardScreenWithParams = { boardSearch: BoardSearch, params: SearchParameters ->
-                navController.navigate(Board(params)) {
+                navController.navigate(BoardSearch(params)) {
                     popUpTo(boardSearch) {
                         inclusive = true
                     }
                 }
+            }
+        )
+
+        boardScreen(
+            popBack = navController::popBackStack,
+            navigateToFilterScreen = { searchParameters: SearchParameters ->
+                navController.navigate(
+                    BoardSearch(searchParameters)
+                )
+            },
+            navigateToNotificationScreen = {},
+            navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
+                navController.navigate(
+                    BoardMenu(boardId, workspaceId)
+                )
             }
         )
     }
