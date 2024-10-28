@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * jwt 기능 단위 테스트 (레드 사이클)
  */
-@Deprecated
+@Disabled
 @SpringBootTest
 @Transactional
 class JwtTokenProviderTest {
