@@ -73,9 +73,9 @@ pipeline {
             steps {
                 // 기존 BE 컨테이너 중지 및 삭제
                 sh '''
-                if [ $(docker ps -aq -f name=be) ]; then
-                    docker stop be || true
-                    docker rm -f be
+                if [ $(docker ps -aq -f name=total-server) ]; then
+                    docker stop total-server || true
+                    docker rm -f total-server
                 fi
                 '''
             }
@@ -84,7 +84,7 @@ pipeline {
         stage('Run New BE Container') {
             steps {
                 // 새로운 BE 컨테이너 실행
-                sh 'docker run -d --name be --network my-network -p 18080:8080 total-sever'
+                sh 'docker run -d --name total-server -p 18080:8080 total-sever'
             }
         }
 
