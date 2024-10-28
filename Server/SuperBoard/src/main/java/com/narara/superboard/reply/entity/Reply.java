@@ -31,7 +31,7 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
 
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;  // 보드 키
 
