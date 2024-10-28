@@ -8,9 +8,7 @@ pipeline {
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: '*/BE/develop'], [name: '*/BE/deploy']],
-                    extensions: [
-                        [$class: 'SubmoduleOption', parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: true]
-                    ],
+                    extensions: [[$class: 'SubmoduleOption', parentCredentials: true, recursiveSubmodules: true, trackingSubmodules: true]],
                     userRemoteConfigs: [[credentialsId: 'gitlabId', url: 'https://lab.ssafy.com/s11-final/S11P31S107.git']]
                 ])
             }
