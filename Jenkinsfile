@@ -84,7 +84,22 @@ pipeline {
         stage('Run New BE Container') {
             steps {
                 // 새로운 BE 컨테이너 실행
-                sh 'docker run -d --name total-server -p 18080:8080 total-sever'
+                script {
+                    // 네트워크 확인 및 조건 설정
+                    def networks = []
+                    if (sh(script: 'docker network ls --filter name=^total-server-network$ --format "{{.Name}}"', returnStdout: true).trim()) {
+                        networks << "total-server-network"
+                    }
+                    if (sh(script: 'docker network ls --filter name=^total-server-test-network$ --format "{{.Name}}"', returnStdout: true).trim()) {
+                        networks << "total-server-test-network"
+                    }
+
+                    // 네트워크 연결 옵션 생성
+                    def networkOptions = networks.collect { "--network $_" }.join(" ")
+
+                    // Docker 컨테이너 실행
+                    sh "docker run -d --name total-server ${networkOptions} -p 18080:8080 total-sever"
+                }
             }
         }
 
