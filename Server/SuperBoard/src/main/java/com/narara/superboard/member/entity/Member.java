@@ -46,4 +46,10 @@ public class Member {
         this.email = email;
         this.profileImgUrl = profileImgUrl;
     }
+
+    public Member(Long id, String nickname, String email) {
+        this.id = id;
+        this.nickname = nickname;
+        this.email = email;
+    }
 }
