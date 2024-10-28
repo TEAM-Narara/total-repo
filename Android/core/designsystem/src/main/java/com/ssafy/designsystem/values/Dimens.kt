@@ -47,6 +47,7 @@ val CornerMedium = 8.dp
 val CornerLarge = 12.dp
 
 val BorderDefault = 1.dp
+val BorderFat = 3.dp
 
 val ListWidth = 300.dp
 val CardWidth = 270.dp
