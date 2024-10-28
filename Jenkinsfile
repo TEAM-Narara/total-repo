@@ -4,13 +4,20 @@ pipeline {
     stages {
         stage('Git Clone') {
             steps {
-                // GitLab에서 코드 클론 (서브모듈 포함)
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '^BE/(develop|deploy)$']],
-                    extensions: [[$class: 'SubmoduleOption', parentCredentials: true, recursiveSubmodules: true, trackingSubmodules: true]],
-                    userRemoteConfigs: [[credentialsId: 'gitlabId', url: 'https://lab.ssafy.com/s11-final/S11P31S107.git']]
-                ])
+                script {
+                    // BRANCH_NAME 변수는 Jenkins가 자동으로 설정해주는 환경 변수로, 빌드 트리거된 브랜치의 이름을 가집니다.
+                    // 그러나, 이 변수가 자동으로 설정되지 않는 경우도 있으므로, 이를 명시적으로 설정해야 할 수 있습니다.
+                    def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/develop'
+                    env.BRANCH_NAME = branch
+                    echo "Checking out branch: ${branch}" // 변경된 브랜치 표시
+                    // GitLab에서 코드 클론 (서브모듈 포함)
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${branch}"]], // 변경된 브랜치를 지정
+                        extensions: [[$class: 'SubmoduleOption', parentCredentials: true, recursiveSubmodules: true, trackingSubmodules: true]],
+                        userRemoteConfigs: [[credentialsId: 'gitlabId', url: 'https://lab.ssafy.com/s11-final/S11P31S107.git']]
+                    ])
+                }
             }
         }
 
