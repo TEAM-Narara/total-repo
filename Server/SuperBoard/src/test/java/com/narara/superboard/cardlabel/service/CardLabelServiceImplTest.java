@@ -4,6 +4,7 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
 import com.narara.superboard.cardlabel.service.validator.CardLabelValidator;
 import com.narara.superboard.common.exception.cardlabel.MismatchedBoardException;
@@ -100,4 +101,42 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         assertThrows(MismatchedBoardException.class, () -> cardLabelService.createCardLabel(cardId, labelId));
         verify(cardLabelValidator, times(1)).validateMismatchBoard(card, label);
     }
+
+    @Test
+    @DisplayName("성공 테스트: 동일한 보드에 속하는 Card와 Label로 CardLabel 생성")
+    void createCardLabel_Success() {
+        // given
+        Long cardId = 1L;
+        Long labelId = 1L;
+
+        Board board = Board.builder().id(1L).build();
+
+        Card card = Card.builder()
+                .id(cardId)
+                .list(com.narara.superboard.list.entity.List.builder().board(board).build())
+                .build();
+
+        Label label = Label.builder()
+                .id(labelId)
+                .board(board)
+                .build();
+
+        CardLabel cardLabel = CardLabel.builder().card(card).label(label).build();
+
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(labelRepository.findById(labelId)).thenReturn(Optional.of(label));
+        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.empty());
+        when(cardLabelRepository.save(any(CardLabel.class))).thenReturn(cardLabel);
+
+        // when
+        CardLabel result = cardLabelService.createCardLabel(cardId, labelId);
+
+        // then
+        assertNotNull(result);
+        assertEquals(card, result.getCard());
+        assertEquals(label, result.getLabel());
+        verify(cardLabelValidator, times(1)).validateMismatchBoard(card, label);
+        verify(cardLabelRepository, times(1)).save(any(CardLabel.class));
+    }
+
 }
