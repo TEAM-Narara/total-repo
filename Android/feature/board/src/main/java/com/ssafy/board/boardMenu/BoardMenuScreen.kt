@@ -37,7 +37,7 @@ import androidx.core.view.WindowCompat
 import com.ssafy.board.components.BoardMemberItem
 import com.ssafy.board.components.MenuEditTextRow
 import com.ssafy.board.components.MenuHorizontalDivider
-import com.ssafy.board.data.HistoryData
+import com.ssafy.model.card.HistoryData
 import com.ssafy.board.getIcon
 import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.component.EditableText

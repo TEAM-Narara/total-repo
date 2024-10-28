@@ -1,4 +1,4 @@
-package com.ssafy.board.data
+package com.ssafy.model.card
 
 data class HistoryData(
     val type: String,
