@@ -3,7 +3,7 @@ package com.narara.superboard.workspace.service;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.common.exception.WorkspaceNameNotFoundException;
+import com.narara.superboard.workspace.exception.WorkspaceNameNotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
