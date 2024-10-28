@@ -124,7 +124,6 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
 
         CardLabel cardLabel = CardLabel.createCardLabel(card, label);
 
-        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.empty());
         when(cardLabelRepository.save(any(CardLabel.class))).thenReturn(cardLabel);
 
         // when
@@ -140,33 +139,57 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     @Test
-    @DisplayName("카드와 라벨이 이미 연결되어 있을 때 기존 CardLabel 반환")
-    void shouldReturnExistingCardLabelIfExists() {
+    @DisplayName("성공 테스트: CardLabel이 존재하지 않을 때 새로 생성")
+    void changeCardLabelIsActivated_CardLabelNotExist_CreateNew() {
         // given
-        Board board = Board.builder().id(1L).build();
+        Card card = Card.builder().id(1L).build();
+        Label label = Label.builder().id(1L).build();
 
-        Card card = Card.builder()
-                .id(1L)
-                .list(com.narara.superboard.list.entity.List.builder().board(board).build())
-                .build();
+        CardLabel newCardLabel = CardLabel.createCardLabel(card, label);
 
-        Label label = Label.builder()
-                .id(1L)
-                .board(board)
-                .build();
+        // CardLabel이 존재하지 않음을 모킹
+        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.empty());
+        when(cardLabelRepository.save(any(CardLabel.class))).thenReturn(newCardLabel);
 
-        CardLabel existingCardLabel = CardLabel.createCardLabel(card, label);
+        // when
+        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label);
 
+        // then
+        assertNotNull(result, "새로 생성된 CardLabel이 반환되어야 합니다.");
+        assertEquals(card, result.getCard());
+        assertEquals(label, result.getLabel());
+        assertTrue(result.getIsActivated(), "새로 생성된 CardLabel의 isActivated는 true 여야 합니다.");
+
+        // 검증: CardLabel 조회 1회, 새로 생성된 CardLabel 저장 1회
+        verify(cardLabelRepository, times(1)).findByCardAndLabel(card, label);
+        verify(cardLabelRepository, times(1)).save(any(CardLabel.class));
+    }
+
+    @Test
+    @DisplayName("성공 테스트: CardLabel이 이미 존재할 때 isActivated 상태 변경")
+    void changeCardLabelIsActivated_CardLabelExists_ToggleActivation() {
+        // given
+        Card card = Card.builder().id(1L).build();
+        Label label = Label.builder().id(1L).build();
+
+        CardLabel existingCardLabel = spy(CardLabel.createCardLabel(card, label));
+
+        // 초기 상태를 false로 설정해두기 위해 토글 한 번 적용
+        existingCardLabel.changeIsActivated(); // 초기 상태 false로 설정
+
+        // CardLabel이 존재하도록 모킹
         when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.of(existingCardLabel));
 
         // when
-        CardLabel result = cardLabelService.createCardLabel(card, label);
+        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label);
 
         // then
-        assertNotNull(result);
-        assertEquals(existingCardLabel, result, "이미 존재하는 CardLabel 객체를 반환해야 합니다.");
-        verify(cardLabelValidator, times(1)).validateMismatchBoard(card, label);
-        verify(cardLabelRepository, never()).save(any(CardLabel.class));
+        assertNotNull(result, "기존 CardLabel이 반환되어야 합니다.");
+        assertEquals(existingCardLabel, result, "기존 CardLabel이 반환되어야 합니다.");
+        assertTrue(result.getIsActivated(), "isActivated 상태가 true로 변경되어야 합니다.");
+
+        // 검증: CardLabel 조회 1회 발생해야 함
+        verify(cardLabelRepository, times(1)).findByCardAndLabel(card, label);
     }
 
 }
