@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * jwt 기능 단위 테스트 (레드 사이클)
  */
+@Deprecated
 @SpringBootTest
 @Transactional
 class JwtTokenProviderTest {
