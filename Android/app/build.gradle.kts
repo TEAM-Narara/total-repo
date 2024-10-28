@@ -53,6 +53,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:ui"))
+
     // 기능
     implementation(project(":feature:login"))
     implementation(project(":feature:board"))
