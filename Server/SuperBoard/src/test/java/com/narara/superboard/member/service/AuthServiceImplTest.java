@@ -1,5 +1,8 @@
 package com.narara.superboard.member.service;
 
+import com.narara.superboard.common.exception.redis.RedisDataSaveException;
+import com.narara.superboard.common.infrastructure.redis.RedisService;
+import com.narara.superboard.common.infrastructure.redis.RedisServiceImpl;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.member.exception.*;
@@ -9,6 +12,7 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,17 +21,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.AssertionErrors.assertNull;
 
 class AuthServiceImplTest {
     @Mock
@@ -42,6 +49,15 @@ class AuthServiceImplTest {
 
     @InjectMocks
     private AuthServiceImpl authService; // 테스트 대상 서비스
+
+    @Mock
+    private RedisServiceImpl redisService;
+
+    @Mock
+    private JavaMailSender emailSender;
+
+    @Mock
+    private SpringTemplateEngine templateEngine;
 
     @BeforeEach
     void setUp() {
@@ -258,7 +274,91 @@ class AuthServiceImplTest {
     }
 
     /**
-     *
+     * 로그아웃 TEST ----------------------------------------------------------------------------------
      */
+    @Test
+    @DisplayName("로그아웃 성공 테스트")
+    void logoutSuccess() {
+        // Given: 존재하는 회원
+        Long memberId = 1L;
+        Member member = new Member();
+        member.setId(memberId);
+        member.setRefreshToken("refresh-token"); // 기존 토큰 설정
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        // When: 로그아웃 호출
+        authService.logout(memberId);
+
+        // Then: 회원의 refreshToken이 null로 설정되었는지 확인
+        assertNull("로그아웃 시 refreshToken은 null이어야 합니다.",member.getRefreshToken());
+        verify(memberRepository, times(1)).save(member); // 회원 정보 저장 호출 확인
+    }
+
+    @Test
+    @DisplayName("로그아웃 실패 테스트 - 존재하지 않는 회원")
+    void logoutFail_NonExistentMember() {
+        // Given: 존재하지 않는 회원 ID
+        Long memberId = 99L;
+
+        // When & Then: 회원을 찾을 수 없는 경우 예외 발생
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        assertThrows(MemberNotFoundException.class, () -> authService.logout(memberId));
+    }
+
+    /**
+     * 회원 탈퇴 TEST ----------------------------------------------------------------------------------
+     */
+    @Test
+    @DisplayName("회원 탈퇴 성공 테스트")
+    void withdrawalSuccess() {
+        // Given: 존재하는 회원 ID
+        Long memberId = 1L;
+        Member member = new Member();
+        member.setId(memberId);
+        member.setIsDeleted(false);
+        member.setRefreshToken("refresh-token"); // 기존 토큰 설정
+
+        // Mocking: 회원 조회 시 성공적으로 회원 객체 반환
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        // When: 회원 탈퇴 호출
+        authService.withdrawal(memberId);
+
+        // Then: 회원 탈퇴 상태로 변경되었는지 확인
+        assertTrue(member.getIsDeleted()); // 회원이 탈퇴 처리되었는지 확인
+        // Then: 회원의 refreshToken이 null로 설정되었는지 확인
+        assertNull("로그아웃 시 refreshToken은 null이어야 합니다.",member.getRefreshToken());
+        verify(memberRepository, times(1)).save(member); // save 메서드가 호출되었는지 확인
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 테스트 - 존재하지 않는 회원")
+    void withdrawalFail_NonExistentMember() {
+        // Given: 존재하지 않는 회원 ID
+        Long memberId = 99L;
+
+        // When & Then: 회원을 찾을 수 없는 경우 예외 발생
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        assertThrows(MemberNotFoundException.class, () -> authService.withdrawal(memberId));
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 테스트 - 이미 탈퇴된 회원")
+    void withdrawalFail_AlreadyDeletedMember() {
+        // Given: 이미 탈퇴된 회원 ID
+        Long memberId = 1L;
+        Member deletedMember = new Member();
+        deletedMember.setId(memberId);
+        deletedMember.setIsDeleted(true); // 탈퇴 상태 설정
+
+        // Mocking: 회원 조회 시 탈퇴된 회원 객체 반환
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(deletedMember));
+
+        // When & Then: 이미 탈퇴된 계정인 경우 예외 발생
+        assertThrows(AccountDeletedException.class, () -> authService.withdrawal(memberId));
+    }
 
 }
