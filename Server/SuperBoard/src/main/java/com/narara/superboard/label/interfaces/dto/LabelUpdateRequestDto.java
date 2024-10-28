@@ -1,4 +1,9 @@
 package com.narara.superboard.label.interfaces.dto;
 
-public class LabelUpdateRequestDto {
+import com.narara.superboard.common.interfaces.dto.ColorHolder;
+
+public record LabelUpdateRequestDto(
+        String name,
+        Long color
+) implements ColorHolder {
 }

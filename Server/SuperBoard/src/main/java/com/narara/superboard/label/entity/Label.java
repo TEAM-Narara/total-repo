@@ -2,6 +2,7 @@ package com.narara.superboard.label.entity;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
+import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,5 +39,11 @@ public class Label {
                 .name(createLabelRequestDto.name())
                 .color(createLabelRequestDto.color())
                 .build();
+    }
+
+    public Label updateLabel(LabelUpdateRequestDto updateLabelRequestDto) {
+        this.name = updateLabelRequestDto.name();
+        this.color = updateLabelRequestDto.color();
+        return this;
     }
 }

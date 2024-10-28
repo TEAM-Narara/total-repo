@@ -6,6 +6,8 @@ import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
+import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
+import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class LabelServiceImpl implements LabelService {
     private final ColorValidator colorValidator;
 
     @Override
-    public Label createLabel(Long boardId, CreateLabelRequestDto createLabelRequestDto) {
+    public Label createLabel(Long boardId, LabelCreateRequestDto createLabelRequestDto) {
         colorValidator.validateLabelColor(createLabelRequestDto);
 
         Board board = boardRepository.findById(boardId)
@@ -28,5 +30,21 @@ public class LabelServiceImpl implements LabelService {
         Label label = Label.createLabel(board, createLabelRequestDto);
 
         return labelRepository.save(label);
+    }
+
+    @Override
+    public Label getLabel(Long labelId) {
+        return labelRepository.findById(labelId)
+                .orElseThrow(() -> new NotFoundEntityException(labelId, "라벨"));
+    }
+
+
+    @Override
+    public Label updateLabel(Long labelId, LabelUpdateRequestDto updateLabelRequestDto) {
+        colorValidator.validateLabelColor(updateLabelRequestDto);
+
+        Label label = getLabel(labelId);
+
+        return label.updateLabel(updateLabelRequestDto);
     }
 }
