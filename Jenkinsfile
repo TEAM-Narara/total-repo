@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    // 젠킨스 설정의 tool에서 설정해줘야함.
+    tools {
+        jdk ("jdk21")
+    }
+
     stages {
         stage('Git Clone') {
             steps {
