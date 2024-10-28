@@ -20,6 +20,7 @@ val PaddingZero = 0.dp
 val PaddingOne = 1.dp
 val PaddingTwo = 2.dp
 val PaddingXSmall = 4.dp
+val PaddingSemiSmall = 5.dp
 val PaddingSmall = 8.dp
 val PaddingMedium = 12.dp
 val PaddingDefault = 16.dp
@@ -48,6 +49,7 @@ val BorderDefault = 1.dp
 val ListWidth = 300.dp
 val CardWidth = 270.dp
 val BoardHeight = 130.dp
+val BoardWidth = 160.dp
 
 val ElevationSmall = 2.dp
 val ElevationMedium = 4.dp
