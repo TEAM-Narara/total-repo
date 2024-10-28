@@ -4,12 +4,15 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.member.entity.Member;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final ListRepository listRepository;
+    private final CardMemberRepository cardMemberRepository;
 
 
     private final NameValidator nameValidator;
@@ -27,7 +31,7 @@ public class CardServiceImpl implements CardService {
     private final LastOrderValidator lastOrderValidator;
 
     @Override
-    public Card createCard(CardCreateRequestDto cardCreateRequestDto) {
+    public Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) {
         nameValidator.validateCardNameIsEmpty(cardCreateRequestDto);
 
         List list = listRepository.findById(cardCreateRequestDto.listId())
@@ -35,6 +39,10 @@ public class CardServiceImpl implements CardService {
         lastOrderValidator.checkValidCardLastOrder(list);
 
         Card card = Card.createCard(cardCreateRequestDto, list);
+
+        CardMember cardMember = CardMember.createCardMember(card, member);
+        cardMemberRepository.save(cardMember);
+
         return cardRepository.save(card);
     }
 
