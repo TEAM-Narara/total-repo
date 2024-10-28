@@ -2,7 +2,7 @@ package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.card.entity.Card;
-import com.narara.superboard.card.infrastrucuture.CardRepository;
+import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;

@@ -1,4 +1,4 @@
-package com.narara.superboard.list.infrastrucure;
+package com.narara.superboard.list.infrastructure;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.list.entity.List;

@@ -1,12 +1,12 @@
 package com.narara.superboard.list.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.infrastrucuture.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
-import com.narara.superboard.list.infrastrucure.ListRepository;
+import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
