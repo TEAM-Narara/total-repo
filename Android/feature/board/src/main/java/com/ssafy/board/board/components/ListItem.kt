@@ -1,4 +1,4 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,15 +12,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
-import com.mohamedrejeb.compose.dnd.annotation.ExperimentalDndApi
+import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
-import com.mohamedrejeb.compose.dnd.drop.dropTarget
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
-import com.ssafy.board.data.ListData
-import com.ssafy.board.data.ReorderCardData
-import com.ssafy.board.handleLazyListScroll
+import com.ssafy.board.board.data.ListData
+import com.ssafy.board.board.data.ReorderCardData
+import com.ssafy.board.board.handleLazyListScroll
 import com.ssafy.designsystem.component.ListItem
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
@@ -28,18 +27,17 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingMedium
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalDndApi::class)
 @Composable
 fun ListItem(
     modifier: Modifier = Modifier,
     listData: ListData,
     reorderState: ReorderState<ReorderCardData>,
-    cardCollections: Map<String, MutableState<List<ReorderCardData>>>,
+    cardCollections: Map<Long, MutableState<List<ReorderCardData>>>,
     onTitleChange: (String) -> Unit = {},
     onCardReordered: () -> Unit = {},
     addCard: () -> Unit = {},
     addPhoto: () -> Unit = {},
-    onDragEnter: () -> Unit = {},
+    onListChanged: (Long) -> Unit = {},
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
@@ -49,27 +47,7 @@ fun ListItem(
 
     ReorderContainer(state = reorderState) {
         ListItem(
-            modifier = modifier.dropTarget(
-                key = listData.id,
-                state = reorderState.dndState,
-                dropAnimationEnabled = false,
-                onDragEnter = { state ->
-                    collectionState.value = collection.toMutableList().apply {
-                        if (!remove(state.data)) {
-                            cardCollections[state.data.listId]?.let {
-                                it.value = it.value.toMutableList().apply {
-                                    remove(state.data)
-                                }
-                            }
-                        }
-
-                        add(state.data.apply { this.listId = listData.id })
-
-                        onDragEnter()
-                    }
-                },
-                onDrop = { onCardReordered() },
-            ),
+            modifier = modifier,
             title = listData.title,
             onTitleChange = onTitleChange,
             addCard = addCard,
@@ -86,9 +64,7 @@ fun ListItem(
                         state = reorderState,
                         key = cardData.id,
                         data = cardData,
-                        zIndex = 1f,
                         dropStrategy = DropStrategy.CenterDistance,
-                        dragAfterLongPress = true,
                         onDragEnter = { state ->
                             collectionState.value = collection.toMutableList().apply {
                                 val index = indexOf(cardData)
@@ -103,33 +79,25 @@ fun ListItem(
                                 }
 
                                 add(index, state.data.apply { this.listId = listData.id })
+                                onListChanged(listData.id)
 
                                 scope.launch {
                                     handleLazyListScroll(
                                         lazyListState = cardLazyListState,
                                         dropIndex = index,
-                                        indexOffset = 1,
                                     )
                                 }
-
-                                onDragEnter()
                             }
                         },
                         onDrop = { onCardReordered() },
-                        draggableContent = {
-                            CardItem(
-                                modifier = Modifier.shadow(
-                                    ElevationLarge,
-                                    shape = RoundedCornerShape(CornerMedium),
-                                ),
-                                cardData = cardData,
-                            )
-                        }
                     ) {
                         CardItem(
                             modifier = Modifier.graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
-                            },
+                            }.shadow(
+                                if (isDragging) ElevationLarge else 0.dp,
+                                shape = RoundedCornerShape(CornerMedium),
+                            ),
                             cardData = cardData,
                         )
                     }
