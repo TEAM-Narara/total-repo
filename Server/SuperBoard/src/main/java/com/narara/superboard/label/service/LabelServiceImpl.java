@@ -11,6 +11,8 @@ import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LabelServiceImpl implements LabelService {
@@ -52,6 +54,14 @@ public class LabelServiceImpl implements LabelService {
     public void deleteLabel(Long labelId) {
         Label label = getLabel(labelId);
         labelRepository.delete(label);
+    }
+
+    @Override
+    public List<Label> getAllLabelsByBoardId(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
+
+        return labelRepository.findAllByBoard(board);
     }
 
 }
