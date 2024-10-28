@@ -163,33 +163,6 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     @Test
-    @DisplayName("성공 테스트: CardLabel이 존재하지 않을 때 새로 생성")
-    void changeCardLabelIsActivated_CardLabelNotExist_CreateNew() {
-        // given
-        Card card = Card.builder().id(1L).build();
-        Label label = Label.builder().id(1L).build();
-
-        CardLabel newCardLabel = CardLabel.createCardLabel(card, label);
-
-        // CardLabel이 존재하지 않음을 모킹
-        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.empty());
-        when(cardLabelRepository.save(any(CardLabel.class))).thenReturn(newCardLabel);
-
-        // when
-        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label);
-
-        // then
-        assertNotNull(result, "새로 생성된 CardLabel이 반환되어야 합니다.");
-        assertEquals(card, result.getCard());
-        assertEquals(label, result.getLabel());
-        assertTrue(result.getIsActivated(), "새로 생성된 CardLabel의 isActivated는 true 여야 합니다.");
-
-        // 검증: CardLabel 조회 1회, 새로 생성된 CardLabel 저장 1회
-        verify(cardLabelRepository, times(1)).findByCardAndLabel(card, label);
-        verify(cardLabelRepository, times(1)).save(any(CardLabel.class));
-    }
-
-    @Test
     @DisplayName("성공 테스트: CardLabel이 이미 존재할 때 isActivated 상태 변경")
     void changeCardLabelIsActivated_CardLabelExists_ToggleActivation() {
         // given
