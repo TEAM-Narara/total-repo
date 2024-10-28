@@ -22,6 +22,7 @@ fun BoardScreen(
     viewModel: BoardViewModel = hiltViewModel(),
     searchParameters: SearchParameters,
     popBack: () -> Unit,
+    moveBoardSetting: (Long, Long) -> Unit,
     moveToBoardSearch: (SearchParameters) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -36,7 +37,8 @@ fun BoardScreen(
         onListTitleChanged = viewModel::updateListTitle,
         onCardReordered = viewModel::updateCardOrder,
         onListReordered = viewModel::updateListOrder,
-        popBack = popBack
+        popBack = popBack,
+        moveBoardSetting = moveBoardSetting
     )
 }
 
@@ -50,6 +52,7 @@ private fun BoardScreen(
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
     popBack: () -> Unit,
+    moveBoardSetting: (Long, Long) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -60,12 +63,14 @@ private fun BoardScreen(
                 onBoardTitleChanged = { onBoardTitleChanged() },
                 onFilterPressed = onFilterPressed,
                 onNotificationPressed = {},
-                onMorePressed = {},
+                onMorePressed = { moveBoardSetting(1, 1) },
             )
         },
     ) { paddingValues ->
         BoardItem(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             boardData = uiState.boardData,
             onListTitleChanged = onListTitleChanged,
             onCardReordered = onCardReordered,
@@ -102,6 +107,9 @@ private fun BoardScreenPreview() {
         onCardReordered = {},
         onListReordered = {},
         popBack = {},
-        onFilterPressed = {}
+        onFilterPressed = {},
+        moveBoardSetting = { id1: Long, id2: Long ->
+            println("Preview를 위한 임의의 함수임: $id1, id2: $id2")
+        }
     )
 }
