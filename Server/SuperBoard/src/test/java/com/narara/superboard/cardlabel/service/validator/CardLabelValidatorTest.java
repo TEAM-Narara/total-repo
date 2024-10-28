@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@DisplayName("카드 검증기에 대한 단위 테스트")
 class CardLabelValidatorTest {
 
     private final CardLabelValidator cardLabelValidator = new CardLabelValidator();
