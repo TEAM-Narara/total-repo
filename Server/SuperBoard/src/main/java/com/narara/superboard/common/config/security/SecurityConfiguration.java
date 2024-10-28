@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -56,7 +58,7 @@ public class SecurityConfiguration {
 
                 // request 인증, 인가 설정
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/member/**").permitAll()
+                        request.requestMatchers("api/v1/member/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 // jwt 관련 설정
@@ -69,5 +71,10 @@ public class SecurityConfiguration {
 //                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

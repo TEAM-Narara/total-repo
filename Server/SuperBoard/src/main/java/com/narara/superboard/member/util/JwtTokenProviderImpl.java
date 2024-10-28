@@ -5,10 +5,7 @@ import com.narara.superboard.common.exception.TokenException;
 import com.narara.superboard.common.service.CustomUserDetailsService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,7 +91,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
                 .subject(authentication.getName())
                 .issuedAt(now)
                 .expiration(expiredDate)
-                .signWith(secretKey,Jwts.SIG.HS512)
+                .signWith(secretKey)
                 .compact();
     }
 

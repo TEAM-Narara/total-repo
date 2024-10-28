@@ -39,8 +39,8 @@ class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
         Long boardId = 1L;
 
         // Mock된 Member와 BoardMember 데이터 설정
-        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "http://profile1.img");
-        Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "http://profile2.img");
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com","","http://profile1.img");
+        Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "","http://profile2.img");
 
 
         BoardMember mockBoardMember1 = new BoardMember(mockMember1, Authority.ADMIN);

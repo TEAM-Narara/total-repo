@@ -2,6 +2,7 @@ package com.narara.superboard.member.service;
 
 import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
 import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
+import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
 
 public interface AuthService {
@@ -9,10 +10,8 @@ public interface AuthService {
     void sendEmailVerificationCode(String email);
     // TODO : 이메일 인증코드 인증
     void verifyEmailCode(VerifyEmailCodeRequestDto verifyEmailCodeRequestDto);
-    // TODO : 회원가입
-    void register(MemberCreateRequestDto memberCreateRequestDto);
-    // TODO : 로그인
-    void login(MemberLoginRequestDto memberLoginRequestDto);
+    TokenDto register(MemberCreateRequestDto memberCreateRequestDto);
+    TokenDto login(MemberLoginRequestDto memberLoginRequestDto);
     // TODO : 로그아웃
     void logout(Long memberId);
     // TODO : 회원 탈퇴
