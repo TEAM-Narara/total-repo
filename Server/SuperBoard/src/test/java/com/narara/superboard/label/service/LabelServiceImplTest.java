@@ -211,4 +211,25 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         verify(labelRepository, times(1)).findById(labelId);
         verify(labelRepository, times(1)).delete(label);
     }
+
+    @Test
+    @DisplayName("보드가 존재하지 않을 때 NotFoundEntityException 발생")
+    void shouldThrowExceptionWhenBoardDoesNotExist() {
+        // given
+        Long nonExistentBoardId = 999L;
+
+        // Mocking: 보드가 존재하지 않도록 설정
+        when(boardRepository.findById(nonExistentBoardId)).thenReturn(Optional.empty());
+
+        // then: 예외 발생 확인
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
+                () -> labelService.getAllLabelsByBoardId(nonExistentBoardId)
+        );
+
+        assertEquals("해당하는 보드(이)가 존재하지 않습니다. 보드ID: " + nonExistentBoardId, exception.getMessage());
+
+        verify(boardRepository, times(1)).findById(nonExistentBoardId);
+        verify(labelRepository, never()).findAllByBoard(any(Board.class));
+    }
 }
