@@ -8,12 +8,10 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
 import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
-import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
 import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -190,5 +188,27 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(0xFFFFFF00L, updatedLabel.getColor());
         verify(labelRepository, times(1)).findById(labelId);
         verify(colorValidator, times(1)).validateLabelColor(updateRequestDto);
+    }
+
+    @Test
+    @DisplayName("성공 테스트: 존재하는 라벨 ID로 라벨 삭제")
+    void shouldDeleteLabelSuccessfullyWhenLabelExists() {
+        // given
+        Long labelId = 1L;
+        Label label = Label.builder()
+                .id(labelId)
+                .name("Test Label")
+                .color(0xFFFFFF00L)
+                .build();
+
+        // Mocking: Label이 존재하도록 설정
+        when(labelRepository.findById(labelId)).thenReturn(Optional.of(label));
+
+        // when & then
+        assertDoesNotThrow(() -> labelService.deleteLabel(labelId), "라벨 삭제 시 예외가 발생하면 안 됩니다.");
+
+        // 라벨이 정상적으로 삭제되었는지 확인
+        verify(labelRepository, times(1)).findById(labelId);
+        verify(labelRepository, times(1)).delete(label);
     }
 }
