@@ -31,7 +31,7 @@ import com.ssafy.model.search.SearchParameters
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Board(), modifier = modifier) {
+    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -101,7 +101,12 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         boardScreen(
             popBack = { navController.popBackStack() },
-            moveBoardSetting = { menuID: Long, workspaceId: Long ->
+            navigateToFilterScreen = { searchParameters: SearchParameters ->
+                navController.navigate(
+                    BoardSearch(searchParameters)
+                )
+            },
+            navigateToBoardMenuScreen = { menuID: Long, workspaceId: Long ->
                 navController.navigate(
                     BoardMenu(
                         menuID,
@@ -109,11 +114,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                     )
                 )
             },
-            moveToBoardSearch = { searchParameters: SearchParameters ->
-                navController.navigate(
-                    BoardSearch(searchParameters)
-                )
-            })
+            navigateToNotificationScreen = {
+                // TODO : navigate to notification screen
+            }
+        )
 
         boardMenuScreen(popBack = { navController.popBackStack() })
 
