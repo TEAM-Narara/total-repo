@@ -139,4 +139,39 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         verify(cardLabelRepository, times(1)).save(any(CardLabel.class));
     }
 
+    @Test
+    @DisplayName("카드와 라벨이 이미 연결되어 있을 때 기존 CardLabel 반환")
+    void shouldReturnExistingCardLabelIfExists() {
+        // given
+        Long cardId = 1L;
+        Long labelId = 1L;
+
+        Board board = Board.builder().id(1L).build();
+
+        Card card = Card.builder()
+                .id(cardId)
+                .list(com.narara.superboard.list.entity.List.builder().board(board).build())
+                .build();
+
+        Label label = Label.builder()
+                .id(labelId)
+                .board(board)
+                .build();
+
+        CardLabel existingCardLabel = CardLabel.builder().card(card).label(label).build();
+
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(labelRepository.findById(labelId)).thenReturn(Optional.of(label));
+        when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.of(existingCardLabel));
+
+        // when
+        CardLabel result = cardLabelService.createCardLabel(cardId, labelId);
+
+        // then
+        assertNotNull(result);
+        assertEquals(existingCardLabel, result, "이미 존재하는 CardLabel 객체를 반환해야 합니다.");
+        verify(cardLabelValidator, times(1)).validateMismatchBoard(card, label);
+        verify(cardLabelRepository, never()).save(any(CardLabel.class));
+    }
+
 }
