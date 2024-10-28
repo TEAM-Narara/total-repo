@@ -10,6 +10,7 @@ import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardScreen
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
+import com.ssafy.card.card.cardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
@@ -87,7 +88,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         myCardScreen(
             popBackToHome = navController::popBackStack,
             moveToCardScreen = {
-                // TODO : navigate to card screen
+                // TODO : 먼저 리스트로 이동하고, 연속으로 카드로 이동시켜야함
             }
         )
 
@@ -120,7 +121,9 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         searchWorkspaceScreen(
             onBackPressed = { navController.popBackStack() },
-            moveToCardScreen = {}
+            moveToCardScreen = {
+                // TODO 리스트로 이동하고, 연속으로 카드로 이동시켜야함
+            }
         )
 
         boardSearchScreen(
@@ -134,6 +137,15 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                         inclusive = true
                     }
                 }
+            }
+        )
+
+        cardScreen(
+            popBackToBoardScreen = {
+                navController.popBackStack()
+            },
+            moveToSelectColor = { cardId: Long ->
+                // TODO : navigate to select color screen
             }
         )
     }
