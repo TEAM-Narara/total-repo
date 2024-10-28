@@ -9,10 +9,13 @@ import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
 import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
 import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
+import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -98,4 +101,39 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         verify(labelRepository, times(1)).save(any(Label.class));
     }
 
+    @Test
+    @DisplayName("존재하지 않는 라벨 ID로 조회 시 NotFoundEntityException 발생")
+    void shouldThrowExceptionWhenLabelNotFound() {
+        // given
+        Long nonExistentLabelId = 1L;
+
+        // Mocking: Label이 존재하지 않도록 설정
+        when(labelRepository.findById(nonExistentLabelId)).thenReturn(Optional.empty());
+
+        // then: 예외 발생 확인
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
+                () -> labelService.getLabel(nonExistentLabelId)
+        );
+        assertEquals("해당하는 라벨(이)가 존재하지 않습니다. 라벨ID: " + nonExistentLabelId, exception.getMessage());
+
+        verify(labelRepository, times(1)).findById(nonExistentLabelId);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {0xFFFFFFFF + 1, -1L}) // 잘못된 색상 값
+    @DisplayName("유효하지 않은 색상 값으로 업데이트 시 예외 발생")
+    void shouldThrowExceptionWhenUpdatingWithInvalidColor(Long invalidColor) {
+        // given
+        Long labelId = 1L;
+        LabelUpdateRequestDto updateRequestDto = new LabelUpdateRequestDto("Updated Label", invalidColor);
+
+        // Mocking: colorValidator가 유효하지 않은 색상에 대해 예외를 던지도록 설정
+        doThrow(new IllegalArgumentException("Invalid color format")).when(colorValidator).validateLabelColor(updateRequestDto);
+
+        // then
+        assertThrows(IllegalArgumentException.class, () -> labelService.updateLabel(labelId, updateRequestDto));
+        verify(colorValidator, times(1)).validateLabelColor(updateRequestDto);
+    }
 }
