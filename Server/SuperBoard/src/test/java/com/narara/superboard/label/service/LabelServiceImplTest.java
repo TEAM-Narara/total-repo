@@ -17,6 +17,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -231,5 +233,73 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
         verify(boardRepository, times(1)).findById(nonExistentBoardId);
         verify(labelRepository, never()).findAllByBoard(any(Board.class));
+    }
+
+    @Test
+    @DisplayName("보드에 라벨이 없을 때 빈 리스트 반환")
+    void shouldReturnEmptyListWhenNoLabelsForBoard() {
+        // given
+        Long boardId = 1L;
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+
+        // Mocking
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(labelRepository.findAllByBoard(board)).thenReturn(Collections.emptyList());
+
+        // when
+        List<Label> labels = labelService.getAllLabelsByBoardId(boardId);
+
+        // then
+        assertTrue(labels.isEmpty(), "라벨 리스트가 비어 있어야 합니다.");
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(labelRepository, times(1)).findAllByBoard(board);
+    }
+
+    @Test
+    @DisplayName("보드에 하나의 라벨이 있을 때 해당 라벨 반환")
+    void shouldReturnSingleLabelWhenOneLabelExistsForBoard() {
+        // given
+        Long boardId = 1L;
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+        Label label = Label.builder().id(1L).name("Label 1").color(0xFFFFFFL).board(board).build();
+
+        // Mocking
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(labelRepository.findAllByBoard(board)).thenReturn(List.of(label));
+
+        // when
+        List<Label> labels = labelService.getAllLabelsByBoardId(boardId);
+
+        // then
+        assertEquals(1, labels.size(), "라벨 리스트 크기는 1이어야 합니다.");
+        assertEquals("Label 1", labels.get(0).getName());
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(labelRepository, times(1)).findAllByBoard(board);
+    }
+
+    @Test
+    @DisplayName("보드에 두 개의 라벨이 있을 때 두 라벨 반환")
+    void shouldReturnTwoLabelsWhenTwoLabelsExistForBoard() {
+        // given
+        Long boardId = 1L;
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+
+        Label label1 = Label.builder().id(1L).name("Label 1").color(0xFFFFFFL).board(board).build();
+        Label label2 = Label.builder().id(2L).name("Label 2").color(0x000000L).board(board).build();
+        List<Label> labelList = List.of(label1, label2);
+
+        // Mocking
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(labelRepository.findAllByBoard(board)).thenReturn(labelList);
+
+        // when
+        List<Label> labels = labelService.getAllLabelsByBoardId(boardId);
+
+        // then
+        assertEquals(2, labels.size(), "라벨 리스트 크기는 2여야 합니다.");
+        assertEquals("Label 1", labels.get(0).getName());
+        assertEquals("Label 2", labels.get(1).getName());
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(labelRepository, times(1)).findAllByBoard(board);
     }
 }
