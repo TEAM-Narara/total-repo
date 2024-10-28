@@ -10,6 +10,7 @@ version = '0.0.1-SNAPSHOT'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+        vendor = JvmVendorSpec.ANY //  Gradle이 자동으로 Java 21을 다운로드하게 변경
     }
 }
 
