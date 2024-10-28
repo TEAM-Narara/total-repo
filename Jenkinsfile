@@ -12,7 +12,7 @@ pipeline {
 
                     // GitLab에서 코드 클론 (서브모듈 포함)
                     checkout([$class: 'GitSCM',
-                        branches: [[]name: "${branch}"]],
+                        branches: [[name: "${branch}"]],
                         extensions: [
                             $class: 'SubmoduleOption',
                             parentCredentials: true,
