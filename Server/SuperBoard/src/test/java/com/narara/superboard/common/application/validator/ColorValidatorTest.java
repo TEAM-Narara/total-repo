@@ -36,7 +36,7 @@ class ColorValidatorTest {
     @ParameterizedTest
     @ValueSource(longs = {0x00000000L, 0xFFFFFFFFL, 0x12345678L})
     @DisplayName("유효한 라벨 컬러 값이 주어졌을 때 예외가 발생하지 않음")
-    void shouldNotThrowExceptionWhenColorIsValid(Long color) {
+    void shouldNotThrowExceptionWhenColorIsPresent(Long color) {
         // given
         String entity = "TestEntity";
         ColorHolder colorHolder = mock(ColorHolder.class);
@@ -57,5 +57,18 @@ class ColorValidatorTest {
 
         // then
         assertThrows(InvalidColorFormatException.class, () -> colorValidator.validateColorIsValid(colorHolder.color(),entity));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0x00000000L, 0xFFFFFFFFL, 0x12345678L})
+    @DisplayName("유효한 라벨 컬러 값이 주어졌을 때 예외가 발생하지 않음")
+    void shouldNotThrowExceptionWhenColorIsValid(Long color) {
+        // given
+        String entity = "TestEntity";
+        ColorHolder colorHolder = mock(ColorHolder.class);
+        when(colorHolder.color()).thenReturn(color);
+
+        // then
+        assertDoesNotThrow(() -> colorValidator.validateColorIsEmpty(colorHolder.color(),entity));
     }
 }
