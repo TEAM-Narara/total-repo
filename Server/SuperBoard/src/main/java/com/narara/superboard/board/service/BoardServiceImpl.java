@@ -2,7 +2,7 @@ package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
-import com.narara.superboard.board.infrastrucuture.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.common.application.handler.CoverHandler;

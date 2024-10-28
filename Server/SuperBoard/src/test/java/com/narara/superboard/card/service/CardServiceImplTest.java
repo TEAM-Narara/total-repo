@@ -2,7 +2,7 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.card.entity.Card;
-import com.narara.superboard.card.infrastrucuture.CardRepository;
+import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.application.validator.CoverValidator;
@@ -10,7 +10,7 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
-import com.narara.superboard.list.infrastrucure.ListRepository;
+import com.narara.superboard.list.infrastructure.ListRepository;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
