@@ -136,4 +136,59 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         assertThrows(IllegalArgumentException.class, () -> labelService.updateLabel(labelId, updateRequestDto));
         verify(colorValidator, times(1)).validateLabelColor(updateRequestDto);
     }
+
+    @Test
+    @DisplayName("존재하는 라벨 ID로 조회 시 Label 반환")
+    void shouldReturnLabelWhenLabelExists() {
+        // given
+        Long labelId = 1L;
+        Label label = Label.builder()
+                .id(labelId)
+                .name("Test Label")
+                .color(0xFFFFFF00L)
+                .build();
+
+        // Mocking: Label이 존재하도록 설정
+        when(labelRepository.findById(labelId)).thenReturn(Optional.of(label));
+
+        // when
+        Label result = labelService.getLabel(labelId);
+
+        // then
+        assertNotNull(result);
+        assertEquals(labelId, result.getId());
+        assertEquals("Test Label", result.getName());
+
+        verify(labelRepository, times(1)).findById(labelId);
+    }
+
+
+    @Test
+    @DisplayName("유효한 데이터로 라벨 업데이트 성공")
+    void shouldUpdateLabelSuccessfullyWhenValidDataIsGiven() {
+        // given
+        Long labelId = 1L;
+        LabelUpdateRequestDto updateRequestDto = new LabelUpdateRequestDto("Updated Label", 0xFFFFFF00L);
+
+        Label existingLabel = Label.builder()
+                .id(labelId)
+                .name("Old Label")
+                .color(0x000000FFL)
+                .build();
+
+        // Mocking: 기존 라벨을 찾도록 설정
+        when(labelRepository.findById(labelId)).thenReturn(Optional.of(existingLabel));
+
+        // Mocking: colorValidator가 유효한 색상에 대해 예외를 던지지 않도록 설정
+        doNothing().when(colorValidator).validateLabelColor(updateRequestDto);
+
+        // when
+        Label updatedLabel = labelService.updateLabel(labelId, updateRequestDto);
+
+        // then
+        assertEquals("Updated Label", updatedLabel.getName());
+        assertEquals(0xFFFFFF00L, updatedLabel.getColor());
+        verify(labelRepository, times(1)).findById(labelId);
+        verify(colorValidator, times(1)).validateLabelColor(updateRequestDto);
+    }
 }
