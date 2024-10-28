@@ -6,4 +6,5 @@ import com.narara.superboard.label.entity.Label;
 
 public interface CardLabelService {
     CardLabel createCardLabel(Card card, Label label);
+    CardLabel changeCardLabelIsActivated(Card card, Label label);
 }

@@ -27,4 +27,15 @@ public class CardLabelServiceImpl implements CardLabelService {
                 .orElseGet(() -> cardLabelRepository.save(CardLabel.createCardLabel(card, label)));
     }
 
+    @Override
+    public CardLabel changeCardLabelIsActivated(Card card, Label label) {
+        Optional<CardLabel> cardLabel = cardLabelRepository.findByCardAndLabel(card, label);
+
+        if (cardLabel.isEmpty()) {
+            return createCardLabel(card, label);
+        }
+
+        return cardLabel.get().changeIsActivated();
+    }
+
 }

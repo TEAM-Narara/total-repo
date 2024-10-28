@@ -28,10 +28,19 @@ public class CardLabel {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
+    @Column(name = "is_activated", nullable = false, columnDefinition = "boolean default true")
+    private Boolean isActivated;
+
     public static CardLabel createCardLabel(Card card, Label label) {
         return CardLabel.builder()
                 .card(card)
                 .label(label)
+                .isActivated(true)
                 .build();
+    }
+
+    public CardLabel changeIsActivated(){
+        this.isActivated = !this.isActivated;
+        return this;
     }
 }
