@@ -20,12 +20,12 @@ pipeline {
                     // GitLab에서 코드 클론 (서브모듈 포함)
                     checkout([$class: 'GitSCM',
                         branches: [[name: "*/${branch}"]],  // '*/'를 추가하여 remote 브랜치임을 명시
-                        extensions: [
+                        extensions: [[
                             $class: 'SubmoduleOption',
                             parentCredentials: true,
                             recursiveSubmodules: true,
                             trackingSubmodules: true
-                        ],
+                        ]],
                         userRemoteConfigs: [[
                             credentialsId: 'gitlabId',
                             url: 'https://lab.ssafy.com/s11-final/S11P31S107.git'
