@@ -8,6 +8,7 @@ import com.narara.superboard.label.entity.Label;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -41,5 +42,10 @@ public class CardLabelServiceImpl implements CardLabelService {
         }
 
         return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
+    }
+
+    @Override
+    public List<CardLabel> getCardLabels(Card card) {
+        return cardLabelRepository.findByCard(card);
     }
 }
