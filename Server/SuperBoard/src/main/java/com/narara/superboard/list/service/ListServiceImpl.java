@@ -27,10 +27,9 @@ public class ListServiceImpl implements ListService{
         nameValidator.validateListNameIsEmpty(listCreateRequestDto);
 
         Board board = boardRepository.getReferenceById(listCreateRequestDto.boardId());
-        Long lastListOrder = board.getLastListOrder();
-        lastOrderValidator.checkValidListLastOrder(lastListOrder);
+        lastOrderValidator.checkValidListLastOrder(board);
 
-        List list = List.createList(listCreateRequestDto, lastListOrder);
+        List list = List.createList(listCreateRequestDto, board);
         return listRepository.save(list);
     }
 

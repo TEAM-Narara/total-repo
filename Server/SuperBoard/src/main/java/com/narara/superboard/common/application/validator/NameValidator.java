@@ -18,4 +18,10 @@ public class NameValidator {
             throw new NotFoundNameException("리스트");
         }
     }
+
+    public void validateCardNameIsEmpty(NameHolder nameHolder) {
+        if (nameHolder.name() == null || nameHolder.name().isEmpty()) {
+            throw new NotFoundNameException("카드");
+        }
+    }
 }

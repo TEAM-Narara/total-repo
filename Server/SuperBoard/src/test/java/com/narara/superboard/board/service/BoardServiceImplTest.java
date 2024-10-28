@@ -15,6 +15,7 @@ import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
+
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,7 +70,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
      * 가상의 객체
      * 주로 단위 테스트에서 의존성을 격리하고 특정 메서드의 동작을 시뮬레이션하는 데 사용됩니다.
      * 실제 로직 실행을 방지, 메서드 호출 검증, 메서드 동작을 제어
-     *
+     * <p>
      * new Board()는
      * 실제 로직을 테스트할 때 사용되는 실제 객체 생성 방법
      * 메서드 호출 검증 불가능, 메서드 동작을 제어 불가능
@@ -141,16 +142,15 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
             boardService.createBoard(requestDto);
         });
 
-        assertEquals("워크스페이스가 존재하지 않습니다.", exception.getMessage());
+        assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
         verify(workspaceRepository, times(1)).findById(workspaceId);
     }
-
 
 
     static Stream<Arguments> provideBoardCreateRequestData() {
         return Stream.of(
                 Arguments.of(1L, "보드 이름1", "COLOR", "#ffffff", "PRIVATE"),
-                Arguments.of(2L, "보드 이름2", "GRADIENT", "#123456", "PUBLIC")
+                Arguments.of(2L, "보드 이름2", "GRADIENT", "#123456", "WORKSPACE")
         );
     }
 
@@ -211,11 +211,18 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
 
+        WorkSpace workSpace = WorkSpace.builder()
+                .id(workspaceId)
+                .build();
+
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.ofNullable(workSpace));
+
         Board expectedBoard = Board.builder()
                 .cover(background)
                 .name(name)
                 .visibility(Visibility.WORKSPACE)
                 .id(1L)
+                .workSpace(workSpace)
                 .build();
 
         // when

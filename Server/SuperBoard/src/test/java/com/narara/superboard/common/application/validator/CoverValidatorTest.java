@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
@@ -19,6 +20,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 
 
 @DisplayName("커버 검증에 대한 단위 테스트")
@@ -162,5 +165,128 @@ class CoverValidatorTest {
                 Arguments.of(validCoverWithColor),
                 Arguments.of(validCoverWithImage)
         );
+    }
+
+    private static Stream<Arguments> provideMissingTypeCases() {
+        return Stream.of(
+                Arguments.of(Map.of("value", "#FFFFFF")),
+                Arguments.of(Map.of("value", "https://example.com/image.png")),
+                Arguments.of(Map.of("value", "linear-gradient(#e66465, #9198e5)"))
+        );
+    }
+
+    // 실패 테스트: type이 없는 경우
+    @ParameterizedTest
+    @MethodSource("provideMissingTypeCases")
+    @DisplayName("실패 케이스: 'type'이 없는 경우 NotFoundCoverTypeException 발생")
+    void validateCardCover_Failure_NoType(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertThrows(NotFoundCoverTypeException.class, () -> coverValidator.validateCardCover(requestDto));
+    }
+
+    // Test data for missing value cases
+    private static Stream<Arguments> provideMissingValueCases() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "COLOR")),
+                Arguments.of(Map.of("type", "IMAGE")),
+                Arguments.of(Map.of("type", "GRADIENT"))
+        );
+    }
+    // 실패 테스트: value가 없는 경우
+    @ParameterizedTest
+    @MethodSource("provideMissingValueCases")
+    @DisplayName("실패 케이스: 'value'가 없는 경우 NotFoundCoverValueException 발생")
+    void validateCardCover_Failure_NoValue(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCardCover(requestDto));
+    }
+
+    // 유효하지 않은 type 값 케이스
+    private static Stream<Arguments> provideInvalidTypeCases() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "INVALID_TYPE", "value", "#FFFFFF")),
+                Arguments.of(Map.of("type", "WRONG_IMAGE", "value", "https://example.com/image.png")),
+                Arguments.of(Map.of("type", "UNKNOWN", "value", "linear-gradient(#e66465, #9198e5)"))
+        );
+    }
+
+
+    // 실패 테스트: type이 유효하지 않은 경우
+    @ParameterizedTest
+    @MethodSource("provideInvalidTypeCases")
+    @DisplayName("실패 케이스: cover의 'type'이 유효하지 않은 경우 InvalidCoverTypeFormatException 발생")
+    void validateCardCover_Failure_InvalidType(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
+    }
+
+    // 유효한 cover 케이스
+    private static Stream<Arguments> provideValidCoverCases() {
+        return Stream.of(
+                Arguments.of(Map.of("type", "COLOR", "value", "#FFFFFF")),
+                Arguments.of(Map.of("type", "IMAGE", "value", "https://example.com/image.png"))
+//                Arguments.of(Map.of("type", "GRADIENT", "value", "linear-gradient(#e66465, #9198e5)"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideValidCoverCases")
+    @DisplayName("성공 케이스: cover의 'type'과 'value'가 올바른 경우")
+    void validateCardCover_Success(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("성공 케이스: cover이 없는 경우")
+    void validateCardCover_NullCover(Map<String, Object> cover) {
+        // given
+        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
+                "Test Card",
+                "Test Description",
+                null,
+                null,
+                cover
+        );
+
+        // when & then
+        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
     }
 }
