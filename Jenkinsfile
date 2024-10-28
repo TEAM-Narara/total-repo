@@ -6,8 +6,7 @@ pipeline {
             steps {
                 script {
                     // 브랜치 이름 설정
-                    def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/develop'
-                    env.BRANCH_NAME = branch
+                    def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : (env.gitlabBranch ?: 'BE/develop')                    env.BRANCH_NAME = branch
                     echo "Checking out branch: ${branch}"
 
                     // GitLab에서 코드 클론 (서브모듈 포함)
