@@ -100,8 +100,19 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         boardScreen(
             popBack = { navController.popBackStack() },
-            moveBoardSetting = { navController.navigate(BoardMenu) },
-            moveToBoardSearch = { navController.navigate(BoardMenu) })
+            moveBoardSetting = { menuID: Long, workspaceId: Long ->
+                navController.navigate(
+                    BoardMenu(
+                        menuID,
+                        workspaceId
+                    )
+                )
+            },
+            moveToBoardSearch = { searchParameters: SearchParameters ->
+                navController.navigate(
+                    BoardSearch(searchParameters)
+                )
+            })
 
         boardMenuScreen(popBack = { navController.popBackStack() })
 
@@ -116,7 +127,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             popBack = {
                 navController.popBackStack()
             },
-            moveBoardSetting = { navController.navigate(BoardMenu) },
+            moveBoardSetting = { menuID: Long, workspaceId: Long ->
+                navController.navigate(
+                    BoardMenu(
+                        menuID,
+                        workspaceId
+                    )
+                )
+            },
             moveToBoardSearch = { searchParameters: SearchParameters ->
                 navController.navigate(BoardSearch(searchParameters))
             }

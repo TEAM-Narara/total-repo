@@ -22,7 +22,7 @@ fun BoardScreen(
     viewModel: BoardViewModel = hiltViewModel(),
     searchParameters: SearchParameters,
     popBack: () -> Unit,
-    moveBoardSetting: () -> Unit,
+    moveBoardSetting: (Long, Long) -> Unit,
     moveToBoardSearch: (SearchParameters) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -52,7 +52,7 @@ private fun BoardScreen(
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
     popBack: () -> Unit,
-    moveBoardSetting: () -> Unit
+    moveBoardSetting: (Long, Long) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -63,7 +63,7 @@ private fun BoardScreen(
                 onBoardTitleChanged = { onBoardTitleChanged() },
                 onFilterPressed = onFilterPressed,
                 onNotificationPressed = {},
-                onMorePressed = { moveBoardSetting() },
+                onMorePressed = { moveBoardSetting(1, 1) },
             )
         },
     ) { paddingValues ->
@@ -108,6 +108,8 @@ private fun BoardScreenPreview() {
         onListReordered = {},
         popBack = {},
         onFilterPressed = {},
-        moveBoardSetting = {}
+        moveBoardSetting = { id1: Long, id2: Long ->
+            println("Preview를 위한 임의의 함수임: $id1, id2: $id2")
+        }
     )
 }
