@@ -184,8 +184,7 @@ fun BoardMenuScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(PaddingXSmall),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(PaddingDefault, PaddingZero)
+                    modifier = Modifier.padding(PaddingDefault, PaddingZero)
                 ) {
                     Text(text = "Visibility", fontSize = TextMedium, color = Primary)
                     Spacer(

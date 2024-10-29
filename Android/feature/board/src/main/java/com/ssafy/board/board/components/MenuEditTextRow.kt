@@ -31,7 +31,7 @@ fun MenuEditTextRow(
         Text(text = title, fontSize = TextMedium, color = Primary)
         EditableText(
             text = content,
-            onTextChanged = { newName: String -> changeContent(newName) },
+            onInputFinished = { newName: String -> changeContent(newName) },
             modifier = modifier.weight(1f),
             alignStyle = TextAlign.End
         )

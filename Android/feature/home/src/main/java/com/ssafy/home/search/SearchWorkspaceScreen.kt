@@ -75,7 +75,7 @@ fun SearchWorkspaceScreen(
             )
             EditableText(
                 text = keyword,
-                onTextChanged = {
+                onInputFinished = {
                     onValueChanged(it)
                     // TODO: data 받아와야함.
                 },

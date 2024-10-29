@@ -17,6 +17,7 @@ fun EditableText(
     modifier: Modifier = Modifier,
     text: String = "",
     onTextChanged: (String) -> Unit = {},
+    onInputFinished: (String) -> Unit = {},
     maxTitleLength: Int = 15,
     alignStyle: TextAlign = TextAlign.Start
 ) {
@@ -27,7 +28,10 @@ fun EditableText(
     BasicTextField(
         value = value,
         onValueChange = { newValue ->
-            if (newValue.length <= maxTitleLength) onValueChange(newValue)
+            if (newValue.length <= maxTitleLength) {
+                onValueChange(newValue)
+                onTextChanged(newValue)
+            }
         },
         modifier = modifier,
         singleLine = true,
@@ -36,7 +40,7 @@ fun EditableText(
             onDone = {
                 keyboardController?.hide()
                 focusManager.clearFocus()
-                onTextChanged(value)
+                onInputFinished(value)
             }
         )
     )
