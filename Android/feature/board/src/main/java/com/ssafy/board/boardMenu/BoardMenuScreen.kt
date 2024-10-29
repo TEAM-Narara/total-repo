@@ -1,7 +1,6 @@
 package com.ssafy.board.boardMenu
 
 import android.app.Activity
-import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +47,7 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
+import com.ssafy.model.background.BackgroundDto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,11 +57,19 @@ fun BoardMenuScreen(
     workspaceId: Long,
     backHome: () -> Unit,
     historyContent: List<HistoryData>?,
+    setBackground: (List<Long>, Long, String?) -> Unit
 ) {
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
     val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-    val (background, onBackgroundChange) = remember { mutableStateOf("#FFF7BD") }
+    val (background, onBackgroundChange) = remember {
+        mutableStateOf(
+            BackgroundDto(
+                0x000000,
+                null
+            )
+        )
+    }
     val (watch, onWatchChange) = remember { mutableStateOf(true) }
     val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
     val activity = LocalContext.current as? Activity
@@ -139,7 +147,14 @@ fun BoardMenuScreen(
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)
-                            .background(color = Color(parseColor(background)))
+                            .clickable {
+                                setBackground(
+                                    listOf(0x000000, 0xFF2E5274),
+                                    background.color,
+                                    background.imgPath
+                                )
+                            }
+                            .background(color = Color(background.color))
                     )
                 }
             }
@@ -212,6 +227,7 @@ fun GreetingPreview() {
         boardId = 1,
         backHome = {},
         workspaceId = 1,
-        historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) }
+        historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
+        setBackground = { _, _, _ -> }
     )
 }
