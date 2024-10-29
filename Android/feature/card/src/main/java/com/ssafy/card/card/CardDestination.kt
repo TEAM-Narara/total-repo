@@ -11,17 +11,18 @@ data class Card(val id: Long)
 
 fun NavGraphBuilder.cardScreen(
     popBackToBoardScreen: () -> Unit,
-    moveToSelectColor: (Long) -> Unit
+    moveToSelectLabel: (Long) -> Unit
 ) {
     composable<Card> { backStackEntry ->
         val card: Card = backStackEntry.toRoute()
         val id = card.id
         val viewModel: CardViewModel = hiltViewModel()
         viewModel.getCardDetail(id)
+        viewModel.setUserId()
 
         CardScreen(
             popBackToBoardScreen = popBackToBoardScreen,
-            moveToSelectColor = { moveToSelectColor(id) }
+            moveToSelectLabel = { moveToSelectLabel(id) }
         )
     }
 }
