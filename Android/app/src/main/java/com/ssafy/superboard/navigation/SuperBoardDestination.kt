@@ -10,6 +10,7 @@ import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
+import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
@@ -32,9 +33,10 @@ import com.ssafy.model.search.SearchParameters
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = Home, modifier = modifier) {
-        loginScreen(moveToSignUpScreen = {
-            navController.navigate(SignUp)
-        })
+        loginScreen(
+            moveToSignUpScreen = { navController.navigate(SignUp) },
+            moveToHomeScreen = { navController.navigate(Home) }
+        )
 
         signupScreen(moveToLogInScreen = {
             navController.navigate(LogIn)
@@ -100,22 +102,20 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         )
 
         boardScreen(
-            popBack = { navController.popBackStack() },
+            popBack = navController::popBackStack,
             navigateToFilterScreen = { searchParameters: SearchParameters ->
                 navController.navigate(
                     BoardSearch(searchParameters)
                 )
             },
-            navigateToBoardMenuScreen = { menuID: Long, workspaceId: Long ->
+            navigateToNotificationScreen = {},
+            navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
                 navController.navigate(
-                    BoardMenu(
-                        menuID,
-                        workspaceId
-                    )
+                    BoardMenu(boardId, workspaceId)
                 )
             },
-            navigateToNotificationScreen = {
-                // TODO : navigate to notification screen
+            navigateToCardScreen = { cardId: Long ->
+                navController.navigate(Card(cardId))
             }
         )
 
@@ -144,26 +144,11 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardScreen(
-            popBack = navController::popBackStack,
-            navigateToFilterScreen = { searchParameters: SearchParameters ->
-                navController.navigate(
-                    BoardSearch(searchParameters)
-                )
-            },
-            navigateToNotificationScreen = {},
-            navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
-                navController.navigate(
-                    BoardMenu(boardId, workspaceId)
-                )
-            }
-        )
-
         cardScreen(
             popBackToBoardScreen = {
                 navController.popBackStack()
             },
-            moveToSelectColor = { cardId: Long ->
+            moveToSelectLabel = { cardId: Long ->
                 // TODO : navigate to select color screen
             }
         )
