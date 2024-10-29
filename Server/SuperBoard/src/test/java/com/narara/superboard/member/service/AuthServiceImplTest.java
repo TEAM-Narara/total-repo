@@ -84,7 +84,8 @@ class AuthServiceImplTest {
         // 4. 사용자 저장 로직 Mocking
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
             Member member = invocation.getArgument(0);
-            member.setId(1L);  // id 값 수동 설정 //테스트에서는 save해도 id값 반환 안됨
+            member = new Member(1L, "username", "password", "refreshToken","");
+
             member.setRefreshToken("refresh-token"); // 토큰 저장 시점
             return member;
         });
@@ -282,7 +283,7 @@ class AuthServiceImplTest {
         // Given: 존재하는 회원
         Long memberId = 1L;
         Member member = new Member();
-        member.setId(memberId);
+        member = new Member(1L, "testNickname", "ddddd","1111","");
         member.setRefreshToken("refresh-token"); // 기존 토큰 설정
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
@@ -316,7 +317,7 @@ class AuthServiceImplTest {
         // Given: 존재하는 회원 ID
         Long memberId = 1L;
         Member member = new Member();
-        member.setId(memberId);
+        member = new Member(1L, "testNickname", "ddddd","1111","");
         member.setIsDeleted(false);
         member.setRefreshToken("refresh-token"); // 기존 토큰 설정
 
@@ -351,7 +352,7 @@ class AuthServiceImplTest {
         // Given: 이미 탈퇴된 회원 ID
         Long memberId = 1L;
         Member deletedMember = new Member();
-        deletedMember.setId(memberId);
+        deletedMember = new Member(1L, "testNickname", "","1111","");
         deletedMember.setIsDeleted(true); // 탈퇴 상태 설정
 
         // Mocking: 회원 조회 시 탈퇴된 회원 객체 반환
