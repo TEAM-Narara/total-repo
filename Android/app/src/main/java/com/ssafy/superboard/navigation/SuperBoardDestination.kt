@@ -13,14 +13,14 @@ import com.ssafy.board.boardMenu.visibilityBackgroundScreen
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
+import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
-import com.ssafy.board.updateboard.UpdateBoard
-import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.member.WorkSpaceInviteMember
 import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
@@ -44,9 +44,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         startDestination = WorkSpaceInviteMember(0L),
         modifier = modifier
     ) {
-        loginScreen(moveToSignUpScreen = {
-            navController.navigate(SignUp)
-        })
+        loginScreen(
+            moveToSignUpScreen = { navController.navigate(SignUp) },
+            moveToHomeScreen = { navController.navigate(Home) }
+        )
 
         signupScreen(moveToLogInScreen = {
             navController.navigate(LogIn)
@@ -105,6 +106,13 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         )
 
         createBoardScreen(
+            popBackToHome = navController::popBackStack,
+            moveToSelectBackgroundScreen = {
+                // TODO : navigate to select background screen
+            }
+        )
+
+        updateBoardScreen(
             popBackToHome = navController::popBackStack,
             moveToSelectBackgroundScreen = {
                 // TODO : navigate to select background screen
