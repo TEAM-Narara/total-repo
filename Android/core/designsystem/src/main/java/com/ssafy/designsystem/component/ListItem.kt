@@ -66,7 +66,7 @@ fun ListItem(
             ) {
                 EditableText(
                     text = title,
-                    onTextChanged = onTitleChange,
+                    onInputFinished = onTitleChange,
                     maxTitleLength = maxTitleLength
                 )
 

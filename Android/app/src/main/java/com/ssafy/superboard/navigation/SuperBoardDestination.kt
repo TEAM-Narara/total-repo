@@ -7,7 +7,11 @@ import androidx.navigation.compose.NavHost
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
+import com.ssafy.board.boardMenu.Visibility
 import com.ssafy.board.boardMenu.boardMenuScreen
+import com.ssafy.board.boardMenu.visibilityBackgroundScreen
+import com.ssafy.board.member.BoardInviteMember
+import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.card.card.Card
@@ -29,6 +33,7 @@ import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -101,25 +106,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardScreen(
-            popBack = navController::popBackStack,
-            navigateToFilterScreen = { searchParameters: SearchParameters ->
-                navController.navigate(
-                    BoardSearch(searchParameters)
-                )
-            },
-            navigateToNotificationScreen = {},
-            navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
-                navController.navigate(
-                    BoardMenu(boardId, workspaceId)
-                )
-            },
-            navigateToCardScreen = { cardId: Long ->
-                navController.navigate(Card(cardId))
+        boardMenuScreen(
+            popBack = { navController.popBackStack() },
+            setBackground = { selectedBackgroundColor: Long, selectBackgroundImg: String? ->
+                navController.navigate(Visibility(selectedBackgroundColor, selectBackgroundImg))
             }
         )
 
-        boardMenuScreen(popBack = { navController.popBackStack() })
+        visibilityBackgroundScreen(popBack = { navController.popBackStack() })
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
 
@@ -144,6 +138,24 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
+        boardScreen(
+            popBack = navController::popBackStack,
+            navigateToFilterScreen = { searchParameters: SearchParameters ->
+                navController.navigate(
+                    BoardSearch(searchParameters)
+                )
+            },
+            navigateToNotificationScreen = {},
+            navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
+                navController.navigate(
+                    BoardMenu(boardId, workspaceId)
+                )
+            },
+            navigateToCardScreen = { cardId: Long ->
+                navController.navigate(Card(cardId))
+            }
+        )
+
         cardScreen(
             popBackToBoardScreen = {
                 navController.popBackStack()
@@ -151,6 +163,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             moveToSelectLabel = { cardId: Long ->
                 // TODO : navigate to select color screen
             }
+        )
+
+        notificationScreen(
+            popBack = navController::popBackStack,
+        )
+
+        boardInviteMemberDestination(
+            popBack = navController::popBackStack
         )
     }
 }

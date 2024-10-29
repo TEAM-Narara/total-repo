@@ -1,8 +1,8 @@
 package com.ssafy.board.boardMenu
 
 import android.app.Activity
-import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -28,10 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import com.ssafy.board.components.BoardMemberItem
@@ -40,15 +40,16 @@ import com.ssafy.board.components.MenuHorizontalDivider
 import com.ssafy.model.card.HistoryData
 import com.ssafy.board.getIcon
 import com.ssafy.designsystem.component.ActivityLog
-import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.values.ImageSmall
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingOne
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
+import com.ssafy.model.background.BackgroundDto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,11 +59,19 @@ fun BoardMenuScreen(
     workspaceId: Long,
     backHome: () -> Unit,
     historyContent: List<HistoryData>?,
+    setBackground: (Long, String?) -> Unit
 ) {
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
     val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-    val (background, onBackgroundChange) = remember { mutableStateOf("#FFF7BD") }
+    val (background, onBackgroundChange) = remember {
+        mutableStateOf(
+            BackgroundDto(
+                0xFFFCFCFC,
+                null
+            )
+        )
+    }
     val (watch, onWatchChange) = remember { mutableStateOf(true) }
     val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
     val activity = LocalContext.current as? Activity
@@ -71,6 +80,14 @@ fun BoardMenuScreen(
             isAppearanceLightStatusBars = false
             it.window.statusBarColor = Primary.toArgb()
         }
+    }
+    val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+    if (showDialog) {
+        VisibilityDialog(
+            onDismiss = { setShowDialog(false) },
+            visibility = visibility,
+            onVisibilityChange
+        )
     }
     Scaffold(
         containerColor = White,
@@ -132,7 +149,14 @@ fun BoardMenuScreen(
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)
-                            .background(color = Color(parseColor(background)))
+                            .clickable {
+                                setBackground(
+                                    background.color,
+                                    background.imgPath
+                                )
+                            }
+                            .background(color = Color(background.color))
+                            .shadow(PaddingOne, spotColor = Color.LightGray)
                     )
                 }
             }
@@ -163,12 +187,12 @@ fun BoardMenuScreen(
                     modifier = Modifier.padding(PaddingDefault, PaddingZero)
                 ) {
                     Text(text = "Visibility", fontSize = TextMedium, color = Primary)
-                    EditableText(
-                        text = visibility,
-                        onTextChanged = { newName: String -> onVisibilityChange(newName) },
-                        modifier = Modifier.weight(1f),
-                        alignStyle = TextAlign.End
+                    Spacer(
+                        modifier = Modifier.weight(1f)
                     )
+                    Text(text = visibility, modifier = Modifier.clickable(onClick = {
+                        setShowDialog(true)
+                    }))
                 }
             }
             item {
@@ -204,6 +228,7 @@ fun GreetingPreview() {
         boardId = 1,
         backHome = {},
         workspaceId = 1,
-        historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) }
+        historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
+        setBackground = { _, _ -> }
     )
 }
