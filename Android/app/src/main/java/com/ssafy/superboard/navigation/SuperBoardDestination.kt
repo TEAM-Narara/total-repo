@@ -37,7 +37,7 @@ import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
+    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
         loginScreen(
             moveToSignUpScreen = { navController.navigate(SignUp) },
             moveToHomeScreen = { navController.navigate(Home) }
