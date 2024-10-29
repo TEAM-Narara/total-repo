@@ -6,12 +6,14 @@ import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
@@ -23,7 +25,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("워크스페이스 서비스 테스트")
+@DisplayName("워크스페이스 서비스에 대한 단위 테스트")
 class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     // 실제 테스트 대상 객체를 생성하고 초기화할 때 사용
@@ -45,6 +46,9 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     @Mock
     private WorkSpaceMemberService workSpaceMemberService;
+
+    @Mock
+    private WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Mock
     private WorkSpaceRepository workSpaceRepository; // 의존성을 Mocking
@@ -64,14 +68,15 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     ) {
         // given
         WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
-
+        Member member = new Member(1L, "시현", "sisi@naver.com");
         // when
-        workSpaceService.createWorkSpace(workspaceCreateDto);
+        workSpaceService.createWorkSpace(member, workspaceCreateDto);
 
         // then
         // 메서드가 한 번 호출되었는지 확인
         verify(workSpaceValidator, times(1)).validateNameIsPresent(workspaceCreateDto);
         verify(workSpaceRepository, times(1)).save(any());
+        verify(workSpaceMemberRepository, times(1)).save(any());
     }
 
     @DisplayName("workspace 이름과 설명 수정 성공")

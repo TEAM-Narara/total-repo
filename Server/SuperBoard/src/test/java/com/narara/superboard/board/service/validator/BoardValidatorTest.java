@@ -26,48 +26,48 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @DisplayName("생성 DTO에 이름이 없으면 에러가 발생한다.")
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoName")
-    void testBoardEntityCreationByName(String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
+    void testBoardEntityCreationByName(Long workspaceId, String name, String visibility, Map<String, Object> background) {
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
 
         assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
     }
 
     static Stream<Arguments> provideInvalidBoardDataByNoName() {
         return Stream.of(
-                Arguments.of(null, "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
-                Arguments.of("", "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+                Arguments.of(1L, null, "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of(2L, "", "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
 
     @DisplayName("생성 DTO에 가시성 정보가 없으면 에러가 발생한다.")
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoVisibility")
-    void testBoardEntityCreationByVisibility(String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
+    void testBoardEntityCreationByVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
 
         assertThrows(BoardVisibilityNotFoundException.class, () -> boardValidator.validateVisibilityIsPresent(boardCreateDto));
     }
 
     static Stream<Arguments> provideInvalidBoardDataByNoVisibility() {
         return Stream.of(
-                Arguments.of("날아라 보드", null, Map.of("type", "color", "value", "#ffffff")),
-                Arguments.of("나의 보드", " ", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+                Arguments.of(1L, "날아라 보드", null, Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of(2L, "나의 보드", " ", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
 
     @DisplayName("생성 DTO에 잘못된 가시성 정보가 있으면 에러가 발생한다.")
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByInvalidVisibility")
-    void testBoardEntityCreationByInvalidVisibility(String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(name, visibility, background);
+    void testBoardEntityCreationByInvalidVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
 
         assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardValidator.validateVisibilityIsValid(boardCreateDto));
     }
 
     static Stream<Arguments> provideInvalidBoardDataByInvalidVisibility() {
         return Stream.of(
-                Arguments.of("날아라 보드", "COCOBALL", Map.of("type", "color", "value", "#ffffff")),
-                Arguments.of("나의 보드", "TOSS", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+                Arguments.of(1L, "날아라 보드", "COCOBALL", Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of(2L, "나의 보드", "TOSS", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
 }

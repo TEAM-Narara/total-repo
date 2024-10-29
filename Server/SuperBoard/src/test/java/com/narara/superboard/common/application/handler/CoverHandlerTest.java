@@ -22,7 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 
-@DisplayName("CoverHandler 테스트")
+@DisplayName("커버 로직에 대한 단위 테스트")
 class CoverHandlerTest implements MockSuperBoardUnitTests {
 
     @InjectMocks

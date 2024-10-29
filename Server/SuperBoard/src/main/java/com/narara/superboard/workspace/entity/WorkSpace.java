@@ -31,7 +31,7 @@ public class WorkSpace {
     private List<WorkSpaceMember> workspaceMemberList;
 
     @OneToMany(mappedBy = "workSpace")
-    private List<Board> boardList;
+    private List<Board> boardCollection;
 
     public static WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         return WorkSpace.builder()

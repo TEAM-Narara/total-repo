@@ -4,9 +4,11 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
-import com.narara.superboard.board.infrastrucuture.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -15,13 +17,20 @@ import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
+
+import com.narara.superboard.member.entity.Member;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -36,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("보드 서비스에 대한 단위 테스트")
 class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
@@ -43,6 +53,12 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private WorkSpaceRepository workspaceRepository;
+
+    @Mock
+    private BoardMemberRepository boardMemberRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -60,7 +76,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
      * 가상의 객체
      * 주로 단위 테스트에서 의존성을 격리하고 특정 메서드의 동작을 시뮬레이션하는 데 사용됩니다.
      * 실제 로직 실행을 방지, 메서드 호출 검증, 메서드 동작을 제어
-     *
+     * <p>
      * new Board()는
      * 실제 로직을 테스트할 때 사용되는 실제 객체 생성 방법
      * 메서드 호출 검증 불가능, 메서드 동작을 제어 불가능
@@ -117,75 +133,121 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("https://example.com/image.jpg", board2.backgroundValue());
     }
 
-    @Test
-    @DisplayName("보드 생성 성공 테스트")
-    void testCreateBoardSuccess() {
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    @DisplayName("워크스페이스 ID가 존재하지 않을 때 예외 발생")
+    void shouldThrowNotFoundEntityExceptionWhenWorkspaceIdNotFound(Long workspaceId) {
         // given
-        Long boardId = 1L;
-        Map<String, Object> background = new HashMap<>();
-        background.put("type", "COLOR");
-        background.put("value", "#ffffff");
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
+        Member member = new Member(1L, "시현", "sisi@naver.com");
+        // Mocking workspaceRepository to return empty Optional
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
 
-        BoardCreateRequestDto boardCreateRequestDto = new BoardCreateRequestDto(
-                "보드 이름",
-                "PRIVATE",
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            boardService.createBoard(member, requestDto);
+        });
+
+        assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
+        verify(workspaceRepository, times(1)).findById(workspaceId);
+    }
+
+
+    static Stream<Arguments> provideBoardCreateRequestData() {
+        return Stream.of(
+                Arguments.of(1L, "보드 이름1", "COLOR", "#ffffff", "PRIVATE"),
+                Arguments.of(2L, "보드 이름2", "GRADIENT", "#123456", "WORKSPACE")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBoardCreateRequestData")
+    @DisplayName("워크스페이스 ID가 존재할 때 보드 생성 성공 테스트")
+    void testCreateBoardWhenWorkspaceIdExists(Long workspaceId, String name, String backgroundType, String backgroundValue, String visibility) {
+        // given
+        Map<String, Object> background = new HashMap<>();
+        background.put("type", backgroundType);
+        background.put("value", backgroundValue);
+
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(
+                workspaceId,
+                name,
+                visibility,
                 background
         );
 
+        Member member = new Member(1L, "시현", "sisi@naver.com");
+
+        WorkSpace workspace = new WorkSpace();
         Board savedBoard = Board.builder()
-                .id(boardId)
+                .id(workspaceId)
                 .cover(background)
-                .name("보드 이름")
-                .visibility(Visibility.PRIVATE)
+                .name(name)
+                .visibility(Visibility.fromString(visibility))
+                .workSpace(workspace)
                 .build();
 
         // Mocking: 검증 로직을 모킹
-        doNothing().when(boardValidator).validateNameIsPresent(boardCreateRequestDto);
-        doNothing().when(boardValidator).validateVisibilityIsValid(boardCreateRequestDto);
-        doNothing().when(boardValidator).validateVisibilityIsPresent(boardCreateRequestDto);
+        doNothing().when(boardValidator).validateNameIsPresent(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsValid(requestDto);
+        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
 
-        // Mocking: boardRepository.save 호출 시 저장된 board 객체 반환
+        // Mocking: workspaceRepository와 boardRepository의 반환값 설정
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.of(workspace));
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
 
         // when
-        Long savedBoardId = boardService.createBoard(boardCreateRequestDto);
+        Long savedBoardId = boardService.createBoard(member, requestDto);
 
         // then
-        assertEquals(boardId, savedBoardId);
-        verify(boardValidator, times(1)).validateNameIsPresent(boardCreateRequestDto);
-        verify(boardValidator, times(1)).validateVisibilityIsValid(boardCreateRequestDto);
-        verify(boardValidator, times(1)).validateVisibilityIsPresent(boardCreateRequestDto);
+        assertEquals(workspaceId, savedBoardId);
+        verify(workspaceRepository, times(1)).findById(workspaceId);
         verify(boardRepository, times(1)).save(any(Board.class));
+        verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
+        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+        verify(boardMemberRepository, times(1)).save(any(BoardMember.class));
     }
 
     @Test
     @DisplayName("background가 null인 경우에도 보드 생성 성공")
     void createBoard_WhenBackgroundIsNull_ThenSuccess() {
         // given
+        Long workspaceId = 1L;
         String name = "테스트 보드";
         Map<String, Object> background = null;
         String visibility = "WORKSPACE";
 
-        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(name, visibility, background);
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
+
+        WorkSpace workSpace = WorkSpace.builder()
+                .id(workspaceId)
+                .build();
+
+        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.ofNullable(workSpace));
 
         Board expectedBoard = Board.builder()
                 .cover(background)
                 .name(name)
                 .visibility(Visibility.WORKSPACE)
                 .id(1L)
+                .workSpace(workSpace)
                 .build();
+
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // when
         when(boardRepository.save(any(Board.class))).thenReturn(expectedBoard);
 
         // then
-        Long boardId = boardService.createBoard(requestDto);
+        Long boardId = boardService.createBoard(member, requestDto);
 
         assertEquals(1L, boardId);
         verify(boardValidator).validateNameIsPresent(requestDto);
         verify(boardValidator).validateVisibilityIsValid(requestDto);
         verify(boardValidator).validateVisibilityIsPresent(requestDto);
         verify(boardRepository).save(any(Board.class));
+        verify(boardMemberRepository).save(any(BoardMember.class));
     }
 
     @DisplayName("보드를 찾을 수 없는 경우 예외 발생")
