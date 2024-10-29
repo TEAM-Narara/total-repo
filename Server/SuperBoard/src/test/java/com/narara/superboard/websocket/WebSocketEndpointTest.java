@@ -143,12 +143,12 @@ public class WebSocketEndpointTest {
     @DisplayName("구독하지 않은 메시지를 수신하지 않는지 테스트")
     void testNoSubscriptionMessage() throws InterruptedException {
         // Given
-        long subscribedBoardId = 1L;
-        long unsubscribedBoardId = 2L;
-        WebSocketBodyDto requestDto = new WebSocketBodyDto(1L, "테스트 제목", "테스트 내용");
+        long subscribedBoardId = 2L;
+        long unsubscribedBoardId = 3L;
+        WebSocketBodyDto requestDto = new WebSocketBodyDto(unsubscribedBoardId, "테스트 제목", "테스트 내용");
         String jwt = "test-jwt-token";
 
-        // When: boardId 1에 대해서만 Topic 구독
+        // When: boardId 2에 대해서만 Topic 구독
         StompFrameHandler frameHandler = new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -164,13 +164,12 @@ public class WebSocketEndpointTest {
             }
         };
 
-        // boardId 1에 대해 구독
         stompSession.subscribe(
                 WEBSOCKET_TOPIC.replace("{boardId}", String.valueOf(subscribedBoardId)),
                 frameHandler
         );
 
-        // 구독하지 않은 boardId 2로 메시지 전송
+        // 구독하지 않은 boardId 3로 메시지 전송
         StompHeaders headers = new StompHeaders();
         headers.add("Authorization", jwt);
         headers.setDestination(WEBSOCKET_SEND_URL.replace("{boardId}", String.valueOf(unsubscribedBoardId)));
@@ -213,6 +212,7 @@ public class WebSocketEndpointTest {
     void cleanup() {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
+            logger.info(() -> "구독 끝났엉");
         }
     }
 }
