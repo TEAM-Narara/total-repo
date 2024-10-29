@@ -57,6 +57,7 @@ fun BoardScreen(
     navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: () -> Unit,
+    navigateToCardScreen: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
@@ -81,6 +82,7 @@ fun BoardScreen(
                 onListTitleChanged = viewModel::updateListTitle,
                 onCardReordered = viewModel::updateCardOrder,
                 onListReordered = viewModel::updateListOrder,
+                navigateToCardScreen = navigateToCardScreen,
                 addList = viewModel::addList,
                 addCard = viewModel::addCard,
                 addPhoto = viewModel::addPhoto
@@ -113,6 +115,7 @@ private fun BoardScreen(
     onListTitleChanged: () -> Unit,
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
+    navigateToCardScreen: (Long) -> Unit,
     addList: () -> Unit,
     addCard: () -> Unit,
     addPhoto: () -> Unit,
@@ -178,6 +181,7 @@ private fun BoardScreen(
                         cardCollections = cardCollections,
                         onTitleChange = { onListTitleChanged() },
                         onCardReordered = { onCardReordered() },
+                        navigateToCardScreen = { id -> navigateToCardScreen(id) },
                         addCard = addCard,
                         addPhoto = addPhoto,
                         onListChanged = { listId ->
@@ -223,6 +227,7 @@ private fun BoardScreenPreview() {
         onListTitleChanged = {},
         onCardReordered = {},
         onListReordered = {},
+        navigateToCardScreen = {},
         addList = {},
         addCard = {},
         addPhoto = {}
