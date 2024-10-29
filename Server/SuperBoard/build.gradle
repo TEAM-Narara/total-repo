@@ -35,13 +35,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
-//    implementation 'com.vladmihalcea:hibernate-types-52:2.21.1'
-//    implementation 'org.hibernate:hibernate-core:6.6.1.Final'
+    implementation 'com.vladmihalcea:hibernate-types-52:2.21.1'
+    implementation 'org.hibernate:hibernate-core:6.6.1.Final'
 //    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // mariaDB 사용시 위의 사항 제거하고 여기로 해주세요
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     //webSocket
@@ -77,11 +77,18 @@ tasks.register('copyYML', Copy) {
     into 'src/main/resources'  // 파일을 복사할 위치
 }
 
+// application-test.yml 파일 복사
+tasks.register('copyTestYML', Copy) {
+    from 's107-secret-value'
+    include "application-test.yml"  // 복사할 파일 지정
+    into 'src/test/resources'       // 테스트 리소스 위치로 복사
+}
+
 tasks.named('build') {
-    dependsOn('copyYML')
+    dependsOn('copyYML', 'copyTestYML')
 }
 
 // 혹은 processResources 작업과 연결
 tasks.named('processResources') {
-    dependsOn('copyYML')
+    dependsOn('copyYML', 'copyTestYML')
 }
