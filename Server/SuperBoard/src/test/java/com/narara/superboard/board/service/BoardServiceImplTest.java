@@ -7,6 +7,8 @@ import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatExcepti
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -16,6 +18,7 @@ import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
+import com.narara.superboard.member.entity.Member;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -53,6 +56,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private WorkSpaceRepository workspaceRepository;
+
+    @Mock
+    private BoardMemberRepository boardMemberRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -133,13 +139,13 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void shouldThrowNotFoundEntityExceptionWhenWorkspaceIdNotFound(Long workspaceId) {
         // given
         BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
-
+        Member member = new Member(1L, "시현", "sisi@naver.com");
         // Mocking workspaceRepository to return empty Optional
         when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
-            boardService.createBoard(requestDto);
+            boardService.createBoard(member, requestDto);
         });
 
         assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
@@ -170,6 +176,8 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 background
         );
 
+        Member member = new Member(1L, "시현", "sisi@naver.com");
+
         WorkSpace workspace = new WorkSpace();
         Board savedBoard = Board.builder()
                 .id(workspaceId)
@@ -189,7 +197,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
 
         // when
-        Long savedBoardId = boardService.createBoard(requestDto);
+        Long savedBoardId = boardService.createBoard(member, requestDto);
 
         // then
         assertEquals(workspaceId, savedBoardId);
@@ -198,6 +206,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
         verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
         verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+        verify(boardMemberRepository, times(1)).save(any(BoardMember.class));
     }
 
     @Test
@@ -225,17 +234,20 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 .workSpace(workSpace)
                 .build();
 
+        Member member = new Member(1L, "시현", "sisi@naver.com");
+
         // when
         when(boardRepository.save(any(Board.class))).thenReturn(expectedBoard);
 
         // then
-        Long boardId = boardService.createBoard(requestDto);
+        Long boardId = boardService.createBoard(member, requestDto);
 
         assertEquals(1L, boardId);
         verify(boardValidator).validateNameIsPresent(requestDto);
         verify(boardValidator).validateVisibilityIsValid(requestDto);
         verify(boardValidator).validateVisibilityIsPresent(requestDto);
         verify(boardRepository).save(any(Board.class));
+        verify(boardMemberRepository).save(any(BoardMember.class));
     }
 
     @DisplayName("보드를 찾을 수 없는 경우 예외 발생")

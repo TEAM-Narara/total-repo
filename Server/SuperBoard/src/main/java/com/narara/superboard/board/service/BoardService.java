@@ -6,12 +6,13 @@ import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 
+import com.narara.superboard.member.entity.Member;
 import java.util.List;
 
 public interface BoardService {
     BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
 
-    Long createBoard(BoardCreateRequestDto boardCreateRequestDto);
+    Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto);
 
     Board getBoard(Long boardId);
 

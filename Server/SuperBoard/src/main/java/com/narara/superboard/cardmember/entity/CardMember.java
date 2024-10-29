@@ -1,7 +1,6 @@
-package com.narara.superboard.boardmember.entity;
+package com.narara.superboard.cardmember.entity;
 
-import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,8 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "board_member")
-public class BoardMember {
+@Table(name = "card_member")
+public class CardMember {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본 키
@@ -32,31 +32,26 @@ public class BoardMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;  // 멤버 ID
 
-    @JoinColumn(name = "board", nullable = false)
+    @JoinColumn(name = "card", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private Board board;  // 워크스페이스 ID
-
-    @Column(name = "authority", nullable = false, length = 50)
-    private Authority authority;  // 권한 (ADMIN, MEMBER)
+    private Card card;  // 워크스페이스 ID
 
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
-    public static BoardMember createBoardMemberByAdmin(Board board, Member member){
-        return BoardMember.builder()
-                .board(board)
+    public static CardMember createCardMember(Card card, Member member){
+        return CardMember.builder()
                 .member(member)
-                .authority(Authority.ADMIN)
+                .card(card)
                 .build();
     }
 
-    public BoardMember(Board board) {
-        this.board = board;
+    public CardMember(Card card) {
+        this.card = card;
     }
 
-    public BoardMember(Member member, Authority authority) {
+    public CardMember(Member member) {
         this.member = member;
-        this.authority = authority;
     }
 
     public void changeIsAlert() {
