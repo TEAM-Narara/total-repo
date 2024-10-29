@@ -35,7 +35,8 @@ import com.ssafy.designsystem.values.PaddingZero
 @Composable
 fun LogInScreen(
     viewModel: LogInViewModel = hiltViewModel(),
-    moveToSignUpScreen: () -> Unit
+    moveToSignUpScreen: () -> Unit,
+    moveToHomeScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var email by remember { mutableStateOf("") }
@@ -80,7 +81,7 @@ fun LogInScreen(
                     PaddingSemiLarge
                 )
         )
-        FilledButton(onClick = { moveToSignUpScreen() }, text = "로그인")
+        FilledButton(onClick = { moveToHomeScreen() }, text = "로그인")
         OutlineButton(text = "회원가입", onClick = { moveToSignUpScreen() })
 
         HorizontalDivider(
@@ -111,5 +112,8 @@ fun LogInScreen(
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
-    LogInScreen {}
+    LogInScreen(
+        moveToSignUpScreen = {},
+        moveToHomeScreen = {}
+    )
 }
