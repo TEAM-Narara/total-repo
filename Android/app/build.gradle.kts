@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:board"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:card"))
     implementation(project(":feature:notification"))
 
     // DTO

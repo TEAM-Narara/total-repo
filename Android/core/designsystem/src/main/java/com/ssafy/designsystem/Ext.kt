@@ -3,6 +3,7 @@ package com.ssafy.designsystem
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -28,4 +29,28 @@ fun formatRangeTimeStamp(start: Long, end: Long): String {
         Locale.getDefault()
     )
     return "${startFormatter.format(startDate)}${endFormatter.format(startDate)}"
+}
+
+fun formatUnixTimeStamp(start: Long, end: Long): String {
+    val startDate = Date(start)
+    val endDate = Date(end)
+    val cal1 = Calendar.getInstance().apply { time = startDate }
+    val cal2 = Calendar.getInstance().apply { time = endDate }
+
+    val sameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+    val sameMonth = sameYear && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+    val dateFormat = SimpleDateFormat("yyyy년 M월 d일", Locale.getDefault())
+
+    return buildString {
+        append(dateFormat.format(startDate))
+        if (sameMonth) {
+            val endFormat = SimpleDateFormat("d일", Locale.getDefault())
+            append(" ~ ${endFormat.format(endDate)}")
+        } else if (sameYear) {
+            val endFormat = SimpleDateFormat("M월 d일", Locale.getDefault())
+            append(" ~ ${endFormat.format(endDate)}")
+        } else {
+            append(" ~ ${dateFormat.format(endDate)}")
+        }
+    }
 }
