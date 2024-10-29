@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import coil3.compose.AsyncImage
+import com.ssafy.board.getContrastingTextColor
 import com.ssafy.board.search.dto.IconType
 import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.IconMedium
@@ -85,9 +86,3 @@ private fun DrawIcon(iconType: IconType, size: Dp) {
     }
 }
 
-private fun getContrastingTextColor(backgroundColor: Color): Color {
-    if (backgroundColor == Transparent) return Color.Black
-
-    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
-    return if (brightness > 384) Color.Black else Color.White
-}

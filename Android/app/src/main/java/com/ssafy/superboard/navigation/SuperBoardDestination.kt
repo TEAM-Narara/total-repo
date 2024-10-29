@@ -7,7 +7,9 @@ import androidx.navigation.compose.NavHost
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
+import com.ssafy.board.boardMenu.Visibility
 import com.ssafy.board.boardMenu.boardMenuScreen
+import com.ssafy.board.boardMenu.visibilityBackgroundScreen
 import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
@@ -101,7 +103,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             }
         )
 
-        boardMenuScreen(popBack = { navController.popBackStack() })
+        boardMenuScreen(
+            popBack = { navController.popBackStack() },
+            setBackground = { selectedBackgroundColor: Long, selectBackgroundImg: String? ->
+                navController.navigate(Visibility(selectedBackgroundColor, selectBackgroundImg))
+            }
+        )
+
+        visibilityBackgroundScreen(popBack = { navController.popBackStack() })
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
 

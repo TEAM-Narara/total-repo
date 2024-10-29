@@ -12,7 +12,10 @@ data class BoardMenu(
     val workspaceId: Long,
 )
 
-fun NavGraphBuilder.boardMenuScreen(popBack: () -> Unit) {
+fun NavGraphBuilder.boardMenuScreen(
+    popBack: () -> Unit,
+    setBackground: (Long, String?) -> Unit
+) {
     composable<BoardMenu> { backStackEntry ->
         val boardSearch: BoardMenu = backStackEntry.toRoute()
         val boardId = boardSearch.boardId
@@ -28,7 +31,8 @@ fun NavGraphBuilder.boardMenuScreen(popBack: () -> Unit) {
                     "손오공 renamed test(from testboard)",
                     300
                 )
-            }
+            },
+            setBackground = setBackground
         )
     }
 }
