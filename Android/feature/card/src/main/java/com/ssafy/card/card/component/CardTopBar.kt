@@ -37,10 +37,17 @@ fun CardTopBar(
     onWatchSelected: (Boolean) -> Unit,
     moveToArchive: () -> Unit,
     moveToDelete: () -> Unit,
+    attachments: List<String>,
+    heightOffset: Float,
 ) {
     val (isExpanded, setExpanded) = remember { mutableStateOf(false) }
     val icon = if (isWatching) Icons.Default.VisibilityOff else Icons.Default.Visibility
     val iconText = if (isWatching) "알림 설정 해제" else "알림 설정"
+
+    CardTopImage(
+        attachments = attachments,
+        heightOffset = heightOffset
+    )
 
     TopAppBar(
         modifier = modifier,
