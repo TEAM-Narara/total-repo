@@ -1,6 +1,8 @@
 package com.narara.superboard.board.infrastructure;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
