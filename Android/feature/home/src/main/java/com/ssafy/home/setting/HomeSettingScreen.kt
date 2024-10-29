@@ -101,7 +101,7 @@ fun HomeSettingScreen(
                 Text(text = "Name", fontSize = TextMedium, color = Primary)
                 EditableText(
                     text = name,
-                    onTextChanged = { newName: String -> onValueChange(newName) },
+                    onInputFinished = { newName: String -> onValueChange(newName) },
                     modifier = Modifier.weight(1f),
                     alignStyle = TextAlign.End
                 )

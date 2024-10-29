@@ -82,7 +82,7 @@ private fun BoardSearchScreen(
 
             EditableText(
                 text = parameters.searchedText,
-                onTextChanged = updateSearchText,
+                onInputFinished = updateSearchText,
                 modifier = Modifier
                     .padding(start = PaddingSmall)
                     .weight(1f),

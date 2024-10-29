@@ -10,6 +10,8 @@ import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.Visibility
 import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardMenu.visibilityBackgroundScreen
+import com.ssafy.board.member.BoardInviteMember
+import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.home.createboard.CreateBoard
@@ -30,10 +32,11 @@ import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
+    NavHost(navController = navController, startDestination = BoardInviteMember(0L), modifier = modifier) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -144,6 +147,14 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                     BoardMenu(boardId, workspaceId)
                 )
             }
+        )
+
+        notificationScreen(
+            popBack = navController::popBackStack,
+        )
+
+        boardInviteMemberDestination(
+            popBack = navController::popBackStack
         )
     }
 }
