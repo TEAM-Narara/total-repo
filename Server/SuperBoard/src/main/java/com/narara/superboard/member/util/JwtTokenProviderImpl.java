@@ -4,6 +4,8 @@ import com.narara.superboard.common.entity.CustomUserDetails;
 import com.narara.superboard.common.exception.TokenException;
 import com.narara.superboard.common.service.CustomUserDetailsService;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.exception.InvalidRefreshTokenException;
+import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -31,7 +33,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Value("${spring.jwt.secretKey}")
     private String key; //비밀키
     private SecretKey secretKey;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 10L; //10분 
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 10L; //10분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24; //1일
 
     private final MemberRepository memberRepository;
@@ -71,7 +73,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     private void updateMemberRefreshToken(String memberIdStr, String refreshToken) {
         Long memberId = Long.parseLong(memberIdStr);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         member.setRefreshToken(refreshToken);
         memberRepository.save(member);
@@ -170,7 +172,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
      * @return
      */
     public String resolveRefreshToken(HttpServletRequest request) {
-        String refreshToken = request.getHeader("X-Refresh-Token");
+        String refreshToken = request.getHeader("Refresh-Token");
         if (refreshToken == null || refreshToken.isEmpty()) {
             throw new TokenException("Refresh Token is missing or invalid.");
         }
@@ -195,7 +197,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     public String refreshAccessToken(String refreshToken) {
         // 1. refresh 토큰 유효한지 확인
         if (!validateToken(refreshToken)) {
-            throw new TokenException("Refresh Token is invalid or expired.");
+            throw new InvalidRefreshTokenException();
         }
 
         // 2. refreshToken에서 사용자 ID 추출
@@ -203,11 +205,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
         // 3. 해당 사용자의 정보를 가져옴
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         // 4. refreshToken이 일치하는지 확인 (DB에 저장된 값과 비교)
         if (!refreshToken.equals(member.getRefreshToken())) {
-            throw new TokenException("Invalid refresh token.");
+            throw new InvalidRefreshTokenException();
         }
 
         // 5. 새로운 accessToken 발급

@@ -12,5 +12,5 @@ public interface JwtTokenProvider {
     String resolveAccessToken(HttpServletRequest request);
     String resolveRefreshToken(HttpServletRequest request);
     boolean isTokenExpired(String token);
-    String refreshAccessToken(String accessToken);
+    String refreshAccessToken(String refreshToken);
 }

@@ -11,5 +11,5 @@ public interface AuthService {
     void logout(Long memberId);
     void withdrawal(Long memberId);
     // TODO : RefreshToken을 기반으로 새로운 AccessToken을 발급
-    String refreshAccessToken(String refreshToken);
+    String reissueAccessToken(String refreshToken);
 }

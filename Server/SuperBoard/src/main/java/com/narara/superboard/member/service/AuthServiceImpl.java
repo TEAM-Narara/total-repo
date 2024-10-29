@@ -85,13 +85,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String refreshAccessToken(String refreshToken) {
-        // 1. refreshToken 검증
-        // 검증 실패시, Header에 실패했다는 것을 담기(?)
-        // 2. refreshToken 기반 사용자 정보 조회
-        // 3. refreshToken과 해당 사용자의 db에 저장되 refreshToken과 동일한지 비교
-        // 4. accessToken 재발급
-        return null;
+    public String reissueAccessToken(String refreshToken) {
+        // 검증 실패시, GlobalExceptionHandler 에서 Header에 실패했다는 것을 담기
+        // InvalidRefreshTokenException() -> 여기에 Header에 담는 로직 넣기
+        return jwtTokenProvider.refreshAccessToken(refreshToken);
     }
 
     // 새로운 회원 엔티티 생성 및 저장

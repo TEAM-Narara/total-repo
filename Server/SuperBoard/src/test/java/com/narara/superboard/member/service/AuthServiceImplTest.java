@@ -361,4 +361,6 @@ class AuthServiceImplTest {
         assertThrows(AccountDeletedException.class, () -> authService.withdrawal(memberId));
     }
 
+
+
 }
