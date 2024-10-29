@@ -3,8 +3,7 @@ package com.narara.superboard.board.entity;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
-import com.narara.superboard.common.constant.enums.CoverType;
-import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,12 +42,15 @@ public class Board {
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;  // 버전
 
-    @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
-    private Long version;  // 버전
+    @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
+    private Long listOrderVersion;  // 버전
 
     @JoinColumn(name = "workspace_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 키
+
+    @OneToMany(mappedBy = "board")
+    private java.util.List<List> listCollection;  // 보드 키
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = boardUpdateRequestDto.background();
@@ -68,7 +70,7 @@ public class Board {
     }
 
     public void increaseVersion() {
-        this.version += 1;
+        this.listOrderVersion += 1;
     }
 
     public Board(Long id, String name, Map<String, Object> cover) {

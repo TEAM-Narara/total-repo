@@ -42,6 +42,14 @@ public class BoardMember {
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
+    public static BoardMember createBoardMemberByAdmin(Board board, Member member){
+        return BoardMember.builder()
+                .board(board)
+                .member(member)
+                .authority(Authority.ADMIN)
+                .build();
+    }
+
     public BoardMember(Board board) {
         this.board = board;
     }

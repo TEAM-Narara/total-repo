@@ -2,13 +2,18 @@ package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
-import com.narara.superboard.board.infrastrucuture.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +25,9 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final WorkSpaceRepository workspaceRepository;
+    private final BoardMemberRepository boardMemberRepository;
+
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
     private final NameValidator nameValidator;
@@ -47,18 +55,26 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Long createBoard(BoardCreateRequestDto boardCreateRequestDto) {
+    public Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto) {
         boardValidator.validateNameIsPresent(boardCreateRequestDto);
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
+        // TODO: background가 존재하면 background에 대한 검증 추가하기
+
+        WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
+                .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
 
         Board board = Board.builder()
                 .cover(boardCreateRequestDto.background())
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
+                .workSpace(workSpace)
                 .build();
 
         Board saveBoard = boardRepository.save(board);
+
+        BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
+        boardMemberRepository.save(boardMemberByAdmin);
 
         return saveBoard.getId();
     }

@@ -1,5 +1,6 @@
 package com.narara.superboard.common.application.validator;
 
+import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
@@ -17,8 +18,20 @@ public class CoverValidator {
         validateCoversEmpty(cover.cover());
         validateCoverTypeIsEmpty(cover.cover());
         validateCoverValueIsEmpty(cover.cover());
+        // TODO: validateCoverTypeIsValid(cover.cover().get("type").toString()); 추가하기.
     }
 
+    public void validateCardCover(CardUpdateRequestDto cardUpdateRequestDto) {
+        Map<String, Object> cover = cardUpdateRequestDto.cover();
+        if (cover != null) {
+            validateCoverTypeIsEmpty(cover);
+            validateCoverValueIsEmpty(cover);
+            validateCoverTypeIsValid(cover.get("type").toString());
+        }
+    }
+
+
+    // CoverHandler.getType()
     public void validateCoverTypeIsValid(String coverTypeValue) {
         // 1. coverTypeValue가 null인 경우 예외 발생
         if (coverTypeValue == null || coverTypeValue.isEmpty()) {
@@ -57,6 +70,7 @@ public class CoverValidator {
             throw new NotFoundCoverValueException();
         }
     }
+
 
     // TODO: color는 #FFF 이렇게오고 image는 https로 시작하는지 확인하는 로직 추가
 

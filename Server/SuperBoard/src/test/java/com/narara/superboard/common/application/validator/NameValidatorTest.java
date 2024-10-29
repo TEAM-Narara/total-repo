@@ -6,11 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("NameValidator 테스트")
+@DisplayName("이름 검증에 대한 단위 테스트")
 class NameValidatorTest {
 
     /**
@@ -42,7 +44,7 @@ class NameValidatorTest {
     void testValidateNameIsEmpty_Exception(String invalidName) {
         // given: null 문자열을 실제 null 값으로 변환
         String name = "null".equals(invalidName) ? null : invalidName;
-        Mockito.when(nameHolder.name()).thenReturn(name);
+        NameHolder nameHolder = new SimpleNameHolder(name); // 실제 구현체 사용
 
         // then
         assertThrows(NotFoundNameException.class, () -> nameValidator.validateNameIsEmpty(nameHolder));
@@ -56,10 +58,40 @@ class NameValidatorTest {
     @DisplayName("이름이 유효할 경우 예외가 발생하지 않음")
     void testValidateNameIsEmpty_Success(String validName) {
         // given
-        Mockito.when(nameHolder.name()).thenReturn(validName);
+        NameHolder nameHolder = new SimpleNameHolder(validName); // 실제 구현체 사용
 
         // then: 예외가 발생하지 않음
         assertDoesNotThrow(() -> nameValidator.validateNameIsEmpty(nameHolder));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("카드 이름이 비어있거나 null일 때 예외 발생")
+    void shouldFailWhenCardNameIsEmptyOrNull(String cardName) {
+        // given
+        NameHolder nameHolder = new SimpleNameHolder(cardName); // 실제 구현체 사용
+
+        // when & then
+        NotFoundNameException exception = assertThrows(NotFoundNameException.class, () -> {
+            nameValidator.validateCardNameIsEmpty(nameHolder);
+        });
+
+        // then
+        assertEquals("카드의 이름(이)가 존재하지 않습니다. 이름(을)를 작성해주세요.", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Valid Name", "Test Card"})
+    @DisplayName("성공 로직: 카드 이름이 정상적으로 존재할 때 예외 없음")
+    void shouldPassWhenCardNameIsValid(String cardName) {
+        // given
+        NameHolder nameHolder = new SimpleNameHolder(cardName); // 실제 구현체 사용
+
+        // when & then
+        assertDoesNotThrow(() -> nameValidator.validateCardNameIsEmpty(nameHolder));
+    }
+
+    record SimpleNameHolder(String name) implements NameHolder {
     }
 
 }
