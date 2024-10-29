@@ -1,4 +1,4 @@
-package com.ssafy.board.member
+package com.ssafy.home.member
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -23,9 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ssafy.board.member.components.MemberTopAppBar
-import com.ssafy.board.member.data.BoardMemberData
-import com.ssafy.board.member.data.SearchMemberData
+import com.ssafy.home.member.components.MemberTopAppBar
+import com.ssafy.home.member.data.WorkspaceMemberData
+import com.ssafy.home.member.data.SearchMemberData
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.SearchBar
 import com.ssafy.designsystem.component.UserInviteItem
@@ -40,7 +40,7 @@ fun InviteMemberScreen(
     popBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val boardMemberList by viewModel.boardMemberList.collectAsStateWithLifecycle()
+    val workspaceMemberList by viewModel.workspaceMemberList.collectAsStateWithLifecycle()
     val searchMemberList by viewModel.searchMemberList.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -55,10 +55,10 @@ fun InviteMemberScreen(
             }
         }
     ) { paddingValues ->
-        boardMemberList?.let {
+        workspaceMemberList?.let {
             InviteMemberScreen(
                 modifier = Modifier.padding(paddingValues),
-                boardMemberList = it,
+                workspaceMemberList = it,
                 searchMemberList = searchMemberList,
                 onInvite = viewModel::inviteMember,
                 onAuthUpdate = viewModel::updateMemberAuth
@@ -88,7 +88,7 @@ fun InviteMemberScreen(
 @Composable
 fun InviteMemberScreen(
     modifier: Modifier = Modifier,
-    boardMemberList: List<BoardMemberData>,
+    workspaceMemberList: List<WorkspaceMemberData>,
     searchMemberList: List<SearchMemberData>?,
     onInvite: (Long) -> Unit,
     onAuthUpdate: (Long, String) -> Unit
@@ -121,7 +121,7 @@ fun InviteMemberScreen(
                 }
             }
         } ?: LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(boardMemberList) { member ->
+            items(workspaceMemberList) { member ->
                 UserSearchItem(
                     nickname = member.nickname,
                     email = member.email,
@@ -142,8 +142,8 @@ fun InviteMemberScreen(
 @Composable
 private fun InviteMemberScreenPreview() {
     InviteMemberScreen(
-        boardMemberList = (1..10L).map {
-            BoardMemberData(
+        workspaceMemberList = (1..10L).map {
+            WorkspaceMemberData(
                 it,
                 nickname = "nickname",
                 email = "email",

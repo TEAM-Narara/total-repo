@@ -8,7 +8,6 @@ import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.boardMenuScreen
-import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
@@ -16,6 +15,8 @@ import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.member.WorkSpaceInviteMember
+import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
 import com.ssafy.home.search.SearchWorkspace
@@ -33,7 +34,11 @@ import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = BoardInviteMember(0L), modifier = modifier) {
+    NavHost(
+        navController = navController,
+        startDestination = WorkSpaceInviteMember(0L),
+        modifier = modifier
+    ) {
         loginScreen(moveToSignUpScreen = {
             navController.navigate(SignUp)
         })
@@ -144,6 +149,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         )
 
         boardInviteMemberDestination(
+            popBack = navController::popBackStack
+        )
+
+        workSpaceInviteMemberDestination(
             popBack = navController::popBackStack
         )
     }
