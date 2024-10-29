@@ -14,6 +14,8 @@ import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
+import com.ssafy.card.card.Card
+import com.ssafy.card.card.cardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
@@ -35,10 +37,11 @@ import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = BoardInviteMember(0L), modifier = modifier) {
-        loginScreen(moveToSignUpScreen = {
-            navController.navigate(SignUp)
-        })
+    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
+        loginScreen(
+            moveToSignUpScreen = { navController.navigate(SignUp) },
+            moveToHomeScreen = { navController.navigate(Home) }
+        )
 
         signupScreen(moveToLogInScreen = {
             navController.navigate(LogIn)
@@ -92,7 +95,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         myCardScreen(
             popBackToHome = navController::popBackStack,
             moveToCardScreen = {
-                // TODO : navigate to card screen
+                // TODO : 먼저 리스트로 이동하고, 연속으로 카드로 이동시켜야함
             }
         )
 
@@ -116,7 +119,9 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         searchWorkspaceScreen(
             onBackPressed = { navController.popBackStack() },
-            moveToCardScreen = {}
+            moveToCardScreen = {
+                // TODO 리스트로 이동하고, 연속으로 카드로 이동시켜야함
+            }
         )
 
         boardSearchScreen(
@@ -145,6 +150,18 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 navController.navigate(
                     BoardMenu(boardId, workspaceId)
                 )
+            },
+            navigateToCardScreen = { cardId: Long ->
+                navController.navigate(Card(cardId))
+            }
+        )
+
+        cardScreen(
+            popBackToBoardScreen = {
+                navController.popBackStack()
+            },
+            moveToSelectLabel = { cardId: Long ->
+                // TODO : navigate to select color screen
             }
         )
 

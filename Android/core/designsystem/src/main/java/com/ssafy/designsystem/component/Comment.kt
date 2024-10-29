@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -30,7 +30,11 @@ fun Comment(
     nickname: String,
     date: Long,
     content: String,
-    onMenuClick: () -> Unit,
+    setContent: (String) -> Unit,
+    hasAuth: Boolean = false,
+    isFocus: Boolean = false,
+    setFocus: (Boolean) -> Unit,
+    deleteComment: () -> Unit
 ) {
 
     Row(modifier = modifier.fillMaxWidth()) {
@@ -50,14 +54,28 @@ fun Comment(
         ) {
             Text(text = nickname, fontSize = TextMedium)
             Text(text = date.formatTimestamp(), fontSize = TextSmall, color = DarkGray)
-            MarkdownText(markdown = content, fontSize = TextMedium)
+            if (hasAuth) {
+                EditableMarkDownText(
+                    content = content,
+                    setContent = setContent,
+                    isFocus = isFocus,
+                    setFocus = setFocus
+                )
+            } else {
+                MarkdownText(
+                    fontSize = TextMedium,
+                    markdown = content,
+                )
+            }
         }
 
-        IconButton(onClick = onMenuClick) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "더보기 메뉴"
-            )
+        if (hasAuth) {
+            IconButton(onClick = { deleteComment() }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "삭제하기"
+                )
+            }
         }
     }
 }

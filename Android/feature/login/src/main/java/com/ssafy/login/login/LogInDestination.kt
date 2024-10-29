@@ -7,8 +7,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 object LogIn
 
-fun NavGraphBuilder.loginScreen(moveToSignUpScreen: () -> Unit) {
+fun NavGraphBuilder.loginScreen(
+    moveToSignUpScreen: () -> Unit,
+    moveToHomeScreen: () -> Unit
+) {
     composable<LogIn> {
-        LogInScreen(moveToSignUpScreen = moveToSignUpScreen)
+        LogInScreen(
+            moveToSignUpScreen = moveToSignUpScreen,
+            moveToHomeScreen = moveToHomeScreen
+        )
     }
 }

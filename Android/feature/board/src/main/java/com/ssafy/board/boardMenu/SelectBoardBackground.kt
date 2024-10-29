@@ -1,13 +1,6 @@
 package com.ssafy.board.boardMenu
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,13 +27,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,29 +44,18 @@ import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingTwo
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.model.background.BackgroundDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.ByteArrayInputStream
+import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 import java.io.File
-import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectBoardBackground(
+fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
     selectedBackground: BackgroundDto,
 ) {
-    val colors = listOf(
-        0xFFFCFCFC,
-        0xFFFFE3E8,
-        0xFFFFF7BD,
-        0xFFD9E1F4,
-        0xFFE5EFFF,
-        0xFFEAFFE5,
-        0xFFEEE5FF,
-        0xFFCCCCCC
-    )
+
     val localImages = remember { mutableStateListOf<String>() }
 
     val attachmentLauncher = rememberLauncherForSaveImage { path ->
@@ -111,8 +91,8 @@ fun SelectBoardBackground(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5), modifier = Modifier.fillMaxWidth(),
             ) {
-                items(colors.size) {
-                    val color = colors[it]
+                items(backgroundColorList.size) {
+                    val color = backgroundColorList[it]
                     Box(
                         modifier = Modifier
                             .size(60.dp)
@@ -222,50 +202,7 @@ fun DisplayImageFromPath(imagePath: String) {
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview2() {
-    SelectBoardBackground(
+    SelectBoardBackgroundScreen(
         {}, BackgroundDto(0xFFFCFCFC, null)
     )
-}
-
-@Composable
-fun rememberLauncherForSaveImage(saveAttachment: (String) -> Unit): ManagedActivityResultLauncher<String, Uri?> {
-    val contract = ActivityResultContracts.GetContent()
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    return rememberLauncherForActivityResult(contract = contract) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-
-        coroutineScope.launch(Dispatchers.IO) {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                val imageData = inputStream.readBytes()
-
-                val exif = ExifInterface(ByteArrayInputStream(imageData))
-                val orientation = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL
-                )
-                val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-                val matrix = when (orientation) {
-                    ExifInterface.ORIENTATION_ROTATE_90 -> Matrix().apply { postRotate(90f) }
-                    ExifInterface.ORIENTATION_ROTATE_180 -> Matrix().apply { postRotate(180f) }
-                    ExifInterface.ORIENTATION_ROTATE_270 -> Matrix().apply { postRotate(270f) }
-                    else -> Matrix()
-                }
-
-                val rotatedBitmap = Bitmap.createBitmap(
-                    bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
-                )
-
-                val file =
-                    File(context.cacheDir, "uploaded_image_${System.currentTimeMillis()}.jpg")
-                FileOutputStream(file).use { out ->
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    out.flush()
-                }
-
-                saveAttachment(file.absolutePath)
-            }
-        }
-    }
 }

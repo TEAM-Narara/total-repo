@@ -29,6 +29,7 @@ val PaddingSemiLarge = 20.dp
 val PaddingLarge = 24.dp
 val PaddingSemiXLarge = 32.dp
 val PaddingXLarge = 64.dp
+val PaddingLegendLarge = 200.dp
 
 val IconLegendLarge = 200.dp
 val IconXXLarge = 80.dp
@@ -59,6 +60,7 @@ val ElevationMedium = 4.dp
 val ElevationDefault = 6.dp
 val ElevationLarge = 20.dp
 
+val RadiusLarge = 12.dp
 val RadiusDefault = 8.dp
 val RadiusSMall = 6.dp
 
@@ -66,3 +68,8 @@ val MascotDefault = 116.dp
 val BoxDefault = 55.dp
 
 val BackgroundMini = 33.dp
+
+val LabelWidth = 50.dp
+val LabelHeight = 20.dp
+
+val DividerLarge = 5.dp

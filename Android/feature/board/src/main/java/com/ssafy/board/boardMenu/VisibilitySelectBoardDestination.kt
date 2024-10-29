@@ -19,7 +19,7 @@ fun NavGraphBuilder.visibilityBackgroundScreen(popBack: () -> Unit) {
         val selectedBackgroundImg = selectBackground.selectedBackgroundImg
 
 
-        SelectBoardBackground(
+        SelectBoardBackgroundScreen(
             onBackPressed = popBack,
             selectedBackground = BackgroundDto(
                 color = selectedBackgroundColor,
