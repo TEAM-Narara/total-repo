@@ -10,7 +10,6 @@ import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.Visibility
 import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardMenu.visibilityBackgroundScreen
-import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
@@ -20,6 +19,7 @@ import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
 import com.ssafy.home.search.SearchWorkspace
@@ -170,6 +170,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         )
 
         boardInviteMemberDestination(
+            popBack = navController::popBackStack
+        )
+
+        workSpaceInviteMemberDestination(
             popBack = navController::popBackStack
         )
     }
