@@ -165,7 +165,7 @@ fun BoardMenuScreen(
                     Text(text = "Visibility", fontSize = TextMedium, color = Primary)
                     EditableText(
                         text = visibility,
-                        onTextChanged = { newName: String -> onVisibilityChange(newName) },
+                        onInputFinished = { newName: String -> onVisibilityChange(newName) },
                         modifier = Modifier.weight(1f),
                         alignStyle = TextAlign.End
                     )
