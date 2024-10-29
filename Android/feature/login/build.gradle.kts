@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -11,11 +14,16 @@ android {
     namespace = "com.ssafy.login"
     compileSdk = 34
 
+    val properties = Properties()
+    properties.load(FileInputStream(rootProject.file("local.properties")))
+
     defaultConfig {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "NAVER_ID", properties.getProperty("naverClientId"))
+        buildConfigField("String", "NAVER_SECRET", properties.getProperty("naverClientScret"))
     }
 
     buildTypes {
@@ -34,11 +42,18 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:ui"))
+
+    // naver Auth
+    implementation(libs.oauth)
 
     // Coil
     implementation(libs.coil.compose)
