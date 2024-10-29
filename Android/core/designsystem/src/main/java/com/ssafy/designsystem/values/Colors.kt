@@ -18,3 +18,14 @@ val Transparent = Color(0x00000000)
 val LabelRed = Color(0xFFFF6B5F)
 val LabelYellow = Color(0xFFFFE770)
 val LabelBlue = Color(0xFF5D9CEC)
+
+val backgroundColorList = listOf(
+    0xFFFCFCFC,
+    0xFFFFE3E8,
+    0xFFFFF7BD,
+    0xFFD9E1F4,
+    0xFFE5EFFF,
+    0xFFEAFFE5,
+    0xFFEEE5FF,
+    0xFFCCCCCC
+)

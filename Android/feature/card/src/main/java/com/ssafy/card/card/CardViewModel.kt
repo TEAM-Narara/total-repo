@@ -1,6 +1,5 @@
 package com.ssafy.card.card
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.model.card.CardDTO
@@ -83,7 +82,7 @@ class CardViewModel @Inject constructor() : ViewModel() {
             .onFailure { /* 실패 처리 */ }
     }
 
-    fun addAttachment(bitmap: Bitmap) {
+    fun addAttachment(filePath: String) {
         // TODO : 이미지를 S3나 앱 폴더에 저장하고, _cardDTO에 이미지 경로를 추가
     }
 

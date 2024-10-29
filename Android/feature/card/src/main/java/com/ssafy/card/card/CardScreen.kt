@@ -1,6 +1,5 @@
 package com.ssafy.card.card
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +27,7 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingLegendLarge
 import com.ssafy.model.card.CardDTO
 import com.ssafy.model.card.CommentDTO
+import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 
 @Composable
 fun CardScreen(
@@ -50,7 +50,7 @@ fun CardScreen(
         saveCardContent = { viewModel.saveCardContent() },
         resetCardContent = { viewModel.resetCardContent() },
         deleteComment = { comment -> viewModel.deleteComment(comment) },
-        addAttachment = { bitmap -> viewModel.addAttachment(bitmap) },
+        addAttachment = { filePath -> viewModel.addAttachment(filePath) },
         addComment = { comment -> viewModel.addComment(comment) },
         setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
         saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
@@ -71,7 +71,7 @@ private fun CardScreen(
     saveCardContent: () -> Unit,
     resetCardContent: () -> Unit,
     deleteComment: (CommentDTO) -> Unit,
-    addAttachment: (Bitmap) -> Unit,
+    addAttachment: (String) -> Unit,
     addComment: (String) -> Unit,
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
@@ -79,8 +79,8 @@ private fun CardScreen(
 ) {
     val (isContentFocus, setContentFocus) = remember { mutableStateOf(false) }
     val (focusedComment, setFocusedComment) = remember { mutableStateOf<CommentDTO?>(null) }
-    val attachmentLauncher = rememberLauncherForSaveImage { bitmap ->
-        addAttachment(bitmap)
+    val attachmentLauncher = rememberLauncherForSaveImage { filePath ->
+        addAttachment(filePath)
     }
 
     Scaffold(
