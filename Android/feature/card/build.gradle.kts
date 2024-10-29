@@ -41,6 +41,10 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
 
+    // Markdown
+    implementation(libs.compose.markdown)
+    implementation(libs.coil)
+
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
@@ -50,6 +54,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.exifinterface)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
