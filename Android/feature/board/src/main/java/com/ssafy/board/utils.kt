@@ -6,7 +6,9 @@ import androidx.compose.material.icons.filled.AddReaction
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.ssafy.designsystem.values.Transparent
 import kotlinx.coroutines.coroutineScope
 
 suspend fun handleLazyListScroll(
@@ -42,4 +44,12 @@ fun getIcon(type: String): ImageVector {
         "attached" -> Icons.Default.AttachFile
         else -> Icons.Default.AddReaction
     }
+}
+
+
+fun getContrastingTextColor(backgroundColor: Color): Color {
+    if (backgroundColor == Transparent) return Color.Black
+
+    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
+    return if (brightness > 384) Color.Black else Color.White
 }

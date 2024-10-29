@@ -3,7 +3,7 @@ package com.ssafy.board.boardMenu
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ssafy.board.data.HistoryData
+import com.ssafy.model.card.HistoryData
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,7 +12,10 @@ data class BoardMenu(
     val workspaceId: Long,
 )
 
-fun NavGraphBuilder.boardMenuScreen(popBack: () -> Unit) {
+fun NavGraphBuilder.boardMenuScreen(
+    popBack: () -> Unit,
+    setBackground: (Long, String?) -> Unit
+) {
     composable<BoardMenu> { backStackEntry ->
         val boardSearch: BoardMenu = backStackEntry.toRoute()
         val boardId = boardSearch.boardId
@@ -28,7 +31,8 @@ fun NavGraphBuilder.boardMenuScreen(popBack: () -> Unit) {
                     "손오공 renamed test(from testboard)",
                     300
                 )
-            }
+            },
+            setBackground = setBackground
         )
     }
 }

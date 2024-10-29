@@ -35,6 +35,7 @@ fun ListItem(
     cardCollections: Map<Long, MutableState<List<ReorderCardData>>>,
     onTitleChange: (String) -> Unit = {},
     onCardReordered: () -> Unit = {},
+    navigateToCardScreen: (Long) -> Unit = {},
     addCard: () -> Unit = {},
     addPhoto: () -> Unit = {},
     onListChanged: (Long) -> Unit = {},
@@ -92,13 +93,16 @@ fun ListItem(
                         onDrop = { onCardReordered() },
                     ) {
                         CardItem(
-                            modifier = Modifier.graphicsLayer {
-                                alpha = if (isDragging) 0f else 1f
-                            }.shadow(
-                                if (isDragging) ElevationLarge else 0.dp,
-                                shape = RoundedCornerShape(CornerMedium),
-                            ),
+                            modifier = Modifier
+                                .graphicsLayer {
+                                    alpha = if (isDragging) 0f else 1f
+                                }
+                                .shadow(
+                                    if (isDragging) ElevationLarge else 0.dp,
+                                    shape = RoundedCornerShape(CornerMedium),
+                                ),
                             cardData = cardData,
+                            onClick = { navigateToCardScreen(cardData.id) },
                         )
                     }
                 }
