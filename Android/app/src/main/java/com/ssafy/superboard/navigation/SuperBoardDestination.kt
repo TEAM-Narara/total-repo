@@ -28,7 +28,6 @@ import com.ssafy.login.login.LogIn
 import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
-import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.search.SearchParameters
 
 @Composable
@@ -103,8 +102,8 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         boardMenuScreen(
             popBack = { navController.popBackStack() },
-            setBackground = { colors: List<Long>, selectedBackgroundColor: Long, selectBackgroundImg:String? ->
-                navController.navigate(Visibility(colors, selectedBackgroundColor,selectBackgroundImg))
+            setBackground = { selectedBackgroundColor: Long, selectBackgroundImg: String? ->
+                navController.navigate(Visibility(selectedBackgroundColor, selectBackgroundImg))
             }
         )
 

@@ -64,9 +64,18 @@ import java.io.FileOutputStream
 @Composable
 fun SelectBoardBackground(
     onBackPressed: () -> Unit,
-    colors: List<Long>,
     selectedBackground: BackgroundDto,
 ) {
+    val colors = listOf(
+        0xFFFCFCFC,
+        0xFFFFE3E8,
+        0xFFFFF7BD,
+        0xFFD9E1F4,
+        0xFFE5EFFF,
+        0xFFEAFFE5,
+        0xFFEEE5FF,
+        0xFFCCCCCC
+    )
     val localImages = remember { mutableStateListOf<String>() }
 
     val attachmentLauncher = rememberLauncherForSaveImage { path ->
@@ -102,27 +111,6 @@ fun SelectBoardBackground(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(5), modifier = Modifier.fillMaxWidth(),
             ) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .padding(PaddingTwo, PaddingTwo)
-                            .background(LightSkyBlue, shape = RoundedCornerShape(PaddingSmall))
-                            .clickable {
-                                // TODO: color 추가 화면 열기
-                            },
-                    )
-                    {
-                        Icon(
-                            imageVector = Icons.Sharp.Add,
-                            contentDescription = "색상 추가",
-                            modifier = Modifier
-                                .size(60.dp)
-                                .align(Alignment.Center),
-                            tint = Primary
-                        )
-                    }
-                }
                 items(colors.size) {
                     val color = colors[it]
                     Box(
@@ -235,7 +223,7 @@ fun DisplayImageFromPath(imagePath: String) {
 @Composable
 fun GreetingPreview2() {
     SelectBoardBackground(
-        {}, colors = listOf(0x000000, 0xFF2E5274), BackgroundDto(0x000000, null)
+        {}, BackgroundDto(0xFFFCFCFC, null)
     )
 }
 

@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Visibility(
-    val colors: List<Long>,
     val selectedBackgroundColor: Long,
     val selectedBackgroundImg: String?,
 )
@@ -16,14 +15,12 @@ data class Visibility(
 fun NavGraphBuilder.visibilityBackgroundScreen(popBack: () -> Unit) {
     composable<Visibility> { backStackEntry ->
         val selectBackground: Visibility = backStackEntry.toRoute()
-        val colors = selectBackground.colors
         val selectedBackgroundColor = selectBackground.selectedBackgroundColor
         val selectedBackgroundImg = selectBackground.selectedBackgroundImg
 
 
         SelectBoardBackground(
             onBackPressed = popBack,
-            colors = colors,
             selectedBackground = BackgroundDto(
                 color = selectedBackgroundColor,
                 imgPath = selectedBackgroundImg

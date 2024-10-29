@@ -14,7 +14,7 @@ data class BoardMenu(
 
 fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
-    setBackground: (List<Long>, Long, String?) -> Unit
+    setBackground: (Long, String?) -> Unit
 ) {
     composable<BoardMenu> { backStackEntry ->
         val boardSearch: BoardMenu = backStackEntry.toRoute()

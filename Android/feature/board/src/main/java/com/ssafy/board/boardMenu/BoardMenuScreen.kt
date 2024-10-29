@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,7 @@ import com.ssafy.board.getIcon
 import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.values.ImageSmall
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingOne
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.Primary
@@ -57,7 +59,7 @@ fun BoardMenuScreen(
     workspaceId: Long,
     backHome: () -> Unit,
     historyContent: List<HistoryData>?,
-    setBackground: (List<Long>, Long, String?) -> Unit
+    setBackground: (Long, String?) -> Unit
 ) {
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
@@ -65,7 +67,7 @@ fun BoardMenuScreen(
     val (background, onBackgroundChange) = remember {
         mutableStateOf(
             BackgroundDto(
-                0x000000,
+                0xFFFCFCFC,
                 null
             )
         )
@@ -149,12 +151,12 @@ fun BoardMenuScreen(
                             .size(ImageSmall)
                             .clickable {
                                 setBackground(
-                                    listOf(0x000000, 0xFF2E5274),
                                     background.color,
                                     background.imgPath
                                 )
                             }
                             .background(color = Color(background.color))
+                            .shadow(PaddingOne, spotColor = Color.LightGray)
                     )
                 }
             }
@@ -228,6 +230,6 @@ fun GreetingPreview() {
         backHome = {},
         workspaceId = 1,
         historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
-        setBackground = { _, _, _ -> }
+        setBackground = { _, _ -> }
     )
 }
