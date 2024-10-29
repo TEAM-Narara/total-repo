@@ -3,8 +3,10 @@ package com.ssafy.designsystem.component
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.IconMedium
@@ -15,6 +17,7 @@ fun IconButton(
     imageVector: ImageVector,
     onClick: () -> Unit = {},
     contentDescription: String = "",
+    tint: Color = LocalContentColor.current,
 ) {
     IconButton(
         onClick = onClick,
@@ -23,7 +26,8 @@ fun IconButton(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            modifier = Modifier.size(IconMedium)
+            modifier = Modifier.size(IconMedium),
+            tint = tint
         )
     }
 }

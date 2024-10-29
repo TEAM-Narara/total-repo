@@ -35,8 +35,8 @@ fun UserSearchItem(
     nickname: String,
     email: String,
     userAuth: String,
+    onChangeUserAuth: (String) -> Unit,
     icon: @Composable () -> Unit,
-    onChangeUserAuth: (String) -> Unit
 ) {
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
     val authOptions = listOf("Admin", "Member")

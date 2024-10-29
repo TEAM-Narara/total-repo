@@ -33,7 +33,7 @@ fun TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         title = {
-            EditableText(text = title, onTextChanged = onBoardTitleChanged)
+            EditableText(text = title, onInputFinished = onBoardTitleChanged)
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
