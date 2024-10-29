@@ -13,12 +13,14 @@ import com.ssafy.board.boardMenu.visibilityBackgroundScreen
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
+import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.member.WorkSpaceInviteMember
 import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
@@ -37,7 +39,11 @@ import com.ssafy.notification.notification.notificationScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = LogIn, modifier = modifier) {
+    NavHost(
+        navController = navController,
+        startDestination = WorkSpaceInviteMember(0L),
+        modifier = modifier
+    ) {
         loginScreen(
             moveToSignUpScreen = { navController.navigate(SignUp) },
             moveToHomeScreen = { navController.navigate(Home) }
@@ -95,11 +101,18 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         myCardScreen(
             popBackToHome = navController::popBackStack,
             moveToCardScreen = {
-                // TODO : 먼저 리스트로 이동하고, 연속으로 카드로 이동시켜야함
+                // TODO : navigate to card screen
             }
         )
 
         createBoardScreen(
+            popBackToHome = navController::popBackStack,
+            moveToSelectBackgroundScreen = {
+                // TODO : navigate to select background screen
+            }
+        )
+
+        updateBoardScreen(
             popBackToHome = navController::popBackStack,
             moveToSelectBackgroundScreen = {
                 // TODO : navigate to select background screen
