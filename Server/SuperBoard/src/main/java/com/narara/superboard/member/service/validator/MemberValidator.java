@@ -69,7 +69,8 @@ public class MemberValidator {
 
     // 이메일 형식 유효성 검사 (간단한 형식 검증 예시)
     private boolean isValidEmailFormat(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return email.matches(emailRegex);
+        // 소문자만 허용하는 정규식
+        String emailRegex = "^[a-z0-9+_.-]+@[a-z0-9.-]+$";
+        return email.matches(emailRegex);  // 이메일을 소문자 형식으로만 검증
     }
 }
