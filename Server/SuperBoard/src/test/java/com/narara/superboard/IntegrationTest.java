@@ -2,7 +2,9 @@ package com.narara.superboard;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,9 +24,11 @@ import static org.assertj.core.api.Fail.fail;
  * Spring이 application-test.yml 파일을 로드하고, 테스트 환경에 맞는 설정을 적용
  */
 @Nested
+@Transactional
 @ActiveProfiles("test")
+@SpringBootTest(classes = SuperBoardApplication.class)  // 메인 애플리케이션 클래스 지정
 // 테스트 환경을 설정할 때 DB 연결을 분리하고 싶을 때 상속을 통해서 적용하세요.
-public class SuperBoardTest {
+public class IntegrationTest {
     @BeforeAll
     public static void checkTestProfile() {
 //        System.out.println("application-test.yml 파일여부 확인(test_db 사용 여부)");
