@@ -2,7 +2,6 @@ package com.ssafy.card.card.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
@@ -15,13 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.EditableMarkDownText
 import com.ssafy.designsystem.formatTimestamp
 import com.ssafy.designsystem.formatUnixTimeStamp
-import com.ssafy.designsystem.values.IconLegendLarge
 import com.ssafy.designsystem.values.LabelHeight
 import com.ssafy.designsystem.values.LabelWidth
 import com.ssafy.designsystem.values.RadiusDefault
@@ -37,27 +33,6 @@ fun LazyListScope.cardInfoScreen(
     setContentFocus: (Boolean) -> Unit,
     setContent: (String) -> Unit
 ) {
-
-    if (cardDTO.attachments.isNotEmpty()) {
-        val attachment = cardDTO.attachments.first()
-        item(key = attachment) {
-            AsyncImage(
-                model = attachment,
-                contentDescription = null,
-                modifier = Modifier.height(IconLegendLarge),
-                contentScale = ContentScale.Crop
-            )
-        }
-    } else {
-        item(key = "empty") {
-            Box(
-                modifier = Modifier
-                    .height(IconLegendLarge)
-                    .fillMaxWidth()
-                    .background(color = Color.LightGray)
-            )
-        }
-    }
 
     item(key = cardDTO.title) {
         Text(
