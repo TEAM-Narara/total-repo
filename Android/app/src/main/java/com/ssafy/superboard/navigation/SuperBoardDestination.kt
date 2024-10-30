@@ -175,7 +175,9 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 navController.popBackStack()
             },
             moveToSelectLabel = { cardId: Long ->
-                // TODO : navigate to select color screen
+                navController.navigate(
+                    Label(cardId)
+                )
             }
         )
 

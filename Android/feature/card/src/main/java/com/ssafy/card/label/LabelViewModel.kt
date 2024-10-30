@@ -19,10 +19,10 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class LabelViewModel @Inject constructor() : BaseViewModel() {
-    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
-    fun setBoardId(boardId: Long) = _boardId.update { boardId }
+    private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setCardId(boardId: Long) = _cardId.update { boardId }
 
-    val labelList: StateFlow<List<LabelData>?> = _boardId.filterNotNull().flatMapLatest { boardId ->
+    val labelList: StateFlow<List<LabelData>?> = _cardId.filterNotNull().flatMapLatest { boardId ->
         flow {
             emit(
                 backgroundColorList.map {
@@ -44,6 +44,5 @@ class LabelViewModel @Inject constructor() : BaseViewModel() {
     fun createLabel(labelData: LabelData) {}
     fun updateLabel(id: Long, labelData: LabelData) {}
     fun deleteLabel(id: Long) {}
-
     fun selectLabel(id: Long, isSelected: Boolean) {}
 }
