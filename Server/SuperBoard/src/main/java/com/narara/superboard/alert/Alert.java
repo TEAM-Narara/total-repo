@@ -1,6 +1,7 @@
 package com.narara.superboard.alert;
 
 import com.narara.superboard.common.constant.enums.Status;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Alert {
+public class Alert extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

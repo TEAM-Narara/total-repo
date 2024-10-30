@@ -1,6 +1,7 @@
 package com.narara.superboard.label.entity;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.label.interfaces.dto.LabelCreateRequestDto;
 import com.narara.superboard.label.interfaces.dto.LabelUpdateRequestDto;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "label")
-public class Label {
+public class Label extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.narara.superboard.fcmtoken.entity;
 
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FcmToken {
+public class FcmToken extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

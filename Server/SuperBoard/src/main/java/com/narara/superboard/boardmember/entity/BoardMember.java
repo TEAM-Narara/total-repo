@@ -2,6 +2,7 @@ package com.narara.superboard.boardmember.entity;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "board_member")
-public class BoardMember {
+public class BoardMember extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본 키

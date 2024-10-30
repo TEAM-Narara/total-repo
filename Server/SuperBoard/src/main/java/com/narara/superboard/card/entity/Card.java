@@ -4,6 +4,7 @@ import com.narara.superboard.attachment.Attachment;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardlabel.entity.CardLabel;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +20,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "card")
-public class Card {
+public class Card extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

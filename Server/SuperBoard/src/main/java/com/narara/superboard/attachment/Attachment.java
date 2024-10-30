@@ -1,6 +1,7 @@
 package com.narara.superboard.attachment;
 
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Attachment {
+public class Attachment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

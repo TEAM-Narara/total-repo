@@ -2,6 +2,7 @@ package com.narara.superboard.member.entity;
 
 import com.narara.superboard.alert.Alert;
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.cardmember.entity.CardMember;
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

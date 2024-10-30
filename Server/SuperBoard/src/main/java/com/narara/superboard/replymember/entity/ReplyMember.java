@@ -1,5 +1,6 @@
 package com.narara.superboard.replymember.entity;
 
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import jakarta.persistence.Entity;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "reply_member")
-public class ReplyMember {
+public class ReplyMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

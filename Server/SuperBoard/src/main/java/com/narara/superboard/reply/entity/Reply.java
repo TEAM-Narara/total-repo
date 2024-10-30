@@ -1,6 +1,7 @@
 package com.narara.superboard.reply.entity;
 
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ import lombok.Setter;
 @Table(name = "reply")
 @Entity
 @Builder
-public class Reply {
+public class Reply extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

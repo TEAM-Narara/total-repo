@@ -1,6 +1,7 @@
 package com.narara.superboard.cardlabel.entity;
 
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.label.entity.Label;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CardLabel {
+public class CardLabel extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
