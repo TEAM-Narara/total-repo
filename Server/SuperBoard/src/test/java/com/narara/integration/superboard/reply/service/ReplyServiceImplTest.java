@@ -113,4 +113,27 @@ public class ReplyServiceImplTest extends IntegrationTest {
         assertThat(foundReply.getCard().getId()).isEqualTo(savedCard.getId());
     }
 
+
+
+    @Test
+    @DisplayName("존재하지 않는 Reply 조회 시 NotFoundEntityException 예외 발생 테스트")
+    void testGetReply_NotFound() {
+        // given
+        Long nonExistentReplyId = 999L;
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
+            replyService.getReply(nonExistentReplyId);
+        });
+
+        // 예외 메시지가 예상한 형식으로 반환되는지 확인
+        assertThat(exception.getMessage()).contains("해당하는 댓글(이)가 존재하지 않습니다. 댓글ID: " + nonExistentReplyId);
+
+
+        // 예외의 원인으로 정확한 클래스 타입인지 검증 (Optional.orElseThrow()에서 발생 확인)
+        assertThat(exception).isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining("ID: " + nonExistentReplyId);
+    }
+
+
 }
