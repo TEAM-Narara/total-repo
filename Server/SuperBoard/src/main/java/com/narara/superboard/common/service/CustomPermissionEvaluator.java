@@ -1,7 +1,7 @@
 package com.narara.superboard.common.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.infrastrucuture.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.CustomUserDetails;
@@ -29,7 +29,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private final MemberRepository memberRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardRepository boardRepository;
-
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {

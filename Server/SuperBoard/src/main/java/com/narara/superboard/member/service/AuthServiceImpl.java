@@ -12,6 +12,8 @@ import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import com.narara.superboard.workspace.service.WorkSpaceService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +38,17 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberValidator memberValidator;
+    private final WorkSpaceService workSpaceService;
 
     @Override
     public TokenDto register(MemberCreateRequestDto memberCreateRequestDto) {
         memberValidator.registerValidate(memberCreateRequestDto);
 
         Member newMember = createNewMember(memberCreateRequestDto);
+        // 워크 스페이스 생성
+        workSpaceService.createWorkSpace(newMember,
+                new WorkSpaceCreateRequestDto(newMember.getNickname()+"의 워크스페이스"));
+
         TokenDto tokenDto = createTokens(newMember);
         saveRefreshToken(newMember, tokenDto.refreshToken());
 
