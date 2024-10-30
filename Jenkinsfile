@@ -100,12 +100,15 @@ pipeline {
                     // 추가 네트워크 연결
                     if (networks.size() > 1) {
                         networks[1..-1].each { network ->
+                            // 네트워크 연결 확인 및 디버깅 메시지 출력
+                            echo "Connecting to additional network: ${network}"
                             sh "docker network connect ${network} total-server"
                         }
                     }
                 }
             }
         }
+
 
 
         // 컨테이너 상태 확인
