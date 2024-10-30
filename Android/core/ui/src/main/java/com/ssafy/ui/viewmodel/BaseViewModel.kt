@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 
 open class BaseViewModel : ViewModel() {
     val uiState: StateFlow<UiState> get() = _uiState
-    protected val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    protected val _uiState = MutableStateFlow<UiState>(UiState.Idle)
 
     fun <T> Flow<T>.withUiState() = this.onStart {
         _uiState.update { UiState.Loading }
@@ -20,5 +20,9 @@ open class BaseViewModel : ViewModel() {
         _uiState.update { UiState.Success }
     }.catch { exception ->
         _uiState.update { UiState.Error(exception.message) }
+    }
+
+    fun resetUiState() {
+        _uiState.update { UiState.Idle }
     }
 }

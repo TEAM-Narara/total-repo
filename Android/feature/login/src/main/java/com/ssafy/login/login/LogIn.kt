@@ -47,7 +47,8 @@ fun LogInScreen(
     moveToSignUpScreen: () -> Unit,
     moveToHomeScreen: () -> Unit
 ) {
-    val uiState by viewModel.loginState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     LoginScreen(
         moveToSignUpScreen = moveToSignUpScreen,
@@ -60,6 +61,7 @@ fun LogInScreen(
         is UiState.Loading -> LoadingScreen()
         is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
         is UiState.Success -> {}
+        is UiState.Idle -> {}
     }
 }
 
