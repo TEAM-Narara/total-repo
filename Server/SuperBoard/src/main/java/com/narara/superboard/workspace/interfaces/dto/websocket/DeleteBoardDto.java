@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class WorkspaceDeleteData implements WebSocketData {
-    private Long workspaceId;
+public class DeleteBoardDto {
+    private Long boardId;
 }

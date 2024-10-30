@@ -12,9 +12,11 @@ import com.narara.superboard.websocket.interfaces.dto.websocket.BoardMemberAddRe
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.websocket.AddWorkspaceMemberDto;
+import com.narara.superboard.workspace.interfaces.dto.websocket.DeleteBoardDto;
+import com.narara.superboard.workspace.interfaces.dto.websocket.DeleteWorkspaceDto;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkSpaceAddMemberDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDeleteData;
+import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDeleteResponse;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceMemberAddResponse;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import java.util.List;
@@ -56,32 +58,30 @@ public class WorkspaceWebSocketController {
 //        );
     }
 
+    //워크스페이스 삭제
     @MessageMapping("/workspace/{workspaceId}/delete")
     public void deleteWorkspace(@DestinationVariable Long workspaceId) {
-        //삭제할 수 있는권한이 있는지 확인
-        //workspace 밑에있는 보드들 조회
+        //삭제할 수 있는권한이 있는지 확인, workspace 밑에있는 보드들 조회, 삭제
+//        workspaceService.deleteWorkSpace(workspaceId); //워크스페이스 삭제 로직 수행
 
-        // 워크스페이스 삭제 로직 수행
+        //TODO service 로직에서 받아와야함
+        DeleteWorkspaceDto deleteWorkspaceDto = new DeleteWorkspaceDto();
 
-        //⇒ 모든 워크스페이스 멤버에게
-        // 1. Member 구독자들에게 보낼 메시지
-        WebSocketResponse memberResponse = new WebSocketResponse(
-                WORKSPACE,
-                WorkspaceAction.DELETE_WORKSPACE.toString(),
-                new WorkspaceDeleteData(workspaceId)
+        // workspace 브로드캐스트
+        WorkspaceDeleteResponse workspaceDeleteResponse = new WorkspaceDeleteResponse(
+                deleteWorkspaceDto.getWorkspaceId()
         );
+        messagingTemplate.convertAndSend("/topic/workspace/" + workspaceId, workspaceDeleteResponse);
 
-        // 2. Board 구독자들에게 보낼 메시지
-        Long boardId = 1L;
-        WebSocketResponse boardResponse = new WebSocketResponse(
-                BOARD,
-                BoardAction.DELETE_BOARD.toString(),
-                new BoardUpdateData(boardId)
-        );
-
-        // topic으로 브로드캐스트 메시지 전송
-        messagingTemplate.convertAndSend("/topic/member/1", memberResponse);
-        messagingTemplate.convertAndSend("/topic/board/" + boardId, boardResponse);
+        // board 브로드캐스트
+        for (DeleteBoardDto deleteBoardDto : deleteWorkspaceDto.getDeleteBoardDtoList()) {
+            WebSocketResponse boardResponse = new WebSocketResponse(
+                    BOARD,
+                    BoardAction.DELETE_BOARD.toString(),
+                    new BoardUpdateData(deleteBoardDto.getBoardId())
+            );
+            messagingTemplate.convertAndSend("/topic/board/" + deleteBoardDto.getBoardId(), boardResponse);
+        }
     }
 
     //워크스페이스 멤버추가
