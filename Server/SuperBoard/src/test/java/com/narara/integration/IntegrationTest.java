@@ -1,5 +1,6 @@
-package com.narara.superboard;
+package com.narara.integration;
 
+import com.narara.superboard.SuperBoardApplication;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.springframework.boot.test.context.SpringBootTest;
