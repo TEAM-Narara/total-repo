@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +23,6 @@ public class WorkspaceWebSocketController {
     private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/workspaces/create")
-    @SendTo("/topic/member/1") //임시로 만든 거
     public WebSocketResponse createWorkspace(WorkSpaceCreateRequestDto dto) {
         //workspace 추가로직
         //workspace에 권한이 있는 사람에게 broadcast 메시지 보내기
