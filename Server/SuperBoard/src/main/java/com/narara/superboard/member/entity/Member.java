@@ -1,8 +1,12 @@
 package com.narara.superboard.member.entity;
 
+import com.narara.superboard.alert.Alert;
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.common.entity.BaseTimeEntity;
+import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.memberbackground.MemberBackground;
 import com.narara.superboard.replymember.entity.ReplyMember;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
@@ -15,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +52,15 @@ public class Member {
     @Column(name = "login_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'LOCAL'")
     @Setter
     private LoginType loginType;  // Java에서 기본값 설정
+
+    @OneToMany(mappedBy = "member")
+    private List<FcmToken> fcmTokenList;
+
+    @OneToMany(mappedBy = "member")
+    private List<Alert> alretList;
+
+    @OneToMany(mappedBy = "member")
+    private List<MemberBackground> mamberBackgroundList;
 
     @OneToMany(mappedBy = "member")
     private List<WorkSpaceMember> workspaceMemberList;

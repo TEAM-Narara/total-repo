@@ -2,6 +2,7 @@ package com.narara.superboard.list.entity;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import jakarta.persistence.*;
@@ -18,13 +19,13 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "list")
-public class List {
+public class List extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
 
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;  // 보드 키
 

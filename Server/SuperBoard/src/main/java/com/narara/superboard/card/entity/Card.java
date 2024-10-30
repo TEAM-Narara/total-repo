@@ -1,7 +1,10 @@
 package com.narara.superboard.card.entity;
 
+import com.narara.superboard.attachment.Attachment;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.cardlabel.entity.CardLabel;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,14 +20,14 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "card")
-public class Card {
+public class Card extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @JoinColumn(name = "list_id", nullable = false)
+    @JoinColumn(name = "list_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private List list;
 
@@ -52,6 +55,12 @@ public class Card {
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;
+
+    @OneToMany(mappedBy = "card")
+    private java.util.List<CardLabel> cardLabelList;
+
+    @OneToMany(mappedBy = "card")
+    private java.util.List<Attachment> attachmentList;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         return Card.builder()

@@ -1,6 +1,7 @@
 package com.narara.superboard.workspace.entity;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -16,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WorkSpace {
+public class WorkSpace extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

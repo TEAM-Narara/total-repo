@@ -33,11 +33,12 @@ public class ReplyServiceImpl implements ReplyService{
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card);
+        Reply savedReply = replyRepository.save(reply);
 
-        ReplyMember replyMember = ReplyMember.createReplyMember(reply, member);
+        ReplyMember replyMember = ReplyMember.createReplyMember(savedReply, member);
         replyMemberRepository.save(replyMember);
 
-        return replyRepository.save(reply);
+        return savedReply;
     }
 
     @Override
