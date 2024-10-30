@@ -33,6 +33,8 @@ public class WorkSpace {
     @OneToMany(mappedBy = "workSpace")
     private List<Board> boardCollection;
 
+    private Long offset = 0L;
+
     public static WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         return WorkSpace.builder()
                 .name(workspaceCreateRequestDto.name())

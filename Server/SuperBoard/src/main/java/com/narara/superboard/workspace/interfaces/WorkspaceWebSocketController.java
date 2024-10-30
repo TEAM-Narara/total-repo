@@ -9,11 +9,11 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardAddMemberDto;
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardMemberAddResponse;
+import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.websocket.AddWorkspaceMemberDto;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkSpaceAddMemberDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateData;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDeleteData;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceMemberAddResponse;
 import com.narara.superboard.workspace.service.WorkSpaceService;
@@ -38,16 +38,22 @@ public class WorkspaceWebSocketController {
     private final WorkSpaceService workspaceService;
     private final BoardService boardService;
 
+    //워크스페이스 추가(웹소켓 버전, http도 있음)
     @MessageMapping("/workspaces/create")
-    public WebSocketResponse createWorkspace(WorkSpaceCreateRequestDto dto) {
-        //workspace 추가로직
-        //workspace에 권한이 있는 사람에게 broadcast 메시지 보내기
+    public void createWorkspace(WorkSpaceCreateRequestDto dto) {
+//        workspaceService.createWorkSpace(dto);
 
-        return new WebSocketResponse(
-                WORKSPACE,
-                WorkspaceAction.ADD_WORKSPACE.toString(),
-                new WorkspaceCreateData(1L, "새워크")
+        //TODO 서비스로직에서 받아온 워크스페이스여야함
+        WorkSpace workSpace = new WorkSpace(
+                1L, "나의 워크스페이스"
         );
+
+        //workspace에 권한이 있는 사람에게 broadcast 메시지 보내기
+//        return new WebSocketResponse(
+//                WORKSPACE,
+//                WorkspaceAction.ADD_WORKSPACE.toString(),
+//                new WorkspaceCreateData(1L, "새워크")
+//        );
     }
 
     @MessageMapping("/workspace/{workspaceId}/delete")
