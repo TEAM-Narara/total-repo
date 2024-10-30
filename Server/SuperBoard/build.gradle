@@ -34,15 +34,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation 'com.vladmihalcea:hibernate-types-52:2.21.1'
-    implementation 'org.hibernate:hibernate-core:6.6.1.Final'
-//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // mariaDB 사용시 위의 사항 제거하고 여기로 해주세요
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    annotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // hibernate
+    implementation 'org.hibernate:hibernate-core:6.6.1.Final'
+
+    // db
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+    testRuntimeOnly 'org.postgresql:postgresql'
+//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // mariaDB 사용시 위의 사항 제거하고 여기로 해주세요
 
     //webSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -67,9 +71,6 @@ test{
     // JVM이 사용 가능한 CPU 코어 수 중 절반을 사용
     maxParallelForks = (Runtime.runtime.availableProcessors() / 2) ?: 1
 }
-tasks.named('test') {
-    useJUnitPlatform()
-}
 
 tasks.register('copyYML', Copy) {
     from 's107-secret-value'
@@ -77,7 +78,6 @@ tasks.register('copyYML', Copy) {
     into 'src/main/resources'  // 파일을 복사할 위치
 }
 
-// application-test.yml 파일 복사
 tasks.register('copyTestYML', Copy) {
     from 's107-secret-value'
     include "application-test.yml"  // 복사할 파일 지정
@@ -85,10 +85,18 @@ tasks.register('copyTestYML', Copy) {
 }
 
 tasks.named('build') {
-    dependsOn('copyYML', 'copyTestYML')
+    dependsOn('copyYML')
 }
 
-// 혹은 processResources 작업과 연결
+tasks.named('test') {
+    dependsOn('copyTestYML')
+    useJUnitPlatform()
+}
+
 tasks.named('processResources') {
-    dependsOn('copyYML', 'copyTestYML')
+    dependsOn('copyYML')
+}
+
+tasks.named('processTestResources') {
+    dependsOn 'copyTestYML' // processTestResources가 copyTestYML에 의존성을 가지도록 설정
 }
