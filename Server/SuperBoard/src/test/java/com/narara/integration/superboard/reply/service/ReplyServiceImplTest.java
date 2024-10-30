@@ -12,10 +12,12 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.service.ReplyServiceImpl;
+import com.narara.superboard.replymember.entity.ReplyMember;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
@@ -90,8 +92,10 @@ public class ReplyServiceImplTest extends IntegrationTest {
         String replyContent = "테스트 댓글 내용";
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(savedCard.getId(), replyContent);
 
+
+        Member member = new Member(1L,"시현","sisi@naver.com");
         // when
-        Reply createdReply = replyService.createReply(requestDto);
+        Reply createdReply = replyService.createReply(member, requestDto);
 
         // then
         // 실제 ContentValidator 동작 확인
