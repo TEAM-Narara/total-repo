@@ -64,12 +64,7 @@ public class BoardServiceImpl implements BoardService {
         WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
 
-        Board board = Board.builder()
-                .cover(boardCreateRequestDto.background())
-                .name(boardCreateRequestDto.name())
-                .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
-                .workSpace(workSpace)
-                .build();
+        Board board = Board.createBoard(boardCreateRequestDto, workSpace);
 
         Board saveBoard = boardRepository.save(board);
 
@@ -78,6 +73,8 @@ public class BoardServiceImpl implements BoardService {
 
         return saveBoard.getId();
     }
+
+
 
     @Override
     public Board getBoard(Long boardId) {
