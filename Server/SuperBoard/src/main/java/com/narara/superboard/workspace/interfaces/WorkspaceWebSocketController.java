@@ -90,7 +90,8 @@ public class WorkspaceWebSocketController {
                 1L,
                 Authority.ADMIN,
                 new Member(1L, "마루", "asdf@gmail.com", "http"),
-                List.of(new BoardAddMemberDto(1L, 1L, Authority.ADMIN, Visibility.WORKSPACE))  //워크스페이스에 포함된 board
+                List.of(new BoardAddMemberDto(1L, 1L, 1L, "주효림", Authority.ADMIN, Visibility.WORKSPACE))
+                //워크스페이스에 포함된 board
         );
 
         Member member = workSpaceAddMemberDto.getMember();
@@ -123,6 +124,8 @@ public class WorkspaceWebSocketController {
                     BoardAction.ADD_MEMBER.toString(),
                     new BoardMemberAddResponse(
                             boardAddMemberDto.getBoardId(),
+                            boardAddMemberDto.getMemberId(),
+                            boardAddMemberDto.getMemberName(),
                             boardAddMemberDto.getAuthority(),
                             boardAddMemberDto.getBoardOffset()
                     )

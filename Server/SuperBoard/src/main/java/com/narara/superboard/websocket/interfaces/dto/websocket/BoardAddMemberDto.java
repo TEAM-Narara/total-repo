@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class BoardAddMemberDto {
     private Long boardId;
     private Long boardOffset;
+    private Long memberId;
+    private String memberName;
     private Authority authority;
     private Visibility visibility;
 }

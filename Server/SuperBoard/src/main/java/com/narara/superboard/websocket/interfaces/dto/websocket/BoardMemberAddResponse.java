@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class BoardMemberAddResponse implements WebSocketData {
     private Long boardId;
+    private Long memberId;
+    private String memberName;
     private Authority authority;
     private Long boardOffset;
 }
