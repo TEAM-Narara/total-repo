@@ -36,7 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ssafy.board.getContrastingTextColor
+import com.ssafy.designsystem.getContrastingTextColor
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.LightSkyBlue
 import com.ssafy.designsystem.values.PaddingDefault

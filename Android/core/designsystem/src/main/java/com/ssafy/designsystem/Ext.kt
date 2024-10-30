@@ -1,5 +1,7 @@
 package com.ssafy.designsystem
 
+import androidx.compose.ui.graphics.Color
+import com.ssafy.designsystem.values.Transparent
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -53,4 +55,11 @@ fun formatUnixTimeStamp(start: Long, end: Long): String {
             append(" ~ ${dateFormat.format(endDate)}")
         }
     }
+}
+
+fun getContrastingTextColor(backgroundColor: Color): Color {
+    if (backgroundColor == Transparent) return Color.Black
+
+    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
+    return if (brightness > 384) Color.Black else Color.White
 }

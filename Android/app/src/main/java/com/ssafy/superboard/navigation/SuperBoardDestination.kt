@@ -16,11 +16,12 @@ import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
+import com.ssafy.card.label.Label
+import com.ssafy.card.label.labelScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
-import com.ssafy.home.member.WorkSpaceInviteMember
 import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
@@ -41,7 +42,7 @@ import com.ssafy.notification.notification.notificationScreen
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = LogIn,
+        startDestination = Label(0L),
         modifier = modifier
     ) {
         loginScreen(
@@ -187,6 +188,10 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         )
 
         workSpaceInviteMemberDestination(
+            popBack = navController::popBackStack
+        )
+
+        labelScreen(
             popBack = navController::popBackStack
         )
     }
