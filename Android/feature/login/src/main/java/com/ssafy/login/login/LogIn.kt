@@ -35,8 +35,9 @@ import com.ssafy.designsystem.values.PaddingXLarge
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.login.BuildConfig
+import com.ssafy.login.login.github.GitHubLoginHelper
+import com.ssafy.login.login.github.GitHubOauthEffect
 import com.ssafy.login.login.naver.NaverLoginCallback
-import com.ssafy.model.user.User
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -53,8 +54,9 @@ fun LogInScreen(
     LoginScreen(
         moveToSignUpScreen = moveToSignUpScreen,
         moveToHomeScreen = moveToHomeScreen,
+        successToLoginWithGitHub = viewModel::successToLoginWithGitHub,
         successToLoginWithNaver = viewModel::successToLoginWithNaver,
-        failToLoginWithNaver = viewModel::failToLoginWithNaver
+        failToLoginWithOauth = viewModel::failToLoginWithOauth
     )
 
     when (uiState) {
@@ -69,13 +71,19 @@ fun LogInScreen(
 private fun LoginScreen(
     moveToSignUpScreen: () -> Unit,
     moveToHomeScreen: () -> Unit,
-    successToLoginWithNaver: (User) -> Unit,
-    failToLoginWithNaver: (String) -> Unit,
+    successToLoginWithNaver: (String) -> Unit,
+    successToLoginWithGitHub: (String) -> Unit,
+    failToLoginWithOauth: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val (email, setEmail) = remember { mutableStateOf("") }
     val (password, setPassword) = remember { mutableStateOf("") }
+
+    GitHubOauthEffect(
+        onSuccessToGetCode = successToLoginWithGitHub,
+        onFailToGetCode = failToLoginWithOauth
+    )
 
     LaunchedEffect(Unit) {
         initializeOauth(context)
@@ -86,9 +94,7 @@ private fun LoginScreen(
             .fillMaxWidth()
             .padding(horizontal = PaddingDefault)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(
-            PaddingXSmall
-        )
+        verticalArrangement = Arrangement.spacedBy(PaddingXSmall)
     ) {
 
         Image(
@@ -114,8 +120,10 @@ private fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    PaddingZero, PaddingZero, PaddingZero,
-                    PaddingSemiLarge
+                    start = PaddingZero,
+                    top = PaddingZero,
+                    end = PaddingZero,
+                    bottom = PaddingSemiLarge
                 )
         )
 
@@ -134,7 +142,7 @@ private fun LoginScreen(
             onClick = {
                 val naverLoginCallback = NaverLoginCallback(
                     onSuccess = successToLoginWithNaver,
-                    onFailure = failToLoginWithNaver
+                    onFailure = failToLoginWithOauth
                 )
                 NaverIdLoginSDK.authenticate(context, naverLoginCallback)
             },
@@ -145,7 +153,7 @@ private fun LoginScreen(
         )
 
         LoginButton(
-            onClick = { moveToSignUpScreen() },
+            onClick = { GitHubLoginHelper().githubLogin(context) },
             icon = painterResource(id = R.drawable.logo_github),
             content = "깃허브 로그인",
             backColor = Color.Black,
