@@ -1,10 +1,7 @@
 package com.narara.superboard.member.service;
 
-import com.narara.superboard.common.exception.redis.RedisDataSaveException;
-import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.common.infrastructure.redis.RedisServiceImpl;
 import com.narara.superboard.member.entity.Member;
-import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.member.exception.*;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
@@ -12,9 +9,6 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,10 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.Optional;
