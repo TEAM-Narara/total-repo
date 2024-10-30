@@ -52,6 +52,8 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private java.util.List<List> listCollection;  // 보드 키
 
+    private Long offset;
+
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = boardUpdateRequestDto.background();
         this.name = boardUpdateRequestDto.name();
