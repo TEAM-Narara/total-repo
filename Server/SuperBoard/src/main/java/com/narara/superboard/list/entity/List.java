@@ -54,6 +54,10 @@ public class List {
                 .name(listCreateRequestDto.listName())
                 .board(board)
                 .myOrder(board.getLastListOrder() +1)
+                .lastCardOrder(0L)
+                .isArchived(false)
+                .isDeleted(false)
+                .cardOrderVersion(0L)
                 .build();
     }
 

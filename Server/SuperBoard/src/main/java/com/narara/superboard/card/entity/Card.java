@@ -58,6 +58,9 @@ public class Card {
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
                 .myOrder(list.getLastCardOrder() + 1)
+                .myOrder(0L)
+                .isDeleted(false)
+                .isArchived(false)
                 .build();
     }
 

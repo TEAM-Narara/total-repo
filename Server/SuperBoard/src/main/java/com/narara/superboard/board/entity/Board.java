@@ -1,6 +1,7 @@
 package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
+import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.list.entity.List;
@@ -51,6 +52,18 @@ public class Board {
 
     @OneToMany(mappedBy = "board")
     private java.util.List<List> listCollection;  // 보드 키
+
+    public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
+        return Board.builder()
+                .cover(boardCreateRequestDto.background())
+                .name(boardCreateRequestDto.name())
+                .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
+                .workSpace(workSpace)
+                .lastListOrder(0L)
+                .isArchived(false)
+                .listOrderVersion(0L)
+                .build();
+    }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = boardUpdateRequestDto.background();
