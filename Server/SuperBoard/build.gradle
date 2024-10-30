@@ -45,8 +45,10 @@ dependencies {
     // db
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
-    testRuntimeOnly 'org.postgresql:postgresql'
 //    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // mariaDB 사용시 위의 사항 제거하고 여기로 해주세요
+
+    // test db
+    testRuntimeOnly 'org.postgresql:postgresql'
 
     //webSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
