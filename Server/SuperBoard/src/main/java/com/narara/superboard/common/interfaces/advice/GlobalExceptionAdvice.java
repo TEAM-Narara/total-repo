@@ -1,6 +1,9 @@
 package com.narara.superboard.common.interfaces.advice;
 
 import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.common.interfaces.response.DefaultResponse;
+import com.narara.superboard.common.interfaces.response.ResponseMessage;
+import com.narara.superboard.common.interfaces.response.StatusCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,12 +16,8 @@ import java.util.Map;
 public class GlobalExceptionAdvice {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(NotFoundException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> handleIllegalArgumentException(NotFoundException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND);
     }
-
-
 
 }

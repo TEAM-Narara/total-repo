@@ -9,6 +9,8 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import com.narara.superboard.workspace.service.WorkSpaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,9 @@ class AuthServiceImplTest {
 
     @Mock
     private MemberValidator memberValidator;
+
+    @Mock
+    private WorkSpaceService workSpaceService;
 
     @InjectMocks
     private AuthServiceImpl authService; // 테스트 대상 서비스
@@ -86,6 +91,7 @@ class AuthServiceImplTest {
 
         // 6. MemberValidator가 검증을 호출했는지 확인
         verify(memberValidator, times(1)).registerValidate(requestDto); // 유효성 검증 호출 확인
+        verify(workSpaceService, times(1)).createWorkSpace(any(Member.class),any(WorkSpaceCreateRequestDto.class)); // 유효성 검증 호출 확인
 
         // 6. 결과 검증
         // 호출되었는지 확인
