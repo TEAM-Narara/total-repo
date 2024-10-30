@@ -41,13 +41,13 @@ public class Member {
     // 기본값을 false로 설정
     @Setter
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
-    private Boolean isDeleted = false;  // Java에서 기본값 설정
+    private Boolean isDeleted;  // Java에서 기본값 설정
 
     // 로그인 타입을 LOCAL로 설정
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'LOCAL'")
     @Setter
-    private LoginType loginType = LoginType.LOCAL;  // Java에서 기본값 설정
+    private LoginType loginType;  // Java에서 기본값 설정
 
     @OneToMany(mappedBy = "member")
     private List<WorkSpaceMember> workspaceMemberList;
