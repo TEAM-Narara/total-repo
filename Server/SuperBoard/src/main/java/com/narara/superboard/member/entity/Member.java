@@ -3,11 +3,12 @@ package com.narara.superboard.member.entity;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Entity
 @Getter
 public class Member {
