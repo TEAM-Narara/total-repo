@@ -83,7 +83,6 @@ pipeline {
 
         stage('Run New BE Container') {
             steps {
-                // 새로운 BE 컨테이너 실행
                 script {
                     // 네트워크 확인 및 조건 설정
                     def networks = []
@@ -94,14 +93,23 @@ pipeline {
                         networks << "total-server-test-network"
                     }
 
-                    // 네트워크 연결 옵션 생성
-                    def networkOptions = networks.collect { "--network ${it}" }.join(" ")
+                    // 첫 번째 네트워크에만 연결하여 Docker 컨테이너 실행
+                    def primaryNetwork = networks[0]  // 첫 번째 네트워크를 선택
+                    sh "docker run -d --name total-server --network ${primaryNetwork} -p 18080:8080 total-server"
 
-                    // Docker 컨테이너 실행
-                    sh "docker run -d --name total-server ${networkOptions} -p 18080:8080 total-server"
+                    // 추가 네트워크 연결
+                    if (networks.size() > 1) {
+                        networks[1..-1].each { network ->
+                            // 네트워크 연결 확인 및 디버깅 메시지 출력
+                            echo "Connecting to additional network: ${network}"
+                            sh "docker network connect ${network} total-server"
+                        }
+                    }
                 }
             }
         }
+
+
 
         // 컨테이너 상태 확인
         stage('Check Containers') {
