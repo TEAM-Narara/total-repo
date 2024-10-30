@@ -4,6 +4,8 @@ import com.narara.superboard.board.enums.BoardAction;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.websocket.BoardUpdateData;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardAddMemberDto;
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardMemberAddResponse;
@@ -83,22 +85,35 @@ public class WorkspaceWebSocketController {
 //        workspaceService.addWorkspaceMember(requestDto); //워크스페이스 멤버 추가
 
         //TODO 서비스로직에서 받아오는 데이터여야함
-        WorkSpaceAddMemberDto workspace = new WorkSpaceAddMemberDto(
+        WorkSpaceAddMemberDto workSpaceAddMemberDto = new WorkSpaceAddMemberDto(
                 1L,
                 1L,
-                List.of(new BoardAddMemberDto(1L, 1L, Visibility.WORKSPACE))  //워크스페이스에 포함된 board
+                Authority.ADMIN,
+                new Member(1L, "마루", "asdf@gmail.com", "http"),
+                List.of(new BoardAddMemberDto(1L, 1L, Authority.ADMIN, Visibility.WORKSPACE))  //워크스페이스에 포함된 board
         );
+
+        Member member = workSpaceAddMemberDto.getMember();
 
         // workspace 브로드캐스트
         WebSocketResponse memberResponse = new WebSocketResponse(
                 WORKSPACE,
                 WorkspaceAction.ADD_MEMBER.toString(),
-                new WorkspaceMemberAddResponse(workspaceId, 1L)
+                new WorkspaceMemberAddResponse(
+                        workspaceId,
+                        member.getId(),
+                        member.getNickname(),
+                        member.getEmail(),
+                        member.getProfileImgUrl(),
+                        workSpaceAddMemberDto.getAuthority(),
+                        1L
+                )
         );
+
         messagingTemplate.convertAndSend("/topic/workspaces/" + workspaceId, memberResponse);
 
         // board 브로드캐스트
-        for (BoardAddMemberDto boardAddMemberDto : workspace.getBoardAddMemberDtoList()) {
+        for (BoardAddMemberDto boardAddMemberDto : workSpaceAddMemberDto.getBoardAddMemberDtoList()) {
             if (boardAddMemberDto.getVisibility() != Visibility.WORKSPACE) {
                 continue;
             }
@@ -106,7 +121,11 @@ public class WorkspaceWebSocketController {
             WebSocketResponse boardResponse = new WebSocketResponse(
                     BOARD,
                     BoardAction.ADD_MEMBER.toString(),
-                    new BoardMemberAddResponse(boardAddMemberDto.getBoardId(), boardAddMemberDto.getBoardOffset())
+                    new BoardMemberAddResponse(
+                            boardAddMemberDto.getBoardId(),
+                            boardAddMemberDto.getAuthority(),
+                            boardAddMemberDto.getBoardOffset()
+                    )
             );
 
             messagingTemplate.convertAndSend("/topic/boards/" + boardAddMemberDto.getBoardId(), boardResponse);

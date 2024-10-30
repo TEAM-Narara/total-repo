@@ -1,4 +1,6 @@
 package com.narara.superboard.workspace.interfaces.dto.websocket;
 
-public record AddWorkspaceMemberDto(Long memberId) {
+import com.narara.superboard.common.constant.enums.Authority;
+
+public record AddWorkspaceMemberDto(Long memberId, Authority authority) {
 }
