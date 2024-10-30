@@ -64,7 +64,7 @@ pipeline {
         stage('Build BE Docker Image') {
             steps {
                 dir("./Server/SuperBoard") {
-                    sh 'docker build -t total-sever .'
+                    sh 'docker build -t total-server .'
                 }
             }
         }
@@ -95,10 +95,10 @@ pipeline {
                     }
 
                     // 네트워크 연결 옵션 생성
-                    def networkOptions = networks.collect { "--network $_" }.join(" ")
+                    def networkOptions = networks.collect { "--network ${it}" }.join(" ")
 
                     // Docker 컨테이너 실행
-                    sh "docker run -d --name total-server ${networkOptions} -p 18080:8080 total-sever"
+                    sh "docker run -d --name total-server ${networkOptions} -p 18080:8080 total-server"
                 }
             }
         }
@@ -106,14 +106,6 @@ pipeline {
         // 컨테이너 상태 확인
         stage('Check Containers') {
             steps {
-                sh 'docker ps -a'
-            }
-        }
-    }
-
-    post {
-        always {
-            script {
                 sh 'docker ps -a'
             }
         }
