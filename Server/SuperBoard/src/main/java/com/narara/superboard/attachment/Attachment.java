@@ -19,7 +19,7 @@ public class Attachment extends BaseTimeEntity {
     private Long id; // 기본키
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Card card; // 카드 키
 
     @Column(name = "url", nullable = false)

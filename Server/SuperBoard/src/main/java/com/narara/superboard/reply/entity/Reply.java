@@ -4,15 +4,7 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +24,7 @@ public class Reply extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
 
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;  // 보드 키
 

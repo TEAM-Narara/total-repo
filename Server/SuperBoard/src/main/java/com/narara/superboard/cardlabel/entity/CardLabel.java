@@ -22,11 +22,11 @@ public class CardLabel extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "label_id", nullable = false)
+    @JoinColumn(name = "label_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Label label;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Card card;
 
     @Column(name = "is_activated", nullable = false, columnDefinition = "boolean default true")

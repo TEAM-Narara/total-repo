@@ -24,11 +24,11 @@ public class WorkSpaceMember extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본 키
 
-    @JoinColumn(name = "member", nullable = false)
+    @JoinColumn(name = "member", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;  // 멤버 ID
 
-    @JoinColumn(name = "workspace", nullable = false)
+    @JoinColumn(name = "workspace", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 ID
 

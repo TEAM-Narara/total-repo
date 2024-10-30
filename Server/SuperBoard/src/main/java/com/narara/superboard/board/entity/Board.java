@@ -47,7 +47,7 @@ public class Board extends BaseTimeEntity {
     @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long listOrderVersion;  // 버전
 
-    @JoinColumn(name = "workspace_id", nullable = false)
+    @JoinColumn(name = "workspace_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 키
 

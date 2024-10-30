@@ -25,7 +25,7 @@ public class List extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
 
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;  // 보드 키
 

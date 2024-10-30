@@ -24,7 +24,7 @@ public class Label extends BaseTimeEntity {
     private Long id;  // 기본키
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Board board;  // 보드 키
 
     @Column(name = "name", nullable = false)
