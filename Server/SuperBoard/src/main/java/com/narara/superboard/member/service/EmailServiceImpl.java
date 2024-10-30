@@ -95,7 +95,7 @@ public class EmailServiceImpl implements EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
         helper.setTo(email);
-        helper.setSubject("[인증 코드] " + code);
+        helper.setSubject("[SUPER BOARD] 회원가입 본인인증 메일입니다.");
         helper.setText(setEmailContent(code), true); // HTML 템플릿 적용 및 이메일 내용 설정
 
         emailSender.send(message);

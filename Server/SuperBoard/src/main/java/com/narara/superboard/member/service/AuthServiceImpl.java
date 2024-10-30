@@ -2,6 +2,7 @@ package com.narara.superboard.member.service;
 
 import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.InvalidCredentialsException;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -106,6 +107,8 @@ public class AuthServiceImpl implements AuthService {
                 .nickname(memberCreateRequestDto.nickname())
                 .email(memberCreateRequestDto.email())
                 .password(encodedPassword)
+                .loginType(LoginType.LOCAL)
+                .isDeleted(false)
                 .build();
 
         return memberRepository.save(newMember);

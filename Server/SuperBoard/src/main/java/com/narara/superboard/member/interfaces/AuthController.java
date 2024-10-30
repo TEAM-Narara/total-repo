@@ -34,7 +34,7 @@ public class AuthController implements AuthAPI{
         headers.add("Authorization", "Bearer " + tokens.accessToken());
         headers.add("Refresh-Token", tokens.refreshToken());
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS,tokens), headers,HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS), headers,HttpStatus.OK);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class AuthController implements AuthAPI{
         headers.add("Authorization", "Bearer " + tokens.accessToken());
         headers.add("Refresh-Token", tokens.refreshToken());
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CREATED_USER,tokens),headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CREATED_USER),headers, HttpStatus.CREATED);
     }
 
     @Override
