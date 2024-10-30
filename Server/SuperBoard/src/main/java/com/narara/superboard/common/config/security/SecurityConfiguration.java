@@ -58,7 +58,9 @@ public class SecurityConfiguration {
 
                 // request 인증, 인가 설정
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("api/v1/members/register","api/v1/members/login","api/v1/members/reissue").permitAll()
+                        request.requestMatchers("api/v1/members/register","api/v1/members/login"
+                                        ,"api/v1/members/reissue","api/v1/members/email-code"
+                                ,"api/v1/members/email-code/verify").permitAll()
                                 .anyRequest().authenticated()
                 )
                 // jwt 관련 설정

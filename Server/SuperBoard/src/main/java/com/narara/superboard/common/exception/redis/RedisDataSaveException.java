@@ -1,6 +1,8 @@
 package com.narara.superboard.common.exception.redis;
 
-public class RedisDataSaveException extends RuntimeException {
+import io.lettuce.core.RedisException;
+
+public class RedisDataSaveException extends RedisException {
 
     // 단순 key, value 저장 실패의 경우
     public RedisDataSaveException(String key, String value) {

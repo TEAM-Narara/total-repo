@@ -1,6 +1,8 @@
 package com.narara.superboard.common.exception.redis;
 
-public class RedisConnectionException extends RuntimeException {
+import io.lettuce.core.RedisException;
+
+public class RedisConnectionException extends RedisException {
     public RedisConnectionException(String message) {
         super(message);
     }

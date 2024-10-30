@@ -6,6 +6,7 @@ public class ResponseMessage {
     public static final String DUPLICATE_EMAIL = "이메일 중복 에러";
     public static final String VALIDATION_ERROR = "이메일 유효성 에러";
     public static final String SEND_EMAIL_AUTHENTICATION_CODE = "이메일 인증코드 전송 성공";
+    public static final String EMAIL_AUTHENTICATION_SUCCESS = "이메일 인증 성공";
     public static final String LOGIN_SUCCESS = "로그인 성공";
     public static final String LOGOUT_SUCCESS = "로그아웃 성공";
     public static final String NAVER_LOGIN_SUCCESS = "네이버 로그인 성공";
