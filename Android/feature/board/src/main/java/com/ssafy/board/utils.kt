@@ -1,41 +1,11 @@
 package com.ssafy.board
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddReaction
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.ssafy.designsystem.values.Transparent
-import kotlinx.coroutines.coroutineScope
-
-suspend fun handleLazyListScroll(
-    lazyListState: LazyListState,
-    dropIndex: Int,
-    indexOffset: Int,
-    isRow: Boolean = false,
-): Unit = coroutineScope {
-    val targetIndex = dropIndex + indexOffset
-
-    val viewportSize = if (isRow) {
-        lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-    } else {
-        lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-    }
-
-    val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == targetIndex }
-    val itemSize = itemInfo?.size ?: 0
-
-    val centerOffset = (viewportSize - itemSize) / 2
-
-    lazyListState.animateScrollToItem(
-        index = targetIndex,
-        scrollOffset = -centerOffset,
-    )
-}
-
 
 @Composable
 fun getIcon(type: String): ImageVector {
@@ -44,12 +14,4 @@ fun getIcon(type: String): ImageVector {
         "attached" -> Icons.Default.AttachFile
         else -> Icons.Default.AddReaction
     }
-}
-
-
-fun getContrastingTextColor(backgroundColor: Color): Color {
-    if (backgroundColor == Transparent) return Color.Black
-
-    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
-    return if (brightness > 384) Color.Black else Color.White
 }
