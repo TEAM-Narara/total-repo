@@ -5,12 +5,15 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.member.entity.Member;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -41,7 +44,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     private NameValidator nameValidator;
 
     @Mock
-    private CoverValidator coverValidator;
+    private CardMemberRepository cardMemberRepository;
 
     @Mock
     private LastOrderValidator lastOrderValidator;
@@ -76,6 +79,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .list(list)
                 .build();
 
+        Member member = new Member(1L, "시현", "sisi@naver.com");
+
         // Mocking: 이름 검증 로직
         doNothing().when(nameValidator).validateCardNameIsEmpty(cardCreateRequestDto);
 
@@ -86,13 +91,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         doNothing().when(lastOrderValidator).checkValidCardLastOrder(list);
 
         // when
-        Card result = cardService.createCard(cardCreateRequestDto);
+        Card result = cardService.createCard(member, cardCreateRequestDto);
 
         // then
         assertEquals(cardId, result.getId());
         assertEquals(cardName, result.getName());
         verify(nameValidator, times(1)).validateCardNameIsEmpty(cardCreateRequestDto);
         verify(cardRepository, times(1)).save(any(Card.class));
+        verify(cardMemberRepository, times(1)).save(any(CardMember.class));
     }
 
     @ParameterizedTest
@@ -102,13 +108,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         // given
         String cardName = "Test Card";
         CardCreateRequestDto cardCreateRequestDto = new CardCreateRequestDto(listId, cardName);
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking listRepository to return an empty Optional (리스트가 존재하지 않음)
         when(listRepository.findById(listId)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(NotFoundEntityException.class, () -> {
-            cardService.createCard(cardCreateRequestDto);
+            cardService.createCard(member, cardCreateRequestDto);
         });
 
         // 검증: listRepository.findById가 1번 호출되었는지 확인

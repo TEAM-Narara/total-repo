@@ -4,10 +4,13 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import com.narara.superboard.replymember.entity.ReplyMember;
+import com.narara.superboard.replymember.infrastructure.ReplyMemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,17 +21,21 @@ public class ReplyServiceImpl implements ReplyService{
 
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
+    private final ReplyMemberRepository replyMemberRepository;
 
     private final ContentValidator contentValidator;
 
     @Override
-    public Reply createReply(ReplyCreateRequestDto replyCreateRequestDto) {
+    public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
         Card card = cardRepository.findById(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card);
+
+        ReplyMember replyMember = ReplyMember.createReplyMember(reply, member);
+        replyMemberRepository.save(replyMember);
 
         return replyRepository.save(reply);
     }

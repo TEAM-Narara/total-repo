@@ -1,5 +1,7 @@
 package com.narara.superboard.workspacemember.entity;
 
+import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -34,6 +36,14 @@ public class WorkSpaceMember {
 
     public WorkSpaceMember(WorkSpace workSpace) {
         this.workSpace = workSpace;
+    }
+
+    public static WorkSpaceMember createWorkspaceMemberByAdmin(WorkSpace workSpace, Member member){
+        return WorkSpaceMember.builder()
+                .member(member)
+                .workSpace(workSpace)
+                .authority(Authority.ADMIN)
+                .build();
     }
 
     public WorkSpaceMember(Member member, Authority authority) {

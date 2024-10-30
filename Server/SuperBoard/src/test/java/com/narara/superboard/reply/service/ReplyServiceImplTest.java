@@ -6,10 +6,13 @@ import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import com.narara.superboard.replymember.entity.ReplyMember;
+import com.narara.superboard.replymember.infrastructure.ReplyMemberRepository;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +43,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     private CardRepository cardRepository;
 
     @Mock
+    private ReplyMemberRepository replyMemberRepository;
+
+    @Mock
     private ReplyRepository replyRepository;
 
     @Test
@@ -47,12 +53,13 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     void shouldThrowExceptionWhenCardDoesNotExist() {
         // given
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(1L, "Valid content");
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 카드가 존재하지 않도록 설정
         when(cardRepository.findById(requestDto.cardId())).thenReturn(Optional.empty());
 
         // then
-        assertThrows(NotFoundEntityException.class, () -> replyService.createReply(requestDto));
+        assertThrows(NotFoundEntityException.class, () -> replyService.createReply(member, requestDto));
     }
 
     @Test
@@ -62,6 +69,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(1L, "Valid content");
         Card card = Card.builder().id(requestDto.cardId()).name("Test Card").build();
         Reply expectedReply = Reply.builder().id(1L).content(requestDto.content()).card(card).build();
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 검증 로직을 모킹
         doNothing().when(contentValidator).validateReplyContentIsEmpty(requestDto);
@@ -69,7 +77,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         when(replyRepository.save(any(Reply.class))).thenReturn(expectedReply);  // Mocking save 결과
 
         // when
-        Reply result = replyService.createReply(requestDto);
+        Reply result = replyService.createReply(member, requestDto);
 
         // then
         assertNotNull(result);  // result가 null이 아님을 확인
@@ -79,6 +87,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         verify(contentValidator, times(1)).validateReplyContentIsEmpty(requestDto);
         verify(cardRepository, times(1)).findById(requestDto.cardId());
         verify(replyRepository, times(1)).save(any(Reply.class));
+        verify(replyMemberRepository, times(1)).save(any(ReplyMember.class));
     }
 
 
