@@ -1,7 +1,9 @@
 package com.narara.superboard.card.entity;
 
+import com.narara.superboard.attachment.Attachment;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,6 +54,12 @@ public class Card {
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;
+
+    @OneToMany(mappedBy = "card")
+    private java.util.List<CardLabel> cardLabelList;
+
+    @OneToMany(mappedBy = "card")
+    private java.util.List<Attachment> attachmentList;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         return Card.builder()
