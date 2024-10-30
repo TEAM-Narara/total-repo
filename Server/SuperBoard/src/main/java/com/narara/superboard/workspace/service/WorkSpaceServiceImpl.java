@@ -27,11 +27,13 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceMemberService workSpaceMemberService;
 
     @Override
-    public void createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
+    public WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);
         workSpaceRepository.save(workSpace);
+
+        return workSpace;
     }
 
     @Override

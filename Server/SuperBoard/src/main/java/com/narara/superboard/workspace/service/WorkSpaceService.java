@@ -7,7 +7,7 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 
 public interface WorkSpaceService {
 
-    void createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto);
+    WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto);
     WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto);
     void deleteWorkSpace(Long workSpaceId);
     WorkSpace getWorkSpace(Long workSpaceId);

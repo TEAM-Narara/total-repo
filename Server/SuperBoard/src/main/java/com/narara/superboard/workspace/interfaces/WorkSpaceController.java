@@ -1,14 +1,17 @@
 package com.narara.superboard.workspace.interfaces;
 
+import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateData;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,7 +26,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Tag(name = "나의 워크스페이스 리스트 조회")
     @GetMapping
-    public ResponseEntity<WorkSpaceListResponseDto> createWorkspace() {
+    public ResponseEntity<WorkSpaceListResponseDto> getWorkspaceListByMember() {
         //userId 기반, 내가 권한이 있는 워크스페이스 조회
         WorkSpaceListResponseDto workSpaceListResponseDto = new WorkSpaceListResponseDto(
                 List.of(
@@ -33,5 +36,15 @@ public class WorkSpaceController implements WorkSpaceAPI {
         );
 
         return ResponseEntity.ok(workSpaceListResponseDto);
+    }
+
+    @Tag(name = "워크스페이스 생성")
+    @PostMapping
+    public ResponseEntity<WorkspaceCreateData> createWorkspace() {
+        WorkSpace workSpace = workSpaceService.createWorkSpace(
+                new WorkSpaceCreateRequestDto("새로운 워크스페이스")
+        );
+
+        return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
     }
 }
