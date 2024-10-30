@@ -42,7 +42,7 @@ fun UserInviteItem(
     email: String,
     isInvited: Boolean = false,
     onInvite: () -> Unit = {},
-    icon: @Composable () -> Unit,
+    profileImage: @Composable () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -55,7 +55,7 @@ fun UserInviteItem(
                 .size(IconXLarge)
                 .clip(CircleShape)
         ) {
-            icon()
+            profileImage()
         }
 
         Column(

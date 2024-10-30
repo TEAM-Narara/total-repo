@@ -42,7 +42,7 @@ import com.ssafy.notification.notification.notificationScreen
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = Label(0L),
+        startDestination = Card(0L),
         modifier = modifier
     ) {
         loginScreen(
