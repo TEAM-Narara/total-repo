@@ -9,6 +9,7 @@ import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
+import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -19,9 +20,12 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
 import com.narara.superboard.member.entity.Member;
+
+import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -594,6 +598,68 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // then: 보드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, board.getIsArchived());
         verify(boardRepository, times(1)).findById(boardId);
+    }
+
+    /**
+     * 보드별 댓글 조회 TEST -------------------------------------------------------------------
+     */
+    @Test
+    @DisplayName("보드별 댓글 조회 성공 테스트")
+    void getAllRepliesForBoard_success() {
+        // Given
+        Long boardId = 1L;
+
+        // 1. Member 엔티티 생성
+        Member member = new Member(1L, "testUser", "user@example.com");
+
+        // 2. Board 객체 생성
+        Map<String, Object> cover1 = new HashMap<>();
+        cover1.put("type", "COLOR");
+        cover1.put("value", "#ffffff");
+        Board board = Board.builder()
+                .id(boardId)
+                .name("보드 1")
+                .cover(cover1)
+                .build();
+
+        // 3. List 엔티티 생성 및 Board 연결
+        com.narara.superboard.list.entity.List list = com.narara.superboard.list.entity.List.builder()
+                .id(10001L)
+                .name("List A")
+                .board(board) // 리스트에 보드 추가
+                .build();
+
+        // 4. Card 엔티티 생성 및 List 연결
+        Card card = Card.builder()
+                .id(1001L)
+                .name("Card A")
+                .list(list) // 카드에 리스트 추가
+                .build();
+
+        // 5. Reply 엔티티 생성 및 Card, Member 연결
+        Reply reply = Reply.builder()
+                .id(1L)
+                .card(card)
+                .content("This is a comment") // 테스트에서 검증할 댓글 내용
+                .isDeleted(false)
+                .member(member) // 댓글에 멤버 추가
+                .build();
+
+        // Mock repository behavior
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // When
+        List<BoardReplyCollectionResponseDto> replies = boardService.getRepliesByBoardId(boardId);
+
+        // Then
+        assertNotNull(replies);
+        assertEquals(1, replies.size());
+        assertEquals("This is a comment", replies.get(0).content());
+        assertEquals("user@example.com", replies.get(0).email());
+        assertEquals(1001L, replies.get(0).cardId());
+        assertEquals("Card A", replies.get(0).cardName());
+        assertEquals(10001L, replies.get(0).listId());
+        assertEquals("List A", replies.get(0).listName());
     }
 
 }

@@ -129,4 +129,10 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
     }
 
+    // 보드별 댓글 조회
+    @Override
+    public List<BoardReplyCollectionResponseDto> getRepliesByBoardId(Long boardId) {
+        return null;
+    }
+
 }

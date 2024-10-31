@@ -1,10 +1,7 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.board.interfaces.dto.*;
 
 import com.narara.superboard.member.entity.Member;
 import java.util.List;
@@ -25,5 +22,9 @@ public interface BoardService {
     List<Board> getArchivedBoards(Long workspaceId);
 
     void changeArchiveStatus(Long boardId);
+
+    List<BoardReplyCollectionResponseDto> getRepliesByBoardId(Long boardId);
+
+
 
 }
