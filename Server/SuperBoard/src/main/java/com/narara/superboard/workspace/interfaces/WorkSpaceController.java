@@ -21,11 +21,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     private final WorkSpaceService workSpaceService;
 
-    @Override
-    public void createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
-        workSpaceService.createWorkSpace(member, workspaceCreateRequestDto);
-    }
-
     @Tag(name = "나의 워크스페이스 리스트 조회")
     @GetMapping
     public ResponseEntity<WorkSpaceListResponseDto> getWorkspaceListByMember() {
@@ -42,8 +37,9 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Tag(name = "워크스페이스 생성")
     @PostMapping
-    public ResponseEntity<WorkspaceCreateData> createWorkspace() {
+    public ResponseEntity<WorkspaceCreateData> createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         WorkSpace workSpace = workSpaceService.createWorkSpace(
+                new Member(),
                 new WorkSpaceCreateRequestDto("새로운 워크스페이스")
         );
 
