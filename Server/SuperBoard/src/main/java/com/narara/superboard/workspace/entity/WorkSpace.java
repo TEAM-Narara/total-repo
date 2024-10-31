@@ -34,6 +34,10 @@ public class WorkSpace extends BaseTimeEntity {
     @OneToMany(mappedBy = "workSpace")
     private List<Board> boardCollection;
 
+    @Builder.Default
+    @Column(name = "\"offset\"")
+    private Long offset = 0L;
+
     public static WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         return WorkSpace.builder()
                 .name(workspaceCreateRequestDto.name())
@@ -49,9 +53,10 @@ public class WorkSpace extends BaseTimeEntity {
 
     // test
     @Builder
-    public WorkSpace(Long id, String name) {
+    public WorkSpace(Long id, String name, Long offset) {
         this.id = id;
         this.name = name;
         this.workspaceMemberList = null;
+        this.offset = offset;
     }
 }

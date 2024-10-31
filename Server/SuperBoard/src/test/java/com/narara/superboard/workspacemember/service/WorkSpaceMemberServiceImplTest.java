@@ -40,8 +40,8 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         Long memberId = 1L;
 
         // Mock된 WorkSpace 데이터 생성
-        WorkSpace mockWorkSpace1 = new WorkSpace(1L, "워크스페이스 1");
-        WorkSpace mockWorkSpace2 = new WorkSpace(2L, "워크스페이스 2");
+        WorkSpace mockWorkSpace1 = new WorkSpace(1L, "워크스페이스 1", 1L);
+        WorkSpace mockWorkSpace2 = new WorkSpace(2L, "워크스페이스 2", 1L);
 
         // Mock된 WorkSpaceMember 데이터 생성
         WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockWorkSpace1);
