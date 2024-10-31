@@ -47,7 +47,7 @@ public class WorkspaceWebSocketController {
 
         //TODO 서비스로직에서 받아온 워크스페이스여야함
         WorkSpace workSpace = new WorkSpace(
-                1L, "나의 워크스페이스"
+                1L, "나의 워크스페이스", 1L
         );
 
         //workspace에 권한이 있는 사람에게 broadcast 메시지 보내기

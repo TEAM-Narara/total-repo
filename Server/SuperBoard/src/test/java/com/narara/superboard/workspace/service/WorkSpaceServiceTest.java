@@ -161,13 +161,13 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     // WorkSpace 객체를 실제로 만들어서 테스트하기 위한 데이터 제공 메서드
     static Stream<WorkSpace> provideWorkSpaces() {
         return Stream.of(
-                new WorkSpace(1L, "Workspace 1"
+                new WorkSpace(1L, "Workspace 1", 1L
 //                        , "Description 1"
                 ),
-                new WorkSpace(2L, "Workspace 2"
+                new WorkSpace(2L, "Workspace 2", 1L
 //                        , "Description 2"
                 ),
-                new WorkSpace(3L, "Workspace 3"
+                new WorkSpace(3L, "Workspace 3", 1L
 //                        , "Description 3"
                 )
         );
@@ -197,7 +197,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         // given
         Long workspaceId = 1L;
 
-        WorkSpace mockWorkSpace =  new WorkSpace(workspaceId, "시현의 워크스페이스");
+        WorkSpace mockWorkSpace =  new WorkSpace(workspaceId, "시현의 워크스페이스", 1L);
         BoardCollectionResponseDto mockBoardCollectionResponseDto = createMockBoardCollection();
         WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto = createMockMemberCollection();
 
