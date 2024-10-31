@@ -1,8 +1,10 @@
 package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
@@ -11,6 +13,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +46,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private ReplyRepository replyRepository;
 
+    @Mock
+    private CardService cardService;
+
     @Test
     @DisplayName("댓글 생성시, 카드가 존재하지 않을 때 NotFoundEntityException 발생")
     void shouldThrowExceptionWhenCardDoesNotExist() {
@@ -67,6 +73,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 검증 로직을 모킹
+        doNothing().when(cardService).checkBoardMember(card, member, ReplyAction.ADD_REPLY);
         doNothing().when(contentValidator).validateReplyContentIsEmpty(requestDto);
         when(cardRepository.findById(requestDto.cardId())).thenReturn(Optional.of(card));
         when(replyRepository.save(any(Reply.class))).thenReturn(expectedReply);  // Mocking save 결과

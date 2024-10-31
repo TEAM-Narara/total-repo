@@ -14,6 +14,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class ReplyServiceImpl implements ReplyService{
         Card card = cardRepository.findById(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
-        cardService.checkBoardMember(card,member, CardAction.ADD_CARD);
+        cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
 
