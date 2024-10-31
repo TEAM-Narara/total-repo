@@ -10,7 +10,7 @@ public record CardSimpleResponseDto(
         String name
 ) {
     public static CardSimpleResponseDto of(Card card){
-        CardSimpleResponseDto.builder()
+        return CardSimpleResponseDto.builder()
                 .cardId(card.getId())
                 .listId(card.getList().getId())
                 .name(card.getName())
