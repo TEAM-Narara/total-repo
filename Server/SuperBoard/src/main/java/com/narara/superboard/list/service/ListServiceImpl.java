@@ -13,6 +13,7 @@ import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.websocket.constant.Action;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +70,7 @@ public class ListServiceImpl implements ListService{
     }
 
     @Override
-    public void checkBoardMember(List list, Member member, CardAction action) {
+    public void checkBoardMember(List list, Member member, Action action) {
         java.util.List<BoardMember> boardMemberList = list.getBoard().getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {

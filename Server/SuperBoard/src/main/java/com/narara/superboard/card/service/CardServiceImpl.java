@@ -19,6 +19,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.websocket.constant.Action;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -98,7 +99,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void checkBoardMember(Card card, Member member, CardAction action) {
+    public void checkBoardMember(Card card, Member member, Action action) {
         java.util.List<BoardMember> boardMemberList = card.getList().getBoard().getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {

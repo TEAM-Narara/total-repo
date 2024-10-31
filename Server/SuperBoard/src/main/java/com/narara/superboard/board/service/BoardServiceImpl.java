@@ -15,6 +15,7 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
@@ -133,7 +134,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void checkBoardMember(Board board, Member member, CardAction action) {
+    public void checkBoardMember(Board board, Member member, Action action) {
         java.util.List<BoardMember> boardMemberList = board.getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {

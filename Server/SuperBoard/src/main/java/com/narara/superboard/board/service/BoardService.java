@@ -8,6 +8,7 @@ import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 
 import com.narara.superboard.card.CardAction;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.websocket.constant.Action;
 import java.util.List;
 
 public interface BoardService {
@@ -27,6 +28,6 @@ public interface BoardService {
 
     void changeArchiveStatus(Long boardId);
 
-    void checkBoardMember(Board board, Member member, CardAction action);
+    void checkBoardMember(Board board, Member member, Action action);
 
 }
