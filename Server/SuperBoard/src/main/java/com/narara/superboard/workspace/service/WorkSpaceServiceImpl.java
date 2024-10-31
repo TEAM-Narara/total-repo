@@ -3,6 +3,7 @@ package com.narara.superboard.workspace.service;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.exception.WorkspaceNameNotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
@@ -10,6 +11,8 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +28,18 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardService boardService;
     private final WorkSpaceMemberService workSpaceMemberService;
+    private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Override
-    public WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
+    public WorkSpace createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);
-        workSpaceRepository.save(workSpace);
 
-        return workSpace;
+        WorkSpace newWorkSpace = workSpaceRepository.save(workSpace);
+        WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member);
+        workSpaceMemberRepository.save(workspaceMemberByAdmin);
+        return newWorkSpace;
     }
 
     @Override

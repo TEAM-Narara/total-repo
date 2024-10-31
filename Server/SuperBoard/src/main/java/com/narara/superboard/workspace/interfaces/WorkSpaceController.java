@@ -1,5 +1,6 @@
 package com.narara.superboard.workspace.interfaces;
 
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
@@ -17,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceController implements WorkSpaceAPI {
+
     private final WorkSpaceService workSpaceService;
 
     @Override
-    public void createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
-        workSpaceService.createWorkSpace(workspaceCreateRequestDto);
+    public void createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+        workSpaceService.createWorkSpace(member, workspaceCreateRequestDto);
     }
 
     @Tag(name = "나의 워크스페이스 리스트 조회")

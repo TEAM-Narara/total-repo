@@ -1,6 +1,9 @@
 package com.narara.superboard.workspacemember.entity;
 
+import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
@@ -15,17 +18,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "workspace_member")
-public class WorkSpaceMember {
+public class WorkSpaceMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본 키
 
-    @JoinColumn(name = "member", nullable = false)
+    @JoinColumn(name = "member", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;  // 멤버 ID
 
-    @JoinColumn(name = "workspace", nullable = false)
+    @JoinColumn(name = "workspace", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkSpace workSpace;  // 워크스페이스 ID
 
@@ -34,6 +37,14 @@ public class WorkSpaceMember {
 
     public WorkSpaceMember(WorkSpace workSpace) {
         this.workSpace = workSpace;
+    }
+
+    public static WorkSpaceMember createWorkspaceMemberByAdmin(WorkSpace workSpace, Member member){
+        return WorkSpaceMember.builder()
+                .member(member)
+                .workSpace(workSpace)
+                .authority(Authority.ADMIN)
+                .build();
     }
 
     public WorkSpaceMember(Member member, Authority authority) {

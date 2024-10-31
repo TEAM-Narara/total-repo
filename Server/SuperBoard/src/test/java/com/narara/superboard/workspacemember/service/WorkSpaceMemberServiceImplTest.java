@@ -75,8 +75,8 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         Long workSpaceId = 1L;
 
         // Mock된 Member와 WorkSpaceMember 데이터 설정
-        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "http://profile1.img");
-        Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "http://profile2.img");
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "","http://profile1.img");
+        Member mockMember2 = new Member(2L, "닉네임2", "user2@example.com", "","http://profile2.img");
 
 
         WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
