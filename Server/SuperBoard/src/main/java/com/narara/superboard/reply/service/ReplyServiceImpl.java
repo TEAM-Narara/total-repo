@@ -12,11 +12,8 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
-import com.narara.superboard.replymember.entity.ReplyMember;
-import com.narara.superboard.replymember.infrastructure.ReplyMemberRepository;
 import java.util.List;
 
-import com.narara.superboard.websocket.enums.ReplyAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +26,6 @@ public class ReplyServiceImpl implements ReplyService{
 
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
-    private final ReplyMemberRepository replyMemberRepository;
 
     private final ContentValidator contentValidator;
 
@@ -42,13 +38,9 @@ public class ReplyServiceImpl implements ReplyService{
 
 //        TODO: 댓글을 포함하는 보드의 권한이 있는지 확인
 
-        Reply reply = Reply.createReply(replyCreateRequestDto, card);
-        Reply savedReply = replyRepository.save(reply);
+        Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
 
-        ReplyMember replyMember = ReplyMember.createReplyMember(savedReply, member);
-        replyMemberRepository.save(replyMember);
-
-        return savedReply;
+        return replyRepository.save(reply);
     }
 
     @Override
