@@ -7,7 +7,7 @@ import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.memberbackground.MemberBackground;
-import com.narara.superboard.replymember.entity.ReplyMember;
+import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -74,7 +74,7 @@ public class Member extends BaseTimeEntity {
     private List<CardMember> cardMemberList;
 
     @OneToMany(mappedBy = "member")
-    private List<ReplyMember> replyMemberList;
+    private List<Reply> replyList;
 
     public Member(Long id, String nickname, String email,String profileImgUrl) {
 

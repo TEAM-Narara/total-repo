@@ -32,17 +32,19 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "content", nullable = false)
     private String content;  // 이름
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
-    @ManyToOne
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public static Reply createReply(ReplyCreateRequestDto replyCreateRequestDto, Card card) {
+    public static Reply createReply(ReplyCreateRequestDto replyCreateRequestDto, Card card, Member member) {
         return Reply.builder()
                 .content(replyCreateRequestDto.content())
                 .card(card)
+                .member(member)
                 .build();
     }
 
