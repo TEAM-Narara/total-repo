@@ -4,6 +4,7 @@ import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -53,6 +54,9 @@ public class Board extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "board")
     private java.util.List<List> listCollection;  // 보드 키
+
+    @OneToMany(mappedBy = "board")
+    private java.util.List<BoardMember> boardMemberList;  // 보드 키
 
     @Builder.Default
     @Column(name = "\"offset\"")

@@ -6,8 +6,11 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.CustomUserDetails;
 import com.narara.superboard.common.exception.CustomAccessDeniedException;
+import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
+import com.narara.superboard.reply.entity.Reply;
+import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -32,20 +35,22 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private final MemberRepository memberRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardRepository boardRepository;
+    private final ReplyRepository replyRepository;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         return false;
     }
 
-    /**
-     * 권한 인증 로직
-     * @param authentication 인증 정보
-     * @param targetId 검증할 객체 (워크스페이스 ID 또는 보드 ID)
-     * @param targetType 워크스페이스 or 보드
-     * @param permission 검증할 권한
-     * @return
-     */
+        /**
+         * 권한 인증 로직
+         * @param authentication 인증 정보
+         * @param targetId 검증할 객체 (워크스페이스 ID 또는 보드 ID)
+         * @param targetType 워크스페이스 or 보드
+         * @param permission 검증할 권한
+         * @return
+         */
+    // 일관성과 보안 관리가 중요한 경우
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
@@ -65,8 +70,16 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 Board board = findBoardById(Long.valueOf(targetId.toString()));
                 yield hasBoardPermission(member, board, permission.toString());
             }
+            case "REPLY" -> {
+                Long replyId = Long.valueOf(targetId.toString());
+                yield hasReplyPermission(member, replyId);
+            }
             default -> false;
         };
+    }
+
+    private boolean hasReplyPermission(Member member, Long replyId) {
+        return replyRepository.existsByMemberAndId(member, replyId);
     }
 
     private boolean hasWorkspacePermission(Member member, WorkSpace workSpace, String permission) {
@@ -118,5 +131,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private Board findBoardById(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found with ID: " + boardId));
+    }
+
+    private Reply findReplyById(Long aLong) {
+        return replyRepository.findById(aLong)
+                .orElseThrow(() -> new NotFoundEntityException(aLong, "댓글"));
     }
 }

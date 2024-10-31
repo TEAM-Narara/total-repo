@@ -2,6 +2,7 @@ package com.narara.superboard.reply.entity;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.entity.BaseTimeEntity;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import jakarta.persistence.*;
@@ -31,15 +32,29 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "content", nullable = false)
     private String content;  // 이름
 
-    public static Reply createReply(ReplyCreateRequestDto replyCreateRequestDto, Card card) {
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted = false;
+
+    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
+    public static Reply createReply(ReplyCreateRequestDto replyCreateRequestDto, Card card, Member member) {
         return Reply.builder()
                 .content(replyCreateRequestDto.content())
                 .card(card)
+                .member(member)
                 .build();
     }
 
     public Reply updateReply(ReplyUpdateRequestDto replyUpdateRequestDto) {
         this.content = replyUpdateRequestDto.content();
+        return this;
+    }
+
+    public Reply deleteReply() {
+        this.isDeleted = true;
         return this;
     }
 }

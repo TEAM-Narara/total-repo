@@ -13,11 +13,11 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.service.ReplyServiceImpl;
-import com.narara.superboard.replymember.entity.ReplyMember;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
@@ -56,6 +56,9 @@ public class ReplyServiceImplTest extends IntegrationTest {
     @Autowired
     private WorkSpaceRepository workSpaceRepository; // 실제 ListRepository 사용
 
+    @Autowired
+    private MemberRepository memberRepository; // 실제 ListRepository 사용
+
     @Test
 //    @DisplayName("연관된 엔티티 설정 및 댓글 생성 요청 테스트")
 //    void createEntitiesAndSaveReply() {
@@ -84,27 +87,23 @@ public class ReplyServiceImplTest extends IntegrationTest {
         // Card 생성 요청 DTO 생성
         CardCreateRequestDto cardRequest = new CardCreateRequestDto(savedList.getId(), "카드 이름");
 
-        // when - Card 생성 및 저장
+        // Card 생성 및 저장
         Card card = Card.createCard(cardRequest, savedList);
         Card savedCard = cardRepository.save(card);
 
+        // Member와 ReplyCreateRequestDto 생성
+        Member member = new Member(1L,"시현","sisi@naver.com");
+        memberRepository.save(member);
 
         String replyContent = "테스트 댓글 내용";
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(savedCard.getId(), replyContent);
 
-
-        Member member = new Member(1L,"시현","sisi@naver.com");
         // when
         Reply createdReply = replyService.createReply(member, requestDto);
 
         // then
         // 실제 ContentValidator 동작 확인
         contentValidator.validateReplyContentIsEmpty(requestDto);
-
-//        assertThat(savedCard).isNotNull();
-//        assertThat(savedCard.getName()).isEqualTo("카드 이름");
-//        assertThat(savedCard.getList().getId()).isEqualTo(savedList.getId());
-//        assertThat(savedCard.getMyOrder()).isEqualTo(savedList.getLastCardOrder() + 1);
 
         assertThat(createdReply).isNotNull();
         assertThat(createdReply.getContent()).isEqualTo(replyContent);
