@@ -23,7 +23,7 @@ public class AuthController implements AuthAPI{
 
     private final AuthService authService;
     @Autowired
-    private IAuthenticationFacade authenticationFacade;
+    private final IAuthenticationFacade authenticationFacade;
 
 
     @Override

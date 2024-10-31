@@ -47,7 +47,7 @@ public class SwaggerConfiguration {
      */
     @Bean
     public ModelResolver modelResolver(ObjectMapper objectMapper) {
-        return new ModelResolver(objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE));
+        return new ModelResolver(objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE));
     }
 
 
