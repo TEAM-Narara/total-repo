@@ -13,7 +13,7 @@ class GitHubLoginHelper {
         .appendPath("oauth")
         .appendPath("authorize")
         .appendQueryParameter("client_id", BuildConfig.GIT_ID)
-        .appendQueryParameter("scope", "user:email")
+        .appendQueryParameter("scope", "read:user")
         .build()
 
     fun githubLogin(context: Context) {
