@@ -16,7 +16,6 @@ import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
-import com.ssafy.card.label.Label
 import com.ssafy.card.label.labelScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
@@ -42,7 +41,7 @@ import com.ssafy.notification.notification.notificationScreen
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = Card(0L),
+        startDestination = LogIn,
         modifier = modifier
     ) {
         loginScreen(
@@ -175,9 +174,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 navController.popBackStack()
             },
             moveToSelectLabel = { cardId: Long ->
-                navController.navigate(
-                    Label(cardId)
-                )
+                // TODO : navigate to select color screen
             }
         )
 
