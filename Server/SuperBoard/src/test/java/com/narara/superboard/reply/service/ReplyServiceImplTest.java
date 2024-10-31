@@ -141,12 +141,12 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     void shouldThrowExceptionWhenContentIsEmpty(String invalidContent) {
         // given
         ReplyUpdateRequestDto requestDto = new ReplyUpdateRequestDto(invalidContent);
-
+        Member member = new Member(1L, "시현", "sisi@naver.com");
         // Mocking: contentValidator가 예외를 던지도록 설정
         doThrow(new NotFoundContentException("댓글")).when(contentValidator).validateReplyContentIsEmpty(requestDto);
 
         // then
-        assertThrows(NotFoundContentException.class, () -> replyService.updateReply(1L, requestDto));
+        assertThrows(NotFoundContentException.class, () -> replyService.updateReply(member, 1L, requestDto));
     }
 
     @Test
@@ -163,9 +163,10 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         when(replyRepository.findById(replyId)).thenReturn(Optional.of(existingReply));
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // when
-        Reply updatedReply = replyService.updateReply(replyId, requestDto);
+        Reply updatedReply = replyService.updateReply(member, replyId, requestDto);
 
         // then
         assertEquals(updatedContent, updatedReply.getContent());
@@ -181,12 +182,13 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .id(replyId)
                 .content("This is a test reply")
                 .build();
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: getReply가 호출될 때 reply 객체를 반환하도록 설정
         when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
 
         // when
-        replyService.deleteReply(replyId);
+        replyService.deleteReply(member, replyId);
 
         // then
         // delete 메서드가 올바르게 호출되었는지 확인
