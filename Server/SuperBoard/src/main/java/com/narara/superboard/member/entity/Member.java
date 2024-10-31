@@ -10,9 +10,11 @@ import com.narara.superboard.memberbackground.MemberBackground;
 import com.narara.superboard.replymember.entity.ReplyMember;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.*;
 
 import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
