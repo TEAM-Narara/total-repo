@@ -30,7 +30,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "email", nullable = false,unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "profile_img_url")
@@ -54,7 +54,8 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'LOCAL'")
     @Setter
-    private LoginType loginType;  // Java에서 기본값 설정
+    @Builder.Default
+    private LoginType loginType = LoginType.LOCAL;  // Java에서 기본값 설정
 
     @OneToMany(mappedBy = "member")
     private List<FcmToken> fcmTokenList;
@@ -83,6 +84,7 @@ public class Member extends BaseTimeEntity {
         this.email = email;
         this.profileImgUrl = profileImgUrl;
         this.isDeleted = false;
+        this.loginType = LoginType.LOCAL;
     }
 
 
@@ -93,6 +95,7 @@ public class Member extends BaseTimeEntity {
         this.password = password;
         this.profileImgUrl = profileImgUrl;
         this.isDeleted = false;
+        this.loginType = LoginType.LOCAL;
     }
 
     public Member(Long id, String nickname, String email) {
@@ -100,5 +103,6 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickname;
         this.email = email;
         this.isDeleted = false;
+        this.loginType = LoginType.LOCAL;
     }
 }
