@@ -10,7 +10,6 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
-import com.narara.superboard.replymember.infrastructure.ReplyMemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -30,7 +29,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
     private final BoardMemberRepository boardMemberRepository;
-    private final ReplyMemberRepository replyMemberRepository;
     private final MemberRepository memberRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardRepository boardRepository;
@@ -71,15 +69,15 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 yield hasBoardPermission(member, board, permission.toString());
             }
             case "REPLY" -> {
-                Reply reply = findReplyById(Long.valueOf(targetId.toString()));
-                yield hasReplyPermission(member, reply);
+                Long replyId = Long.valueOf(targetId.toString());
+                yield hasReplyPermission(member, replyId);
             }
             default -> false; // 유효하지 않은 targetType인 경우
         };
     }
 
-    private boolean hasReplyPermission(Member member, Reply reply) {
-        return replyMemberRepository.existsByMemberAndReply(member, reply);
+    private boolean hasReplyPermission(Member member, Long replyId) {
+        return replyRepository.existsByMemberAndId(member, replyId);
     }
 
     private boolean hasWorkspacePermission(Member member, WorkSpace workSpace, String permission) {
