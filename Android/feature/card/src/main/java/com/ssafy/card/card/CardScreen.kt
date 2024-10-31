@@ -31,6 +31,8 @@ import com.ssafy.card.card.component.cardInfoScreen
 import com.ssafy.card.card.component.cardMemberInfo
 import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.member.dialogs.ModifyManagerDialog
+import com.ssafy.card.period.data.PeriodData
+import com.ssafy.card.period.dialogs.PeriodDialog
 import com.ssafy.designsystem.dialog.rememberDialogState
 import com.ssafy.designsystem.values.DividerLarge
 import com.ssafy.designsystem.values.Gray
@@ -51,6 +53,7 @@ fun CardScreen(
     val userId by viewModel.userId.collectAsStateWithLifecycle()
 
     val managerDialogState = rememberDialogState<Unit>()
+    val periodDialogState = rememberDialogState<PeriodData>()
 
     CardScreen(
         cardDTO = cardDTO,
@@ -69,6 +72,7 @@ fun CardScreen(
         setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
         saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
         resetCommitContent = { comment -> viewModel.resetCommitContent(comment) },
+        showPeriod = { periodDialogState.show(PeriodData(cardDTO.startDate, cardDTO.endDate)) },
         showCardMembers = { managerDialogState.show() }
     )
 
@@ -83,6 +87,11 @@ fun CardScreen(
                 isManager = true
             )
         }
+    )
+
+    PeriodDialog(
+        dialogState = periodDialogState,
+        onConfirm = viewModel::updatePeriod
     )
 }
 
@@ -104,6 +113,7 @@ private fun CardScreen(
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
     resetCommitContent: (CommentDTO) -> Unit,
+    showPeriod: () -> Unit,
     showCardMembers: () -> Unit
 ) {
 
@@ -190,7 +200,7 @@ private fun CardScreen(
                     modifier = Modifier.padding(horizontal = PaddingDefault),
                     cardDTO = cardDTO,
                     onClickLabel = moveToSelectLabel,
-                    onClickDate = { /* TODO 날짜 선택 다이얼로그 호출 */ },
+                    onClickDate = showPeriod,
                     isContentFocus = isContentFocus,
                     setContentFocus = setContentFocus,
                     setContent = setCardContent
@@ -263,6 +273,7 @@ fun CardScreenPreview() {
         setCommitContent = { _, _ -> },
         saveCommitContent = { },
         resetCommitContent = { },
+        showPeriod = { },
         showCardMembers = { }
     )
 }
