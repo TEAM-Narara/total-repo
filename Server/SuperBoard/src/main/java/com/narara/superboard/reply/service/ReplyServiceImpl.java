@@ -4,6 +4,7 @@ import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.validator.ContentValidator;
+import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
@@ -63,10 +64,15 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 기존 댓글이 존재하는지 확인
         Reply reply = getReply(replyId);
+        if (reply.getIsDeleted()){
+            throw new DeletedEntityException(replyId, "댓글");
+        }
 
+        // 이 방식이 성능이 더 중요함.
         if (!member.getId().equals(reply.getMember().getId())){
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
+
         // 댓글 내용 업데이트
         return reply.updateReply(replyUpdateRequestDto);
     }
