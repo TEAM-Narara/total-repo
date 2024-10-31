@@ -24,4 +24,33 @@ public class ResponseMessage {
     public static final String WITHDRAWAL_USER = "회원 탈퇴 성공";
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 에러";
     public static final String DB_ERROR = "데이터베이스 에러";
+
+
+    // 워크스페이스 관련 상수
+    public static final String WORKSPACE_CREATE_SUCCESS = "워크스페이스 생성 성공";
+    public static final String WORKSPACE_UPDATE_SUCCESS = "워크스페이스 수정 성공";
+    public static final String WORKSPACE_DELETE_SUCCESS = "워크스페이스 삭제 성공";
+
+    // 보드 관련 상수
+    public static final String BOARD_CREATE_SUCCESS = "보드 생성 성공";
+    public static final String BOARD_UPDATE_SUCCESS = "보드 수정 성공";
+    public static final String BOARD_DELETE_SUCCESS = "보드 삭제 성공";
+
+    // 리스트 관련 상수
+    public static final String LIST_CREATE_SUCCESS = "리스트 생성 성공";
+    public static final String LIST_UPDATE_SUCCESS = "리스트 수정 성공";
+    public static final String LIST_DELETE_SUCCESS = "리스트 삭제 성공";
+    public static final String LIST_MOVE_SUCCESS = "리스트 이동 성공";
+
+    // 카드 관련 상수
+    public static final String CARD_CREATE_SUCCESS = "카드 생성 성공";
+    public static final String CARD_UPDATE_SUCCESS = "카드 수정 성공";
+    public static final String CARD_DELETE_SUCCESS = "카드 삭제 성공";
+    public static final String CARD_MOVE_SUCCESS = "카드 이동 성공";
+
+    // 댓글 관련 상수
+    public static final String REPLY_CREATE_SUCCESS = "댓글 생성 성공";
+    public static final String REPLY_UPDATE_SUCCESS = "댓글 수정 성공";
+    public static final String REPLY_DELETE_SUCCESS = "댓글 삭제 성공";
+
 }
