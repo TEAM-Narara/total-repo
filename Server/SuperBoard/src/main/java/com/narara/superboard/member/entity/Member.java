@@ -46,8 +46,9 @@ public class Member extends BaseTimeEntity {
 
     // 기본값을 false로 설정
     @Setter
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
-    private Boolean isDeleted;  // Java에서 기본값 설정
+    private Boolean isDeleted = false;  // Java에서 기본값 설정
 
     // 로그인 타입을 LOCAL로 설정
     @Enumerated(EnumType.STRING)
@@ -77,26 +78,27 @@ public class Member extends BaseTimeEntity {
     private List<Reply> replyList;
 
     public Member(Long id, String nickname, String email,String profileImgUrl) {
-
         this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.profileImgUrl = profileImgUrl;
+        this.isDeleted = false;
     }
 
 
     public Member(Long id, String nickname, String email, String password,String profileImgUrl) {
-
         this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.profileImgUrl = profileImgUrl;
+        this.isDeleted = false;
     }
 
     public Member(Long id, String nickname, String email) {
         this.id = id;
         this.nickname = nickname;
         this.email = email;
+        this.isDeleted = false;
     }
 }
