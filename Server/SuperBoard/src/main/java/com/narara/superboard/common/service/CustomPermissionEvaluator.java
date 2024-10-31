@@ -5,8 +5,8 @@ import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.CustomUserDetails;
-import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.CustomAccessDeniedException;
+import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
@@ -74,11 +74,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 Long replyId = Long.valueOf(targetId.toString());
                 yield hasReplyPermission(member, replyId);
             }
-
-            default -> {
-                log.warn("Invalid targetType: {}", targetType);
-                throw new CustomAccessDeniedException();
-            }
+            default -> false;
         };
     }
 
