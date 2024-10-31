@@ -35,7 +35,7 @@
 
                 <data
                     android:host="github-oauth"
-                    android:scheme="pacemaker" />
+                    android:scheme="superboard" />
             </intent-filter>
 
         </activity>
