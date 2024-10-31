@@ -27,7 +27,7 @@ public class ReplyController implements ReplyAPI {
     private final ReplyService replyService;
 
     @Override
-    public ResponseEntity<?> createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto) {
         Reply reply = replyService.createReply(member, replyCreateRequestDto);
 
         ReplySimpleResponseDto replySimpleResponseDto = ReplySimpleResponseDto.of(reply);
@@ -36,7 +36,7 @@ public class ReplyController implements ReplyAPI {
     }
 
     @Override
-    public ResponseEntity<?> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
                                                                Long replyId) {
         Reply reply = replyService.updateReply(member, replyId, updateRequestDto);
 
@@ -46,7 +46,7 @@ public class ReplyController implements ReplyAPI {
     }
 
     @Override
-    public ResponseEntity<?> deleteReply(Member member, Long replyId) {
+    public ResponseEntity<DefaultResponse<Void>> deleteReply(Member member, Long replyId) {
         replyService.deleteReply(member, replyId);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS),HttpStatus.OK);

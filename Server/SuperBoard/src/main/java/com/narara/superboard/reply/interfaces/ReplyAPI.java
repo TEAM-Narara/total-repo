@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface ReplyAPI {
 
     @PostMapping("/")
-    ResponseEntity<?> createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto);
+    ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto);
 
     @PatchMapping("/{replyId}")
-    ResponseEntity<?> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
+    ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
                                                         @PathVariable Long replyId);
     @DeleteMapping("/{replyId}")
-    ResponseEntity<?> deleteReply(Member member, @PathVariable Long replyId);
+    ResponseEntity<DefaultResponse<Void>> deleteReply(Member member, @PathVariable Long replyId);
 }
