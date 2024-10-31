@@ -293,3 +293,5 @@ src/main/resources/*.yml
 src/main/resources/*.properties
 application.yml
 application.properties
+src/test/resources/*.yml
+src/test/resources/*.properties
