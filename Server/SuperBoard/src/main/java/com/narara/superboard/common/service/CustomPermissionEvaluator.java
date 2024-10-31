@@ -65,10 +65,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 Board board = findBoardById(Long.valueOf(targetId.toString()));
                 yield hasBoardPermission(member, board, permission.toString());
             }
-            default -> {
-                log.warn("Invalid targetType: {}", targetType);
-                throw new CustomAccessDeniedException();
-            }
+            default -> false;
         };
     }
 
