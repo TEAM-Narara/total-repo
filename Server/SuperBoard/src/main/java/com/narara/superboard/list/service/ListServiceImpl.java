@@ -2,13 +2,17 @@ package com.narara.superboard.list.service;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.card.CardAction;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
+import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -62,5 +66,16 @@ public class ListServiceImpl implements ListService{
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         return listRepository.findByBoardAndIsArchived(board, true);
+    }
+
+    @Override
+    public void checkBoardMember(List list, Member member, CardAction action) {
+        java.util.List<BoardMember> boardMemberList = list.getBoard().getBoardMemberList();
+        for (BoardMember boardMember : boardMemberList) {
+            if (boardMember.getMember().getId().equals(member.getId())) {
+                return;
+            }
+        }
+        throw new UnauthorizedException(member.getNickname(), action);
     }
 }
