@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class WorkspaceCreateData implements WebSocketData {
+public class WorkspaceData implements WebSocketData {
     private Long workspaceId;
     private String name;
 }

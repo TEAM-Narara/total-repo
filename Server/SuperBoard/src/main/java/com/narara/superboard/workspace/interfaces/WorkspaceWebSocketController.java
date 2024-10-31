@@ -11,15 +11,12 @@ import com.narara.superboard.websocket.interfaces.dto.websocket.BoardAddMemberDt
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardMemberAddResponse;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.AddWorkspaceMemberDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.DeleteBoardDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.DeleteWorkspaceDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkSpaceAddMemberDto;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDeleteResponse;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceMemberAddResponse;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.websocket.*;
 import com.narara.superboard.workspace.service.WorkSpaceService;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -35,12 +32,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class WorkspaceWebSocketController {
     private static final String BOARD = "BOARD";
     private static final String WORKSPACE = "WORKSPACE";
+    private static final String TOPIC_WORKSPACES_URL = "/topic/workspaces/";
+    private static final String TOPIC_BOARD_URL = "/topic/board/";
 
     private final SimpMessagingTemplate messagingTemplate;
     private final WorkSpaceService workspaceService;
     private final BoardService boardService;
 
     //워크스페이스 추가(웹소켓 버전, http도 있음)
+    //TODO service 연결
     @MessageMapping("/workspaces/create")
     public void createWorkspace(WorkSpaceCreateRequestDto dto) {
 //        workspaceService.createWorkSpace(dto);
@@ -58,6 +58,17 @@ public class WorkspaceWebSocketController {
 //        );
     }
 
+    //워크스페이스 수정(이름수정)
+    @MessageMapping("/workspaces/{workspaceId}/edit")
+    public void editWorkspace(@DestinationVariable Long workspaceId, WorkSpaceUpdateRequestDto workSpaceUpdateRequestDto) {
+        WorkSpace workSpace = workspaceService.updateWorkSpace(workspaceId, workSpaceUpdateRequestDto);
+
+        messagingTemplate.convertAndSend(
+                TOPIC_WORKSPACES_URL + workspaceId,
+                new WorkspaceData(workSpace.getId(), workSpace.getName())
+        );
+    }
+
     //워크스페이스 삭제
     @MessageMapping("/workspace/{workspaceId}/delete")
     public void deleteWorkspace(@DestinationVariable Long workspaceId) {
@@ -71,7 +82,7 @@ public class WorkspaceWebSocketController {
         WorkspaceDeleteResponse workspaceDeleteResponse = new WorkspaceDeleteResponse(
                 deleteWorkspaceDto.getWorkspaceId()
         );
-        messagingTemplate.convertAndSend("/topic/workspace/" + workspaceId, workspaceDeleteResponse);
+        messagingTemplate.convertAndSend(TOPIC_WORKSPACES_URL + workspaceId, workspaceDeleteResponse);
 
         // board 브로드캐스트
         for (DeleteBoardDto deleteBoardDto : deleteWorkspaceDto.getDeleteBoardDtoList()) {
@@ -80,7 +91,7 @@ public class WorkspaceWebSocketController {
                     BoardAction.DELETE_BOARD.toString(),
                     new BoardUpdateData(deleteBoardDto.getBoardId())
             );
-            messagingTemplate.convertAndSend("/topic/board/" + deleteBoardDto.getBoardId(), boardResponse);
+            messagingTemplate.convertAndSend(TOPIC_BOARD_URL + deleteBoardDto.getBoardId(), boardResponse);
         }
     }
 
@@ -117,7 +128,7 @@ public class WorkspaceWebSocketController {
                 )
         );
 
-        messagingTemplate.convertAndSend("/topic/workspaces/" + workspaceId, memberResponse);
+        messagingTemplate.convertAndSend(TOPIC_WORKSPACES_URL + workspaceId, memberResponse);
 
         // board 브로드캐스트
         for (BoardAddMemberDto boardAddMemberDto : workSpaceAddMemberDto.getBoardAddMemberDtoList()) {
@@ -137,7 +148,7 @@ public class WorkspaceWebSocketController {
                     )
             );
 
-            messagingTemplate.convertAndSend("/topic/boards/" + boardAddMemberDto.getBoardId(), boardResponse);
+            messagingTemplate.convertAndSend(TOPIC_BOARD_URL + boardAddMemberDto.getBoardId(), boardResponse);
         }
     }
 }
