@@ -29,6 +29,9 @@ import com.ssafy.card.card.component.cardAttachmentInfo
 import com.ssafy.card.card.component.cardComment
 import com.ssafy.card.card.component.cardInfoScreen
 import com.ssafy.card.card.component.cardMemberInfo
+import com.ssafy.card.member.data.ManagerData
+import com.ssafy.card.member.dialogs.ModifyManagerDialog
+import com.ssafy.designsystem.dialog.rememberDialogState
 import com.ssafy.designsystem.values.DividerLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.IconLegendLarge
@@ -47,6 +50,8 @@ fun CardScreen(
     val cardDTO by viewModel.cardDTO.collectAsStateWithLifecycle()
     val userId by viewModel.userId.collectAsStateWithLifecycle()
 
+    val managerDialogState = rememberDialogState()
+
     CardScreen(
         cardDTO = cardDTO,
         userId = userId,
@@ -63,7 +68,21 @@ fun CardScreen(
         addComment = { comment -> viewModel.addComment(comment) },
         setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
         saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
-        resetCommitContent = { comment -> viewModel.resetCommitContent(comment) }
+        resetCommitContent = { comment -> viewModel.resetCommitContent(comment) },
+        showCardMembers = { managerDialogState.show() }
+    )
+
+    ModifyManagerDialog(
+        dialogState = managerDialogState,
+        onIsManagerChanged = viewModel::toggleIsManager,
+        memberList = (0..10L).map {
+            ManagerData(
+                id = it,
+                nickname = "nickname",
+                email = "email@example.com",
+                isManager = true
+            )
+        }
     )
 }
 
@@ -84,7 +103,8 @@ private fun CardScreen(
     addComment: (String) -> Unit,
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
-    resetCommitContent: (CommentDTO) -> Unit
+    resetCommitContent: (CommentDTO) -> Unit,
+    showCardMembers: () -> Unit
 ) {
 
     val (isContentFocus, setContentFocus) = remember { mutableStateOf(false) }
@@ -186,9 +206,7 @@ private fun CardScreen(
                 cardMemberInfo(
                     modifier = Modifier.padding(horizontal = PaddingDefault),
                     members = cardDTO.members,
-                    showCardMembers = {
-                        // TODO 카드 멤버 호출하는 다이얼로그
-                    }
+                    showCardMembers = showCardMembers
                 )
 
                 item(key = "divider2") {
@@ -244,6 +262,7 @@ fun CardScreenPreview() {
         addComment = { },
         setCommitContent = { _, _ -> },
         saveCommitContent = { },
-        resetCommitContent = { }
+        resetCommitContent = { },
+        showCardMembers = { }
     )
 }

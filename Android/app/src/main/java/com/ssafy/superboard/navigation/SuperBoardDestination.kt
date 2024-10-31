@@ -16,6 +16,7 @@ import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
+import com.ssafy.card.label.Label
 import com.ssafy.card.label.labelScreen
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
@@ -174,7 +175,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 navController.popBackStack()
             },
             moveToSelectLabel = { cardId: Long ->
-                // TODO : navigate to select color screen
+                navController.navigate(Label(cardId))
             }
         )
 

@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Label(val boardId: Long)
+data class Label(val cardId: Long)
 
 fun NavGraphBuilder.labelScreen(
     popBack: () -> Unit
@@ -15,7 +15,7 @@ fun NavGraphBuilder.labelScreen(
     composable<Label> { backStackEntry ->
         val label: Label = backStackEntry.toRoute()
         val viewModel = hiltViewModel<LabelViewModel>().apply {
-            setBoardId(label.boardId)
+            setCardId(label.cardId)
         }
         LabelScreen(
             viewModel = viewModel,

@@ -109,4 +109,6 @@ class CardViewModel @Inject constructor() : ViewModel() {
             .onSuccess { /* 성공 처리 */ }
             .onFailure { /* 실패 처리 */ }
     }
+
+    fun toggleIsManager(id: Long, isManager: Boolean) {}
 }
