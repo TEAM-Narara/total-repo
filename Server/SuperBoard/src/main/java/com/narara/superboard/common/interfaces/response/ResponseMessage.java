@@ -17,6 +17,7 @@ public class ResponseMessage {
     public static final String READ_USER = "회원 정보 조회 성공";
     public static final String REISSUE_ACCESSTOKEN = "토큰 재발급 성공";
     public static final String UNAUTHORIZED = "회원 인증 실패";
+    public static final String FORBIDDEN = "회원 권한 실패";
     public static final String NOT_FOUND_USER = "회원을 찾을 수 없습니다.";
 
     public static final String UPDATE_USER = "회원 정보 수정 성공";

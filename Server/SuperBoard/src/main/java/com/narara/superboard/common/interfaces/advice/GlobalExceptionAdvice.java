@@ -14,6 +14,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -22,6 +23,11 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionAdvice {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.FORBIDDEN, ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
 
     // not found
     @ExceptionHandler(NotFoundException.class)
