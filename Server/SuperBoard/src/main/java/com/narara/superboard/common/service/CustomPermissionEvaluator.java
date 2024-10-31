@@ -5,7 +5,11 @@ import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.CustomUserDetails;
+<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/common/service/CustomPermissionEvaluator.java
 import com.narara.superboard.common.exception.NotFoundEntityException;
+=======
+import com.narara.superboard.common.exception.CustomAccessDeniedException;
+>>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/common/service/CustomPermissionEvaluator.java
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
@@ -14,6 +18,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -23,6 +28,7 @@ import java.io.Serializable;
 /**
  * Spring Security에서 사용자 권한을 평가하는 로직
  */
+@Slf4j
 @Component // 이 클래스를 Spring의 컴포넌트로 등록
 @RequiredArgsConstructor
 public class CustomPermissionEvaluator implements PermissionEvaluator {
@@ -51,7 +57,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return false; // 인증이 없거나 CustomUserDetails가 아닐 경우 false 반환
+            throw new CustomAccessDeniedException();
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -62,7 +68,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             case "WORKSPACE" -> {
                 WorkSpace workSpace = findWorkSpaceById(Long.valueOf(targetId.toString()));
                 yield hasWorkspacePermission(member, workSpace, permission.toString());
-                // switch 표현식 내에서 값을 반환할 때 사용 : yield
             }
             case "BOARD" -> {
                 Board board = findBoardById(Long.valueOf(targetId.toString()));
@@ -72,7 +77,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 Long replyId = Long.valueOf(targetId.toString());
                 yield hasReplyPermission(member, replyId);
             }
-            default -> false; // 유효하지 않은 targetType인 경우
+
+            default -> {
+                log.warn("Invalid targetType: {}", targetType);
+                throw new CustomAccessDeniedException();
+            }
         };
     }
 
@@ -103,7 +112,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             return switch (permission.toUpperCase()) {
                 case "ADMIN" -> checkFunction.check(member, target, Authority.ADMIN);
                 case "MEMBER" -> checkFunction.check(member, target, Authority.MEMBER);
-                default -> false; // 해당 권한이 없는 경우
+                default -> throw new CustomAccessDeniedException();
             };
         } catch (Exception e) {
             // 예외 처리 로직 추가 (예: 로그 기록)

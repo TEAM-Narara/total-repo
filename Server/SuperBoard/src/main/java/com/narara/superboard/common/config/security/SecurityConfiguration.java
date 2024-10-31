@@ -1,10 +1,14 @@
 package com.narara.superboard.common.config.security;
 
 import com.narara.superboard.common.config.jwt.JwtAuthenticationFilter;
+import com.narara.superboard.common.exception.security.CustomAccessDeniedHandler;
 import com.narara.superboard.common.exception.security.CustomAuthenticationEntryPoint;
+import com.narara.superboard.common.service.CustomPermissionEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +38,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomPermissionEvaluator customPermissionEvaluator;
 
     // /error, /favicon.ico에 대한 경로 열어주지 않으면 401로 계속 뜸
     @Bean
@@ -69,10 +74,17 @@ public class SecurityConfiguration {
 
                 // 인증 예외 핸들링
                 .exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
-//                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setPermissionEvaluator(customPermissionEvaluator); // Register CustomPermissionEvaluator here
+        return expressionHandler;
     }
 
     @Bean
