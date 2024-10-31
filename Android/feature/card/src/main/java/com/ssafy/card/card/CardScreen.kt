@@ -50,7 +50,7 @@ fun CardScreen(
     val cardDTO by viewModel.cardDTO.collectAsStateWithLifecycle()
     val userId by viewModel.userId.collectAsStateWithLifecycle()
 
-    val managerDialogState = rememberDialogState()
+    val managerDialogState = rememberDialogState<Unit>()
 
     CardScreen(
         cardDTO = cardDTO,

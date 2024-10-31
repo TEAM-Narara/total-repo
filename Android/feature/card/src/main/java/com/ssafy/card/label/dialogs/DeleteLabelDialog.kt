@@ -12,12 +12,15 @@ import com.ssafy.designsystem.dialog.rememberDialogState
 fun DeleteLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<Long>,
+    onConfirm: (Long) -> Unit,
 ) {
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "라벨 삭제",
-        confirmText = "삭제"
+        confirmText = "삭제",
+        onConfirm = { onConfirm(dialogState.property!!) },
+        validation = { dialogState.property != null },
     ) {
         Text(text = "삭제하시겠습니까?")
     }
@@ -27,5 +30,8 @@ fun DeleteLabelDialog(
 @Composable
 private fun DeleteLabelDialogPreview() {
     val dialogState = rememberDialogState<Long>()
-    DeleteLabelDialog(dialogState = dialogState.apply { show() })
+    DeleteLabelDialog(
+        dialogState = dialogState.apply { show() },
+        onConfirm = {},
+    )
 }

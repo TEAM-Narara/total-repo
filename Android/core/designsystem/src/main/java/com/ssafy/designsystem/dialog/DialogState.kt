@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 @Stable
-class DialogState<T>(private val onConfirm: (T) -> Unit = {}) {
+class DialogState<T> {
     var isVisible by mutableStateOf(false)
         private set
 
@@ -23,19 +23,9 @@ class DialogState<T>(private val onConfirm: (T) -> Unit = {}) {
         isVisible = false
         this.property = null
     }
-
-    fun confirm() {
-        property?.let { onConfirm(it) }
-        dismiss()
-    }
 }
 
 @Composable
-fun rememberDialogState(): DialogState<Unit> {
+fun <T> rememberDialogState(): DialogState<T> {
     return remember { DialogState() }
-}
-
-@Composable
-fun <T> rememberDialogState(onConfirm: (T) -> Unit = {}): DialogState<T> {
-    return remember { DialogState(onConfirm) }
 }

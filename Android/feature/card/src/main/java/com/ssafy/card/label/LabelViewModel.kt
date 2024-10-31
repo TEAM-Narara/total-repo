@@ -41,8 +41,8 @@ class LabelViewModel @Inject constructor() : BaseViewModel() {
         initialValue = null,
     )
 
-    fun createLabel(labelData: LabelData) {}
-    fun updateLabel(id: Long, labelData: LabelData) {}
+    fun createLabel(color: Long, description: String) {}
+    fun updateLabel(id: Long, color: Long, description: String) {}
     fun deleteLabel(id: Long) {}
     fun selectLabel(id: Long, isSelected: Boolean) {}
 }

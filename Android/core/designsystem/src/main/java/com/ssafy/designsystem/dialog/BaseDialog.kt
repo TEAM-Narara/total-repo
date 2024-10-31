@@ -20,6 +20,8 @@ fun <T> BaseDialog(
     title: String?,
     confirmText: String = "확인",
     dismissText: String? = "취소",
+    onConfirm: () -> Unit = {},
+    validation: () -> Boolean = { true },
     content: (@Composable () -> Unit)?,
 ) {
     if (dialogState.isVisible) AlertDialog(
@@ -30,7 +32,13 @@ fun <T> BaseDialog(
         containerColor = White,
         text = content,
         confirmButton = {
-            TextButton(onClick = dialogState::confirm) {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    dialogState.dismiss()
+                },
+                enabled = validation()
+            ) {
                 Text(confirmText, color = Primary)
             }
         },

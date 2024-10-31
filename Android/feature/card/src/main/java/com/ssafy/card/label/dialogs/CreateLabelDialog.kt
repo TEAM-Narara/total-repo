@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,16 +45,24 @@ import com.ssafy.designsystem.values.backgroundColorList
 fun CreateLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<LabelData>,
+    onConfirm: (Long, String) -> Unit,
 ) {
+    var color by remember { mutableStateOf(dialogState.property?.color) }
+    var description by remember { mutableStateOf(dialogState.property?.description ?: "") }
+
+    LaunchedEffect(dialogState.isVisible) {
+        color = dialogState.property?.color
+        description = dialogState.property?.description ?: ""
+    }
+
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "라벨 생성",
-        confirmText = "생성"
+        confirmText = "생성",
+        onConfirm = { onConfirm(color!!, description) },
+        validation = { color != null },
     ) {
-        var color by remember { mutableStateOf(dialogState.property?.color) }
-        var description by remember { mutableStateOf(dialogState.property?.description) }
-
         Column {
             Text(
                 text = "색상",
@@ -92,7 +101,7 @@ fun CreateLabelDialog(
             Spacer(modifier = Modifier.height(PaddingDefault))
             EditText(
                 title = "설명",
-                text = description ?: "",
+                text = description,
                 onTextChange = { description = it },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -104,5 +113,8 @@ fun CreateLabelDialog(
 @Composable
 private fun CreateLabelDialogPreview() {
     val dialogState = rememberDialogState<LabelData>()
-    CreateLabelDialog(dialogState = dialogState.apply { show() })
+    CreateLabelDialog(
+        dialogState = dialogState.apply { show() },
+        onConfirm = { _, _ -> },
+    )
 }

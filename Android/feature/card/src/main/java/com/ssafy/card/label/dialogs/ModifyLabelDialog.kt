@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,16 +45,24 @@ import com.ssafy.designsystem.values.backgroundColorList
 fun ModifyLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<LabelData>,
+    onConfirm: (Long, Long, String) -> Unit,
 ) {
+    var color by remember { mutableStateOf(dialogState.property?.color) }
+    var description by remember { mutableStateOf(dialogState.property?.description ?: "") }
+
+    LaunchedEffect(dialogState.isVisible) {
+        color = dialogState.property?.color
+        description = dialogState.property?.description ?: ""
+    }
+
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "라벨 수정",
-        confirmText = "수정"
+        confirmText = "수정",
+        onConfirm = { onConfirm(dialogState.property?.id!!, color!!, description) },
+        validation = { dialogState.property?.id != null && color != null },
     ) {
-        var color by remember { mutableStateOf(dialogState.property?.color) }
-        var description by remember { mutableStateOf(dialogState.property?.description) }
-
         Column {
             Text(
                 text = "색상",
@@ -70,7 +79,11 @@ fun ModifyLabelDialog(
                             .size(60.dp)
                             .padding(PaddingTwo, PaddingTwo)
                             .background(Color(labelColor), shape = RoundedCornerShape(PaddingSmall))
-                            .clickable { color = labelColor }
+                            .clickable {
+                                color = labelColor
+                                dialogState.property =
+                                    dialogState.property?.copy(color = labelColor)
+                            }
                             .then(
                                 if (color == labelColor) Modifier.border(
                                     width = 2.dp,
@@ -92,7 +105,7 @@ fun ModifyLabelDialog(
             Spacer(modifier = Modifier.height(PaddingDefault))
             EditText(
                 title = "설명",
-                text = description ?: "",
+                text = description,
                 onTextChange = { description = it },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -104,5 +117,8 @@ fun ModifyLabelDialog(
 @Composable
 private fun ModifyLabelDialogPreview() {
     val dialogState = rememberDialogState<LabelData>()
-    ModifyLabelDialog(dialogState = dialogState.apply { show() })
+    ModifyLabelDialog(
+        dialogState = dialogState.apply { show() },
+        onConfirm = { _, _, _ -> },
+    )
 }
