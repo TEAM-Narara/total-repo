@@ -54,7 +54,9 @@ public class Board extends BaseTimeEntity {
     @OneToMany(mappedBy = "board")
     private java.util.List<List> listCollection;  // 보드 키
 
-    private Long offset;
+    @Builder.Default
+    @Column(name = "\"offset\"")
+    private Long offset = 0L;
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
         return Board.builder()
