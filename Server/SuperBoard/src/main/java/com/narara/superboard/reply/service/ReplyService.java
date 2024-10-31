@@ -9,7 +9,7 @@ import java.util.List;
 public interface ReplyService {
     Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto);
     Reply getReply(Long replyId);
-    Reply updateReply(Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto);
-    void deleteReply(Long replyId);
+    Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto);
+    Reply deleteReply(Member member, Long replyId);
     List<Reply> getRepliesByCardId(Long cardId);
 }
