@@ -1,12 +1,11 @@
 package com.ssafy.login.login.naver
 
-import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.ssafy.model.user.User
 
 class NaverLoginCallback(
-    private val onSuccess: (User) -> Unit,
-    private val onFailure: (message: String) -> Unit
+    private val onSuccess: (String) -> Unit,
+    private val onFailure: (String) -> Unit
 ) : OAuthLoginCallback {
 
     override fun onError(errorCode: Int, message: String) {
@@ -18,7 +17,7 @@ class NaverLoginCallback(
     }
 
     override fun onSuccess() {
-        val naverProfileCallback = NaverProfileCallback(onSuccess, onFailure)
-        NidOAuthLogin().callProfileApi(naverProfileCallback)
+        val token = NaverIdLoginSDK.getAccessToken() ?: return onFailure("네이버 데이터 연동 실패!")
+        onSuccess(token)
     }
 }

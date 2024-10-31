@@ -24,6 +24,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "NAVER_ID", properties.getProperty("naverClientId"))
         buildConfigField("String", "NAVER_SECRET", properties.getProperty("naverClientScret"))
+        buildConfigField("String", "GIT_ID", properties.getProperty("githubClientId"))
+        buildConfigField("String", "GIT_SECRET", properties.getProperty("githubClientScret"))
     }
 
     buildTypes {
@@ -54,6 +56,9 @@ dependencies {
 
     // naver Auth
     implementation(libs.oauth)
+
+    // Browser
+    implementation(libs.androidx.browser)
 
     // Coil
     implementation(libs.coil.compose)
