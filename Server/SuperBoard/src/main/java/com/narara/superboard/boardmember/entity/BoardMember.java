@@ -29,6 +29,7 @@ public class BoardMember extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;  // 워크스페이스 ID
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "authority", nullable = false, length = 50)
     private Authority authority;  // 권한 (ADMIN, MEMBER)
 
