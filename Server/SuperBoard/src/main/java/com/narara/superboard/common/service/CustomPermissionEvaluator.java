@@ -5,11 +5,8 @@ import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.CustomUserDetails;
-<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/common/service/CustomPermissionEvaluator.java
 import com.narara.superboard.common.exception.NotFoundEntityException;
-=======
 import com.narara.superboard.common.exception.CustomAccessDeniedException;
->>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/common/service/CustomPermissionEvaluator.java
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
