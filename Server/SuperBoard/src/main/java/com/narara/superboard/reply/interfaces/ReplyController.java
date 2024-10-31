@@ -42,7 +42,6 @@ public class ReplyController implements ReplyDestination {
     @MessageMapping("/update/{cardId}")
     @PreAuthorize("hasPermission(#cardId, 'REPLY', 'ADMIN')")
     public WebSocketResponse updateReply(@DestinationVariable Long cardId, @RequestBody ReplyUpdateRequestDto replyUpdateRequestDto, @AuthenticationPrincipal Member member) {
-        // TODO: 멤버 권한 체크하기.
         Reply reply = replyService.updateReply(member, cardId, replyUpdateRequestDto);
 
         return getWebSocketResponse(reply, EDIT_REPLY);
