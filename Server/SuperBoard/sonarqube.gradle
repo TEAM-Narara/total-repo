@@ -1,6 +1,6 @@
 //sonarqube
 // build.gradle 에서 ext로 정의
-//def jacocoDir = "${buildDir}/customJacocoReportDir"
+def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
 def void property(java.lang.String string1, java.lang.String string2) {}
 
 sonarqube {
@@ -18,7 +18,7 @@ sonarqube {
         property "sonar.sources", "src/main/java"
 
         property "sonar.java.binaries", "${projectDir}/build/classes/java/main"
-        property 'sonar.coverage.jacoco.xmlReportPaths', "${jacocoDir}/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoDir}/jacocoTestReport.xml" // JaCoCo에서 생성한 XML 경로
 
 // 이는 메서드의 복잡도가 10을 초과하면 경고를 표시합니다.
         property "sonar.java.metrics.methodComplexityThreshold", "10"
