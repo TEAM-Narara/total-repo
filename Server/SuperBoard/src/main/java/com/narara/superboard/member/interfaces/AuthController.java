@@ -27,7 +27,7 @@ public class AuthController implements AuthAPI{
     private final AuthService authService;
     @Autowired
     private final IAuthenticationFacade authenticationFacade;
-    private OAuth2UserService oAuth2UserService;
+    private final OAuth2UserService oAuth2UserService;
 
     @Override
     public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
@@ -55,14 +55,15 @@ public class AuthController implements AuthAPI{
 
     @Override
     public ResponseEntity<?> oauth2Login(String accessToken, String provider) {
-        TokenDto tokens = oAuth2UserService.getUserInfo(accessToken, provider);
+        MemberLoginResponseDto memberLoginResponseDto = oAuth2UserService.getUserInfo(accessToken, provider);
+        TokenDto tokens = memberLoginResponseDto.tokenDto();
 
         // 위의 소셜의 사용자 데이터를 가지고 토큰 발급
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokens.accessToken());
         headers.add("Refresh-Token", tokens.refreshToken());
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS), headers,HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS,memberLoginResponseDto.memberDto()), headers,HttpStatus.OK);
     }
 
     @Override
