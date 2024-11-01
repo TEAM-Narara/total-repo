@@ -1,18 +1,20 @@
 package com.ssafy.card.period.dialogs
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.ssafy.card.period.components.DateTimeRangePicker
+import androidx.compose.ui.unit.dp
+import com.ssafy.card.period.components.DateTimeInputText
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.designsystem.dialog.BaseDialog
 import com.ssafy.designsystem.dialog.DialogState
-import com.ssafy.designsystem.millisecondsToZonedDateTime
-import java.time.ZoneOffset
+import com.ssafy.designsystem.values.PaddingSmall
 
 @Composable
 fun PeriodDialog(
@@ -20,36 +22,46 @@ fun PeriodDialog(
     dialogState: DialogState<PeriodData>,
     onConfirm: (PeriodData) -> Unit
 ) {
-    var startDateTime by remember {
-        mutableStateOf(dialogState.parameter?.startDate?.millisecondsToZonedDateTime())
-    }
-    var endDateTime by remember {
-        mutableStateOf(dialogState.parameter?.endDate?.millisecondsToZonedDateTime())
-    }
-
-    LaunchedEffect(dialogState.isVisible) {
-        startDateTime = dialogState.parameter?.startDate?.millisecondsToZonedDateTime()
-        endDateTime = dialogState.parameter?.endDate?.millisecondsToZonedDateTime()
+    val (startDateTime, setStartDateTime) = remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.startDate) }
+    val (endDateTime, setEndDateTime) = remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.endDate) }
+    val isValidDateTimeRange = remember(startDateTime, endDateTime) {
+        when {
+            startDateTime == null || endDateTime == null -> true
+            startDateTime <= endDateTime -> true
+            else -> false
+        }
     }
 
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "기간 설정",
-        onConfirm = {
-            onConfirm(
-                PeriodData(
-                    startDateTime?.toEpochSecond(ZoneOffset.UTC),
-                    endDateTime?.toEpochSecond(ZoneOffset.UTC)
-                )
-            )
-        },
+        validation = { isValidDateTimeRange },
+        onConfirm = { onConfirm(PeriodData(startDateTime, endDateTime)) },
     ) {
-        DateTimeRangePicker(
-            startDateTime = startDateTime,
-            endDateTime = endDateTime,
-            onStartDateTimeSelected = { startDateTime = it },
-            onEndDateTimeSelected = { endDateTime = it }
-        )
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(PaddingSmall)
+        ) {
+            DateTimeInputText(
+                initialSelectedDateMillis = startDateTime,
+                onDateTimeSelected = setStartDateTime,
+                label = "시작 날짜/시간",
+            )
+
+            DateTimeInputText(
+                initialSelectedDateMillis = endDateTime,
+                onDateTimeSelected = setEndDateTime,
+                label = "종료 날짜/시간",
+            )
+
+            if (!isValidDateTimeRange) {
+                Text(
+                    text = "시작 시간은 종료 시간보다 이후일 수 없습니다.",
+                    color = androidx.compose.ui.graphics.Color.Red,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
     }
 }

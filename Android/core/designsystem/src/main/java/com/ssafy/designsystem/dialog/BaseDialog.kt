@@ -8,6 +8,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ssafy.designsystem.values.CornerLarge
+import com.ssafy.designsystem.values.LightGray
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.ReversePrimary
@@ -39,7 +40,7 @@ fun <T> BaseDialog(
                 },
                 enabled = validation()
             ) {
-                Text(confirmText, color = Primary)
+                Text(confirmText, color = if (validation()) Primary else LightGray)
             }
         },
         dismissButton = dismissText?.let {
