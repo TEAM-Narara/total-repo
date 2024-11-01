@@ -133,6 +133,7 @@ pipeline {
                         def branchName = env.BRANCH_NAME
 
                         echo "Using branchName for SonarQube analysis: ${branchName}"
+                        echo "Using branchName for SonarQube analysis: ${env.gitlabSourceBranch}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
