@@ -2,6 +2,7 @@ package com.ssafy.card.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.card.period.data.PeriodData
 import com.ssafy.model.card.CardDTO
 import com.ssafy.model.card.CommentDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -111,4 +112,5 @@ class CardViewModel @Inject constructor() : ViewModel() {
     }
 
     fun toggleIsManager(id: Long, isManager: Boolean) {}
+    fun updatePeriod(periodData: PeriodData) {}
 }
