@@ -104,7 +104,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         try {
             return switch (permission.toUpperCase()) {
                 case "ADMIN" -> checkFunction.check(member, target, Authority.ADMIN);
-                case "MEMBER" -> checkFunction.check(member, target, Authority.MEMBER);
+                case "MEMBER" -> checkFunction.check(member, target, Authority.MEMBER) || checkFunction.check(member, target, Authority.ADMIN);
                 default -> throw new CustomAccessDeniedException();
             };
         } catch (Exception e) {
