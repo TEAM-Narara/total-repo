@@ -1,6 +1,5 @@
 package com.ssafy.designsystem
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.ssafy.designsystem.values.Transparent
 import java.text.SimpleDateFormat
@@ -35,8 +34,6 @@ fun formatRangeTimeStamp(start: Long, end: Long): String {
         if (startDate.dayOfMonth != endDate.dayOfMonth) "d일" else "",
         Locale.getDefault()
     )
-    Log.d("TAG", "formatRangeTimeStamp: ${startFormatter.format(startDate)}")
-    Log.d("TAG", "formatRangeTimeStamp: ${endFormatter.format(endDate)}")
     return "${startFormatter.format(startDate)}${endFormatter.format(endDate)}"
 }
 
