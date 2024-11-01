@@ -3,6 +3,7 @@ package com.narara.superboard.cardlabel.service;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
+import com.narara.superboard.cardlabel.interfaces.dto.CardLabelDto;
 import com.narara.superboard.cardlabel.service.validator.CardLabelValidator;
 import com.narara.superboard.label.entity.Label;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,11 @@ public class CardLabelServiceImpl implements CardLabelService {
     @Override
     public List<CardLabel> getCardLabels(Card card) {
         return cardLabelRepository.findByCard(card);
+    }
+
+    @Override
+    public List<CardLabelDto> getCardLabelsDto(Long cardId) {
+        
+        return List.of();
     }
 }
