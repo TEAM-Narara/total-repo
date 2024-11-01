@@ -109,6 +109,16 @@ pipeline {
             }
         }
 
+         stage('SonarQube Analysis') {
+            steps {
+                script {
+                // 수정
+                    def branchName = env.BRANCH_NAME
+                    sh "./gradlew --info --warning-mode all sonar -Dsonar.projectKey=total-server-${branchName} -Dsonar.projectName=total-server-${branchName}"
+                }
+            }
+        }
+
 
 
         // 컨테이너 상태 확인
