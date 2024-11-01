@@ -5,8 +5,11 @@ import lombok.Builder;
 @Builder
 public record BoardDetailResponseDto(
         Long id,
+        Long workspaceId,
         String name,
         String backgroundType,
-        String backgroundValue
+        String backgroundValue,
+        String visibility,
+        Boolean isClosed
 ) {
 }

@@ -1,7 +1,11 @@
 package com.narara.superboard.board.interfaces.dto;
 
 public record BoardSimpleResponseDto(
-        Long boardId,
-        String name
+        Long id,
+        Long workspaceId,
+        String name,
+        String backgroundType,
+        String backgroundValue,
+        Boolean isClosed
 ) {
 }
