@@ -47,12 +47,12 @@ fun ModifyLabelDialog(
     dialogState: DialogState<LabelData>,
     onConfirm: (Long, Long, String) -> Unit,
 ) {
-    var color by remember { mutableStateOf(dialogState.property?.color) }
-    var description by remember { mutableStateOf(dialogState.property?.description ?: "") }
+    var color by remember { mutableStateOf(dialogState.parameter?.color) }
+    var description by remember { mutableStateOf(dialogState.parameter?.description ?: "") }
 
     LaunchedEffect(dialogState.isVisible) {
-        color = dialogState.property?.color
-        description = dialogState.property?.description ?: ""
+        color = dialogState.parameter?.color
+        description = dialogState.parameter?.description ?: ""
     }
 
     BaseDialog(
@@ -60,8 +60,8 @@ fun ModifyLabelDialog(
         dialogState = dialogState,
         title = "라벨 수정",
         confirmText = "수정",
-        onConfirm = { onConfirm(dialogState.property?.id!!, color!!, description) },
-        validation = { dialogState.property?.id != null && color != null },
+        onConfirm = { onConfirm(dialogState.parameter?.id!!, color!!, description) },
+        validation = { dialogState.parameter?.id != null && color != null },
     ) {
         Column {
             Text(
@@ -81,8 +81,8 @@ fun ModifyLabelDialog(
                             .background(Color(labelColor), shape = RoundedCornerShape(PaddingSmall))
                             .clickable {
                                 color = labelColor
-                                dialogState.property =
-                                    dialogState.property?.copy(color = labelColor)
+                                dialogState.parameter =
+                                    dialogState.parameter?.copy(color = labelColor)
                             }
                             .then(
                                 if (color == labelColor) Modifier.border(

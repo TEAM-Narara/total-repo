@@ -21,15 +21,15 @@ fun PeriodDialog(
     onConfirm: (PeriodData) -> Unit
 ) {
     var startDateTime by remember {
-        mutableStateOf(dialogState.property?.startDate?.millisecondsToZonedDateTime())
+        mutableStateOf(dialogState.parameter?.startDate?.millisecondsToZonedDateTime())
     }
     var endDateTime by remember {
-        mutableStateOf(dialogState.property?.endDate?.millisecondsToZonedDateTime())
+        mutableStateOf(dialogState.parameter?.endDate?.millisecondsToZonedDateTime())
     }
 
     LaunchedEffect(dialogState.isVisible) {
-        startDateTime = dialogState.property?.startDate?.millisecondsToZonedDateTime()
-        endDateTime = dialogState.property?.endDate?.millisecondsToZonedDateTime()
+        startDateTime = dialogState.parameter?.startDate?.millisecondsToZonedDateTime()
+        endDateTime = dialogState.parameter?.endDate?.millisecondsToZonedDateTime()
     }
 
     BaseDialog(

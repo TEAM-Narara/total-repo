@@ -47,12 +47,12 @@ fun CreateLabelDialog(
     dialogState: DialogState<LabelData>,
     onConfirm: (Long, String) -> Unit,
 ) {
-    var color by remember { mutableStateOf(dialogState.property?.color) }
-    var description by remember { mutableStateOf(dialogState.property?.description ?: "") }
+    var color by remember { mutableStateOf(dialogState.parameter?.color) }
+    var description by remember { mutableStateOf(dialogState.parameter?.description ?: "") }
 
     LaunchedEffect(dialogState.isVisible) {
-        color = dialogState.property?.color
-        description = dialogState.property?.description ?: ""
+        color = dialogState.parameter?.color
+        description = dialogState.parameter?.description ?: ""
     }
 
     BaseDialog(
