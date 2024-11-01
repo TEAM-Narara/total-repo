@@ -13,6 +13,9 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
 import java.util.ArrayList;
 import java.util.Map;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "카드")
 @CrossOrigin
 @Controller
 @RequiredArgsConstructor
@@ -31,7 +35,8 @@ public class CardController implements CardAPI {
     private final CardService cardService;
     private final CoverHandler coverHandler;
 
-    @PostMapping("/")
+    @Override
+    @Operation(summary = "카드 생성", description = "")
     public ResponseEntity<DefaultResponse<CardSimpleResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
             @RequestBody CardCreateRequestDto cardCreateRequestDto) {
@@ -47,7 +52,7 @@ public class CardController implements CardAPI {
     }
 
     @Override
-    @DeleteMapping("/{cardId}")
+    @Operation(summary = "카드 삭제", description = "")
     public ResponseEntity<DefaultResponse<Void>> deleteCard(@AuthenticationPrincipal Member member,
                                                             @PathVariable Long cardId) {
 
@@ -58,7 +63,7 @@ public class CardController implements CardAPI {
     }
 
     @Override
-    @PatchMapping("/{cardId}")
+    @Operation(summary = "카드 수정", description = "")
     public ResponseEntity<DefaultResponse<CardDetailResponseDto>> updateCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId,
@@ -80,7 +85,7 @@ public class CardController implements CardAPI {
 
 
     @Override
-    @GetMapping("/archived/{boardId}")
+    @Operation(summary = "카드 아카이브 리스트 조회", description = "")
     public ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getArchivedCardList(
             @AuthenticationPrincipal Member member,
             @PathVariable Long boardId) {
@@ -97,7 +102,7 @@ public class CardController implements CardAPI {
     }
 
     @Override
-    @PatchMapping("/{cardId}/archive")
+    @Operation(summary = "카드 아카이브 여부 변경", description = "")
     public ResponseEntity<DefaultResponse<Void>> changeArchiveStatusByCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId) {

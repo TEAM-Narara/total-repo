@@ -89,7 +89,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void deleteBoard(Long boardId) {
         Board board = getBoard(boardId);
-        boardRepository.delete(board);
+        board.deleted();
     }
 
     @Override

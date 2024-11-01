@@ -34,17 +34,20 @@ public class ResponseMessage {
 
     // 보드 관련 상수
     public static final String BOARD_CREATE_SUCCESS = "보드 생성 성공";
-    public static final String BOARD_UPDATE_SUCCESS = "보드 수정 성공";
+    public static final String BOARD_ADMIN_UPDATE_SUCCESS = "어드민의 보드 수정 성공";
     public static final String BOARD_DELETE_SUCCESS = "보드 삭제 성공";
-    public static final String CLOSED_BOARD_LIST_SUCCESS = "아카이브된 보드 목록 조회 성공";
-    public static final String BOARD_CLOSE_STATUS_CHANGE_SUCCESS = "보드 아카이브 상태 변경 성공";
+    public static final String BOARD_FETCH_SUCCESS = "보드 조회 성공";
+    public static final String BOARD_MEMBER_UPDATE_SUCCESS = "사용자의 보드 설정 업데이트 성공";
+    public static final String BOARD_ARCHIVED_FETCH_SUCCESS = "아카이브된 보드 목록 조회 성공";
+    public static final String BOARD_ARCHIVE_STATUS_CHANGED = "보드 아카이브 상태 변경 성공";
+
     // 리스트 관련 상수
     public static final String LIST_CREATE_SUCCESS = "리스트 생성 성공";
     public static final String LIST_UPDATE_SUCCESS = "리스트 수정 성공";
     public static final String LIST_DELETE_SUCCESS = "리스트 삭제 성공";
     public static final String LIST_MOVE_SUCCESS = "리스트 이동 성공";
-    public static final String ARCHIVED_LIST_LIST_SUCCESS = "아카이브된 리스트 목록 조회 성공";
-    public static final String LIST_ARCHIVE_STATUS_CHANGE_SUCCESS = "리스트 아카이브 상태 변경 성공";
+    public static final String LIST_ARCHIVE_CHANGE_SUCCESS = "아카이브된 리스트 목록 조회 성공";
+    public static final String LIST_GET_ARCHIVED_SUCCESS = "리스트 아카이브 상태 변경 성공";
 
     // 카드 관련 상수
     public static final String CARD_CREATE_SUCCESS = "카드 생성 성공";
