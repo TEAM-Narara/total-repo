@@ -4,7 +4,6 @@ import com.ssafy.data.repository.github.GitHubRepository
 import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.user.OAuth
-import com.ssafy.model.user.User
 import com.ssafy.model.user.github.GitHubDTO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -34,8 +33,8 @@ class LogInUseCase @Inject constructor(
         }
     }
 
-    suspend operator fun invoke(user: User): Flow<Boolean> {
-        return userRepository.login(user)
+    suspend operator fun invoke(email: String, password: String): Flow<Boolean> {
+        return userRepository.login(email, password)
             .map { userInfo ->
                 dataStoreRepository.saveUser(userInfo)
                 true

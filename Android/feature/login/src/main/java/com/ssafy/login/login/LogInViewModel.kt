@@ -46,8 +46,7 @@ class LogInViewModel @Inject constructor(
         password: String,
         onSuccess: () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val user = User(email = email, password = password)
-        loginUseCase(user).withUiState().collect { isSuccess ->
+        loginUseCase(email = email, password = password).withUiState().collect { isSuccess ->
             if (isSuccess) withMain(onSuccess)
         }
     }

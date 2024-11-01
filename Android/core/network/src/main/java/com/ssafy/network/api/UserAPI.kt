@@ -15,6 +15,6 @@ interface UserAPI {
     suspend fun loginWithNaver(@Query("accessToken") token: String): Response<User>
 
     @POST("api/v1/user/login")
-    suspend fun login(@Body user: User): Response<User>
+    suspend fun login(@Body body: Map<String, String>): Response<User>
 
 }

@@ -2,8 +2,8 @@ package com.ssafy.data.repository.user
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.response.toFlow
-import com.ssafy.network.source.user.UserDataSource
 import com.ssafy.model.user.User
+import com.ssafy.network.source.user.UserDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -26,8 +26,8 @@ class UserRepositoryImpl @Inject constructor(
         return response.toFlow()
     }
 
-    override suspend fun login(user: User): Flow<User> {
-        val response = withContext(ioDispatcher) { userDataSource.login(user) }
+    override suspend fun login(email: String, password: String): Flow<User> {
+        val response = withContext(ioDispatcher) { userDataSource.login(email, password) }
         return response.toFlow()
     }
 

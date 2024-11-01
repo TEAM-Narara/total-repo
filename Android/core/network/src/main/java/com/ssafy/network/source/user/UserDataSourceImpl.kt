@@ -13,7 +13,9 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun loginWithNaver(token: String): Response<User> =
         userAPI.loginWithNaver(token)
 
-    override suspend fun login(user: User): Response<User> =
-        userAPI.login(user)
+    override suspend fun login(email: String, password: String): Response<User> {
+        val map = mapOf("email" to email, "password" to password)
+        return userAPI.login(map)
+    }
 
 }

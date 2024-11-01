@@ -9,5 +9,5 @@ interface UserRepository {
 
     suspend fun loginWithNaver(token: String): Flow<User>
 
-    suspend fun login(user: User): Flow<User>
+    suspend fun login(email: String, password: String): Flow<User>
 }

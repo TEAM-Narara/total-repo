@@ -9,6 +9,6 @@ interface UserDataSource {
 
     suspend fun loginWithNaver(token: String): Response<User>
 
-    suspend fun login(user: User): Response<User>
+    suspend fun login(email: String, password: String): Response<User>
 
 }
