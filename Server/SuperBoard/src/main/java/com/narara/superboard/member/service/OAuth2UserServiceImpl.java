@@ -46,6 +46,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
 
     @Override
     public TokenDto getUserInfo(String accessToken, String provider) {
+
         log.info("getUserInfo called with provider: {}", provider);
 
         Map<String, Object> attributes = fetchUserInfo(accessToken, provider);
