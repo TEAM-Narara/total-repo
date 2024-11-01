@@ -6,6 +6,7 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
 import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
+import com.narara.superboard.member.interfaces.dto.MemberLoginResponseDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -23,29 +24,31 @@ public class AuthController implements AuthAPI{
 
     private final AuthService authService;
     @Autowired
-    private IAuthenticationFacade authenticationFacade;
+    private final IAuthenticationFacade authenticationFacade;
 
 
     @Override
     public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
-        TokenDto tokens = authService.login(memberLoginRequestDto);
+        MemberLoginResponseDto memberLoginResponseDto = authService.login(memberLoginRequestDto);
+        TokenDto tokens = memberLoginResponseDto.tokenDto();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokens.accessToken());
         headers.add("Refresh-Token", tokens.refreshToken());
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS), headers,HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS,memberLoginResponseDto.memberDto()), headers,HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<?> register(@RequestBody MemberCreateRequestDto memberCreateRequestDto) {
-        TokenDto tokens = authService.register(memberCreateRequestDto);
+        MemberLoginResponseDto memberLoginResponseDto = authService.register(memberCreateRequestDto);
+        TokenDto tokens = memberLoginResponseDto.tokenDto();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokens.accessToken());
         headers.add("Refresh-Token", tokens.refreshToken());
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CREATED_USER),headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CREATED_USER,memberLoginResponseDto.memberDto()),headers, HttpStatus.CREATED);
     }
 
     @Override

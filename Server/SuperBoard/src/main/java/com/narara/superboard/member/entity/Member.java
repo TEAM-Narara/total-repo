@@ -87,7 +87,6 @@ public class Member extends BaseTimeEntity {
         this.loginType = LoginType.LOCAL;
     }
 
-
     public Member(Long id, String nickname, String email, String password,String profileImgUrl) {
         this.id = id;
         this.nickname = nickname;
@@ -104,5 +103,20 @@ public class Member extends BaseTimeEntity {
         this.email = email;
         this.isDeleted = false;
         this.loginType = LoginType.LOCAL;
+    }
+
+
+    // copyWithUpdatedFields 메서드 리팩토링
+    public Member copyWithUpdatedFields(String nickname, String profileImgUrl) {
+        return Member.builder()
+                .id(this.id)
+                .nickname(nickname != null ? nickname : this.nickname)
+                .email(this.email)
+                .password(this.password)
+                .profileImgUrl(profileImgUrl != null ? profileImgUrl : this.profileImgUrl)
+                .isDeleted(this.isDeleted)
+                .loginType(this.loginType)
+                .refreshToken(this.refreshToken)
+                .build();
     }
 }
