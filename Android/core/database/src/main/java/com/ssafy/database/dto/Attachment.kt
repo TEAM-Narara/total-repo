@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "attachment")
 data class Attachment(
-    @PrimaryKey val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val cardId: Long = 0L,
     val url: String = "",
     val type: String = "",
