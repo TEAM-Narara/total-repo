@@ -1,8 +1,8 @@
 // jacoco 테스트 커버리지
 //def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
 //def jacocoDir = "$buildDir/customJacocoReportDir"
-def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
-//def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
+//def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
+def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
 
 jacoco {
     // JaCoCo 버전
@@ -20,7 +20,8 @@ jacocoTestReport {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(false)
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml') as FileSystemLocation
+//        html.outputLocation = layout.buildDirectory.dir('jacocoHtml') as FileSystemLocation
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 //        xml.outputLocation = layout.buildDirectory.file('jacocoXml/jacoco.xml')
 //        html.outputLocation.set(jacocoHtmlDir)
 //        xml.outputLocation.set(jacocoXmlDir.map { it.file('jacocoTestReport.xml') })
