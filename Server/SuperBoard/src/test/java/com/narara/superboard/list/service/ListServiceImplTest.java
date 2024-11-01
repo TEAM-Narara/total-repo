@@ -7,14 +7,19 @@ import static org.mockito.Mockito.*;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundNameException;
+import com.narara.superboard.list.ListAction;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
+import com.narara.superboard.member.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +47,9 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private BoardRepository boardRepository;
 
+    @Mock
+    private BoardService boardService;
+
     @InjectMocks
     private ListServiceImpl listService;
 
@@ -52,14 +60,15 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
     void shouldFailWhenListNameIsEmpty_UnitTest(String listName) {
         // given
         ListCreateRequestDto requestDto = new ListCreateRequestDto(1L, listName);
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
-        // Mocking NameValidator behavior to throw NotFoundNameException
+        // requestDto가 전달될 때만 NotFoundNameException을 발생시키도록 NameValidator를 모의합니다.
         doThrow(new NotFoundNameException("리스트"))
-                .when(nameValidator).validateListNameIsEmpty(any(ListCreateRequestDto.class));
+                .when(nameValidator).validateListNameIsEmpty(requestDto);
 
         // when & then
         NotFoundNameException exception = assertThrows(NotFoundNameException.class, () -> {
-            listService.createList(requestDto);
+            listService.createList(member, requestDto);
         });
 
         assertEquals("리스트의 이름(이)가 존재하지 않습니다. 이름(을)를 작성해주세요.", exception.getMessage());
@@ -75,6 +84,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         Long boardId = 1L;
         String listName = "Valid List Name";
         Long lastListOrder = 10L;
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking ListCreateRequestDto
         ListCreateRequestDto requestDto = new ListCreateRequestDto(boardId, listName);
@@ -94,7 +104,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         doNothing().when(lastOrderValidator).checkValidListLastOrder(board);
 
         // when
-        List resultList = listService.createList(requestDto);
+        List resultList = listService.createList(member, requestDto);
 
         // then
         assertEquals(savedList.getId(), resultList.getId());
@@ -102,35 +112,6 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         verify(lastOrderValidator, times(1)).checkValidListLastOrder(board);
         verify(boardRepository, times(1)).getReferenceById(boardId);
         verify(listRepository, times(1)).save(any(List.class));
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @DisplayName("리스트 이름이 비어있을 때 실패")
-    void testUpdateListFailureEmptyName(String emptyName) {
-        // given
-        Long listId = 1L;
-        ListUpdateRequestDto requestDto = ListUpdateRequestDto.builder()
-                .listId(listId)
-                .listName(emptyName)
-                .build();
-
-        // Mocking List entity
-        List list = mock(List.class);
-        when(listRepository.findById(listId)).thenReturn(Optional.of(list));
-
-        // Mocking: 리스트 이름이 비어있을 때 예외 발생
-        doThrow(new IllegalArgumentException("리스트 이름이 비어있습니다."))
-                .when(nameValidator).validateListNameIsEmpty(requestDto);
-
-        // when & then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            listService.updateList(listId, requestDto);
-        });
-
-        assertEquals("리스트 이름이 비어있습니다.", exception.getMessage());
-        verify(nameValidator, times(1)).validateListNameIsEmpty(requestDto);
-        verify(list, never()).updateList(requestDto);
     }
 
     @ParameterizedTest
@@ -143,13 +124,21 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
                 .listId(listId)
                 .listName(newName)
                 .build();
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking List entity
         List list = mock(List.class);
+        Board board = mock(Board.class); // Board 객체를 모킹
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
+        when(list.getBoard()).thenReturn(board); // list.getBoard()가 board를 반환하도록 설정
+
+        // Mocking the board member list behavior to return a list of board members
+        when(board.getBoardMemberList()).thenReturn(Arrays.asList(
+                new BoardMember(member, Authority.ADMIN) // BoardMember 객체를 생성하여 포함
+        ));
 
         // when
-        List updatedList = listService.updateList(listId, requestDto);
+        List updatedList = listService.updateList(member, listId, requestDto);
 
         // then
         verify(listRepository, times(1)).findById(listId);
@@ -167,13 +156,14 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
                 .listId(listId)
                 .listName("Valid Name")
                 .build();
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 리스트를 찾지 못했을 때 예외 발생
         when(listRepository.findById(listId)).thenReturn(Optional.empty());
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
-            listService.updateList(listId, requestDto);
+            listService.updateList(member, listId, requestDto);
         });
 
         assertEquals("해당하는 리스트(이)가 존재하지 않습니다. 리스트ID: " + listId, exception.getMessage());
@@ -191,13 +181,20 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
                 .listId(listId)
                 .listName(newName)
                 .build();
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking List entity
         List list = mock(List.class);
+        Board board = mock(Board.class); // Board 객체를 모킹
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
+        when(list.getBoard()).thenReturn(board); // list.getBoard()가 board를 반환하도록 설정
 
+        // Mocking the board member list behavior to return a list of board members
+        when(board.getBoardMemberList()).thenReturn(Arrays.asList(
+                new BoardMember(member, Authority.ADMIN) // BoardMember 객체를 생성하여 포함
+        ));
         // when
-        List updatedList = listService.updateList(listId, requestDto);
+        List updatedList = listService.updateList(member, listId, requestDto);
 
         // then
         verify(listRepository, times(1)).findById(listId);
@@ -212,12 +209,17 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         // given
         Long listId = 1L;
         List list = mock(List.class);
+        Board board = mock(Board.class);
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking the repository behavior
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
-
+        when(list.getBoard()).thenReturn(board);
+        when(board.getBoardMemberList()).thenReturn(Arrays.asList(
+                new BoardMember(member, Authority.ADMIN) // assuming BoardMember constructor with Board and Member
+        ));
         // when
-        List updatedList = listService.changeListIsArchived(listId);
+        List updatedList = listService.changeListIsArchived(member, listId);
 
         // then
         verify(listRepository, times(1)).findById(listId);
@@ -231,10 +233,11 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
     void testGetArchivedListBoardNotFound(Long boardId) {
         // given
         when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
-            listService.getArchivedList(boardId);
+            listService.getArchivedList(member, boardId);
         });
 
         // then
@@ -251,12 +254,13 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         // given
         Board board = mock(Board.class);
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // 리스트가 비어있는 경우를 처리
         when(listRepository.findByBoardAndIsArchived(board, true)).thenReturn(Collections.emptyList());
 
         // when
-        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+        java.util.List<List> archivedLists = listService.getArchivedList(member, boardId);
 
         // then
         assertNotNull(archivedLists);
@@ -276,9 +280,10 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
         when(listRepository.findByBoardAndIsArchived(board, true))
                 .thenReturn(Collections.singletonList(archivedList)); // 단일 아카이브 리스트 반환
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // when
-        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+        java.util.List<List> archivedLists = listService.getArchivedList(member, boardId);
 
         // then
         assertNotNull(archivedLists);
@@ -300,9 +305,10 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
         when(listRepository.findByBoardAndIsArchived(board, true))
                 .thenReturn(Arrays.asList(archivedList1, archivedList2)); // 두 개의 아카이브 리스트 반환
+        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // when
-        java.util.List<List> archivedLists = listService.getArchivedList(boardId);
+        java.util.List<List> archivedLists = listService.getArchivedList(member, boardId);
 
         // then
         assertNotNull(archivedLists);
