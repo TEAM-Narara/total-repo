@@ -21,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
@@ -91,5 +94,16 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto);
 
         return workspaceDetailResponseDto;
+    }
+
+    @Override
+    public List<WorkSpace> getWorkspaceByMember(Long memberId) {
+        List<WorkSpaceMember> allByMemberId = workSpaceMemberRepository.findAllByMemberId(memberId);
+        List<WorkSpace> workspaceList = new ArrayList<>();
+        for (WorkSpaceMember workSpaceMember: allByMemberId) {
+            workspaceList.add(workSpaceMember.getWorkSpace());
+        }
+
+        return workspaceList;
     }
 }
