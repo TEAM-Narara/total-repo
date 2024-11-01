@@ -1,6 +1,10 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
@@ -9,17 +13,23 @@ import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepos
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+@Slf4j
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
-
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
+    private final WorkSpaceRepository workSpaceRepository;
     private final WorkSpaceValidator workSpaceValidator;
+    private final MemberRepository memberRepository;
 
     @Override
     public WorkspaceMemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
@@ -63,5 +73,21 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         return WorkSpaceListResponseDto.builder()
                 .workSpaceResponseDtoList(workSpaceResponseDtoList).build();
+    }
+
+    @Transactional
+    @Override
+    public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
+        WorkSpaceMember workSpaceMember = workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
+
+        //WORKSPACE의 ADMIN만 수정가능
+        if (workSpaceMember.getAuthority().equals(Authority.MEMBER)) {
+            throw new UnauthorizedException();
+        }
+
+        workSpaceMember.editAuthority(authority);
+
+        return workSpaceMember;
     }
 }
