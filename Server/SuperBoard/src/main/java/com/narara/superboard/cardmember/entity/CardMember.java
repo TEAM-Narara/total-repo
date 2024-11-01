@@ -50,4 +50,10 @@ public class CardMember extends BaseTimeEntity {
     public void changeIsAlert() {
         this.isAlert = !isAlert;
     }
+
+    public CardMember(Member member, Card card, boolean isAlert) {
+        this.member = member;
+        this.card = card;
+        this.isAlert = isAlert;
+    }
 }
