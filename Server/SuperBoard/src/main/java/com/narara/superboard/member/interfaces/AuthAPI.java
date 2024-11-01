@@ -19,7 +19,7 @@ public interface AuthAPI {
     @Operation(summary = "회원가입")
     ResponseEntity<?> register(MemberCreateRequestDto memberCreateRequestDto);
 
-    @PostMapping("/oauth2/login/{provider}")
+    @GetMapping("/oauth2/login/{provider}")
     @Operation(summary = "소셜 로그인")
     ResponseEntity<?> oauth2Login(@RequestParam("accessToken") String accessToken
             ,@PathVariable("provider") String provider);
