@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SuperBoardApplicationTests {
 
     @Test
+    @DisplayName("실제 환경에 맞는 설정인지 확인 테스트")
     void contextLoads() {
     }
 
