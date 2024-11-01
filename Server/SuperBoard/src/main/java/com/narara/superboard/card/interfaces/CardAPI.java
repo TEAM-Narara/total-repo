@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/card")
+@RequestMapping("/api/v1/card")
 public interface CardAPI {
 
     @PostMapping("/")
