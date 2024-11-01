@@ -47,7 +47,8 @@ public class Board extends BaseTimeEntity {
     private Boolean isArchived;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isDeleted;
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long listOrderVersion;  // 버전
