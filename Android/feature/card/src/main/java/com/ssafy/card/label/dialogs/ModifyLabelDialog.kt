@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,13 +46,8 @@ fun ModifyLabelDialog(
     dialogState: DialogState<LabelData>,
     onConfirm: (Long, Long, String) -> Unit,
 ) {
-    var color by remember { mutableStateOf(dialogState.parameter?.color) }
-    var description by remember { mutableStateOf(dialogState.parameter?.description ?: "") }
-
-    LaunchedEffect(dialogState.isVisible) {
-        color = dialogState.parameter?.color
-        description = dialogState.parameter?.description ?: ""
-    }
+    var color by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
+    var description by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.description ?: "") }
 
     BaseDialog(
         modifier = modifier,
