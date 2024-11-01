@@ -9,8 +9,10 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 
 import com.narara.superboard.workspace.service.WorkSpaceService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +56,16 @@ public class WorkSpaceController implements WorkSpaceAPI {
         );
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
+    }
+
+    @Operation(summary = "워크스페이스 삭제")
+    @DeleteMapping("/{workspaceId}")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')")
+    public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
+//        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+        workSpaceService.deleteWorkSpace(workspaceId);
+
+        return ResponseEntity.ok().build();
     }
 
     @Tag(name = "나의 워크스페이스 리스트 조회")
