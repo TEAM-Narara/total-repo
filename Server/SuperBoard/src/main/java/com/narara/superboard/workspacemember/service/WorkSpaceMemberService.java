@@ -9,4 +9,5 @@ public interface WorkSpaceMemberService {
     WorkspaceMemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId);
     WorkSpaceListResponseDto getMemberWorkspaceList(Long memberId);
     WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority);
+    void addMember(Long workspaceId, Long memberId, Authority authority);
 }

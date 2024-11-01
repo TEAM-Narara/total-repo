@@ -2,6 +2,8 @@ package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
@@ -89,5 +91,21 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.editAuthority(authority);
 
         return workSpaceMember;
+    }
+
+    @Transactional
+    @Override
+    public void addMember(Long workspaceId, Long memberId, Authority authority) {
+        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
+
+        WorkSpaceMember workSpaceMember = WorkSpaceMember.builder()
+                .workSpace(workSpace)
+                .member(member)
+                .authority(authority)
+                .build();
     }
 }
