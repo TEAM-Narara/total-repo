@@ -1,6 +1,7 @@
 package com.ssafy.network.source.user
 
 import com.ssafy.model.user.User
+import com.ssafy.model.user.signup.RegisterDTO
 import com.ssafy.network.api.UserAPI
 import retrofit2.Response
 import javax.inject.Inject
@@ -17,5 +18,14 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
         val map = mapOf("email" to email, "password" to password)
         return userAPI.login(map)
     }
+
+    override suspend fun sendEmailCode(email: String): Response<Unit> =
+        userAPI.sendEmailCode(email)
+
+    override suspend fun verifyEmailCode(email: String, code: String): Response<Unit> =
+        userAPI.verifyEmailCode(email, code)
+
+    override suspend fun register(registerDTO: RegisterDTO): Response<User> =
+        userAPI.register(registerDTO)
 
 }

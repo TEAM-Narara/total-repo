@@ -18,7 +18,7 @@ open class BaseViewModel : ViewModel() {
     val uiState: StateFlow<UiState> get() = _uiState
     protected val _uiState = MutableStateFlow<UiState>(UiState.Idle)
 
-    fun <T> Flow<T>.withUiState() = this.onStart {
+    fun <T> Flow<T>.withUiState(onError: (Throwable) -> Unit = {}) = this.onStart {
         _uiState.update { UiState.Loading }
         // 너무 빨리 로딩이 끝나면 collectLatest이기 때문에 로딩 상태를 감지하지 못함
         delay(100)
@@ -27,6 +27,7 @@ open class BaseViewModel : ViewModel() {
     }.catch { exception ->
         exception.printStackTrace()
         _uiState.update { UiState.Error(exception.message) }
+        onError(exception)
     }
 
     fun resetUiState() {

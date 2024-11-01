@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.login.BuildConfig
 import com.ssafy.login.LogInUseCase
 import com.ssafy.model.user.OAuth
-import com.ssafy.model.user.User
 import com.ssafy.model.user.github.GitHubDTO
 import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
