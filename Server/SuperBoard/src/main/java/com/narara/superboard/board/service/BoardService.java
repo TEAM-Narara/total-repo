@@ -4,6 +4,8 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
 
 import com.narara.superboard.member.entity.Member;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface BoardService {
@@ -23,7 +25,7 @@ public interface BoardService {
 
     void changeArchiveStatus(Long boardId);
 
-    List<BoardReplyCollectionResponseDto> getRepliesByBoardId(Long boardId);
+    PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable);
 
 
 

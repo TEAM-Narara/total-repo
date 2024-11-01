@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 
 public record BoardReplyCollectionResponseDto(
-        Long replyId,String content,Boolean isDeleted,Long updatedAt, // 댓글
-        Long memberId,String email, // 멤버
+        Long replyId,String content,Long updatedAt, // 댓글
+        Long memberId,String email,String nickname,String profileImgUrl, // 멤버
         Long cardId,String cardName, // 카드
         Long listId,String listName // 리스트
 ) {

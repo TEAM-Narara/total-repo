@@ -25,7 +25,6 @@ public class CardServiceImpl implements CardService {
     private final ListRepository listRepository;
     private final CardMemberRepository cardMemberRepository;
 
-
     private final NameValidator nameValidator;
     private final CoverValidator coverValidator;
     private final LastOrderValidator lastOrderValidator;

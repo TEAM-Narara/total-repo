@@ -11,6 +11,7 @@ import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -20,10 +21,12 @@ import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
+import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.member.entity.Member;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.narara.superboard.reply.entity.Reply;
@@ -39,6 +42,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,6 +68,10 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private ReplyRepository replyRepository;
+    @Mock
+    private ListRepository listRepository;
+    @Mock
+    private CardRepository cardRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -608,78 +619,76 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Long boardId = 1L;
 
         // 1. Member 엔티티 생성
-        Member member = new Member(1L, "testUser", "user@example.com");
+        Member member = new Member(1L, "testUser", "user@example.com", "1111", "profileImgUrl");
 
         // 2. Board 객체 생성
-        Map<String, Object> cover1 = new HashMap<>();
-        cover1.put("type", "COLOR");
-        cover1.put("value", "#ffffff");
         Board board = Board.builder()
                 .id(boardId)
                 .name("보드 1")
-                .cover(cover1)
                 .build();
 
-        // 3. List 엔티티 생성 및 Board 연결
+        // 3. List 엔티티 생성
         com.narara.superboard.list.entity.List list = com.narara.superboard.list.entity.List.builder()
                 .id(10001L)
-                .name("List A")
-                .board(board) // 리스트에 보드 추가
+                .name("Test List")
+                .board(board)
                 .build();
 
         // 4. Card 엔티티 생성 및 List 연결
         Card card = Card.builder()
                 .id(1001L)
-                .name("Card A")
+                .name("Test Card")
                 .list(list) // 카드에 리스트 추가
                 .build();
 
         // 5. Reply 엔티티 생성 및 Card, Member 연결
         Reply reply = Reply.builder()
                 .id(1L)
-                .card(card)
                 .content("This is a comment") // 테스트에서 검증할 댓글 내용
                 .isDeleted(false)
                 .member(member) // 댓글에 멤버 추가
+                .card(card) // 댓글에 카드 추가
                 .build();
 
-        // Mock repository behavior
+        // Pageable 설정 및 Mock repository behavior
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Reply> replyPage = new PageImpl<>(Collections.singletonList(reply), pageable, 1);
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(replyRepository.findAllByBoardId(boardId, pageable)).thenReturn(replyPage);
 
         // When
-        List<BoardReplyCollectionResponseDto> replies = boardService.getRepliesByBoardId(boardId);
+        PageBoardReplyResponseDto responseDto = boardService.getRepliesByBoardId(boardId, pageable);
 
         // Then
-        assertNotNull(replies);
-        assertEquals(1, replies.size());
-        assertEquals("This is a comment", replies.get(0).content());
-        assertEquals("user@example.com", replies.get(0).email());
-        assertEquals(1001L, replies.get(0).cardId());
-        assertEquals("Card A", replies.get(0).cardName());
-        assertEquals(10001L, replies.get(0).listId());
-        assertEquals("List A", replies.get(0).listName());
+        assertNotNull(responseDto);
+        assertEquals(1, responseDto.totalElements());
+        assertEquals(1, responseDto.boardReplyCollectionResponseDtos().size());
+        assertEquals("This is a comment", responseDto.boardReplyCollectionResponseDtos().get(0).content());
+        assertEquals("user@example.com", responseDto.boardReplyCollectionResponseDtos().get(0).email());
+        assertEquals("testUser", responseDto.boardReplyCollectionResponseDtos().get(0).nickname());
+        assertEquals("profileImgUrl", responseDto.boardReplyCollectionResponseDtos().get(0).profileImgUrl());
+        assertEquals(1001L, responseDto.boardReplyCollectionResponseDtos().get(0).cardId());
+        assertEquals("Test Card", responseDto.boardReplyCollectionResponseDtos().get(0).cardName());
+        assertEquals(10001L, responseDto.boardReplyCollectionResponseDtos().get(0).listId());
+        assertEquals("Test List", responseDto.boardReplyCollectionResponseDtos().get(0).listName());
     }
 
-    /**
-     * 보드별 댓글 조회 실패 테스트들
-     */
     @Test
     @DisplayName("보드 ID가 유효하지 않을 때 댓글 조회 실패 테스트")
     void getAllRepliesForBoard_boardNotFound() {
         // Given
         Long invalidBoardId = 999L; // 존재하지 않는 보드 ID
 
-        // Mock repository behavior
         when(boardRepository.findById(invalidBoardId)).thenReturn(Optional.empty());
 
         // When & Then
         Exception exception = assertThrows(BoardNotFoundException.class, () -> {
-            boardService.getRepliesByBoardId(invalidBoardId);
+            boardService.getRepliesByBoardId(invalidBoardId, PageRequest.of(0, 10));
         });
 
-        // Exception 메시지 확인 (주석 제거)
-        assertEquals("Board not found with id: " + invalidBoardId, exception.getMessage());
+        assertEquals("ID가 999인 보드를 찾을 수 없습니다.(이)가 존재하지 않습니다. ID가 999인 보드를 찾을 수 없습니다.(을)를 작성해주세요.", exception.getMessage());
     }
+
 
     @Test
     @DisplayName("보드에 댓글이 없을 때 댓글 조회 성공하지만 빈 리스트 반환")
@@ -691,20 +700,23 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Board board = Board.builder()
                 .id(boardId)
                 .name("보드 1")
-                .cover(Collections.singletonMap("type", "COLOR"))
                 .build();
 
-        // Mock repository behavior
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        // Pageable 설정 및 Mock repository behavior
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Reply> emptyReplyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
-        when(boardService.getRepliesByBoardId(boardId)).thenReturn(Collections.emptyList());
+        // 필요한 Mock 설정
+        lenient().when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        lenient().when(replyRepository.findAllByBoardId(boardId, pageable)).thenReturn(emptyReplyPage);
 
         // When
-        List<BoardReplyCollectionResponseDto> replies = boardService.getRepliesByBoardId(boardId);
+        PageBoardReplyResponseDto responseDto = boardService.getRepliesByBoardId(boardId, pageable);
 
         // Then
-        assertNotNull(replies);
-        assertTrue(replies.isEmpty(), "댓글 리스트가 비어 있어야 함");
+        assertNotNull(responseDto);
+        assertTrue(responseDto.boardReplyCollectionResponseDtos().isEmpty(), "댓글 리스트가 비어 있어야 함");
+        assertEquals(0, responseDto.totalElements());
+        assertEquals(0, responseDto.totalPages());
     }
-
 }
