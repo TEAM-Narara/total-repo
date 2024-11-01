@@ -24,6 +24,7 @@ import com.ssafy.designsystem.values.White
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import com.ssafy.designsystem.millisecondsToZonedDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +35,10 @@ fun DateTimePicker(
     onConfirm: (Long?) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateTimeMillis)
-    val timePickerState = rememberTimePickerState()
+    val timePickerState = rememberTimePickerState(
+        initialHour = selectedDateTimeMillis?.millisecondsToZonedDateTime()?.hour ?: 0,
+        initialMinute = selectedDateTimeMillis?.millisecondsToZonedDateTime()?.minute ?: 0
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
