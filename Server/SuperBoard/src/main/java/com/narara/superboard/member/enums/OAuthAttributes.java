@@ -8,18 +8,20 @@ import java.util.function.Function;
 
 public enum OAuthAttributes {
     NAVER("naver", (attributes) -> {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        Map<String, Object> response = (Map<String, Object>) attributes.getOrDefault("response", Map.of());
         return new MemberProfile(
-                (String) response.get("name"),
+                (String) response.get("nickname"),
                 (String) response.get("email")
         );
     }),
 
     // 수정하기
     GITHUB("github", (attributes) -> {
+        String login = (String) attributes.get("login");
+        String email = (String) attributes.get("email");
         return new MemberProfile(
-                (String) attributes.get("name"),
-                (String) attributes.get("email")
+                login,
+                email != null ? email : login // email이 null인 경우 login을 대신 사용
         );
     });
 
