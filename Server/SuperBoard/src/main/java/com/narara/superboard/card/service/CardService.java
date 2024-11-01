@@ -13,5 +13,4 @@ public interface CardService {
     Card updateCard(Long cardId, CardUpdateRequestDto cardUpdateRequestDto);
     List<Card> getArchivedCardList(Long boardId);
     void changeArchiveStatusByCard(Long cardId);
-
 }
