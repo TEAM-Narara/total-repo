@@ -14,9 +14,9 @@ class DialogState<T> {
 
     var parameter: T? by mutableStateOf(null)
 
-    fun show(property: T? = null) {
+    fun show(parameter: T? = null) {
         isVisible = true
-        this.parameter = property
+        this.parameter = parameter
     }
 
     fun dismiss() {
