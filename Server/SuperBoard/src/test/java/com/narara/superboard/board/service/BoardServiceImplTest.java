@@ -4,6 +4,7 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
+import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
@@ -22,10 +23,11 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 import com.narara.superboard.member.entity.Member;
 
 import java.time.Instant;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import com.narara.superboard.reply.entity.Reply;
+import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -38,14 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -63,6 +58,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardMemberRepository boardMemberRepository;
+
+    @Mock
+    private ReplyRepository replyRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -660,6 +658,53 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("Card A", replies.get(0).cardName());
         assertEquals(10001L, replies.get(0).listId());
         assertEquals("List A", replies.get(0).listName());
+    }
+
+    /**
+     * 보드별 댓글 조회 실패 테스트들
+     */
+    @Test
+    @DisplayName("보드 ID가 유효하지 않을 때 댓글 조회 실패 테스트")
+    void getAllRepliesForBoard_boardNotFound() {
+        // Given
+        Long invalidBoardId = 999L; // 존재하지 않는 보드 ID
+
+        // Mock repository behavior
+        when(boardRepository.findById(invalidBoardId)).thenReturn(Optional.empty());
+
+        // When & Then
+        Exception exception = assertThrows(BoardNotFoundException.class, () -> {
+            boardService.getRepliesByBoardId(invalidBoardId);
+        });
+
+        // Exception 메시지 확인 (주석 제거)
+        assertEquals("Board not found with id: " + invalidBoardId, exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("보드에 댓글이 없을 때 댓글 조회 성공하지만 빈 리스트 반환")
+    void getAllRepliesForBoard_noReplies() {
+        // Given
+        Long boardId = 1L;
+
+        // 1. Board 엔티티 생성
+        Board board = Board.builder()
+                .id(boardId)
+                .name("보드 1")
+                .cover(Collections.singletonMap("type", "COLOR"))
+                .build();
+
+        // Mock repository behavior
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        when(boardService.getRepliesByBoardId(boardId)).thenReturn(Collections.emptyList());
+
+        // When
+        List<BoardReplyCollectionResponseDto> replies = boardService.getRepliesByBoardId(boardId);
+
+        // Then
+        assertNotNull(replies);
+        assertTrue(replies.isEmpty(), "댓글 리스트가 비어 있어야 함");
     }
 
 }
