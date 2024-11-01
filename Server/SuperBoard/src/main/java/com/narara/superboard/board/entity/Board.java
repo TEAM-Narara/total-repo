@@ -4,10 +4,12 @@ import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,7 +54,12 @@ public class Board extends BaseTimeEntity {
     private WorkSpace workSpace;  // 워크스페이스 키
 
     @OneToMany(mappedBy = "board")
-    private java.util.List<List> listCollection;  // 보드 키
+    @Builder.Default
+    private java.util.List<List> listCollection = new ArrayList<>();  // 보드 키
+
+    @OneToMany(mappedBy = "board")
+    @Builder.Default
+    private java.util.List<BoardMember> boardMemberList = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "\"offset\"")

@@ -31,6 +31,8 @@ public class MemberValidator {
         validateVerificationCode(verifyEmailCodeRequestDto.code());
     }
 
+
+
     // 이메일 검증
     public void validateEmail(String email) {
         if(!StringUtils.hasText(email)) {
@@ -57,6 +59,17 @@ public class MemberValidator {
 
         if (password.length() < 4 || password.length() > 30) {
             throw new MemberInvalidPasswordFormatException();
+        }
+    }
+
+    // 유저 검색어 검증
+    public void validateSearchTerm(String searchTerm) {
+        if(!StringUtils.hasText(searchTerm)) {
+            throw new SearchTermNotFoundException();
+        }
+
+        if (searchTerm.length() < 3 ) {
+            throw new InvalidSearchTermFormatException();
         }
     }
 

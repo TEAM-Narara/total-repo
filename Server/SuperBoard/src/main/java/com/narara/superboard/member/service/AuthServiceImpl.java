@@ -7,10 +7,7 @@ import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.InvalidCredentialsException;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
-import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
-import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
-import com.narara.superboard.member.interfaces.dto.TokenDto;
-import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
+import com.narara.superboard.member.interfaces.dto.*;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
@@ -42,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final WorkSpaceService workSpaceService;
 
     @Override
-    public TokenDto register(MemberCreateRequestDto memberCreateRequestDto) {
+    public MemberLoginResponseDto register(MemberCreateRequestDto memberCreateRequestDto) {
         memberValidator.registerValidate(memberCreateRequestDto);
 
         Member newMember = createNewMember(memberCreateRequestDto);
@@ -53,11 +50,14 @@ public class AuthServiceImpl implements AuthService {
         TokenDto tokenDto = createTokens(newMember);
         saveRefreshToken(newMember, tokenDto.refreshToken());
 
-        return tokenDto;
+        MemberDto memberDto = new MemberDto(newMember.getEmail(), newMember.getNickname(),
+                newMember.getProfileImgUrl());
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     @Override
-    public TokenDto login(MemberLoginRequestDto memberLoginRequestDto) {
+    public MemberLoginResponseDto login(MemberLoginRequestDto memberLoginRequestDto) {
         memberValidator.loginValidate(memberLoginRequestDto);
 
         Member member = findMemberByEmail(memberLoginRequestDto.email());
@@ -67,7 +67,10 @@ public class AuthServiceImpl implements AuthService {
         TokenDto tokenDto = createTokens(member);
         saveRefreshToken(member, tokenDto.refreshToken());
 
-        return tokenDto;
+        MemberDto memberDto = new MemberDto(member.getEmail(), member.getNickname(),
+                member.getProfileImgUrl());
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     @Override

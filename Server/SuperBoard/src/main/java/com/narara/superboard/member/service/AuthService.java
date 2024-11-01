@@ -1,13 +1,10 @@
 package com.narara.superboard.member.service;
 
-import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
-import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
-import com.narara.superboard.member.interfaces.dto.TokenDto;
-import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
+import com.narara.superboard.member.interfaces.dto.*;
 
 public interface AuthService {
-    TokenDto register(MemberCreateRequestDto memberCreateRequestDto);
-    TokenDto login(MemberLoginRequestDto memberLoginRequestDto);
+    MemberLoginResponseDto register(MemberCreateRequestDto memberCreateRequestDto);
+    MemberLoginResponseDto login(MemberLoginRequestDto memberLoginRequestDto);
     void logout(Long memberId);
     void withdrawal(Long memberId);
     String reissueAccessToken(String refreshToken);

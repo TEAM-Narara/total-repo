@@ -291,6 +291,7 @@ gradle-app.setting
 # secret value 삭제
 src/main/resources/*.yml
 src/main/resources/*.properties
-superboard-secret-value/**
 application.yml
 application.properties
+src/test/resources/*.yml
+src/test/resources/*.properties

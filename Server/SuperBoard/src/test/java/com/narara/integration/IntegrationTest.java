@@ -2,7 +2,9 @@ package com.narara.integration;
 
 import com.narara.superboard.SuperBoardApplication;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Fail.fail;
 @Transactional
 @ActiveProfiles("test")
 @SpringBootTest(classes = SuperBoardApplication.class)  // 메인 애플리케이션 클래스 지정
+@DisplayName("통합 테스트 ")
 // 테스트 환경을 설정할 때 DB 연결을 분리하고 싶을 때 상속을 통해서 적용하세요.
 public class IntegrationTest {
     @BeforeAll
@@ -37,4 +40,10 @@ public class IntegrationTest {
             fail("application-test.yml 파일이 존재하지 않습니다.");
         }
     }
+
+    @Test
+    @DisplayName("테스트 환경에 맞는 설정을 적용하기")
+    void contextLoads() {
+    }
+
 }
