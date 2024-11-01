@@ -25,10 +25,10 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
             val email = stringPreferencesKey(USER_EMAIL)
             val profile = stringPreferencesKey(USER_PROFILE)
 
-            user.id.isNotZero()?.let { preferences[id] = it }
-            user.nickname.isNotBlank()?.let { preferences[nickname] = it }
-            user.email.isNotBlank()?.let { preferences[email] = it }
-            user.profileImage.isNotBlank()?.let { preferences[profile] = it }
+            user.id.ifNotZero()?.let { preferences[id] = it }
+            user.nickname.ifNotBlank()?.let { preferences[nickname] = it }
+            user.email.ifNotBlank()?.let { preferences[email] = it }
+            user.profileImage.ifNotBlank()?.let { preferences[profile] = it }
         }
     }
 
@@ -91,8 +91,8 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
         }
     }
 
-    private fun Long.isNotZero(): Long? = if (this != 0L) this else null
-    private fun String?.isNotBlank() = if (!this.isNullOrBlank()) this else null
+    private fun Long.ifNotZero(): Long? = if (this != 0L) this else null
+    private fun String?.ifNotBlank() = if (!this.isNullOrBlank()) this else null
 
     companion object {
         const val USER = "user"
