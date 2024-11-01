@@ -9,7 +9,7 @@ jacoco {
         toolVersion = "0.8.12"
 
 //  테스트결과 리포트를 저장할 경로 변경
-        reportsDirectory = jacocoDir.asFile
+        reportsDirectory = jacocoDir // 리포트 경로 설정
     }
 
     jacocoTestReport {
@@ -22,7 +22,7 @@ jacoco {
             html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
             //        html.outputLocation.set(jacocoHtmlDir)
 //        xml.outputLocation = layout.buildDirectory.file('jacocoXml/jacoco.xml')
-            xml.outputLocation.set(jacocoDir.file("jacocoTestReport.xml"))
+            xml.outputLocation.set(layout.buildDirectory.file("customJacocoReportDir/jacocoTestReport.xml"))
         }
         finalizedBy 'jacocoTestCoverageVerification'
 
