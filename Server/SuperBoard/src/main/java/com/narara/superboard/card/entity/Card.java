@@ -4,6 +4,7 @@ import com.narara.superboard.attachment.Attachment;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardlabel.entity.CardLabel;
+import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
@@ -61,6 +62,9 @@ public class Card extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "card")
     private java.util.List<Attachment> attachmentList;
+
+    @OneToMany(mappedBy = "card")
+    private java.util.List<CardMember> cardMemberList;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         return Card.builder()

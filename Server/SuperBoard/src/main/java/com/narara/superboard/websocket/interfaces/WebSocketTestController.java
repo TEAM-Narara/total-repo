@@ -4,10 +4,9 @@ import com.narara.superboard.websocket.interfaces.dto.WebSocketBodyDto;
 import com.narara.superboard.websocket.interfaces.dto.WebSocketTestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @RequiredArgsConstructor
 @Controller
 public class WebSocketTestController {
+    private final SimpMessagingTemplate messagingTemplate;
+
     /*
      * <request> /app/test/update
      * {
@@ -48,6 +49,7 @@ public class WebSocketTestController {
         log.info("/topic/test 입장, 비즈니스 로직 수행");
         Thread.sleep(1000);
 
+//        throw new RuntimeException("asdf");
         return new WebSocketTestDto("UPDATE", request);
     }
 }

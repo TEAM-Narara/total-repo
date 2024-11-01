@@ -1,27 +1,36 @@
 package com.narara.superboard.reply.service;
 
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
+import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
-import com.narara.superboard.replymember.entity.ReplyMember;
-import com.narara.superboard.replymember.infrastructure.ReplyMemberRepository;
+import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
+import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
 
+    private final CardService cardService;
+
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
-    private final ReplyMemberRepository replyMemberRepository;
 
     private final ContentValidator contentValidator;
 
@@ -32,13 +41,11 @@ public class ReplyServiceImpl implements ReplyService{
         Card card = cardRepository.findById(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
-        Reply reply = Reply.createReply(replyCreateRequestDto, card);
-        Reply savedReply = replyRepository.save(reply);
+        cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
 
-        ReplyMember replyMember = ReplyMember.createReplyMember(savedReply, member);
-        replyMemberRepository.save(replyMember);
+        Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
 
-        return savedReply;
+        return replyRepository.save(reply);
     }
 
     @Override
@@ -48,20 +55,31 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
-    public Reply updateReply(Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
+    public Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyUpdateRequestDto);
 
         // 기존 댓글이 존재하는지 확인
         Reply reply = getReply(replyId);
+        if (reply.getIsDeleted()){
+            throw new DeletedEntityException(replyId, "댓글");
+        }
+
+        // 이 방식이 성능이 더 중요함.
+        if (!member.getId().equals(reply.getMember().getId())){
+            throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
+        }
 
         // 댓글 내용 업데이트
         return reply.updateReply(replyUpdateRequestDto);
     }
 
     @Override
-    public void deleteReply(Long replyId) {
+    public Reply deleteReply(Member member, Long replyId) {
         Reply reply = getReply(replyId);
-        replyRepository.delete(reply);
+        if (!member.getId().equals(reply.getMember().getId())){
+            throw new UnauthorizedException(member.getNickname(), DELETE_REPLY);
+        }
+        return reply.deleteReply();
     }
 
     @Override

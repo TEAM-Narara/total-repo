@@ -30,6 +30,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-right: 10px;
         }
         button:hover {
             background-color: #45a049;
@@ -40,11 +41,45 @@
             border: 1px solid #ddd;
             min-height: 100px;
         }
+        .status {
+            margin: 10px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .disconnected {
+            background-color: #f2dede;
+            color: #a94442;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>웹소켓 테스트</h2>
+
+    <div id="connectionStatus" class="status disconnected">연결 상태: 연결되지 않음</div>
+
+    <div class="form-group">
+        <label for="wsUrl">웹소켓 연결 URL:</label>
+        <input type="text" id="wsUrl" placeholder="/ws"  required>
+        <button onclick="connect()">웹소켓 연결</button>
+        <button onclick="disconnect()">연결 해제</button>
+    </div>
+
+    <div class="form-group">
+        <label for="subscribeUrl1">구독 URL 1:</label>
+        <input type="text" id="subscribeUrl1" placeholder="/topic/board/..." required>
+        <button onclick="subscribe(1)">구독</button>
+    </div>
+
+    <div class="form-group">
+        <label for="subscribeUrl2">구독 URL 2:</label>
+        <input type="text" id="subscribeUrl2" placeholder="/topic/board/..." required>
+        <button onclick="subscribe(2)">구독</button>
+    </div>
 
     <div class="form-group">
         <label for="endPoint">/app을 포함한 url:</label>
@@ -58,7 +93,7 @@
 
     <div class="form-group">
         <label for="body">body:</label>
-        <textarea id="body" required  style="height: 300px"></textarea>
+        <textarea id="body" style="height: 300px"></textarea>
     </div>
 
     <button onclick="sendHttp()">전송</button>
@@ -71,44 +106,99 @@
 
 <script>
     let stompClient = null;
+    let subscriptions = {
+        1: null,
+        2: null
+    };
 
     function connect() {
-        const socket = new SockJS('/ws');
+        if (stompClient && stompClient.connected) {
+            alert('이미 연결되어 있습니다.');
+            return;
+        }
+
+        const wsUrl = document.getElementById('wsUrl').value || '/game';
+        const jwtToken = document.getElementById('jwtToken').value;
+
+        if (!jwtToken) {
+            alert('JWT 토큰을 입력해주세요.');
+            return;
+        }
+
+        const socket = new SockJS(wsUrl);
         stompClient = Stomp.over(socket);
 
-        // JWT 토큰 가져오기
-        const jwtToken = document.getElementById('jwtToken').value;
         const headers = {
             'Authorization': 'Bearer ' + jwtToken
         };
 
-        // STOMP 클라이언트 디버그 로그 활성화
-        // stompClient.debug = function(str) {
-        //     console.log(str);
-        // };
-
         stompClient.connect(headers, function(frame) {
             console.log('Connected: ' + frame);
-
-            // /topic/cards 구독
-            stompClient.subscribe('/topic/test', function(response) {
-                console.log('Received:', response.body);
-                try {
-                    const message = JSON.parse(response.body);
-                    displayMessage(message);
-                } catch (error) {
-                    console.error('Error parsing message:', error);
-                }
-            });
+            updateConnectionStatus(true);
         }, function(error) {
             console.log('Connection error:', error);
-            setTimeout(connect, 5000);  // 5초 후 재연결 시도
+            updateConnectionStatus(false);
+            setTimeout(connect, 5000);
         });
+    }
+
+    function disconnect() {
+        if (stompClient) {
+            // Unsubscribe from all subscriptions
+            Object.values(subscriptions).forEach(subscription => {
+                if (subscription) {
+                    subscription.unsubscribe();
+                }
+            });
+            subscriptions = {
+                1: null,
+                2: null
+            };
+
+            stompClient.disconnect();
+            stompClient = null;
+            updateConnectionStatus(false);
+        }
+    }
+
+    function updateConnectionStatus(connected) {
+        const statusDiv = document.getElementById('connectionStatus');
+        if (connected) {
+            statusDiv.className = 'status connected';
+            statusDiv.textContent = '연결 상태: 연결됨';
+        } else {
+            statusDiv.className = 'status disconnected';
+            statusDiv.textContent = '연결 상태: 연결되지 않음';
+        }
+    }
+
+    function subscribe(subscriptionNumber) {
+        if (!stompClient || !stompClient.connected) {
+            alert('먼저 웹소켓을 연결해주세요.');
+            return;
+        }
+
+        const subscribeUrl = document.getElementById(`subscribeUrl${subscriptionNumber}`).value;
+        if (!subscribeUrl) {
+            alert('구독할 URL을 입력해주세요.');
+            return;
+        }
+
+        if (subscriptions[subscriptionNumber]) {
+            subscriptions[subscriptionNumber].unsubscribe();
+        }
+
+        subscriptions[subscriptionNumber] = stompClient.subscribe(subscribeUrl, function(response) {
+            console.log('Received:', response);
+            displayMessage(response, subscriptionNumber);
+        });
+
+        alert(`${subscribeUrl} 구독 완료`);
     }
 
     function sendHttp() {
         if (!stompClient || !stompClient.connected) {
-            alert('서버와 연결되어 있지 않습니다. 페이지를 새로고침해주세요.');
+            alert('서버와 연결되어 있지 않습니다. 웹소켓을 먼저 연결해주세요.');
             return;
         }
 
@@ -116,7 +206,7 @@
         const jwtToken = document.getElementById('jwtToken').value;
         const body = document.getElementById('body').value;
 
-        if (!endPoint || !jwtToken || !body) {
+        if (!endPoint || !jwtToken) {
             alert('모든 필드를 입력해주세요.');
             return;
         }
@@ -125,8 +215,7 @@
         try {
             request = JSON.parse(body);
         } catch (error) {
-            alert('Body JSON 형식이 올바르지 않습니다.');
-            return;
+            request = '';
         }
 
         const headers = {
@@ -137,17 +226,20 @@
         stompClient.send(endPoint, headers, JSON.stringify(request));
     }
 
-    function displayMessage(message) {
+    function displayMessage(message, subscriptionNumber) {
         const messagesDiv = document.getElementById('messages');
         const messageElement = document.createElement('div');
         messageElement.style.marginBottom = '10px';
 
-        let content = '<strong>수신된 메시지:</strong><br>';
-        content += `타입: ${message.type || 'N/A'}<br>`;
+        let content = `<strong>수신된 메시지 (구독 ${subscriptionNumber}):</strong><br>`;
 
-        // response가 존재하면, JSON을 문자열로 변환하여 출력
-        if (message.response) {
-            content += `<strong>body:</strong><br><pre>${JSON.stringify(message.response, null, 2)}</pre>`;
+        if (message) {
+            const formattedMessage = message
+                .toString()
+                .replace(/\n/g, '<br>')
+                .replace(/\u0000/g, '');
+
+            content += `<pre style="white-space: pre-wrap; word-wrap: break-word;">${formattedMessage}</pre>`;
         } else {
             content += '정보 없음<br>';
         }
@@ -157,16 +249,6 @@
         messageElement.innerHTML = content;
         messagesDiv.insertBefore(messageElement, messagesDiv.firstChild);
     }
-
-    // 페이지 로드 시 연결
-    window.onload = function() {
-        // JWT 토큰이 입력된 후에만 연결하도록 변경
-        document.getElementById('jwtToken').addEventListener('change', function() {
-            if (this.value) {
-                connect();
-            }
-        });
-    };
 </script>
 </body>
 </html>

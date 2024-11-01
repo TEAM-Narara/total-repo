@@ -5,10 +5,7 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "AUTH API", description = "인증관련 API")
 @RequestMapping("/api/v1/members")
@@ -21,6 +18,11 @@ public interface AuthAPI {
     @PostMapping("/register")
     @Operation(summary = "회원가입")
     ResponseEntity<?> register(MemberCreateRequestDto memberCreateRequestDto);
+
+    @PostMapping("/oauth2/login/{provider}")
+    @Operation(summary = "소셜 로그인")
+    ResponseEntity<?> oauth2Login(@RequestParam("accessToken") String accessToken
+            ,@PathVariable("provider") String provider);
 
     @GetMapping("/logout")
     @Operation(summary = "로그아웃")
