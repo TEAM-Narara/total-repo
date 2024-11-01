@@ -14,11 +14,11 @@ public record CardDetailResponseDto(
         String coverType,
         String coverValue
 ) {
-    public static CardDetailResponseDto of(Card card) {
-        return of(card, null, null);
+    public static CardDetailResponseDto from(Card card) {
+        return from(card, null, null);
     }
 
-    public static CardDetailResponseDto of(Card card, String coverType, String coverValue) {
+    public static CardDetailResponseDto from(Card card, String coverType, String coverValue) {
         return CardDetailResponseDto.builder()
                 .cardSimpleResponseDto(CardSimpleResponseDto.of(card))
                 .description(card.getDescription())

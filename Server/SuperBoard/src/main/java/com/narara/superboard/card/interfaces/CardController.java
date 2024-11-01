@@ -71,7 +71,7 @@ public class CardController implements CardAPI {
         String coverType = cover.isEmpty() ? null : coverHandler.getTypeValue(cover);
         String coverValue = cover.isEmpty() ? null : coverHandler.getValue(cover);
 
-        CardDetailResponseDto cardDetailResponseDto = CardDetailResponseDto.of(card, coverType, coverValue);
+        CardDetailResponseDto cardDetailResponseDto = CardDetailResponseDto.from(card, coverType, coverValue);
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_UPDATE_SUCCESS, cardDetailResponseDto)
