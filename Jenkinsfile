@@ -130,12 +130,14 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-                        echo "Using branchName for SonarQube analysis: ${env.BRANCH_NAME}"
+                        def branchName = env.BRANCH_NAME
+
+                        echo "Using branchName for SonarQube analysis: ${branchName}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
-                            -Dsonar.projectKey=total-server-${env.BRANCH_NAME} \
-                            -Dsonar.projectName=total-server-${env.BRANCH_NAME}
+                            -Dsonar.projectKey=total-server-${branchName} \
+                            -Dsonar.projectName=total-server-${branchName}
                         """
                     }
                 }
