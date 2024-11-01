@@ -1,74 +1,55 @@
 package com.narara.superboard.reply.interfaces;
 
+import com.narara.superboard.common.interfaces.response.DefaultResponse;
+import com.narara.superboard.common.interfaces.response.ResponseMessage;
+import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplySimpleResponseDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.reply.service.ReplyService;
-import com.narara.superboard.websocket.enums.ReplyAction;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import static com.narara.superboard.websocket.enums.ReplyAction.*;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @CrossOrigin
 @Controller
 @RequiredArgsConstructor
-@MessageMapping("/reply")
-public class ReplyController implements ReplyDestination {
+@RequestMapping("/reply")
+public class ReplyController implements ReplyAPI {
 
-    private static final String REPLY = "REPLY";
-
-    private final SimpMessagingTemplate messagingTemplate;
     private final ReplyService replyService;
 
     @Override
-    @MessageMapping("/create")
-    public WebSocketResponse createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto) {
         Reply reply = replyService.createReply(member, replyCreateRequestDto);
 
-        return getWebSocketResponse(reply, ADD_REPLY);
+        ReplySimpleResponseDto replySimpleResponseDto = ReplySimpleResponseDto.of(reply);
+
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.REPLY_CREATE_SUCCESS,replySimpleResponseDto),HttpStatus.CREATED);
     }
 
-    @MessageMapping("/update/{cardId}")
-    @PreAuthorize("hasPermission(#cardId, 'REPLY', 'ADMIN')")
-    public WebSocketResponse updateReply(@DestinationVariable Long cardId, @RequestBody ReplyUpdateRequestDto replyUpdateRequestDto, @AuthenticationPrincipal Member member) {
-        Reply reply = replyService.updateReply(member, cardId, replyUpdateRequestDto);
+    @Override
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
+                                                               Long replyId) {
+        Reply reply = replyService.updateReply(member, replyId, updateRequestDto);
 
-        return getWebSocketResponse(reply, EDIT_REPLY);
+        ReplySimpleResponseDto replySimpleResponseDto = ReplySimpleResponseDto.of(reply);
+
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.REPLY_UPDATE_SUCCESS,replySimpleResponseDto),HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<DefaultResponse<Void>> deleteReply(Member member, Long replyId) {
+        replyService.deleteReply(member, replyId);
 
-    @MessageMapping("/delete/{cardId}")
-    @PreAuthorize("hasPermission(#cardId, 'REPLY', 'ADMIN')")
-    public WebSocketResponse deleteReply(@DestinationVariable Long cardId, @AuthenticationPrincipal Member member) {
-        Reply reply = replyService.deleteReply(member, cardId);
-
-        return getWebSocketResponse(reply, DELETE_REPLY);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS),HttpStatus.OK);
     }
 
-    private WebSocketResponse getWebSocketResponse(Reply reply, ReplyAction action) {
-        ReplySimpleResponseDto cardDto = ReplySimpleResponseDto.builder()
-                .cardId(reply.getCard().getId())
-                .replyId(reply.getId())
-                .content(reply.getContent())
-                .build();
-
-        // WebSocket 응답 객체 생성
-        WebSocketResponse response = WebSocketResponse.of(REPLY, action, cardDto);
-
-        // 동적 경로로 메시지 전송
-        Long boardId = reply.getCard().getList().getBoard().getId();
-        messagingTemplate.convertAndSend("/topic/board/" + boardId, response);
-        return response;
-    }
 }

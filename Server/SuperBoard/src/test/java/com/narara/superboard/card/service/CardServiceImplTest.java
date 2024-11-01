@@ -1,19 +1,23 @@
 package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
-import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -52,9 +56,11 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private ListRepository listRepository;
 
-    @InjectMocks
-    private CardServiceImpl cardService;
+    @Mock
+    private ListService listService; // 추가: listService를 Mock으로 설정
 
+    @InjectMocks
+    private CardServiceImpl cardService; // 실제 인스턴스 생성 후 Mock 주입
 
     @Test
     @DisplayName("카드 생성 성공 테스트")
@@ -123,12 +129,11 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         verifyNoMoreInteractions(cardRepository); // cardRepository는 호출되지 않아야 함
     }
 
-    @ParameterizedTest
-    @ValueSource(longs = {1L, 2L})
+    @Test
     @DisplayName("카드 조회 실패 테스트")
-    void testGetCardFailure(Long cardId) {
+    void testGetCardFailure() {
         // given
-        // Mocking: 카드가 존재하지 않는 경우
+        Long cardId = 999L; // 존재하지 않는 카드 ID 설정
         when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
 
         // when & then
@@ -139,6 +144,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
         verify(cardRepository, times(1)).findById(cardId);
     }
+
 
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L})
@@ -234,13 +240,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         Card card1 = Card.builder().id(1L).name("Archived Card 1").isArchived(true).build();
         Card card2 = Card.builder().id(2L).name("Archived Card 2").isArchived(true).build();
 
+        Member member = new Member(1L , "시현", "sisi@naver.com");
         // 리스트와 아카이브된 카드 설정
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Arrays.asList(list1, list2));
         when(cardRepository.findAllByListAndIsArchivedTrue(list1)).thenReturn(Collections.singletonList(card1));
         when(cardRepository.findAllByListAndIsArchivedTrue(list2)).thenReturn(Collections.singletonList(card2));
 
         // when: 아카이브된 카드 리스트 조회
-        java.util.List<Card> result = cardService.getArchivedCardList(boardId);
+        java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
 
         // then: 반환된 카드 리스트가 예상대로 모킹된 카드들과 일치하는지 확인
         assertEquals(2, result.size());
@@ -258,12 +265,12 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         // given: 보드에 속한 리스트가 있지만 아카이브된 카드가 없는 경우
         Long boardId = 1L;
         List list = List.builder().id(1L).name("List 1").build();
-
+        Member member = new Member(1L , "시현", "sisi@naver.com");
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Collections.singletonList(list));
         when(cardRepository.findAllByListAndIsArchivedTrue(list)).thenReturn(Collections.emptyList());
 
         // when: 아카이브된 카드 리스트 조회
-        java.util.List<Card> result = cardService.getArchivedCardList(boardId);
+        java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
 
         // then: 빈 리스트가 반환되는지 확인
         assertTrue(result.isEmpty());
@@ -279,21 +286,41 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     })
     void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) {
         // given: 카드 모킹
+        Member member = new Member(1L , "시현", "sisi@naver.com");
+
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .boardMemberList(new ArrayList<>()) // boardMemberList를 빈 리스트로 초기화
+                .build();
+
+        // boardMemberList에 멤버 추가
+        board.getBoardMemberList().add(new BoardMember(member, Authority.ADMIN));
+
+        List list = List.builder()
+                .id(1L)
+                .name("Test List")
+                .lastCardOrder(0L)
+                .board(board)
+                .build();
+
         Card card = Card.builder()
                 .id(cardId)
                 .name("Test Card")
                 .isArchived(isArchived)
+                .list(list)
                 .build();
 
-        // Mock: getCard 호출 시 모킹된 카드 반환
+        // Mocking: getCard 호출 시 모킹된 카드 반환
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
 
         // when: 카드 아카이브 상태 변경
-        cardService.changeArchiveStatusByCard(cardId);
+        cardService.changeArchiveStatusByCard(member, cardId);
 
         // then: 카드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, card.getIsArchived());
         verify(cardRepository, times(1)).findById(cardId);
     }
+
 
 }
