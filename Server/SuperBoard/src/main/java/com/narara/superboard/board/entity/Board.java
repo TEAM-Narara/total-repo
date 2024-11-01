@@ -55,7 +55,7 @@ public class Board extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "board")
     @Builder.Default
-    private java.util.List<List> listCollection;  // 보드 키
+    private java.util.List<List> listCollection = new ArrayList<>();  // 보드 키
 
     @OneToMany(mappedBy = "board")
     @Builder.Default
