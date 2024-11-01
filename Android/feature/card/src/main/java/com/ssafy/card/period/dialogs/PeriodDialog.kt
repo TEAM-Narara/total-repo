@@ -11,7 +11,7 @@ import com.ssafy.card.period.components.DateTimeRangePicker
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.designsystem.dialog.BaseDialog
 import com.ssafy.designsystem.dialog.DialogState
-import java.time.LocalDateTime
+import com.ssafy.designsystem.millisecondsToZonedDateTime
 import java.time.ZoneOffset
 
 @Composable
@@ -21,40 +21,15 @@ fun PeriodDialog(
     onConfirm: (PeriodData) -> Unit
 ) {
     var startDateTime by remember {
-        mutableStateOf(dialogState.property?.startDate?.let {
-            LocalDateTime.ofEpochSecond(
-                it,
-                0,
-                ZoneOffset.UTC
-            )
-        })
+        mutableStateOf(dialogState.property?.startDate?.millisecondsToZonedDateTime())
     }
     var endDateTime by remember {
-        mutableStateOf(dialogState.property?.endDate?.let {
-            LocalDateTime.ofEpochSecond(
-                it,
-                0,
-                ZoneOffset.UTC
-            )
-        })
+        mutableStateOf(dialogState.property?.endDate?.millisecondsToZonedDateTime())
     }
 
     LaunchedEffect(dialogState.isVisible) {
-        startDateTime = dialogState.property?.startDate?.let {
-            LocalDateTime.ofEpochSecond(
-                it,
-                0,
-                ZoneOffset.UTC
-            )
-        }
-
-        endDateTime = dialogState.property?.endDate?.let {
-            LocalDateTime.ofEpochSecond(
-                it,
-                0,
-                ZoneOffset.UTC
-            )
-        }
+        startDateTime = dialogState.property?.startDate?.millisecondsToZonedDateTime()
+        endDateTime = dialogState.property?.endDate?.millisecondsToZonedDateTime()
     }
 
     BaseDialog(
