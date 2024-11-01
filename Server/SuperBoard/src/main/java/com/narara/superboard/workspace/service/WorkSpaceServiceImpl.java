@@ -106,4 +106,15 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         return workspaceList;
     }
+
+    @Transactional
+    @Override
+    public WorkSpace editWorkspace(Long memberId, Long workspaceId, String name) {
+        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
+
+        workSpace.edit(name);
+
+        return workSpace;
+    }
 }

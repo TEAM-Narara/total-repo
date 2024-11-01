@@ -14,4 +14,5 @@ public interface WorkSpaceService {
     WorkSpace getWorkSpace(Long workSpaceId);
     WorkSpaceDetailResponseDto getWorkspaceDetail(Long workSpaceId);
     List<WorkSpace> getWorkspaceByMember(Long memberId);
+    WorkSpace editWorkspace(Long memberId, Long workspaceId, String name);
 }

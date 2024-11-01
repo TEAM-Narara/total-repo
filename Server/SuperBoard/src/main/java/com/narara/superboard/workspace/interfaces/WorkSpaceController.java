@@ -7,6 +7,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -50,6 +51,16 @@ public class WorkSpaceController implements WorkSpaceAPI {
         workSpaceService.deleteWorkSpace(workspaceId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "워크스페이스 수정")
+    @PatchMapping("/{workspaceId}")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN') OR hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //WORKSPACE의 ADMIN만 삭제가능
+    public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
+        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+        WorkSpace workSpace = workSpaceService.editWorkspace(memberId, workspaceId, requestDto.name());
+
+        return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
     }
 
     @Operation(summary = "나의 워크스페이스 리스트 조회")

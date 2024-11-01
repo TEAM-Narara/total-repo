@@ -65,4 +65,8 @@ public class WorkSpace extends BaseTimeEntity {
     public void remove() {
         this.isDeleted = true;
     }
+
+    public void edit(String name) {
+        this.name = name;
+    }
 }
