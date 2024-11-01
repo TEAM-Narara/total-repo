@@ -2,6 +2,7 @@ package com.ssafy.data.response
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.json.JSONObject
 import retrofit2.Response
 
 const val ERROR = "에러 발생"
@@ -15,7 +16,11 @@ inline fun <reified T> Response<T>.toFlow(): Flow<T> = flow {
 
     errorBody()?.let {
         val errorMessage = it.charStream().readLines().joinToString()
-        if (errorMessage.isNotBlank()) throw RuntimeException(errorMessage)
+        val json = JSONObject(errorMessage)
+        val message = json.getString("responseMessage")
+
+        if (message.isNotBlank()) throw RuntimeException(message)
+        else throw RuntimeException(ERROR)
     }
 
     if (isSuccessful) {
