@@ -19,10 +19,10 @@ jacoco {
             html.required.set(true)
             xml.required.set(true)
             csv.required.set(false)
-            html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+            html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
             //        html.outputLocation.set(jacocoHtmlDir)
 //        xml.outputLocation = layout.buildDirectory.file('jacocoXml/jacoco.xml')
-            xml.outputLocation.set(layout.buildDirectory.file("customJacocoReportDir/jacocoTestReport.xml"))
+            xml.outputLocation.set(jacocoDir.toPath().resolve("jacocoTestReport.xml").toFile())
         }
         finalizedBy 'jacocoTestCoverageVerification'
 
