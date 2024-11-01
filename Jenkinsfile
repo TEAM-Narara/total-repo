@@ -6,23 +6,18 @@ pipeline {
         jdk ("jdk21")
     }
 
-    environment {
-        // 공유 변수로 branchName을 선언합니다.
-        BRANCH_NAME = ''
-        SOURCE_BRANCH = '' // 기본값 설정
-    }
+    def branchName = ''
+    def sourceBranch = ''
 
     stages {
         stage('Git Clone') {
             steps {
                 script {
                     // 브랜치 이름 설정
-                    def branch = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
+                    branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
-                    env.BRANCH_NAME = branch
-                    env.SOURCE_BRANCH = env.gitlabSourceBranch ?: 'default-branch'
-                    echo "gitlabSourceBranch set to: ${env.SOURCE_BRANCH}"
+                    sourceBranch = env.gitlabSourceBranch ?: 'default-branch'
 
                     // 디버깅을 위한 로그 추가
                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
@@ -135,8 +130,8 @@ pipeline {
                     // 수정
                         def branchName = env.BRANCH_NAME
 
-                        echo "Using branchName for SonarQube analysis: ${branchName}"
-                        echo "Building from branch: ${env.SOURCE_BRANCH}"
+                        echo "Using branchName: ${branchName}"
+                        echo "Using sourceBranch: ${sourceBranch}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
