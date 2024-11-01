@@ -128,8 +128,6 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-                        def branchName = env.BRANCH_NAME
-
                         echo "Using branchName: ${branchName}"
                         echo "Using sourceBranch: ${sourceBranch}"
 
