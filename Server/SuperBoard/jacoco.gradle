@@ -1,5 +1,9 @@
 def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
 
+if (!jacocoDir.exists()) {
+    jacocoDir.mkdirs()
+}
+
 jacoco {
     // JaCoCo 버전
     toolVersion = "0.8.12"
