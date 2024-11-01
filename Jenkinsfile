@@ -9,6 +9,7 @@ pipeline {
     environment {
         // 공유 변수로 branchName을 선언합니다.
         BRANCH_NAME = ''
+        SOURCE_BRANCH = '' // 기본값 설정
     }
 
     stages {
@@ -20,6 +21,8 @@ pipeline {
                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
                     env.BRANCH_NAME = branch
+                    env.SOURCE_BRANCH = env.gitlabSourceBranch ?: 'default-branch'
+                    echo "gitlabSourceBranch set to: ${env.SOURCE_BRANCH}"
 
                     // 디버깅을 위한 로그 추가
                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
@@ -133,7 +136,7 @@ pipeline {
                         def branchName = env.BRANCH_NAME
 
                         echo "Using branchName for SonarQube analysis: ${branchName}"
-                        echo "Using branchName for SonarQube analysis: ${env.gitlabSourceBranch}"
+                        echo "Building from branch: ${env.SOURCE_BRANCH}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
