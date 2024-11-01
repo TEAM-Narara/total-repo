@@ -14,10 +14,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -38,19 +38,48 @@ import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     moveToLogInScreen: () -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var nickname by remember { mutableStateOf("") }
-    var authNumber by remember { mutableStateOf("") }
-    var timer by remember { mutableStateOf("5:00") }
+    val time by viewModel.timeFlow.collectAsStateWithLifecycle()
+    val signState by viewModel.signState.collectAsStateWithLifecycle()
+
+    SignUpScreen(
+        moveToLogInScreen = moveToLogInScreen,
+        time = time,
+        signState = signState,
+        changeState = viewModel::changeState
+    )
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+}
+
+@Composable
+private fun SignUpScreen(
+    moveToLogInScreen: () -> Unit,
+    time: String,
+    signState: SignState,
+    changeState: (SignInfo) -> Unit
+) {
+    val (email, setEmail) = remember { mutableStateOf("") }
+    val (password, setPassword) = remember { mutableStateOf("") }
+    val (nickname, setNickname) = remember { mutableStateOf("") }
+    val (authNumber, setAuthNumber) = remember { mutableStateOf("") }
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -58,9 +87,7 @@ fun SignUpScreen(
             .fillMaxWidth()
             .padding(horizontal = PaddingDefault)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(
-            PaddingXSmall
-        )
+        verticalArrangement = Arrangement.spacedBy(PaddingXSmall)
     ) {
         Image(
             painter = painterResource(id = R.drawable.big_logo),
@@ -73,56 +100,52 @@ fun SignUpScreen(
         EditText(
             title = "이메일",
             text = email,
-            onTextChange = { newText ->
-                email = newText
-            },
+            onTextChange = setEmail,
             modifier = Modifier.fillMaxWidth()
         )
         EditText(
             title = "비밀번호",
             text = password,
-            onTextChange = { newText ->
-                password = newText
-            },
+            onTextChange = setPassword,
             modifier = Modifier.fillMaxWidth()
         )
         EditText(
             title = "닉네임",
             text = nickname,
-            onTextChange = { newText ->
-                nickname = newText
-            },
+            onTextChange = setNickname,
             modifier = Modifier.fillMaxWidth()
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    PaddingZero, PaddingZero, PaddingZero,
-                    PaddingXLarge
-                ),
-            horizontalArrangement = Arrangement.spacedBy(
-                PaddingSmall
-            ),
+                .padding(PaddingZero, PaddingZero, PaddingZero, PaddingXLarge),
+            horizontalArrangement = Arrangement.spacedBy(PaddingSmall),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             EditText(
                 modifier = Modifier.weight(1f),
                 title = "인증번호",
                 text = authNumber,
-                onTextChange = { newText ->
-                    authNumber = newText
-                }
+                onTextChange = setAuthNumber
             )
-            Text(text = timer)
+
+            if (signState == SignState.AUTH) {
+                Text(text = time)
+            }
+
+            val text = if (signState == SignState.CHECK) "확인" else "인증"
+
             OutlinedButton(
                 modifier = Modifier.width(80.dp),
-                onClick = { startTimer() },
+                onClick = {
+                    val signInfo = SignInfo(email, password, nickname, authNumber)
+                    changeState(signInfo)
+                },
                 shape = RoundedCornerShape(CornerSmall),
                 border = BorderStroke(width = BorderDefault, color = Primary)
             ) {
                 Text(
-                    text = "확인",
+                    text = text,
                     color = Primary,
                     fontSize = TextMedium,
                 )
@@ -132,9 +155,6 @@ fun SignUpScreen(
     }
 }
 
-fun startTimer() {
-
-}
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable

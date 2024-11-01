@@ -1,8 +1,9 @@
-package com.ssafy.network
+package com.ssafy.network.module
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.Strictness
+import com.ssafy.network.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val TIME_OUT = 25000L
+    private const val TIME_OUT = 5000L
 
     @Singleton
     @Provides
@@ -38,11 +39,25 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    @UserRetrofit
     fun provideUserRetrofit(
         okHttpClient: OkHttpClient,
         gson: Gson,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+
+
+    @Singleton
+    @Provides
+    @GitHubRetrofit
+    fun provideGitHubRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://github.com")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
