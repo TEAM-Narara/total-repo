@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         // 공유 변수로 branchName을 선언합니다.
-        branchName = ''
+        BRANCH_NAME = ''
     }
 
     stages {
@@ -19,7 +19,16 @@ pipeline {
                     def branch = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
-                    env.branchName = branch
+                    env.BRANCH_NAME = branch
+
+                    // 디버깅을 위한 로그 추가
+                    echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
+                    echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
+                    echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+                    echo "Final branch: ${branch}"
+                    echo "Checking out branch: ${branch}"
+
 
                     // 디버깅을 위한 로그 추가
                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
