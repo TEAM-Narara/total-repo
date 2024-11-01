@@ -53,10 +53,10 @@ fun LogInScreen(
 
     LoginScreen(
         moveToSignUpScreen = moveToSignUpScreen,
-        moveToHomeScreen = moveToHomeScreen,
-        successToLoginWithGitHub = viewModel::successToLoginWithGitHub,
-        successToLoginWithNaver = viewModel::successToLoginWithNaver,
-        failToLoginWithOauth = viewModel::failToLoginWithOauth
+        successToLoginWithGitHub = { code -> viewModel.loginWithGitHub(code, moveToHomeScreen) },
+        successToLoginWithNaver = { token -> viewModel.loginWithNaver(token, moveToHomeScreen) },
+        failToLoginWithOauth = viewModel::failToLoginWithOauth,
+        login = { email, password -> viewModel.login(email, password, moveToHomeScreen) },
     )
 
     when (uiState) {
@@ -70,10 +70,10 @@ fun LogInScreen(
 @Composable
 private fun LoginScreen(
     moveToSignUpScreen: () -> Unit,
-    moveToHomeScreen: () -> Unit,
     successToLoginWithNaver: (String) -> Unit,
     successToLoginWithGitHub: (String) -> Unit,
     failToLoginWithOauth: (String) -> Unit,
+    login: (String, String) -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -127,7 +127,7 @@ private fun LoginScreen(
                 )
         )
 
-        FilledButton(onClick = { moveToHomeScreen() }, text = "로그인")
+        FilledButton(onClick = { login(email, password) }, text = "로그인")
         OutlineButton(text = "회원가입", onClick = { moveToSignUpScreen() })
 
         HorizontalDivider(
