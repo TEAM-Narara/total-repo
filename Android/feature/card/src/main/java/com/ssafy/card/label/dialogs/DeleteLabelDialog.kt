@@ -19,7 +19,7 @@ fun DeleteLabelDialog(
         dialogState = dialogState,
         title = "라벨 삭제",
         confirmText = "삭제",
-        onConfirm = { onConfirm(dialogState.parameter!!) },
+        onConfirm = { dialogState.parameter?.let { onConfirm(it) } },
         validation = { dialogState.parameter != null },
     ) {
         Text(text = "삭제하시겠습니까?")

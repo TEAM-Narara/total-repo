@@ -19,10 +19,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,15 +44,19 @@ fun ModifyLabelDialog(
     dialogState: DialogState<LabelData>,
     onConfirm: (Long, Long, String) -> Unit,
 ) {
-    var color by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
-    var description by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.description ?: "") }
+    val (color, setColor) = remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
+    val (description, setDescription) = remember(dialogState.isVisible) {
+        mutableStateOf(dialogState.parameter?.description ?: "")
+    }
 
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "라벨 수정",
         confirmText = "수정",
-        onConfirm = { onConfirm(dialogState.parameter?.id!!, color!!, description) },
+        onConfirm = {
+            if (color != null) dialogState.parameter?.let { onConfirm(it.id, color, description) }
+        },
         validation = { dialogState.parameter?.id != null && color != null },
     ) {
         Column {
@@ -74,7 +76,7 @@ fun ModifyLabelDialog(
                             .padding(PaddingTwo, PaddingTwo)
                             .background(Color(labelColor), shape = RoundedCornerShape(PaddingSmall))
                             .clickable {
-                                color = labelColor
+                                setColor(labelColor)
                                 dialogState.parameter =
                                     dialogState.parameter?.copy(color = labelColor)
                             }
@@ -100,7 +102,7 @@ fun ModifyLabelDialog(
             EditText(
                 title = "설명",
                 text = description,
-                onTextChange = { description = it },
+                onTextChange = setDescription,
                 modifier = Modifier.fillMaxWidth()
             )
         }
