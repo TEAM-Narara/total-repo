@@ -8,11 +8,11 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 
 public interface ListService {
-    List createList(ListCreateRequestDto listCreateRequestDto);
-    List updateList(Long listId, ListUpdateRequestDto listUpdateRequestDto);
+    List createList(Member member, ListCreateRequestDto listCreateRequestDto);
+    List updateList(Member member, Long listId, ListUpdateRequestDto listUpdateRequestDto);
     List getList(Long listId);
-    List changeListIsArchived(Long listId);
-    java.util.List<List> getArchivedList(Long listId);
+    List changeListIsArchived(Member member, Long listId);
+    java.util.List<List> getArchivedList(Member member, Long boardId);
     void checkBoardMember(List list, Member member, Action action);
 
 }
