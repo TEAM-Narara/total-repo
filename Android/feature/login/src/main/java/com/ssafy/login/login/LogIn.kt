@@ -53,16 +53,16 @@ fun LogInScreen(
 
     LoginScreen(
         moveToSignUpScreen = moveToSignUpScreen,
-        successToLoginWithGitHub = viewModel::successToLoginWithGitHub,
-        successToLoginWithNaver = viewModel::successToLoginWithNaver,
+        successToLoginWithGitHub = { code -> viewModel.loginWithGitHub(code, moveToHomeScreen) },
+        successToLoginWithNaver = { token -> viewModel.loginWithNaver(token, moveToHomeScreen) },
         failToLoginWithOauth = viewModel::failToLoginWithOauth,
-        login = viewModel::login
+        login = { email, password -> viewModel.login(email, password, moveToHomeScreen) },
     )
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()
         is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
-        is UiState.Success -> moveToHomeScreen()
+        is UiState.Success -> {}
         is UiState.Idle -> {}
     }
 }

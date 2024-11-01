@@ -10,7 +10,6 @@ import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,22 +18,38 @@ class LogInViewModel @Inject constructor(
     private val loginUseCase: LogInUseCase
 ) : BaseViewModel() {
 
-    fun successToLoginWithGitHub(code: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun loginWithGitHub(
+        code: String,
+        onSuccess: () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val gitHubDTO = GitHubDTO(BuildConfig.GIT_ID, BuildConfig.GIT_SECRET, code)
-        loginUseCase(gitHubDTO).withUiState().collect()
+        loginUseCase(gitHubDTO).withUiState().collect { isSuccess ->
+            if (isSuccess) withMain(onSuccess)
+        }
     }
 
-    fun successToLoginWithNaver(token: String) = viewModelScope.launch(Dispatchers.IO) {
-        loginUseCase(OAuth.Naver(token)).withUiState().collect()
+    fun loginWithNaver(
+        token: String,
+        onSuccess: () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        loginUseCase(OAuth.Naver(token)).withUiState().collect { isSuccess ->
+            if (isSuccess) withMain(onSuccess)
+        }
     }
 
     fun failToLoginWithOauth(message: String) = viewModelScope.launch(Dispatchers.IO) {
         _uiState.emit(UiState.Error(message))
     }
 
-    fun login(email: String, password: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun login(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val user = User(email = email, password = password)
-        loginUseCase(user).withUiState().collect()
+        loginUseCase(user).withUiState().collect { isSuccess ->
+            if (isSuccess) withMain(onSuccess)
+        }
     }
 
 }
