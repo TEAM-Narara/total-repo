@@ -70,7 +70,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
         Member member = new Member(1L, "시현", "sisi@naver.com");
         // when
-        workSpaceService.createWorkSpace(member, workspaceCreateDto);
+        workSpaceService.createWorkSpace(member.getId(), workspaceCreateDto);
 
         // then
         // 메서드가 한 번 호출되었는지 확인

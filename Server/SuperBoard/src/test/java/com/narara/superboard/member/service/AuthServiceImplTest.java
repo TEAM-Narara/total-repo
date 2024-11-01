@@ -92,7 +92,7 @@ class AuthServiceImplTest {
 
         // 6. MemberValidator가 검증을 호출했는지 확인
         verify(memberValidator, times(1)).registerValidate(requestDto); // 유효성 검증 호출 확인
-        verify(workSpaceService, times(1)).createWorkSpace(any(Member.class),any(WorkSpaceCreateRequestDto.class)); // 유효성 검증 호출 확인
+        verify(workSpaceService, times(1)).createWorkSpace(any(Long.class),any(WorkSpaceCreateRequestDto.class)); // 유효성 검증 호출 확인
 
         // 6. 결과 검증
         // 호출되었는지 확인
