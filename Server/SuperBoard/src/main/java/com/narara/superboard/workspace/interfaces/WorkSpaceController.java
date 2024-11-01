@@ -60,7 +60,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 삭제")
     @DeleteMapping("/{workspaceId}")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
 //        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         workSpaceService.deleteWorkSpace(workspaceId);

@@ -19,8 +19,9 @@ import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberColle
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class WorkSpaceServiceImpl implements WorkSpaceService {
@@ -33,6 +34,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Override
+    @Transactional
     public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
@@ -48,6 +50,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
+    @Transactional
     public WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
@@ -57,9 +60,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
+    @Transactional
     public void deleteWorkSpace(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workSpaceRepository.delete(workSpace);
+        workSpace.remove(); //삭제 처리
     }
 
     @Override
