@@ -1,8 +1,8 @@
 // jacoco 테스트 커버리지
 //def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
 //def jacocoDir = "$buildDir/customJacocoReportDir"
-//def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
-def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
+def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
+//def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir')
 
 jacoco {
     // JaCoCo 버전
@@ -11,7 +11,8 @@ jacoco {
 //  테스트결과 리포트를 저장할 경로 변경
 //  default는 "$/jacoco"
 //    reportsDirectory = jacocoDir
-    reportsDirectory = layout.buildDirectory.dir(jacocoDir)
+//    reportsDirectory = layout.buildDirectory.dir(jacocoDir)
+    reportsDirectory = jacocoDir
 }
 
 jacocoTestReport {
