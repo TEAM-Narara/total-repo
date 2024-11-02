@@ -5,7 +5,8 @@ import com.narara.superboard.member.service.MemberService;
 import com.narara.superboard.member.util.JwtTokenProvider;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberEditDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberRequest;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +27,32 @@ public class WorkspaceMemberController {
     private final WorkSpaceMemberService workSpaceMemberService;
 
     @Operation(summary = "워크스페이스 멤버 권한 수정")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
     @PatchMapping("/{workspaceId}/member")
-    public ResponseEntity<WorkspaceMemberEditDto> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberEditDto requestDto) {
+    public ResponseEntity<WorkspaceMemberDto> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(memberId, workspaceId, requestDto.authority());
 
-        return ResponseEntity.ok(new WorkspaceMemberEditDto(workSpaceMember.getMember().getId(), workSpaceMember.getAuthority()));
+        return ResponseEntity.ok(
+                new WorkspaceMemberDto(
+                        workSpaceMember.getMember().getId(),
+                        workSpaceMember.getAuthority()
+                )
+        );
     }
 
     @Operation(summary = "워크스페이스 멤버 추가")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 추가가능
     @PostMapping("/{workspaceId}/member")
-    public ResponseEntity addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberEditDto requestDto) {
-        workSpaceMemberService.addMember(workspaceId, requestDto.memberId(), requestDto.authority());
+    public ResponseEntity<WorkspaceMemberDto> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
+        WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
+                requestDto.authority());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                new WorkspaceMemberDto(
+                        workSpaceMember.getMember().getId(),
+                        workSpaceMember.getAuthority()
+                )
+        );
     }
 }

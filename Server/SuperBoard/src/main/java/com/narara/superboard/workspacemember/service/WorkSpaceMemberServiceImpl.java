@@ -80,8 +80,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Transactional
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
-        WorkSpaceMember workSpaceMember = workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
+        WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
 
         //WORKSPACE의 ADMIN만 수정가능
         if (workSpaceMember.getAuthority().equals(Authority.MEMBER)) {
@@ -93,19 +92,38 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         return workSpaceMember;
     }
 
+    private WorkSpaceMember getWorkSpaceMember(Long memberId, Long workspaceId) {
+        return workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
+    }
+
     @Transactional
     @Override
-    public void addMember(Long workspaceId, Long memberId, Authority authority) {
+    public WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority) {
         WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
+        //1. 워크스페이스에 이미 멤버가 추가되어 있으면 무시
+        WorkSpaceMember workspaceMember = workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId,
+                        memberId)
+                .orElse(null);
+
+        if (workspaceMember != null) {
+            return workspaceMember;
+        }
+
+        //2. 워크스페이스에 멤버가 추가되어 있지 않다면 새로생성
         WorkSpaceMember workSpaceMember = WorkSpaceMember.builder()
                 .workSpace(workSpace)
                 .member(member)
                 .authority(authority)
                 .build();
+
+        workSpaceMemberRepository.save(workSpaceMember);
+
+        return workSpaceMember;
     }
 }

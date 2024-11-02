@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -33,6 +34,11 @@ public class WorkSpaceMember extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "authority", nullable = false, length = 50)
     private Authority authority;  // 권한 (ADMIN, MEMBER)
+
+    @Setter
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isDeleted = false;
 
     public WorkSpaceMember(WorkSpace workSpace) {
         this.workSpace = workSpace;

@@ -30,7 +30,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
     private final IAuthenticationFacade authenticationFacade;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
-    @Tag(name = "워크스페이스 생성")
+    @Operation(summary = "워크스페이스 생성")
     @PostMapping
     public ResponseEntity<WorkspaceCreateData> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
