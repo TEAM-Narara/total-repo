@@ -18,7 +18,7 @@ sonarqube {
         property "sonar.sources", "src/main/java"
 
         property "sonar.java.binaries", "${projectDir}/build/classes/java/main"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/customJacocoReportDir/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "$jacocoDir/jacocoTestReport.xml"
 
 // 이는 메서드의 복잡도가 10을 초과하면 경고를 표시합니다.
         property "sonar.java.metrics.methodComplexityThreshold", "10"
