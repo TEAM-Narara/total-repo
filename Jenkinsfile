@@ -19,10 +19,10 @@ pipeline {
                     env.BRANCH_NAME = branchName
 
                     // 디버깅을 위한 로그 추가
-                    echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
-                    echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
-                    echo "GIT_BRANCH: ${env.GIT_BRANCH}"
-                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+//                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
+//                     echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
+//                     echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+//                     echo "BRANCH_NAME: ${env.BRANCH_NAME}"
                     echo "Final branch: ${branchName}"
                     echo "Checking out branch: ${branchName}"
 
@@ -120,7 +120,7 @@ pipeline {
                     // 수정
 
                         echo "Using branch: ${branchName}"
-                        echo "Using sourceBranch: ${sourceBranch}"
+//                         echo "Using sourceBranch: ${sourceBranch}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
