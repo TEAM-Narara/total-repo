@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -315,7 +316,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // Then
         verify(boardRepository, times(1)).findById(boardId);
-        verify(boardRepository, times(1)).delete(mockBoard);
+        Assertions.assertTrue(mockBoard.getIsDeleted());
     }
 
     @ParameterizedTest

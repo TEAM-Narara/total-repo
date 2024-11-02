@@ -44,7 +44,11 @@ public class Board extends BaseTimeEntity {
     private Long lastListOrder;  // 보드 내 마지막 리스트 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isArchived;  // 버전
+    private Boolean isArchived;
+
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long listOrderVersion;  // 버전
@@ -96,6 +100,11 @@ public class Board extends BaseTimeEntity {
 
     public void increaseVersion() {
         this.listOrderVersion += 1;
+    }
+
+    public Board deleted(){
+        this.isDeleted = true;
+        return this;
     }
 
     public Board(Long id, String name, Map<String, Object> cover) {
