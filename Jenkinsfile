@@ -5,10 +5,7 @@ pipeline {
     tools {
         jdk ("jdk21")
     }
-
-    def branchName = ''
-    def sourceBranch = ''
-
+    
     stages {
         stage('Git Clone') {
             steps {
@@ -17,6 +14,8 @@ pipeline {
                     branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
+                    env.BRANCH_NAME = branchName
+                    env.branchName = env.GIT_BRANCH
                     sourceBranch = env.gitlabSourceBranch ?: 'default-branch'
 
                     // 디버깅을 위한 로그 추가
@@ -24,17 +23,8 @@ pipeline {
                     echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
                     echo "GIT_BRANCH: ${env.GIT_BRANCH}"
                     echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                    echo "Final branch: ${branch}"
-                    echo "Checking out branch: ${branch}"
-
-
-                    // 디버깅을 위한 로그 추가
-                    echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
-                    echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
-                    echo "GIT_BRANCH: ${env.GIT_BRANCH}"
-                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                    echo "Final branch: ${branch}"
-                    echo "Checking out branch: ${branch}"
+                    echo "Final branch: ${branchName}"
+                    echo "Checking out branch: ${branchName}"
 
                     // GitLab에서 코드 클론 (서브모듈 포함)
                     checkout([$class: 'GitSCM',
@@ -128,7 +118,10 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-                        echo "Using branchName: ${branchName}"
+                        def branchName = env.BRANCH_NAME
+                        def branch = env.GIT_BRANCH
+                        echo "Using branchName: ${branch}"
+                        echo "Using branch: ${branchName}"
                         echo "Using sourceBranch: ${sourceBranch}"
 
                         sh """
