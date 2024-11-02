@@ -11,20 +11,20 @@ pipeline {
             steps {
                 script {
                     // 브랜치 이름 설정
-                    def branchName = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/develop'
+                    def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/develop'
 
 //                     def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
 //                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
-                    env.BRANCH_NAME = branchName
+                    env.BRANCH_NAME = branch
 
                     // 디버깅을 위한 로그 추가
 //                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
 //                     echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
 //                     echo "GIT_BRANCH: ${env.GIT_BRANCH}"
 //                     echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                    echo "Final branch: ${branchName}"
-                    echo "Checking out branch: ${branchName}"
+                    echo "Final branch: ${branch}"
+                    echo "Checking out branch: ${branch}"
 
                     // GitLab에서 코드 클론 (서브모듈 포함)
                     checkout([$class: 'GitSCM',
@@ -119,13 +119,13 @@ pipeline {
                     script {
                     // 수정
 
-                        echo "Using branch: ${branchName}"
+                        echo "Using branch: ${branch}"
 //                         echo "Using sourceBranch: ${sourceBranch}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
-                            -Dsonar.projectKey=total-server-${branchName} \
-                            -Dsonar.projectName=total-server-${branchName}
+                            -Dsonar.projectKey=total-server-${branch} \
+                            -Dsonar.projectName=total-server-${branch}
                         """
                     }
                 }
