@@ -11,11 +11,10 @@ pipeline {
             steps {
                 script {
                     // 브랜치 이름 설정
-                    branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
+                    def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
                     env.BRANCH_NAME = branchName
-                    env.branchName = env.GIT_BRANCH
                     sourceBranch = env.gitlabSourceBranch ?: 'default-branch'
 
                     // 디버깅을 위한 로그 추가
@@ -118,9 +117,7 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-//                         def branchName = env.BRANCH_NAME
-//                         def branch = env.GIT_BRANCH
-                        echo "Using branchName: ${branch}"
+
                         echo "Using branch: ${branchName}"
                         echo "Using sourceBranch: ${sourceBranch}"
 
