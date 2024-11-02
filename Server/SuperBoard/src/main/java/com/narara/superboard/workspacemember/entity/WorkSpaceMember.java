@@ -1,7 +1,5 @@
 package com.narara.superboard.workspacemember.entity;
 
-import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;

@@ -295,3 +295,6 @@ application.yml
 application.properties
 src/test/resources/*.yml
 src/test/resources/*.properties
+
+### querydsl ###
+src/main/generated/**
