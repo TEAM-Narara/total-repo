@@ -124,14 +124,15 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
+                        def branchName = env.BRANCH_NAME
 
-                        echo "Using branch: ${branch}"
+                        echo "Using branch: ${branchName}"
 //                         echo "Using sourceBranch: ${sourceBranch}"
 
                         sh """
                             ./gradlew --info --warning-mode all sonar \
-                            -Dsonar.projectKey=total-server-${branch} \
-                            -Dsonar.projectName=total-server-${branch}
+                            -Dsonar.projectKey=total-server-${branchName} \
+                            -Dsonar.projectName=total-server-${branchName}
                         """
                     }
                 }
