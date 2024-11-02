@@ -118,8 +118,8 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-                        def branchName = env.BRANCH_NAME
-                        def branch = env.GIT_BRANCH
+//                         def branchName = env.BRANCH_NAME
+//                         def branch = env.GIT_BRANCH
                         echo "Using branchName: ${branch}"
                         echo "Using branch: ${branchName}"
                         echo "Using sourceBranch: ${sourceBranch}"
