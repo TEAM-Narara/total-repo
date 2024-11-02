@@ -5,6 +5,7 @@ import com.narara.superboard.member.service.MemberService;
 import com.narara.superboard.member.util.JwtTokenProvider;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDeleteRequest;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberRequest;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
@@ -30,8 +31,7 @@ public class WorkspaceMemberController {
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
     @PatchMapping("/{workspaceId}/member")
     public ResponseEntity<WorkspaceMemberDto> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
-        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(memberId, workspaceId, requestDto.authority());
+        WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(requestDto.memberId(), workspaceId, requestDto.authority());
 
         return ResponseEntity.ok(
                 new WorkspaceMemberDto(
@@ -47,6 +47,20 @@ public class WorkspaceMemberController {
     public ResponseEntity<WorkspaceMemberDto> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
                 requestDto.authority());
+
+        return ResponseEntity.ok(
+                new WorkspaceMemberDto(
+                        workSpaceMember.getMember().getId(),
+                        workSpaceMember.getAuthority()
+                )
+        );
+    }
+
+    @Operation(summary = "워크스페이스 멤버 삭제")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
+    @DeleteMapping("/{workspaceId}/member")
+    public ResponseEntity<WorkspaceMemberDto> deleteWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto) {
+        WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(workspaceId, requestDto.memberId());
 
         return ResponseEntity.ok(
                 new WorkspaceMemberDto(

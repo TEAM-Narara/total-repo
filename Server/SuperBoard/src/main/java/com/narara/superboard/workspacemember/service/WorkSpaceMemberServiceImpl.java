@@ -81,18 +81,12 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
-
-        //WORKSPACE의 ADMIN만 수정가능
-        if (workSpaceMember.getAuthority().equals(Authority.MEMBER)) {
-            throw new UnauthorizedException();
-        }
-
         workSpaceMember.editAuthority(authority);
 
         return workSpaceMember;
     }
 
-    private WorkSpaceMember getWorkSpaceMember(Long memberId, Long workspaceId) {
+    private WorkSpaceMember getWorkSpaceMember(Long workspaceId, Long memberId) {
         return workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
     }
@@ -123,6 +117,15 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                 .build();
 
         workSpaceMemberRepository.save(workSpaceMember);
+
+        return workSpaceMember;
+    }
+
+    @Transactional
+    @Override
+    public WorkSpaceMember deleteMember(Long workspaceId, Long memberId) {
+        WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
+        workSpaceMember.deleted();
 
         return workSpaceMember;
     }

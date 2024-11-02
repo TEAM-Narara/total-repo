@@ -62,7 +62,7 @@ public class WorkSpace extends BaseTimeEntity {
         this.offset = offset;
     }
 
-    public void remove() {
+    public void deleted() {
         this.isDeleted = true;
     }
 

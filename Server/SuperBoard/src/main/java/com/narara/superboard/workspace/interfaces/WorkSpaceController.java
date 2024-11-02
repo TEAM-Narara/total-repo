@@ -12,7 +12,6 @@ import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +44,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 삭제")
     @DeleteMapping("/{workspaceId}")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //ADMIN만 가능
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
 //        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         workSpaceService.deleteWorkSpace(workspaceId);
@@ -55,7 +54,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 수정")
     @PatchMapping("/{workspaceId}")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN') OR hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //WORKSPACE의 ADMIN만 삭제가능
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
     public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         WorkSpace workSpace = workSpaceService.editWorkspace(memberId, workspaceId, requestDto.name());

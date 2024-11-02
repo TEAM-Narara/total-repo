@@ -66,7 +66,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Transactional
     public void deleteWorkSpace(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workSpace.remove(); //삭제 처리
+        workSpace.deleted(); //삭제 처리
     }
 
     @Override
