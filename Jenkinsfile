@@ -11,11 +11,12 @@ pipeline {
             steps {
                 script {
                     // 브랜치 이름 설정
-                    def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
-                        (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
+                    def branchName = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/develop'
+
+//                     def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
+//                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
                     env.BRANCH_NAME = branchName
-                    sourceBranch = env.gitlabSourceBranch ?: 'default-branch'
 
                     // 디버깅을 위한 로그 추가
                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
