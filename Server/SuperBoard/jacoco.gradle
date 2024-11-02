@@ -1,158 +1,21 @@
-def jacocoDir = layout.buildDirectory.dir('customJacocoReportDir').get().asFile
-
-if (!jacocoDir.exists()) {
-    jacocoDir.mkdirs()
-}
-
 jacoco {
-    // JaCoCo 버전
     toolVersion = "0.8.12"
-
-    jacoco {
-        // JaCoCo 버전
-        toolVersion = "0.8.12"
-
-//  테스트결과 리포트를 저장할 경로 변경
-        reportsDirectory = jacocoDir // 리포트 경로 설정
-    }
-
-    jacocoTestReport {
-        dependsOn test // jacocoTestReport 작업이 test 작업에 종속되도록 설정
-        // 원하는 리포트를 켜고 끌 수 있습니다.
-        reports {
-            html.required.set(true)
-            xml.required.set(true)
-            csv.required.set(false)
-            html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-            //        html.outputLocation.set(jacocoHtmlDir)
-//        xml.outputLocation = layout.buildDirectory.file('jacocoXml/jacoco.xml')
-//            xml.outputLocation.set(layout.buildDirectory.file("customJacocoReportDir/jacocoTestReport.xml"))
-        }
-        finalizedBy 'jacocoTestCoverageVerification'
-
-        // QueryDSL QDomain 제외시키기
-        def QDomains = []
-
-        for (qPattern in '**/QA'..'**/QZ') {
-            QDomains.add(qPattern + '*')
-        }
-        afterEvaluate {
-            classDirectories.setFrom(
-                    // 그 외의 매칭되는 클래스도 제외 대상
-                    files(classDirectories.files.collect {
-                        fileTree(dir: it, excludes: [
-                                "**/*Util*",
-                                "**/*Application*",
-                                "**/*Config*",
-                                "**/*Dto*",
-                                "**/*Request*",
-                                "**/*Response*",
-                                "**/*Exception*",
-                                "**/dto/**",
-                                "**/error/**",
-                        ] + QDomains)
-                    })
-            )
-        }
-    }
-
-    jacocoTestCoverageVerification {
-        def QDomains = []
-        // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
-        for (qPattern in '*.QA'..'*.QZ') {
-            QDomains.add(qPattern + '*')
-        }
-        violationRules {
-            rule {
-                // 'element'가 없으면 프로젝트의 전체 파일을 합친 값을 기준으로 합니다.
-                // 위의 리포트에서 'Total'로 표시된 부분입니다.
-                limit {
-                    // 'counter'를 지정하지 않으면 default는 'INSTRUCTION'
-                    // 'value'를 지정하지 않으면 default는 'COVEREDRATIO'
-                    //  이 규칙은 프로젝트의 전체 커버리지를 검증합니다.
-                    minimum = 0.01
-                }
-            }
-
-            // 여러 룰을 생성할 수 있습니다.
-            rule {
-                // 룰을 간단히 켜고 끌 수 있습니다.
-                enabled = false
-
-                // 룰을 체크할 단위는 클래스 단위
-                element = 'CLASS'
-
-                /**
-                 * Branch Coverage (분기 커버리지)
-                 설명: 코드 내의 모든 분기(branch) 구문이 테스트되는지를 확인합니다.
-                 세부 사항:
-                 분기는 조건문(if, switch 등) 내에서 발생합니다.
-                 예를 들어, if (condition)이 있을 때, condition이 true일 때와 false일 때 두 가지 경우 모두 테스트가 되는지를 확인합니다.
-                 목표: 코드의 모든 분기점이 테스트되는 것을 보장하여, 논리적 경로의 결함을 줄입니다.
-                 */
-                // 브랜치 커버리지를 최소한 90% 만족시켜야 합니다.
-                limit {
-                    counter = 'BRANCH'
-                    value = 'COVEREDRATIO'
-                    minimum = 0.10
-                }
-
-                /**
-                 *
-                 Line Coverage (라인 커버리지)
-                 설명: 코드 내의 각 코드 라인이 테스트되는지를 확인합니다.
-                 세부 사항:
-                 한 라인이 최소한 한 번 실행되면 해당 라인은 커버된 것으로 간주됩니다.
-                 코드의 모든 라인이 테스트에서 실행되는지를 확인합니다.
-                 목표: 가능한 모든 코드가 실행되어 테스트되지 않은 코드 부분이 없도록 합니다.
-                 */
-                // 라인 커버리지를 최소한 80% 만족시켜야 합니다.
-                limit {
-                    counter = 'LINE'
-                    value = 'COVEREDRATIO'
-                    minimum = 0.10
-                }
-
-                // 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한합니다.
-                limit {
-                    counter = 'LINE'
-                    value = 'TOTALCOUNT'
-                    maximum = 200
-                }
-                // 커버리지 체크를 제외할 클래스들
-                excludes = [
-                        "**/*Util*",
-                        "**.*Application*",
-                        "**.*Config*",
-                        "**.*Dto*",
-                        "**.*Request*",
-                        "**.*Response*",
-                        "**.*Exception*",
-                        "**/dto/**",
-                        "**/error/**",
-                ] + QDomains
-            }
-        }
-    }
-
-    check {
-        dependsOn jacocoTestCoverageVerification
-    }
-
-    reportsDirectory = jacocoDir
+    reportsDirectory = file("${project.ext.jacocoDir}")
 }
+println "JaCoCo directory: ${project.ext.jacocoDir}"
 
 jacocoTestReport {
+    // jacocoTestReport task에서 사용할 exec 타입의 테스트를 모두 포함할 수 있도록 executionData를 include해 주면 된다.
+    // 여기서 포인트는 include로, 파일이 존재하는 경우만 추가하는 것이다.
+    executionData fileTree(dir: "$buildDir/jacoco", includes: ["test.exec"])
     dependsOn test // jacocoTestReport 작업이 test 작업에 종속되도록 설정
     // 원하는 리포트를 켜고 끌 수 있습니다.
     reports {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(false)
-        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-        //        html.outputLocation.set(jacocoHtmlDir)
-//        xml.outputLocation = layout.buildDirectory.file('jacocoXml/jacoco.xml')
-        xml.outputLocation.set(layout.buildDirectory.file("jacocoTestReport/jacocoTestReport.xml"))
+        html.outputLocation.set(file("${project.ext.jacocoDir}/jacocoHtml"))
+        xml.outputLocation.set(file("${project.ext.jacocoDir}/jacocoTestReport.xml"))
     }
     finalizedBy 'jacocoTestCoverageVerification'
 
@@ -182,6 +45,7 @@ jacocoTestReport {
     }
 }
 
+
 jacocoTestCoverageVerification {
     def QDomains = []
     // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
@@ -203,11 +67,16 @@ jacocoTestCoverageVerification {
         // 여러 룰을 생성할 수 있습니다.
         rule {
             // 룰을 간단히 켜고 끌 수 있습니다.
-            enabled = false
+            enabled = true
 
             // 룰을 체크할 단위는 클래스 단위
             element = 'CLASS'
-
+            element = 'BUNDLE'
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.1
+            }
             /**
              * Branch Coverage (분기 커버리지)
              설명: 코드 내의 모든 분기(branch) 구문이 테스트되는지를 확인합니다.
@@ -216,12 +85,11 @@ jacocoTestCoverageVerification {
              예를 들어, if (condition)이 있을 때, condition이 true일 때와 false일 때 두 가지 경우 모두 테스트가 되는지를 확인합니다.
              목표: 코드의 모든 분기점이 테스트되는 것을 보장하여, 논리적 경로의 결함을 줄입니다.
              */
-            // 브랜치 커버리지를 최소한 90% 만족시켜야 합니다.
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.10
-            }
+//            limit {
+//                counter = 'BRANCH'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.10
+//            }
 
             /**
              *
@@ -233,18 +101,30 @@ jacocoTestCoverageVerification {
              목표: 가능한 모든 코드가 실행되어 테스트되지 않은 코드 부분이 없도록 합니다.
              */
             // 라인 커버리지를 최소한 80% 만족시켜야 합니다.
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.10
-            }
+//            limit {
+//                counter = 'CLASS'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.10
+//            }
 
-            // 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한합니다.
-            limit {
-                counter = 'LINE'
-                value = 'TOTALCOUNT'
-                maximum = 200
-            }
+//            limit {
+//                counter = 'METHOD'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.10
+//            }
+
+//            limit {
+//                counter = 'LINE'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.10
+//            }
+                        // 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한합니다.
+//            limit {
+//                counter = 'LINE'
+//                value = 'TOTALCOUNT'
+//                maximum = 200
+//            }
+
             // 커버리지 체크를 제외할 클래스들
             excludes = [
                     "**/*Util*",
