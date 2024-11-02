@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember, Long> {
-    List<WorkSpaceMember> findAllByWorkSpaceId(Long workSpaceId);
+    @Query("SELECT wsm from WorkSpaceMember wsm left join wsm.workSpace ws left join wsm.member where ws.id = :workspaceId and wsm.isDeleted = false")
+    List<WorkSpaceMember> findAllByWorkSpaceId(@Param("workspaceId") Long workspaceId);
 
     List<WorkSpaceMember> findAllByMemberId(Long memberId);
 

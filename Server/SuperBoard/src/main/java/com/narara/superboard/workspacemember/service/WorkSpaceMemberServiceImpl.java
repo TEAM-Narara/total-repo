@@ -129,4 +129,9 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         return workSpaceMember;
     }
+
+    @Override
+    public List<WorkSpaceMember> getWorkspaceMember(Long workspaceId) {
+        return workSpaceMemberRepository.findAllByWorkSpaceId(workspaceId);
+    }
 }
