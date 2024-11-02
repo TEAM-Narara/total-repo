@@ -10,13 +10,19 @@ pipeline {
         stage('Git Clone') {
             steps {
                 script {
+
+                    // GIT_BRANCH 환경 변수로부터 브랜치 이름 추출
+                    branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/deploy'
+                    env.BRANCH_NAME = branch
+                    echo "Final branch: ${branch}"
+                    echo "Checking out branch: ${branch}"
                     // 브랜치 이름 설정
-                    def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/deploy'
+//                     def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/deploy'
 
 //                     def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
 //                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
 
-                    env.BRANCH_NAME = branch
+//                     env.BRANCH_NAME = branch
 
                     // 디버깅을 위한 로그 추가
 //                     echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
