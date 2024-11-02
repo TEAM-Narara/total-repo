@@ -116,7 +116,7 @@ pipeline {
                 dir("./Server/SuperBoard") {
                     script {
                     // 수정
-                        def branchName = env.BRANCH_NAME
+                        def branchName = env.BRANCH_NAME.replaceAll("/", "-")
 
                         echo "Using branch: ${branchName}"
 //                         echo "Using sourceBranch: ${sourceBranch}"
