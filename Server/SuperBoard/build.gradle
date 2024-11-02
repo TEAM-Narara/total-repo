@@ -8,6 +8,13 @@ plugins {
 
 group = 'com.narara'
 version = '0.0.1-SNAPSHOT'
+// jacocoDir 디렉토리 정의
+ext {
+    jacocoDir = new File(buildDir, "customJacocoReportDir")
+}
+if (!ext.jacocoDir.exists()) {
+    ext.jacocoDir.mkdirs()
+}
 
 java {
     toolchain {
