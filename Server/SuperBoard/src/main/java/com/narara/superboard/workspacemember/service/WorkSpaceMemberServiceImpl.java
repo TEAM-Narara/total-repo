@@ -1,8 +1,8 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
-import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -56,8 +56,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     }
 
     @Override
-    public WorkSpaceListResponseDto getMemberWorkspaceList(Long memberId) {
-        List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMemberId(memberId);
+    public WorkSpaceListResponseDto getMemberWorkspaceList(Member member) {
+        List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMember(member);
 
         List<WorkSpaceResponseDto> workSpaceResponseDtoList = new ArrayList<>();
 
