@@ -10,3 +10,15 @@ annotation class UserRetrofit
 @Retention(AnnotationRetention.BINARY)
 annotation class GitHubRetrofit
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AuthRetrofit
+
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AuthInterceptorOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Client
