@@ -42,7 +42,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     @Transactional
     public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
-        workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
+        workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto.name());
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
@@ -54,17 +54,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
 
         return newWorkSpace;
-    }
-
-    @Override
-    @Transactional
-    public WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
-        workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
-
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workspaceOffsetService.saveUpdateWorkspaceDiff(workSpace);
-
-        return workSpace.updateWorkSpace(workspaceUpdateRequestDto); //offset++
     }
 
     @Override
@@ -98,7 +87,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
                 .workspaceMemberList(workspaceMemberCollectionResponseDto)
                 .build();
 
-        workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto);
+        workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto.name());
 
         return workspaceDetailResponseDto;
     }
@@ -116,11 +105,12 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Transactional
     @Override
-    public WorkSpace editWorkspace(Long memberId, Long workspaceId, String name) {
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new MemberNotFoundException(memberId));
+    public WorkSpace updateWorkSpace(Long workspaceId, String name) {
+        workSpaceValidator.validateNameIsPresent(name);
 
-        workSpace.edit(name); //offset++
+        WorkSpace workSpace = getWorkSpace(workspaceId);
+
+        workSpace.updateWorkSpace(name); //offset++
 
         workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
 

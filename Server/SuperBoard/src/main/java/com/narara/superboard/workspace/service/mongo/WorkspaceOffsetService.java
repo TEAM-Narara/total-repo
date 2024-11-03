@@ -102,30 +102,6 @@ public class WorkspaceOffsetService {
         mongoTemplate.save(workspaceOffset);
     }
 
-    public void saveUpdateWorkspaceDiff(WorkSpace workspace) {
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(WORKSPACE_NAME_COLUMN, workspace.getName());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.EDIT_WORKSPACE.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
-    }
-
     public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
         WorkSpace workspace = workspaceMember.getWorkSpace();
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());

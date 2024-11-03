@@ -60,7 +60,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
     public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
-        WorkSpace workSpace = workSpaceService.editWorkspace(memberId, workspaceId, requestDto.name());
+        WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
     }
