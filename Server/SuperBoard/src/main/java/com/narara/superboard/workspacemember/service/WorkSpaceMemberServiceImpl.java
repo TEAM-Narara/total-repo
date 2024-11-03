@@ -137,6 +137,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
+        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
+
         return workSpaceMember;
     }
 
