@@ -10,16 +10,13 @@ import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.AlreadyRegisteredLoginException;
 import com.narara.superboard.member.exception.InvalidRefreshTokenException;
 import io.lettuce.core.RedisException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionAdvice {
@@ -27,6 +24,12 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.FORBIDDEN, ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
+    
+    //잘못된 입력
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleAccessDeniedException(HttpMessageNotReadableException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     // not found

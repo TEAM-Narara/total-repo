@@ -4,6 +4,8 @@ import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.exception.MemberNotFoundException;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.exception.WorkspaceNameNotFoundException;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
@@ -17,22 +19,30 @@ import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberColle
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     private final WorkSpaceValidator workSpaceValidator;
-
+    private final MemberRepository memberRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardService boardService;
     private final WorkSpaceMemberService workSpaceMemberService;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Override
-    public WorkSpace createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
+    @Transactional
+    public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);
 
@@ -43,6 +53,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
+    @Transactional
     public WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
@@ -52,9 +63,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
+    @Transactional
     public void deleteWorkSpace(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workSpaceRepository.delete(workSpace);
+        workSpace.deleted(); //삭제 처리
     }
 
     @Override
@@ -82,5 +94,27 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto);
 
         return workspaceDetailResponseDto;
+    }
+
+    @Override
+    public List<WorkSpace> getWorkspaceByMember(Long memberId) {
+        List<WorkSpaceMember> allByMemberId = workSpaceMemberRepository.findAllByMemberId(memberId);
+        List<WorkSpace> workspaceList = new ArrayList<>();
+        for (WorkSpaceMember workSpaceMember: allByMemberId) {
+            workspaceList.add(workSpaceMember.getWorkSpace());
+        }
+
+        return workspaceList;
+    }
+
+    @Transactional
+    @Override
+    public WorkSpace editWorkspace(Long memberId, Long workspaceId, String name) {
+        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
+
+        workSpace.edit(name);
+
+        return workSpace;
     }
 }
