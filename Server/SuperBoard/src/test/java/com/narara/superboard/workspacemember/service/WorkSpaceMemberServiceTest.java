@@ -101,7 +101,7 @@ class WorkSpaceMemberServiceTest {
                 .willReturn(Arrays.asList(workSpaceMember));
 
         // when
-        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(MEMBER_ID_1);
+        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(member);
 
         // then
         assertThat(result.workSpaceResponseDtoList()).hasSize(1);

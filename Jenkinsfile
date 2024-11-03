@@ -5,26 +5,28 @@ pipeline {
     tools {
         jdk ("jdk21")
     }
-
+    
     stages {
         stage('Git Clone') {
             steps {
                 script {
-                    // 브랜치 이름 설정
-                    def branch = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
-                        (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
+                   // 전역 환경 변수에 브랜치 이름 설정
+                   env.BRANCH_NAME = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/deploy'
+                   echo "Final branch: ${env.BRANCH_NAME}"
+                   echo "Checking out branch: ${env.BRANCH_NAME}"
 
-                    // 디버깅을 위한 로그 추가
-                    echo "gitlabTargetBranch: ${env.gitlabTargetBranch}"
-                    echo "gitlabSourceBranch: ${env.gitlabSourceBranch}"
-                    echo "GIT_BRANCH: ${env.GIT_BRANCH}"
-                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                    echo "Final branch: ${branch}"
-                    echo "Checking out branch: ${branch}"
+                    // 브랜치 이름 설정
+//                     def branch = env.GIT_BRANCH ? env.GIT_BRANCH.replaceAll(/^origin\//, '') : 'BE/deploy'
+
+//                     def branchName  = env.gitlabTargetBranch ?: env.gitlabSourceBranch ?: env.GIT_BRANCH?.replaceAll(/^origin\//, '') ?:
+//                         (env.BRANCH_NAME?.startsWith('refs/heads/') ? env.BRANCH_NAME.replaceAll('refs/heads/', '') : 'BE/deploy')
+
+//                     env.BRANCH_NAME = branch
+
 
                     // GitLab에서 코드 클론 (서브모듈 포함)
                     checkout([$class: 'GitSCM',
-                        branches: [[name: "*/${branch}"]],  // '*/'를 추가하여 remote 브랜치임을 명시
+                        branches: [[name: "*/${env.BRANCH_NAME}"]],
                         extensions: [[
                             $class: 'SubmoduleOption',
                             parentCredentials: true,
@@ -104,6 +106,26 @@ pipeline {
                             echo "Connecting to additional network: ${network}"
                             sh "docker network connect ${network} total-server"
                         }
+                    }
+                }
+            }
+        }
+
+         stage('SonarQube Analysis') {
+            steps {
+                dir("./Server/SuperBoard") {
+                    script {
+                    // 수정
+                        def branchName = env.BRANCH_NAME.replaceAll("/", "-")
+
+                        echo "Using branch: ${branchName}"
+//                         echo "Using sourceBranch: ${sourceBranch}"
+
+                        sh """
+                            ./gradlew --info --warning-mode all sonar \
+                            -Dsonar.projectKey=total-server-${branchName} \
+                            -Dsonar.projectName=total-server-${branchName}
+                        """
                     }
                 }
             }

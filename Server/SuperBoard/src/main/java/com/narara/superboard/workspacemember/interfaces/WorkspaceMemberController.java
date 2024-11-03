@@ -1,9 +1,5 @@
 package com.narara.superboard.workspacemember.interfaces;
 
-import com.narara.superboard.common.service.IAuthenticationFacade;
-import com.narara.superboard.member.service.MemberService;
-import com.narara.superboard.member.util.JwtTokenProvider;
-import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDeleteRequest;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
@@ -12,22 +8,50 @@ import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberReque
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import com.narara.superboard.common.interfaces.response.DefaultResponse;
+import com.narara.superboard.common.interfaces.response.ResponseMessage;
+import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/v1/workspaces")
-@Slf4j
 @RestController
 @RequiredArgsConstructor
-public class WorkspaceMemberController {
-    private final WorkSpaceService workSpaceService;
-    private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final IAuthenticationFacade authenticationFacade;
+public class WorkspaceMemberController implements WorkSpaceMemberAPI {
     private final WorkSpaceMemberService workSpaceMemberService;
+
+    @Override
+    public ResponseEntity<DefaultResponse<WorkspaceMemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
+            Long workspaceId) {
+        WorkspaceMemberCollectionResponseDto responseDto = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(
+                workspaceId);
+        return new ResponseEntity<>(DefaultResponse.res(
+                StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
+                , HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<WorkSpaceListResponseDto>> getMemberWorkspaceList(
+            @AuthenticationPrincipal Member member) {
+        WorkSpaceListResponseDto responseDto = workSpaceMemberService.getMemberWorkspaceList(member);
+
+        return new ResponseEntity<>(DefaultResponse.res(
+                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto)
+                , HttpStatus.OK);
+    }
 
     @Operation(summary = "워크스페이스 멤버 권한 수정")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
@@ -83,3 +107,4 @@ public class WorkspaceMemberController {
         );
     }
 }
+

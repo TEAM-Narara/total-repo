@@ -19,10 +19,14 @@ public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember
 
     boolean existsByMemberAndWorkSpaceAndAuthority(Member member, WorkSpace workSpace, Authority authority);
 
+
+    List<WorkSpaceMember> findAllByMember(Member member);
+
     @Query("SELECT wsm FROM WorkSpaceMember wsm " +
             "JOIN FETCH wsm.workSpace ws " +
             "JOIN FETCH wsm.member m " +
             "WHERE ws.id = :workspaceId AND m.id = :memberId AND wsm.isDeleted = false")
     Optional<WorkSpaceMember> findFirstByWorkSpaceIdAndMemberId(@Param("workspaceId") Long workspaceId,
                                                                 @Param("memberId") Long memberId);
+
 }
