@@ -4,9 +4,14 @@ import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
+import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -45,5 +50,21 @@ public class WorkspaceOffsetService {
         workspaceOffset.getDiffList().add(diffInfo);
 
         WorkspaceOffset saved = mongoTemplate.save(workspaceOffset);
+    }
+
+    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
+        Query query = new Query(Criteria.where("workspaceId").is(workspaceId));
+        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+
+        if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
+            log.debug("No diff list found for workspace: {}", workspaceId);
+            return Collections.emptyList();
+        }
+
+        return workspaceOffset.getDiffList().stream()
+                .filter(diffInfo -> diffInfo.getOffset() >= fromOffset)
+                .sorted(Comparator.comparing(DiffInfo::getOffset))
+                .map(WorkspaceDiffDto::from)
+                .collect(Collectors.toList());
     }
 }

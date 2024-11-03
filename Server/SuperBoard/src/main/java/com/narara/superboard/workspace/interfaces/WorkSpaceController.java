@@ -8,7 +8,9 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import com.narara.superboard.workspace.service.WorkSpaceService;
+import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +30,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
     private final JwtTokenProvider jwtTokenProvider;
     private final IAuthenticationFacade authenticationFacade;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Operation(summary = "워크스페이스 생성")
     @PostMapping
@@ -70,5 +73,16 @@ public class WorkSpaceController implements WorkSpaceAPI {
         WorkSpaceListResponseDto workSpaceListResponseDto = WorkSpaceListResponseDto.from(workSpaceMemberList);
 
         return ResponseEntity.ok(workSpaceListResponseDto);
+    }
+
+    @Operation(summary = "특정 offset 이후 데이터 싹 조회")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
+    @GetMapping("/{workspaceId}/diffs")
+    public ResponseEntity<List<WorkspaceDiffDto>> getDiffs(
+            @PathVariable Long workspaceId,
+            @RequestParam(required = false, defaultValue = "0") Long fromOffset
+    ) {
+        List<WorkspaceDiffDto> diffs = workspaceOffsetService.getDiffListFromOffset(workspaceId, fromOffset);
+        return ResponseEntity.ok(diffs);
     }
 }
