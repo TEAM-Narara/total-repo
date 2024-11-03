@@ -7,5 +7,6 @@ public enum WorkspaceAction {
     ADD_MEMBER,
     EDIT_MEMBER,
     DELETE_MEMBER,
-    ADD_BOARD
+    ADD_BOARD,
+    DELETE_BOARD //board 닫기
 }

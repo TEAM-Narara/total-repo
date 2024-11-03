@@ -211,4 +211,30 @@ public class WorkspaceOffsetService {
 
         mongoTemplate.save(workspaceOffset);
     }
+
+    public void saveDeleteBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put("isClosed", board.getIsArchived()); //true로 나와야해
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.DELETE_BOARD.name(),
+                data
+        );
+
+        if (workspaceOffset == null) {
+            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        }
+
+        workspaceOffset.getDiffList().add(diffInfo);
+
+        mongoTemplate.save(workspaceOffset);
+    }
 }

@@ -91,6 +91,10 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Long boardId) {
         Board board = getBoard(boardId);
         board.deleted();
+
+        //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
+        board.getWorkSpace().addOffset();
+        workspaceOffsetService.saveDeleteBoardDiff(board);
     }
 
     @Override
