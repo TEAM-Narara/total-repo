@@ -1,5 +1,6 @@
 package com.ssafy.data.response
 
+import com.ssafy.network.source.ApiResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
@@ -7,10 +8,10 @@ import retrofit2.Response
 
 const val ERROR = "에러 발생"
 
-inline fun <reified T> Response<T>.toFlow(): Flow<T> = flow {
+inline fun <reified T> Response<ApiResponse<T>>.toFlow(): Flow<T> = flow {
 
     body()?.let {
-        if (isSuccessful) return@flow emit(it)
+        if (isSuccessful) return@flow emit(it.data)
         else throw RuntimeException(ERROR)
     }
 
