@@ -28,8 +28,7 @@ public class WorkspaceOffsetService {
     private final MongoTemplate mongoTemplate;
 
     public void saveEditWorkspaceOffset(WorkSpace workspace) {
-        Query query = new Query(Criteria.where("workspaceId").is(workspace.getId()));
-        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
         data.put("workspaceId", workspace.getId());
@@ -49,12 +48,18 @@ public class WorkspaceOffsetService {
 
         workspaceOffset.getDiffList().add(diffInfo);
 
-        WorkspaceOffset saved = mongoTemplate.save(workspaceOffset);
+        mongoTemplate.save(workspaceOffset);
     }
 
-    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
-        Query query = new Query(Criteria.where("workspaceId").is(workspaceId));
+    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
+        Query query = new Query(Criteria.where("workspaceId").is(workspace));
         WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+        return workspaceOffset;
+    }
+
+    //특정 offset 이후 변경사항 불러오는 로직
+    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
 
         if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
             log.debug("No diff list found for workspace: {}", workspaceId);
@@ -66,5 +71,28 @@ public class WorkspaceOffsetService {
                 .sorted(Comparator.comparing(DiffInfo::getOffset))
                 .map(WorkspaceDiffDto::from)
                 .collect(Collectors.toList());
+    }
+
+    public void saveDeleteWorkspaceOffset(WorkSpace workspace) {
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("workspaceId", workspace.getId());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.DELETE_WORKSPACE.name(),
+                data
+        );
+
+        if (workspaceOffset == null) {
+            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        }
+
+        workspaceOffset.getDiffList().add(diffInfo);
+
+        mongoTemplate.save(workspaceOffset);
     }
 }
