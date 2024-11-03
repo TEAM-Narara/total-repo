@@ -1,6 +1,7 @@
 package com.ssafy.superboard.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,11 +36,24 @@ import com.ssafy.login.login.LogIn
 import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
+import com.ssafy.model.auth.AuthManager
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.notificationScreen
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+
+    LaunchedEffect(Unit) {
+        AuthManager.noAuthEvent.collectLatest {
+            navController.navigate(LogIn) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = LogIn,
