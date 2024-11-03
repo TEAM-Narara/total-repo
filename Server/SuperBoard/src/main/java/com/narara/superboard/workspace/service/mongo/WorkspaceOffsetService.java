@@ -1,5 +1,6 @@
 package com.narara.superboard.workspace.service.mongo;
 
+import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
@@ -31,6 +32,8 @@ public class WorkspaceOffsetService {
     public static final String MEMBER_ID_COLUMN = "memberId";
     public static final String MEMBER_NAME_COLUMN = "memberName";
     public static final String AUTHORITY_COLUMN = "authority";
+    public static final String BOARD_ID_COLUMN = "boardId";
+    public static final String BOARD_NAME_COLUMN = "boardName";
     private final MongoTemplate mongoTemplate;
 
     public void saveEditWorkspaceDiff(WorkSpace workspace) {
@@ -168,6 +171,35 @@ public class WorkspaceOffsetService {
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_MEMBER.name(),
+                data
+        );
+
+        if (workspaceOffset == null) {
+            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        }
+
+        workspaceOffset.getDiffList().add(diffInfo);
+
+        mongoTemplate.save(workspaceOffset);
+    }
+
+    public void saveAddBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(BOARD_NAME_COLUMN, board.getName());
+        data.put("backgroundType", board.getCover().get("type"));
+        data.put("backgroundValue", board.getCover().get("value"));
+        data.put("isClosed", board.getIsArchived());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.ADD_BOARD.name(),
                 data
         );
 

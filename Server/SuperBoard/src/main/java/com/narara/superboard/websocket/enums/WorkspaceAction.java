@@ -6,5 +6,6 @@ public enum WorkspaceAction {
     DELETE_WORKSPACE,
     ADD_MEMBER,
     EDIT_MEMBER,
-    DELETE_MEMBER
+    DELETE_MEMBER,
+    ADD_BOARD
 }
