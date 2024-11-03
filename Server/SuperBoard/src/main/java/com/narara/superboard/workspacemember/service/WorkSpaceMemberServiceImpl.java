@@ -85,7 +85,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-        workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
+        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
 
         workSpaceMember.getWorkSpace().addOffset();
 
@@ -124,6 +124,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         workSpaceMemberRepository.save(workSpaceMember);
         workSpace.addOffset(); //workspace offset++
+
+        workspaceOffsetService.saveAddMemberDiff(workspaceMember);
 
         return workSpaceMember;
     }
