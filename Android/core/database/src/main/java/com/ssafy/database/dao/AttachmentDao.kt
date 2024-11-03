@@ -11,11 +11,22 @@ import com.ssafy.database.dto.Attachment
 
 @Dao
 interface AttachmentDao {
+
+    @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
+    suspend fun getAttachment(id: Long): Attachment
+
     @Query("SELECT * FROM attachment WHERE isStatus != 'DELETE'")
     suspend fun getAllAttachments(): List<Attachment>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttachment(attachment: Attachment): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAttachments(attachments: List<Attachment>): List<Long>
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM attachment WHERE id NOT IN (:ids)")
+    suspend fun deleteAttachmentsNotIn(ids: List<Long>)
 
     // 원격 삭제(isStatus == STAY)
     @Update

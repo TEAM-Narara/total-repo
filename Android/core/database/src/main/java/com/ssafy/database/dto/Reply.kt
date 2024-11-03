@@ -9,5 +9,6 @@ data class Reply(
     val cardId: Long = 0L,
     val memberId: Long = 0L,
     val content: String = "",
+
     val isStatus: String = "STAY"
 )

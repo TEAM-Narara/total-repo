@@ -11,10 +11,11 @@ data class Card(
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
-    // TODO JSONB
-    val cover: String? = null,
+    val coverType: String? = null,
+    val coverValue: String? = null,
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,
+
     val isStatus: String = "STAY",
     val columnUpdate: Long = 0L,
 )

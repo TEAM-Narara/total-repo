@@ -20,19 +20,20 @@ import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.Label
-import com.ssafy.database.dto.List
+import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.Member
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.Reply
 import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.WorkspaceMember
 
-@Database(entities = [Alert::class, Attachment::class, Board::class, BoardMember::class, Card::class,
-    CardLabel::class, CardMember::class, Label::class, List::class, Member::class,
+@Database(entities = [Alert::class, Attachment::class, Board::class, BoardMember::class, BoardMemberAlarm::class,
+    Card::class, CardLabel::class, CardMember::class, Label::class, SbList::class, Member::class,
     MemberBackground::class, Reply::class, Workspace::class, WorkspaceMember::class], version = 1)
 abstract class SBDatabase : RoomDatabase() {
     abstract fun AlertDao(): AlertDao

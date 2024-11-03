@@ -10,5 +10,6 @@ data class Attachment(
     val url: String = "",
     val type: String = "",
     val isCover: Boolean = false,
+
     val isStatus: String = "STAY"
 )
