@@ -50,9 +50,9 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
             moveToHomeScreen = { navController.navigate(Home) }
         )
 
-        signupScreen(moveToLogInScreen = {
-            navController.navigate(LogIn)
-        })
+        signupScreen(
+            moveToHomeScreen = { navController.navigate(Home) }
+        )
 
         homeScreen(
             moveToBoardScreen = {

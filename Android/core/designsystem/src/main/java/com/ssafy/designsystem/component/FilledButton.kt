@@ -25,13 +25,15 @@ fun FilledButton(
     textColor: Color = White,
     cornerRadius: Dp = CornerSmall,
     borderSize: Dp = 0.dp,
+    enabled: Boolean = true
 ) {
     Button(
         modifier = modifier.fillMaxWidth(),
         onClick = { onClick() },
         shape = RoundedCornerShape(cornerRadius),
         border = BorderStroke(borderSize, Primary),
-        colors = ButtonDefaults.buttonColors(containerColor = color)
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        enabled = enabled
     ) {
         Text(
             text = text,
