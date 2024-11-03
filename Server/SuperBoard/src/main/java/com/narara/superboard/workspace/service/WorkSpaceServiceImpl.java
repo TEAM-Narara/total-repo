@@ -62,7 +62,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
         WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workspaceOffsetService.saveUpdateWorkspaceOffset(workSpace);
+        workspaceOffsetService.saveUpdateWorkspaceDiff(workSpace);
 
         return workSpace.updateWorkSpace(workspaceUpdateRequestDto); //offset++
     }
@@ -73,7 +73,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
-        workspaceOffsetService.saveDeleteWorkspaceOffset(workSpace);
+        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         workSpace.edit(name); //offset++
 
-        workspaceOffsetService.saveEditWorkspaceOffset(workSpace);
+        workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
 
         return workSpace;
     }

@@ -1,7 +1,6 @@
 package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.common.constant.enums.Authority;
-import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -9,6 +8,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -32,6 +32,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkSpaceRepository workSpaceRepository;
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
     public WorkspaceMemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
@@ -82,6 +83,11 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
         workSpaceMember.editAuthority(authority);
+        workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
+
+        workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
+
+        workSpaceMember.getWorkSpace().addOffset();
 
         return workSpaceMember;
     }
@@ -117,6 +123,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                 .build();
 
         workSpaceMemberRepository.save(workSpaceMember);
+        workSpace.addOffset(); //workspace offset++
 
         return workSpaceMember;
     }
@@ -126,6 +133,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     public WorkSpaceMember deleteMember(Long workspaceId, Long memberId) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
         workSpaceMember.deleted();
+        workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
         return workSpaceMember;
     }

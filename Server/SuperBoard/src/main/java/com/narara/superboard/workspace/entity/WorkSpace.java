@@ -72,4 +72,8 @@ public class WorkSpace extends BaseTimeEntity {
         this.name = name;
         this.offset ++;
     }
+
+    public void addOffset() {
+        this.offset++;
+    }
 }

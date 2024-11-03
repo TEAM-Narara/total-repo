@@ -5,6 +5,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,9 +28,12 @@ public class WorkspaceOffsetService {
     public static final String WORKSPACE = "WORKSPACE";
     public static final String WORKSPACE_ID_COLUMN = "workspaceId";
     public static final String WORKSPACE_NAME_COLUMN = "workspaceName";
+    public static final String MEMBER_ID_COLUMN = "memberId";
+    public static final String MEMBER_NAME_COLUMN = "memberName";
+    public static final String AUTHORITY_COLUMN = "authority";
     private final MongoTemplate mongoTemplate;
 
-    public void saveEditWorkspaceOffset(WorkSpace workspace) {
+    public void saveEditWorkspaceDiff(WorkSpace workspace) {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
@@ -75,7 +79,7 @@ public class WorkspaceOffsetService {
                 .collect(Collectors.toList());
     }
 
-    public void saveDeleteWorkspaceOffset(WorkSpace workspace) {
+    public void saveDeleteWorkspaceDiff(WorkSpace workspace) {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
@@ -98,7 +102,7 @@ public class WorkspaceOffsetService {
         mongoTemplate.save(workspaceOffset);
     }
 
-    public void saveUpdateWorkspaceOffset(WorkSpace workspace) {
+    public void saveUpdateWorkspaceDiff(WorkSpace workspace) {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
@@ -110,6 +114,33 @@ public class WorkspaceOffsetService {
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_WORKSPACE.name(),
+                data
+        );
+
+        if (workspaceOffset == null) {
+            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        }
+
+        workspaceOffset.getDiffList().add(diffInfo);
+
+        mongoTemplate.save(workspaceOffset);
+    }
+
+    public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
+        WorkSpace workspace = workspaceMember.getWorkSpace();
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_NAME_COLUMN, workspace.getId());
+        data.put(AUTHORITY_COLUMN, workspace.getName());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.ADD_MEMBER.name(),
                 data
         );
 
