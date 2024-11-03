@@ -25,14 +25,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkspaceOffsetService {
     public static final String WORKSPACE = "WORKSPACE";
+    public static final String WORKSPACE_ID_COLUMN = "workspaceId";
+    public static final String WORKSPACE_NAME_COLUMN = "workspaceName";
     private final MongoTemplate mongoTemplate;
 
     public void saveEditWorkspaceOffset(WorkSpace workspace) {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
-        data.put("workspaceId", workspace.getId());
-        data.put("workspaceName", workspace.getName());
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(WORKSPACE_NAME_COLUMN, workspace.getName());
 
         DiffInfo diffInfo = new DiffInfo(
                 workspace.getOffset(),
@@ -77,13 +79,37 @@ public class WorkspaceOffsetService {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
-        data.put("workspaceId", workspace.getId());
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
 
         DiffInfo diffInfo = new DiffInfo(
                 workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_WORKSPACE.name(),
+                data
+        );
+
+        if (workspaceOffset == null) {
+            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        }
+
+        workspaceOffset.getDiffList().add(diffInfo);
+
+        mongoTemplate.save(workspaceOffset);
+    }
+
+    public void saveUpdateWorkspaceOffset(WorkSpace workspace) {
+        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(WORKSPACE_NAME_COLUMN, workspace.getName());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_WORKSPACE.name(),
                 data
         );
 

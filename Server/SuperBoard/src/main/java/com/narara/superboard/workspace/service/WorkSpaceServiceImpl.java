@@ -62,6 +62,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
 
         WorkSpace workSpace = getWorkSpace(workSpaceId);
+        workspaceOffsetService.saveUpdateWorkspaceOffset(workSpace);
 
         return workSpace.updateWorkSpace(workspaceUpdateRequestDto); //offset++
     }
