@@ -1,9 +1,12 @@
 package com.ssafy.superboard.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
@@ -39,19 +42,15 @@ import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.auth.AuthManager
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.notificationScreen
-import kotlinx.coroutines.flow.collectLatest
+import com.ssafy.ui.uistate.ErrorScreen
 
 @Composable
 fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+    val noAuthEvent by AuthManager.noAuthEvent.collectAsStateWithLifecycle(initialValue = false)
 
-    LaunchedEffect(Unit) {
-        AuthManager.noAuthEvent.collectLatest {
-            navController.navigate(LogIn) {
-                popUpTo(navController.graph.id) {
-                    inclusive = true
-                }
-            }
-        }
+    if (noAuthEvent) {
+        navController.navigate(LogIn) { popUpAll(navController) }
+        ErrorScreen(errorMessage = AuthManager.NO_AUTH)
     }
 
     NavHost(
@@ -61,7 +60,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
     ) {
         loginScreen(
             moveToSignUpScreen = { navController.navigate(SignUp) },
-            moveToHomeScreen = { navController.navigate(Home) }
+            moveToHomeScreen = { navController.navigate(Home) { popUpAll(navController) } }
         )
 
         signupScreen(
@@ -83,11 +82,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
                 )
             },
             moveToLoginScreen = {
-                navController.navigate(LogIn) {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                }
+                navController.navigate(LogIn) { popUpAll(navController) }
             },
             moveToSettingScreen = {
                 navController.navigate(Setting)
@@ -105,11 +100,7 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
 
         settingScreen(
             backHomeScreen = {
-                navController.navigate(Home) {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                }
+                navController.navigate(Home) { popUpAll(navController) }
             }
         )
 
@@ -208,5 +199,11 @@ fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Mod
         labelScreen(
             popBack = navController::popBackStack
         )
+    }
+}
+
+private fun NavOptionsBuilder.popUpAll(navController: NavController) {
+    popUpTo(navController.graph.id) {
+        inclusive = true
     }
 }
