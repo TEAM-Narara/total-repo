@@ -1,72 +1,43 @@
 package com.narara.superboard.workspacemember.interfaces;
 
-import com.narara.superboard.common.service.IAuthenticationFacade;
-import com.narara.superboard.member.service.MemberService;
-import com.narara.superboard.member.util.JwtTokenProvider;
-import com.narara.superboard.workspace.service.WorkSpaceService;
-import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDeleteRequest;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberRequest;
+import com.narara.superboard.common.interfaces.response.DefaultResponse;
+import com.narara.superboard.common.interfaces.response.ResponseMessage;
+import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
+import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/v1/workspaces")
-@Slf4j
 @RestController
 @RequiredArgsConstructor
-public class WorkspaceMemberController {
-    private final WorkSpaceService workSpaceService;
-    private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final IAuthenticationFacade authenticationFacade;
+public class WorkSpaceMemberController implements WorkSpaceMemberAPI {
+
     private final WorkSpaceMemberService workSpaceMemberService;
 
-    @Operation(summary = "워크스페이스 멤버 권한 수정")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
-    @PatchMapping("/{workspaceId}/member")
-    public ResponseEntity<WorkspaceMemberDto> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(requestDto.memberId(), workspaceId, requestDto.authority());
+    @Override
+    public ResponseEntity<DefaultResponse<WorkspaceMemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
+            Long workspaceId) {
+        WorkspaceMemberCollectionResponseDto responseDto = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(
+                workspaceId);
+        return new ResponseEntity<>(DefaultResponse.res(
+                StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
+                , HttpStatus.OK);
 
-        return ResponseEntity.ok(
-                new WorkspaceMemberDto(
-                        workSpaceMember.getMember().getId(),
-                        workSpaceMember.getAuthority()
-                )
-        );
     }
 
-    @Operation(summary = "워크스페이스 멤버 추가")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 추가가능
-    @PostMapping("/{workspaceId}/member")
-    public ResponseEntity<WorkspaceMemberDto> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
-                requestDto.authority());
 
-        return ResponseEntity.ok(
-                new WorkspaceMemberDto(
-                        workSpaceMember.getMember().getId(),
-                        workSpaceMember.getAuthority()
-                )
-        );
-    }
+    @Override
+    public ResponseEntity<DefaultResponse<WorkSpaceListResponseDto>> getMemberWorkspaceList(
+            @AuthenticationPrincipal Member member) {
+        WorkSpaceListResponseDto responseDto = workSpaceMemberService.getMemberWorkspaceList(member);
 
-    @Operation(summary = "워크스페이스 멤버 삭제")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
-    @DeleteMapping("/{workspaceId}/member")
-    public ResponseEntity<WorkspaceMemberDto> deleteWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto) {
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(workspaceId, requestDto.memberId());
-
-        return ResponseEntity.ok(
-                new WorkspaceMemberDto(
-                        workSpaceMember.getMember().getId(),
-                        workSpaceMember.getAuthority()
-                )
-        );
+        return new ResponseEntity<>(DefaultResponse.res(
+                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto)
+                , HttpStatus.OK);
     }
 }
