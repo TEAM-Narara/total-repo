@@ -4,6 +4,8 @@ import com.ssafy.data.repository.board.BoardRepository
 import com.ssafy.data.repository.board.BoardRepositoryImpl
 import com.ssafy.data.repository.github.GitHubRepository
 import com.ssafy.data.repository.github.GitHubRepositoryImpl
+import com.ssafy.data.repository.member.MemberRepository
+import com.ssafy.data.repository.member.MemberRepositoryImpl
 import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.data.repository.user.UserRepositoryImpl
 import com.ssafy.data.repository.workspace.WorkspaceRepository
@@ -33,5 +35,9 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindBoardRepository(boardRepositoryImpl: BoardRepositoryImpl): BoardRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindMemberRepository(memberRepositoryImpl: MemberRepositoryImpl): MemberRepository
 
 }

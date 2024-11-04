@@ -6,6 +6,8 @@ import com.ssafy.network.source.board.BoardDataSource
 import com.ssafy.network.source.board.BoardDataSourceImpl
 import com.ssafy.network.source.github.GitHubDataSource
 import com.ssafy.network.source.github.GitHubDataSourceImpl
+import com.ssafy.network.source.member.MemberDataSource
+import com.ssafy.network.source.member.MemberDataSourceImpl
 import com.ssafy.network.source.user.UserDataSource
 import com.ssafy.network.source.user.UserDataSourceImpl
 import com.ssafy.network.source.workspace.WorkspaceDataSource
@@ -39,5 +41,9 @@ abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindBoardDataSource(boardDataSourceImpl: BoardDataSourceImpl): BoardDataSource
+
+    @Singleton
+    @Binds
+    abstract fun bindMemberDataSource(memberDataSourceImpl: MemberDataSourceImpl): MemberDataSource
 
 }

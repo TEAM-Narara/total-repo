@@ -1,26 +1,17 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
 }
 
 android {
-    namespace = "com.ssafy.network"
+    namespace = "com.ssafy.member"
     compileSdk = 34
 
-    val properties = Properties()
-    properties.load(FileInputStream(rootProject.file("local.properties")))
-
     defaultConfig {
-        minSdk = 26
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "BASE_URL", properties.getProperty("baseUrl"))
     }
 
     buildTypes {
@@ -39,27 +30,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 dependencies {
     implementation(project(":core:model"))
-    implementation(project(":core:datastore"))
-
-    //Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-
-    // HTTP Client
-    implementation(libs.gson)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.okhttp)
-    implementation(libs.squareup.logging.interceptor)
-
-    // Paging
+    implementation(project(":core:data"))
+    implementation(libs.javax.inject)
     implementation(libs.androidx.paging.runtime)
 
     implementation(libs.androidx.core.ktx)
