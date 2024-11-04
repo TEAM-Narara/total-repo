@@ -1,6 +1,7 @@
 package com.ssafy.network.module
 
 import com.ssafy.network.api.AuthAPI
+import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.api.GitHubAPI
 import com.ssafy.network.api.UserAPI
 import com.ssafy.network.api.WorkspaceAPI
@@ -31,5 +32,9 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideWorkspaceAPI(@UserRetrofit retrofit: Retrofit): WorkspaceAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideBoardAPI(@UserRetrofit retrofit: Retrofit): BoardAPI = retrofit.create()
 
 }
