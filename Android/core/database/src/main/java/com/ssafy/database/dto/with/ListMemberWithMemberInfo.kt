@@ -2,11 +2,12 @@ package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.ssafy.database.dto.Alert
+import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.Member
+import com.ssafy.database.dto.SbListMember
 
-data class AlertWithMemberInfo(
-    @Embedded val alert: Alert,
+data class ListMemberWithMemberInfo(
+    @Embedded val listMember: SbListMember,
 
     @Relation(
         parentColumn = "memberId",

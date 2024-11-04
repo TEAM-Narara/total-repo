@@ -5,11 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.SbList
-import com.ssafy.database.dto.with.CardThumbnail
-import com.ssafy.database.dto.with.ListInCards
+import com.ssafy.database.dto.with.ListInCardThumbnails
 
 @Dao
 interface ListDao {
@@ -20,7 +18,7 @@ interface ListDao {
         FROM list 
         WHERE id == :listId And isStatus != 'DELETE' And isArchived == 0
     """)
-    suspend fun getList(listId: Long): List<ListInCards>
+    suspend fun getList(listId: Long): List<ListInCardThumbnails>
 
     // 현재 보드에서 볼 것
     @Query("""
@@ -28,7 +26,7 @@ interface ListDao {
         FROM list 
         WHERE boardId == :boardId And isStatus != 'DELETE' And isArchived == 0
     """)
-    suspend fun getAllLists(boardId: Long): List<ListInCards>
+    suspend fun getAllLists(boardId: Long): List<ListInCardThumbnails>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -36,7 +34,7 @@ interface ListDao {
         FROM list 
         WHERE isStatus != 'DELETE' And isArchived == 1
     """)
-    suspend fun getAllListsArchived(): List<ListInCards>
+    suspend fun getAllListsArchived(): List<ListInCardThumbnails>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

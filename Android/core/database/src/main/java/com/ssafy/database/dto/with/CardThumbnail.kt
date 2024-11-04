@@ -14,7 +14,7 @@ data class CardThumbnail(
         entityColumn = "cardId",
         entity = CardMember::class
     )
-    val cardRepresentative: CardMemberWithMemberInfo,
+    val cardRepresentatives: List<CardMemberWithMemberInfo>,
 
     @Relation(
         parentColumn = "id",

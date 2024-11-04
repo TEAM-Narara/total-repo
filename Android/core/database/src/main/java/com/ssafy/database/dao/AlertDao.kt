@@ -15,16 +15,8 @@ interface AlertDao {
     suspend fun getAllAlerts(): List<Alert>
 
     @Query("""
-        SELECT 
-            alert.id AS alertId, 
-            alert.memberId AS memberId, 
-            alert.title AS title, 
-            alert.body AS body, 
-            alert.status AS status, 
-            member.nickname AS nickname, 
-            member.profileImageUrl AS profileImageUrl 
+        SELECT *
         FROM alert 
-        INNER JOIN member ON alert.memberId = member.id
     """)
     suspend fun getAllAlertsWithMemberInfo(): List<AlertWithMemberInfo>
 

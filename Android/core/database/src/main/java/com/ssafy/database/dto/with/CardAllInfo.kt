@@ -6,9 +6,10 @@ import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.CardMember
+import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.Reply
 
-data class CardDetail(
+data class CardAllInfo(
     @Embedded val card: Card,
 
     @Relation(
@@ -16,14 +17,20 @@ data class CardDetail(
         entityColumn = "cardId",
         entity = CardLabel::class
     )
-    val cardLabels: List<CardLabelWithLabelInfo>,
+    val cardLabels: List<CardLabel>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId",
         entity = CardMember::class
     )
-    val cardRepresentatives: List<CardMemberWithMemberInfo>,
+    val cardMembers: List<CardMember>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "cardId"
+    )
+    val cardMemberAlarm: CardMemberAlarm?,
 
     @Relation(
         parentColumn = "id",

@@ -18,7 +18,7 @@ interface CardMemberDao {
         WHERE cardId == :cardId AND isRepresentative == 1
     """
     )
-    suspend fun getCardMember(cardId: Long): CardMemberWithMemberInfo
+    suspend fun getCardRepresentatives(cardId: Long): List<CardMemberWithMemberInfo>
     
     // 카드 멤버들 조회
     @Query("""
