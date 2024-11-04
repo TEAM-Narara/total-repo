@@ -12,6 +12,7 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.NotFoundNameException;
@@ -179,7 +180,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 workspaceId,
                 name,
                 visibility,
-                background
+                new BoardBackgroundDto(backgroundType, backgroundValue)
         );
 
         Member member = new Member(1L, "시현", "sisi@naver.com");
@@ -225,7 +226,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> background = null;
         String visibility = "WORKSPACE";
 
-        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, null);
 
         WorkSpace workSpace = WorkSpace.builder()
                 .id(workspaceId)
@@ -336,16 +337,18 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void testUpdateBoard_NameInvalidValue(String name, String backgroundJson, String visibility) {
         // given
         Long boardId = 1L;
+        Long memberId = 1L;
         Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
 
         // 요청 DTO 생성
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, background, visibility);
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, new BoardBackgroundDto((String)background.get("type"), (String)background.get("value")), visibility);
 
         // Mocking: validateNameIsPresent 호출 시 예외 발생 설정
         doThrow(new NotFoundException("Board", "name")).when(boardValidator).validateNameIsPresent(requestDto);
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
 
         // when & then: 이름 값이 없을 때 예외가 발생하는지 확인
-        assertThrows(NotFoundException.class, () -> boardService.updateBoard(boardId, requestDto));
+        assertThrows(NotFoundException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 이름 검증이 호출되었는지 확인
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
@@ -364,13 +367,15 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
 
         // 요청 DTO 생성
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, background, visibility);
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, new BoardBackgroundDto((String)background.get("type"), (String)background.get("value")), visibility);
 
         // Mocking: validateVisibilityIsPresent 호출 시 예외 발생 설정
         doThrow(new NotFoundException("Board", "visibility")).when(boardValidator).validateVisibilityIsPresent(requestDto);
 
         // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
-        assertThrows(NotFoundException.class, () -> boardService.updateBoard(boardId, requestDto));
+        Long memberId = 1L;
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+        assertThrows(NotFoundException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 가시성 검증이 호출되었는지 확인
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto); // 호출된 후 호출됨.
@@ -389,13 +394,15 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
 
         // 요청 DTO 생성
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, background, visibility);
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, new BoardBackgroundDto((String)background.get("type"), (String)background.get("value")), visibility);
 
         // Mocking: validateVisibilityIsPresent 호출 시 예외 발생 설정
         doThrow(new BoardInvalidVisibilityFormatException()).when(boardValidator).validateVisibilityIsValid(requestDto);
 
         // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
-        assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardService.updateBoard(boardId, requestDto));
+        Long memberId = 1L;
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+        assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 가시성 검증이 호출되었는지 확인
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto); // 호출된 후 호출됨.
@@ -412,13 +419,15 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> coverWithoutType = new HashMap<>();
         coverWithoutType.put("value", "#ffffff");  // type 필드 없음
 
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", coverWithoutType, "PRIVATE");
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", new BoardBackgroundDto((String)coverWithoutType.get("type"), (String)coverWithoutType.get("value")), "PRIVATE");
 
         // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
 
         // when & then: 예외가 발생하는지 확인
-        assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoard(boardId, requestDto));
+        Long memberId = 1L;
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+        assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
         verify(coverValidator, times(1)).validateContainCover(requestDto);
@@ -432,13 +441,15 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> coverWithoutValue = new HashMap<>();
         coverWithoutValue.put("type", "COLOR");  // value 필드 없음
 
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", coverWithoutValue, "PRIVATE");
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto("보드 이름", new BoardBackgroundDto((String)coverWithoutValue.get("type"), (String)coverWithoutValue.get("value")), "PRIVATE");
 
         // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
 
         // when & then: 예외가 발생하는지 확인
-        assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoard(boardId, requestDto));
+        Long memberId = 1L;
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+        assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
         verify(coverValidator, times(1)).validateContainCover(requestDto);
@@ -460,7 +471,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> cover = coverJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
 
         // BoardUpdateRequestDto 생성
-        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, cover, visibility);
+        BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name, new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value")), visibility);
 
         // 보드 데이터 모킹 설정 (모의 객체 반환하게 설정)
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
@@ -477,7 +488,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         }
 
         // when
-        Board updatedBoard = boardService.updateBoard(boardId, requestDto);
+        Long memberId = 1L;
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+        Board updatedBoard = boardService.updateBoard(memberId, boardId, requestDto);
 
         // then
         assertEquals(board, updatedBoard);  // 업데이트된 보드가 원래 보드와 동일해야 함
@@ -504,7 +517,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> coverWithoutType = new HashMap<>();
         coverWithoutType.put("value", "#ffffff");  // type 필드 없음
 
-        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutType);
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", new BoardBackgroundDto(null, (String)coverWithoutType.get("value")));
 
         // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
@@ -524,7 +537,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> coverWithoutValue = new HashMap<>();
         coverWithoutValue.put("type", "COLOR");  // value 필드 없음
 
-        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", coverWithoutValue);
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto("보드 이름", new BoardBackgroundDto((String)coverWithoutValue.get("type"), (String)coverWithoutValue.get("value")));
 
         // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
         doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
@@ -541,7 +554,8 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void testUpdateBoardByMember_NameNotFoundException() {
         // given
         Long boardId = 1L;
-        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto(null, Map.of("type", "COLOR", "value", "#ffffff"));
+        Map<String, String> background = Map.of("type", "COLOR", "value", "#ffffff");
+        BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto(null, new BoardBackgroundDto((String)background.get("type"), (String)background.get("value")));
 
         // Mock: 이름이 없는 경우 예외를 발생시키도록 설정
         doThrow(new NotFoundNameException("보드")).when(nameValidator).validateNameIsEmpty(requestDto);

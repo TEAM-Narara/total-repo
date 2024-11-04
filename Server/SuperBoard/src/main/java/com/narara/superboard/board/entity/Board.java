@@ -72,10 +72,11 @@ public class Board extends BaseTimeEntity {
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
         return Board.builder()
-                .cover(new HashMap<>() {{
-                    put("type", boardCreateRequestDto.background().type());
-                    put("value", boardCreateRequestDto.background().value());
-                }})
+                .cover(boardCreateRequestDto.background() != null
+                        ? Map.of(
+                        "type", boardCreateRequestDto.background().type(),
+                        "value", boardCreateRequestDto.background().value())
+                        : null)
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
@@ -86,16 +87,21 @@ public class Board extends BaseTimeEntity {
     }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = boardUpdateRequestDto.background();
+        this.cover = new HashMap<>(){{
+            put("type", boardUpdateRequestDto.background().type());
+            put("value", boardUpdateRequestDto.background().value());
+        }};
         this.name = boardUpdateRequestDto.name();
         this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         return this;
     }
     public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
-        this.cover = boardUpdateByMemberRequestDto.background();
+        this.cover = new HashMap<>(){{
+            put("type", boardUpdateByMemberRequestDto.background().type());
+            put("value", boardUpdateByMemberRequestDto.background().value());
+        }};
         this.name = boardUpdateByMemberRequestDto.name();
         return this;
-
     }
 
     public void changeArchiveStatus() {

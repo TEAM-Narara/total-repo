@@ -35,18 +35,18 @@ public interface BoardAPI {
     ResponseEntity<DefaultResponse<Void>> deleteBoard(@PathVariable Long boardId);
 
     @PatchMapping("/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 수정")
     ResponseEntity<DefaultResponse<BoardDetailResponseDto>> updateBoard(
             @PathVariable Long boardId,
             @RequestBody BoardUpdateRequestDto boardUpdateRequestDto);
 
-    @PatchMapping("/{boardId}/member")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
-    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
-            @PathVariable Long boardId,
-            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
+//    @PatchMapping("/{boardId}/member")
+//    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
+//    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
+//    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
+//            @PathVariable Long boardId,
+//            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
 
     @GetMapping("/workspace/{workspaceId}/archived")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")

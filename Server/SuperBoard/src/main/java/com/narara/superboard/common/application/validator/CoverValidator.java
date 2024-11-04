@@ -6,6 +6,7 @@ import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.narara.superboard.common.interfaces.dto.CoverHolder;
@@ -15,14 +16,17 @@ import org.springframework.stereotype.Component;
 public class CoverValidator {
 
     public void validateContainCover(CoverHolder cover) {
-        validateCoversEmpty(cover.cover());
-        validateCoverTypeIsEmpty(cover.cover());
-        validateCoverValueIsEmpty(cover.cover());
+//        validateCoversEmpty(cover.cover());
+//        validateCoverTypeIsEmpty(cover.cover());
+//        validateCoverValueIsEmpty(cover.cover());
         // TODO: validateCoverTypeIsValid(cover.cover().get("type").toString()); 추가하기.
     }
 
     public void validateCardCover(CardUpdateRequestDto cardUpdateRequestDto) {
-        Map<String, Object> cover = cardUpdateRequestDto.cover();
+        Map<String, Object> cover = new HashMap<>(){{
+            put("type", cardUpdateRequestDto.cover().type());
+            put("value", cardUpdateRequestDto.cover().value());
+        }};
         if (cover != null) {
             validateCoverTypeIsEmpty(cover);
             validateCoverValueIsEmpty(cover);

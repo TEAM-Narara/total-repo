@@ -20,7 +20,7 @@ public interface BoardService {
 
     void deleteBoard(Long boardId);
 
-    Board updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
+    Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
 
     Board updateBoardByMember(Long boardId, BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
 

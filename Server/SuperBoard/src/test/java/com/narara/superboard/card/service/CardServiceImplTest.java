@@ -2,6 +2,7 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -190,10 +191,18 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     private static Stream<Arguments> provideValidUpdateCardCases() {
+        Map<String, String> background = Map.of("type", "COLOR", "value", "#FFFFFF");
+        Map<String, String> background2 = Map.of("type", "IMAGE", "value", "https://example.com/image.png");
         return Stream.of(
                 // 모든 필드가 업데이트된 경우
                 Arguments.of(
-                        new CardUpdateRequestDto("Updated Name", "Updated Description", 1633024800000L, 1633111200000L, Map.of("type", "COLOR", "value", "#FFFFFF")),
+                        new CardUpdateRequestDto(
+                                "Updated Name",
+                                "Updated Description",
+                                1633024800000L,
+                                1633111200000L,
+                                new BoardBackgroundDto((String)background.get("type"), (String)background.get("value"))
+                        ),
                         "Updated Name", "Updated Description", Map.of("type", "COLOR", "value", "#FFFFFF"), 1633024800000L, 1633111200000L
                 ),
                 // 이름과 설명만 업데이트된 경우
@@ -208,7 +217,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 ),
                 // 커버만 업데이트된 경우
                 Arguments.of(
-                        new CardUpdateRequestDto(null, null, null, null, Map.of("type", "IMAGE", "value", "https://example.com/image.png")),
+                        new CardUpdateRequestDto(null, null, null, null, new BoardBackgroundDto((String)background2.get("type"), (String)background2.get("value"))),
                         "Existing Name", null, Map.of("type", "IMAGE", "value", "https://example.com/image.png"), null, null
                 ),
                 // 이름이 비어 있는 경우 기존 이름 유지

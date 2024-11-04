@@ -10,6 +10,7 @@ import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.AlreadyRegisteredLoginException;
 import com.narara.superboard.member.exception.InvalidRefreshTokenException;
 import io.lettuce.core.RedisException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionAdvice {
 

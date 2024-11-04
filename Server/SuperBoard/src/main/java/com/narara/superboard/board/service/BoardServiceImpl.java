@@ -9,6 +9,7 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
@@ -19,6 +20,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -104,13 +106,20 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
+    public Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
         boardValidator.validateNameIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
 
         if (boardUpdateRequestDto.cover() != null) {
             coverValidator.validateContainCover(boardUpdateRequestDto);
+        }
+
+        BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
+                .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
+
+        if (boardUpdateRequestDto.visibility() != null && boardMember.getAuthority().equals(Authority.MEMBER)) {
+            throw new AccessDeniedException("visibility를 수정할 수 있는 권한이 없습니다");
         }
 
         Board board = getBoard(boardId);
