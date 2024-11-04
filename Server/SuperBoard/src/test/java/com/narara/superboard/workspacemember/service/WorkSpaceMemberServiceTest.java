@@ -97,7 +97,7 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("멤버의 워크스페이스 목록 조회 성공")
     void getMemberWorkspaceList_Success() {
         // given
-        given(workSpaceMemberRepository.findAllByMemberId(MEMBER_ID_1))
+        given(workSpaceMemberRepository.findAllByMember(member))
                 .willReturn(Arrays.asList(workSpaceMember));
 
         // when

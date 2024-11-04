@@ -306,6 +306,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Board mockBoard = Board.builder()
                 .id(boardId)
                 .name("my Board")
+                .workSpace(new WorkSpace(1L, "asdf", 0L))
                 .build();
 
         // getBoard 메서드가 워크스페이스를 반환하도록 설정

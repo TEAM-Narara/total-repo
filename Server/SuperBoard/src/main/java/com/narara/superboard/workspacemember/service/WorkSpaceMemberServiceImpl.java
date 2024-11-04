@@ -8,7 +8,6 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
-import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -32,7 +31,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkSpaceRepository workSpaceRepository;
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
-    private final WorkspaceOffsetService workspaceOffsetService;
+//    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
     public WorkspaceMemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
@@ -85,7 +84,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
+//        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
 
         workSpaceMember.getWorkSpace().addOffset();
 
@@ -125,7 +124,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMemberRepository.save(workSpaceMember);
         workSpace.addOffset(); //workspace offset++
 
-        workspaceOffsetService.saveAddMemberDiff(workspaceMember);
+//        workspaceOffsetService.saveAddMemberDiff(workspaceMember);
 
         return workSpaceMember;
     }
@@ -137,7 +136,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
+//        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
 
         return workSpaceMember;
     }
