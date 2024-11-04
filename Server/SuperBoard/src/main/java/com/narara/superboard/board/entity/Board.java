@@ -10,6 +10,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,7 +72,10 @@ public class Board extends BaseTimeEntity {
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
         return Board.builder()
-                .cover(boardCreateRequestDto.background())
+                .cover(new HashMap<>() {{
+                    put("type", boardCreateRequestDto.background().type());
+                    put("value", boardCreateRequestDto.background().value());
+                }})
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
