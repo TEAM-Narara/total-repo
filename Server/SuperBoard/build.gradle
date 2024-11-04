@@ -88,6 +88,13 @@ dependencies {
 
     // Mongo DB
 //    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    //Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    //jsonObject
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    implementation 'org.json:json:20211205'
 }
 
 test{
