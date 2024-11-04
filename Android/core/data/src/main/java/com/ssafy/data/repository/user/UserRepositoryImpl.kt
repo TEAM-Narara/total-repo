@@ -48,4 +48,8 @@ class UserRepositoryImpl @Inject constructor(
         return response.toFlow()
     }
 
+    override suspend fun logout(): Flow<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.logout() }
+        return response.toFlow()
+    }
 }
