@@ -14,7 +14,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     fun logout(onSuccess: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        logoutUseCase().withUiState().collect {
+        logoutUseCase.logout().withUiState().collect {
             withMain { onSuccess() }
         }
     }
