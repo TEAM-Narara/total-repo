@@ -46,6 +46,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+    implementation(project(":core:datastore"))
 
     //Hilt
     implementation(libs.hilt.android)

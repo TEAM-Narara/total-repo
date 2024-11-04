@@ -1,5 +1,6 @@
 package com.ssafy.network.module
 
+import com.ssafy.network.api.AuthAPI
 import com.ssafy.network.api.GitHubAPI
 import com.ssafy.network.api.UserAPI
 import dagger.Module
@@ -16,10 +17,13 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun provideUserAPI(@UserRetrofit retrofit: Retrofit): UserAPI = retrofit.create()
+    fun provideGitHubAPI(@GitHubRetrofit retrofit: Retrofit): GitHubAPI = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideGitHubAPI(@GitHubRetrofit retrofit: Retrofit): GitHubAPI = retrofit.create()
+    fun provideAuthAPI(@AuthRetrofit retrofit: Retrofit): AuthAPI = retrofit.create()
 
+    @Singleton
+    @Provides
+    fun provideUserAPI(@UserRetrofit retrofit: Retrofit): UserAPI = retrofit.create()
 }
