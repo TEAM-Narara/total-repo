@@ -32,4 +32,7 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun logout(): Response<ApiResponse<Unit>> =
         userAPI.logout()
 
+    override suspend fun withdrawal(): Response<ApiResponse<Unit>> =
+        userAPI.withdrawal()
+
 }
