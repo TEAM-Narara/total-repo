@@ -2,7 +2,7 @@ package com.ssafy.data.repository.board
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.BoardMemberResponseDtoList
+import com.ssafy.model.board.MemberListResponseDTO
 import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
@@ -27,6 +27,6 @@ interface BoardRepository {
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getBoardMembers(id: Long): Flow<BoardMemberResponseDtoList>
+    suspend fun getBoardMembers(id: Long): Flow<MemberListResponseDTO>
 
 }

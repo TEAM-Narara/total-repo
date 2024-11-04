@@ -1,6 +1,6 @@
 package com.ssafy.model.board
 
-data class BoardMemberResponseDTO(
+data class MemberResponseDTO(
     val memberId: Long,
     val authority: String,
     val memberEmail: String,

@@ -2,7 +2,7 @@ package com.ssafy.network.api
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.BoardMemberResponseDtoList
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -52,6 +52,6 @@ interface BoardAPI {
     suspend fun toggleWatchBoard(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>
 
     @GET("api/v1/boards/{boardId}/members")
-    suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<BoardMemberResponseDtoList>>
+    suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<MemberListResponseDTO>>
 
 }

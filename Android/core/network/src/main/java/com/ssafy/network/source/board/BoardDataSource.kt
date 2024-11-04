@@ -2,7 +2,7 @@ package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.BoardMemberResponseDtoList
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 
@@ -28,6 +28,6 @@ interface BoardDataSource {
 
     suspend fun toggleWatchBoard(boardId: Long): Response<ApiResponse<Unit>>
 
-    suspend fun getBoardMembers(boardId: Long): Response<ApiResponse<BoardMemberResponseDtoList>>
+    suspend fun getBoardMembers(boardId: Long): Response<ApiResponse<MemberListResponseDTO>>
 
 }

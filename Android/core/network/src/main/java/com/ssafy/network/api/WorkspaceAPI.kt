@@ -1,5 +1,6 @@
 package com.ssafy.network.api
 
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.model.workspace.WorkspaceResponseDto
@@ -29,4 +30,9 @@ interface WorkspaceAPI {
         @Body workspaceRequestDTO: WorkspaceRequestDTO
     ): Response<ApiResponse<WorkspaceResponseDto>>
 
+    @GET("api/v1/workspaces/{workspaceId}/members")
+    suspend fun getWorkspaceMembers(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<MemberListResponseDTO>>
+
+    @GET("api/v1/members/{memberId}/workspaces")
+    suspend fun getWorkspacesByMember(@Path("memberId") memberId: Long): Response<ApiResponse<WorkSpaceListResponseDTO>>
 }

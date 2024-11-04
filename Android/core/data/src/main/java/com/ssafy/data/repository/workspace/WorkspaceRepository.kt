@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.workspace
 
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import kotlinx.coroutines.flow.Flow
@@ -20,5 +21,9 @@ interface WorkspaceRepository {
         workspaceRequestDTO: WorkspaceRequestDTO,
         isConnected: Boolean
     ): Flow<Unit>
+
+    suspend fun getWorkspaceMembers(workspaceId: Long): Flow<MemberListResponseDTO>
+
+    suspend fun getWorkspacesByMember(memberId: Long): Flow<WorkSpaceListResponseDTO>
 
 }

@@ -1,5 +1,6 @@
 package com.ssafy.network.source.workspace
 
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.model.workspace.WorkspaceResponseDto
@@ -26,5 +27,12 @@ class WorkspaceDataSourceImpl @Inject constructor(
         workspaceRequestDTO: WorkspaceRequestDTO
     ): Response<ApiResponse<WorkspaceResponseDto>> =
         workspaceAPI.updateWorkspace(workspaceId, workspaceRequestDTO)
+
+
+    override suspend fun getWorkspaceMembers(workspaceId: Long): Response<ApiResponse<MemberListResponseDTO>> =
+        workspaceAPI.getWorkspaceMembers(workspaceId)
+
+    override suspend fun getWorkspacesByMember(memberId: Long): Response<ApiResponse<WorkSpaceListResponseDTO>> =
+        workspaceAPI.getWorkspacesByMember(memberId)
 
 }

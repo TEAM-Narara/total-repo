@@ -4,7 +4,7 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.response.toFlow
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.BoardMemberResponseDtoList
+import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.network.source.board.BoardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -108,7 +108,7 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoardMembers(id: Long): Flow<BoardMemberResponseDtoList> =
+    override suspend fun getBoardMembers(id: Long): Flow<MemberListResponseDTO> =
         withContext(ioDispatcher) {
             TODO("보드의 멤버를 가져오는 로직을 추가해주세요.")
         }
