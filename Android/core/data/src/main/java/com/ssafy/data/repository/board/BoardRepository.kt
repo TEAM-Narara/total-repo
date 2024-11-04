@@ -15,8 +15,6 @@ interface BoardRepository {
 
     suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<BoardDTO>
 
-    suspend fun 이게뭐하는함수인교(id: Long, isConnected: Boolean): Flow<Unit>
-
     suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getBoardsByWorkspace(id: Long): Flow<BoardDetailResponseDtoList>

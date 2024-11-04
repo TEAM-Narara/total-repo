@@ -30,12 +30,6 @@ interface BoardAPI {
         @Body boardDTO: BoardDTO
     ): Response<ApiResponse<BoardDTO>>
 
-    @PATCH("api/v1/boards/{boardId}/member")
-    suspend fun 이게뭐하는함수인교(
-        @Path("boardId") boardId: Long,
-        @Body boardDTO: BoardDTO
-    ): Response<ApiResponse<Unit>>
-
     @PATCH("api/v1/boards/{boardId}/archive")
     suspend fun setBoardArchive(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>
 

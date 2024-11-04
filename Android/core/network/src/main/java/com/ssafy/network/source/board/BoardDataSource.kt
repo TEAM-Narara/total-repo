@@ -16,8 +16,6 @@ interface BoardDataSource {
 
     suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Response<ApiResponse<BoardDTO>>
 
-    suspend fun 이게뭐하는함수인교(boardId: Long, boardDTO: BoardDTO): Response<ApiResponse<Unit>>
-
     suspend fun setBoardArchive(boardId: Long): Response<ApiResponse<Unit>>
 
     suspend fun getBoardsByWorkspace(workspaceId: Long): Response<ApiResponse<BoardDetailResponseDtoList>>

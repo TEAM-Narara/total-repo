@@ -63,10 +63,6 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun 이게뭐하는함수인교(id: Long, isConnected: Boolean): Flow<Unit> {
-        TODO("얜 뭐하는 함수인지 모르겄네 이거 왜만들어야 하지")
-    }
-
     override suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {

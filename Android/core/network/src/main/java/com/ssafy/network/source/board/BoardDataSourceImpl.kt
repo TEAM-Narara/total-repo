@@ -24,9 +24,6 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
         boardDTO: BoardDTO
     ): Response<ApiResponse<BoardDTO>> = boardAPI.updateBoard(id, boardDTO)
 
-    override suspend fun 이게뭐하는함수인교(boardId: Long, boardDTO: BoardDTO): Response<ApiResponse<Unit>> =
-        boardAPI.이게뭐하는함수인교(boardId, boardDTO)
-
     override suspend fun setBoardArchive(boardId: Long): Response<ApiResponse<Unit>> =
         boardAPI.setBoardArchive(boardId)
 
