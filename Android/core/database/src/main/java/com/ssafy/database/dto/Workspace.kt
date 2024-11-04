@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Workspace(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String = "",
-    val offset: Long = 0L,
+//    val offset: Long = 0L,
+
     val isStatus: String = "STAY"
 )

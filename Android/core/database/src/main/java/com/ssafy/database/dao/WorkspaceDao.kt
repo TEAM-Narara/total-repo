@@ -9,10 +9,30 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.with.WorkspaceDetail
+import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 
 @Dao
 interface WorkspaceDao {
+
+    // 로컬 워크스페이스 아래 모든 것 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM workspace 
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalWorkspace(): List<WorkspaceInBoard>
+
+    // 서버 워크스페이스 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM workspace
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteWorkspace(): List<Workspace>
+
     // 워크스페이스 상세 조회
     @Transaction
     @Query("""

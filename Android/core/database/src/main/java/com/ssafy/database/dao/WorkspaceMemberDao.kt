@@ -4,11 +4,24 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.WorkspaceMember
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 
 @Dao
 interface WorkspaceMemberDao {
+
+    // 서버 보드 멤버 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM workspace_member
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMember>
+
     @Query("""
         SELECT *
         FROM workspace_member 

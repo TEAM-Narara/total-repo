@@ -8,10 +8,31 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Board
+import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.with.BoardDetail
+import com.ssafy.database.dto.with.BoardInList
+import com.ssafy.database.dto.with.WorkspaceInBoard
 
 @Dao
 interface BoardDao {
+
+    // 로컬 보드 아래 모든 것 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM board
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalBoard(): List<BoardInList>
+
+    // 서버 보드 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM board
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteBoard(): List<Board>
 
     // 보드 상세 조회
     @Transaction

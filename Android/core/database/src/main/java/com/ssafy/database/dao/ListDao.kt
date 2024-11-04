@@ -5,12 +5,34 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.SbList
+import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.ListInCardThumbnails
+import com.ssafy.database.dto.with.ListInCards
 
 @Dao
 interface ListDao {
+
+    // 로컬 리스트 아래 모든 것 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalList(): List<ListInCards>
+
+    // 서버 리스트 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteList(): List<SbList>
 
     // 리스트 단일 조회
     @Query("""

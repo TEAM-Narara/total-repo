@@ -4,12 +4,35 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
+import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 
 @Dao
 interface BoardMemberDao {
+
+    // 서버 보드 멤버 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM board_member
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteBoardMember(): List<BoardMember>
+
+    // 서버 보드 멤버 알람 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM board_member_alarm
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteBoardMemberAlarm(): List<BoardMemberAlarm>
+
+    // 보드 멤버 조회
     @Query("""
         SELECT *
         FROM board_member 

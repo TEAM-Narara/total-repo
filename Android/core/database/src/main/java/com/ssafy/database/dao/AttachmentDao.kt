@@ -5,12 +5,23 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
+import com.ssafy.database.dto.Reply
 
 @Dao
 interface AttachmentDao {
+
+    // 로컬 첨부파일 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM attachment
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalAttachment(): List<Attachment>
 
     @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
     suspend fun getAttachment(id: Long): Attachment

@@ -8,5 +8,7 @@ data class WorkspaceMember(
     @PrimaryKey val id: Long = 0L,
     val memberId: Long = 0L,
     val workspaceId: Long = 0L,
-    val authority: String = ""
+    val authority: String = "",
+
+    val isStatus: String = "STAY"
 )

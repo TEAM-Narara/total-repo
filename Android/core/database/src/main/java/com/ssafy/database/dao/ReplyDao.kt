@@ -5,11 +5,31 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.Reply
 
 @Dao
 interface ReplyDao {
+
+    // 로컬 댓글 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM reply
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalReply(): List<Reply>
+
+    // 서버 댓글 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM reply
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteReply(): List<Reply>
 
     // 카드에서 볼 댓글
     @Query("""

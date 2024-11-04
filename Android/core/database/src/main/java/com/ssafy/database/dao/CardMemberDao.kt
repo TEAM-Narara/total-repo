@@ -4,11 +4,33 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.CardMember
+import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
 
 @Dao
 interface CardMemberDao {
+
+    // 서버 보드 멤버 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card_member
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteCardMember(): List<CardMember>
+
+    // 서버 보드 멤버 알람 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card_member_alarm
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteCardMemberAlarm(): List<CardMemberAlarm>
     
     // 담당자 조회
     @Query(

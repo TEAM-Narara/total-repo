@@ -8,5 +8,7 @@ data class Label(
     @PrimaryKey val id: Long = 0L,
     val boardId: Long = 0L,
     val name: String = "",
-    val color: Long = 0L
+    val color: Long = 0L,
+
+    val isStatus: String = "STAY"
 )

@@ -4,12 +4,34 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.Label
+import com.ssafy.database.dto.with.CardAllInfo
 
 @Dao
 interface LabelDao {
+
+    // 로컬 라벨 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM label
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalLabel(): List<Label>
+
+    // 서버 라벨 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM label
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteLabel(): List<Label>
+
     // 보드 라벨 모두 조회
     @Query("""
         SELECT * 

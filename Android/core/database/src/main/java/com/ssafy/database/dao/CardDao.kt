@@ -8,10 +8,31 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Card
+import com.ssafy.database.dto.SbList
+import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardDetail
+import com.ssafy.database.dto.with.ListInCards
 
 @Dao
 interface CardDao {
+
+    // 로컬 리스트 아래 모든 것 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE isStatus == 'CREATE'
+    """)
+    suspend fun getAllLocalCard(): List<CardAllInfo>
+
+    // 서버 리스트 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteCard(): List<Card>
 
     // 카드 상세 조회
     @Transaction

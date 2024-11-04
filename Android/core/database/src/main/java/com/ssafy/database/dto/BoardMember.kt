@@ -10,6 +10,8 @@ data class BoardMember(
     val memberId: Long = 0L,
     val boardId: Long = 0L,
     val authority: String = "",
+
+    val isStatus: String = "STAY",
 )
 
 // 내 보드들의 알람
@@ -17,5 +19,7 @@ data class BoardMember(
     primaryKeys = ["boardId"])
 data class BoardMemberAlarm(
     val boardId: Long = 0L,
-    val isAlert: Boolean = false
+    val isAlert: Boolean = false,
+
+    val isStatus: String = "STAY"
 )

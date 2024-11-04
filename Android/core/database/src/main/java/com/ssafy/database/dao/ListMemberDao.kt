@@ -3,10 +3,32 @@ package com.ssafy.database.dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.SbListMember
+import com.ssafy.database.dto.SbListMemberAlarm
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 
 interface ListMemberDao {
+
+    // 서버 리스트 멤버 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list_member
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteListMember(): List<SbListMember>
+
+    // 서버 리스트 멤버 알람 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list_member_alarm
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getAllRemoteListMemberAlarm(): List<SbListMemberAlarm>
 
     // 리스트 멤버들 조회
     @Query("""
