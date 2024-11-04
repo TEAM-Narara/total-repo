@@ -14,7 +14,7 @@ import java.util.List;
 public interface BoardService {
     BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
 
-    Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto);
+    Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto);
 
     Board getBoard(Long boardId);
 

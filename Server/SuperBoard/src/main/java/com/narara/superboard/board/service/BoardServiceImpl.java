@@ -12,15 +12,19 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.exception.MemberNotFoundException;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
@@ -35,6 +39,7 @@ public class BoardServiceImpl implements BoardService {
     private final NameValidator nameValidator;
 
     private final CoverHandler coverHandler;
+    private final MemberRepository memberRepository;
 
     @Override
     public BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId) {
@@ -57,11 +62,14 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto) {
+    public Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto) {
         boardValidator.validateNameIsPresent(boardCreateRequestDto);
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
         // TODO: background가 존재하면 background에 대한 검증 추가하기
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
@@ -69,7 +77,6 @@ public class BoardServiceImpl implements BoardService {
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
 
         Board saveBoard = boardRepository.save(board);
-
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
         boardMemberRepository.save(boardMemberByAdmin);
 
@@ -77,7 +84,7 @@ public class BoardServiceImpl implements BoardService {
         board.getWorkSpace().addOffset(); //workspace offset++
 //        workspaceOffsetService.saveAddBoardDiff(board);
 
-        return saveBoard.getId();
+        return saveBoard;
     }
 
     @Override

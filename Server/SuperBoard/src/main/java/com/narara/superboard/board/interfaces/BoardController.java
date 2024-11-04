@@ -7,13 +7,14 @@ import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
-import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.common.service.IAuthenticationFacade;
+import com.narara.superboard.member.service.MemberService;
+import com.narara.superboard.member.service.MemberServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,9 +25,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/boards")
 public class BoardController implements BoardAPI {
-
+    private final IAuthenticationFacade authenticationFacade;
     private final BoardService boardService;
+    private final MemberService memberService;
     private final CoverHandler coverHandler;
+    private final MemberServiceImpl memberServiceImpl;
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")
@@ -38,11 +41,11 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
-    public ResponseEntity<DefaultResponse<Long>> createBoard(
-            @AuthenticationPrincipal Member member,
-            @RequestBody BoardCreateRequestDto boardCreateRequestDto) {
-        Long boardId = boardService.createBoard(member, boardCreateRequestDto);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardId), HttpStatus.CREATED);
+    public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+        Board board = boardService.createBoard(memberId, boardCreateRequestDto);
+        BoardDetailResponseDto dto  = BoardDetailResponseDto.of(board);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, dto), HttpStatus.CREATED);
     }
 
     @Override

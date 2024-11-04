@@ -19,6 +19,7 @@ import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -72,6 +73,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CoverHandler coverHandler;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     /**
      * 가상의 객체
@@ -143,10 +147,11 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
         // Mocking workspaceRepository to return empty Optional
         when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
-            boardService.createBoard(member, requestDto);
+            boardService.createBoard(member.getId(), requestDto);
         });
 
         assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
@@ -196,12 +201,13 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Mocking: workspaceRepository와 boardRepository의 반환값 설정
         when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.of(workspace));
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
-        Long savedBoardId = boardService.createBoard(member, requestDto);
+        Board board = boardService.createBoard(member.getId(), requestDto);
 
         // then
-        assertEquals(workspaceId, savedBoardId);
+        assertEquals(workspaceId, board.getId());
         verify(workspaceRepository, times(1)).findById(workspaceId);
         verify(boardRepository, times(1)).save(any(Board.class));
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
@@ -239,11 +245,12 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when
         when(boardRepository.save(any(Board.class))).thenReturn(expectedBoard);
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // then
-        Long boardId = boardService.createBoard(member, requestDto);
+        Board board1 = boardService.createBoard(member.getId(), requestDto);
 
-        assertEquals(1L, boardId);
+        assertEquals(1L, board1.getId());
         verify(boardValidator).validateNameIsPresent(requestDto);
         verify(boardValidator).validateVisibilityIsValid(requestDto);
         verify(boardValidator).validateVisibilityIsPresent(requestDto);

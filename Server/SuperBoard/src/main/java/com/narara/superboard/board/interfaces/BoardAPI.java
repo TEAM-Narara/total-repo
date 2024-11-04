@@ -22,9 +22,7 @@ public interface BoardAPI {
     @PostMapping
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
-    ResponseEntity<DefaultResponse<Long>> createBoard(
-            @AuthenticationPrincipal Member member,
-            @RequestBody BoardCreateRequestDto boardCreateRequestDto);
+    ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto);
 
     @GetMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
