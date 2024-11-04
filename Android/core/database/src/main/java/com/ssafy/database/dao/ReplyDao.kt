@@ -14,7 +14,6 @@ import com.ssafy.database.dto.Reply
 interface ReplyDao {
 
     // 로컬에서 생성한 오프라인 댓글 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM reply
@@ -23,7 +22,6 @@ interface ReplyDao {
     suspend fun getAllLocalReply(): List<Reply>
 
     // 서버에 연산할 댓글 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM reply

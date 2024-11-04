@@ -24,7 +24,6 @@ interface LabelDao {
     suspend fun getAllLocalLabels(): List<Label>
 
     // 서버에 연산할 라벨 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM label

@@ -25,7 +25,6 @@ interface WorkspaceDao {
     suspend fun getAllLocalWorkspace(): List<WorkspaceInBoard>
 
     // 서버에 연산할 워크스페이스 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM workspace

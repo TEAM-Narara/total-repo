@@ -1,5 +1,6 @@
 package com.ssafy.database.dao
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -10,10 +11,10 @@ import com.ssafy.database.dto.SbListMember
 import com.ssafy.database.dto.SbListMemberAlarm
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 
+@Dao
 interface ListMemberDao {
 
     // 서버에 연산할 리스트 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM list_member
@@ -22,7 +23,6 @@ interface ListMemberDao {
     suspend fun getAllRemoteListMember(): List<SbListMember>
 
     // 서버에 연산할 리스트 멤버 알람 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM list_member_alarm
@@ -31,6 +31,7 @@ interface ListMemberDao {
     suspend fun getAllRemoteListMemberAlarm(): List<SbListMemberAlarm>
 
     // 리스트 멤버들 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM list_member

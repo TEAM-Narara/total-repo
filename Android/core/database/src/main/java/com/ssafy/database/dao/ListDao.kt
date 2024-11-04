@@ -26,7 +26,6 @@ interface ListDao {
     suspend fun getAllLocalList(): List<ListInCards>
 
     // 서버에 연산할 리스트 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM list
@@ -35,6 +34,7 @@ interface ListDao {
     suspend fun getAllRemoteList(): List<SbList>
 
     // 리스트 단일 조회
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 
@@ -43,6 +43,7 @@ interface ListDao {
     suspend fun getList(listId: Long): List<ListInCardThumbnails>
 
     // 현재 보드에서 볼 것
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 
@@ -51,6 +52,7 @@ interface ListDao {
     suspend fun getAllLists(boardId: Long): List<ListInCardThumbnails>
 
     // 아카이브에서 볼 것
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 

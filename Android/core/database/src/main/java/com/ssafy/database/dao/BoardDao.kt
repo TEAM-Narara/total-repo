@@ -26,7 +26,6 @@ interface BoardDao {
     suspend fun getAllLocalBoards(): List<BoardInList>
 
     // 서버에 연산할 보드 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board

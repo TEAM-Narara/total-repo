@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.MemberBackground
@@ -14,6 +15,7 @@ interface AlertDao {
     @Query("SELECT * FROM alert")
     suspend fun getAllAlerts(): List<Alert>
 
+    @Transaction
     @Query("""
         SELECT *
         FROM alert 

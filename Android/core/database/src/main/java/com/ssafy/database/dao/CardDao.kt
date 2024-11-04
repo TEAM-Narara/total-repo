@@ -26,7 +26,6 @@ interface CardDao {
     suspend fun getAllLocalCard(): List<CardAllInfo>
 
     // 서버에 연산할 카드 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card

@@ -15,7 +15,6 @@ import com.ssafy.database.dto.with.CardMemberWithMemberInfo
 interface CardMemberDao {
 
     // 서버에 연산할 카드 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_member
@@ -24,7 +23,6 @@ interface CardMemberDao {
     suspend fun getAllRemoteCardMember(): List<CardMember>
 
     // 서버에 연산할 카드 멤버 알람 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_member_alarm
@@ -33,6 +31,7 @@ interface CardMemberDao {
     suspend fun getAllRemoteCardMemberAlarm(): List<CardMemberAlarm>
     
     // 담당자 조회
+    @Transaction
     @Query(
         """
         SELECT *
@@ -43,6 +42,7 @@ interface CardMemberDao {
     suspend fun getCardRepresentatives(cardId: Long): List<CardMemberWithMemberInfo>
     
     // 카드 멤버들 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM card_member 

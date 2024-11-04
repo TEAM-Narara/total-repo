@@ -15,7 +15,6 @@ import com.ssafy.database.dto.with.CardLabelWithLabelInfo
 interface CardLabelDao {
 
     // 로컬에서 오프라인으로 생성한 카드라벨 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_label
@@ -24,7 +23,6 @@ interface CardLabelDao {
     suspend fun getAllLocalCardLabels(): List<CardLabel>
 
     // 서버에 연산할 라벨 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_label
@@ -33,6 +31,7 @@ interface CardLabelDao {
     suspend fun getAllRemoteCardLabels(): List<CardLabel>
 
     // 카드 라벨 모두 조회
+    @Transaction
     @Query("""
         SELECT * 
         FROM card_label 

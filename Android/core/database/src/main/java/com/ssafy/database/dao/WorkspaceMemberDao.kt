@@ -14,7 +14,6 @@ import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 interface WorkspaceMemberDao {
 
     // 서버에 연산할 워크스페이스 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM workspace_member
@@ -23,6 +22,7 @@ interface WorkspaceMemberDao {
     suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMember>
 
     // 워크스페이스 멤버 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM workspace_member 

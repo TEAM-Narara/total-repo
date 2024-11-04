@@ -15,7 +15,6 @@ import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 interface BoardMemberDao {
 
     // 서버에 연산할 보드 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board_member
@@ -24,7 +23,6 @@ interface BoardMemberDao {
     suspend fun getAllRemoteBoardMember(): List<BoardMember>
 
     // 서버에 연산할 내 보드별 알람 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board_member_alarm
@@ -33,6 +31,7 @@ interface BoardMemberDao {
     suspend fun getAllRemoteBoardMemberAlarm(): List<BoardMemberAlarm>
 
     // 보드 멤버 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM board_member 
