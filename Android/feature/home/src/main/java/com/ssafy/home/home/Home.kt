@@ -9,6 +9,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -24,6 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.drawer.DrawerSheet
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,17 +49,27 @@ fun HomeScreen(
             it.window.statusBarColor = Color.White.toArgb()
         }
     }
+
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
+
     HomeScreen(
-        workSpace = uiState.workSpace,
+        workSpace = Any(),
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
         moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
-        moveToLoginScreen = moveToLoginScreen,
+        moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
         moveToSettingScreen = moveToSettingScreen,
         moveToMyCardScreen = moveToMyCardScreen,
         moveToUpdateProfile = moveToUpdateProfile,
         moveToSearchScreen = moveToSearchScreen,
     )
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
 }
 
 @Composable

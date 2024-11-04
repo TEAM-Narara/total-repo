@@ -29,4 +29,7 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun register(registerDTO: RegisterDTO): Response<ApiResponse<User>> =
         userAPI.register(registerDTO)
 
+    override suspend fun logout(): Response<ApiResponse<Unit>> =
+        userAPI.logout()
+
 }

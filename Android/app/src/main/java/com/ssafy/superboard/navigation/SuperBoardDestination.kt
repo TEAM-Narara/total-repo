@@ -42,20 +42,25 @@ import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.auth.AuthManager
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.notificationScreen
+import com.ssafy.superboard.MainViewModel
 import com.ssafy.ui.uistate.ErrorScreen
 
 @Composable
-fun SuperBoardNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    val noAuthEvent by AuthManager.noAuthEvent.collectAsStateWithLifecycle(initialValue = false)
+fun SuperBoardNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    viewModel: MainViewModel
+) {
+    val authEvent by viewModel.authEvent.collectAsStateWithLifecycle(false)
 
-    if (noAuthEvent) {
+    if (authEvent) {
         navController.navigate(LogIn) { popUpAll(navController) }
         ErrorScreen(errorMessage = AuthManager.NO_AUTH)
     }
 
     NavHost(
         navController = navController,
-        startDestination = Card(0L),
+        startDestination = LogIn,
         modifier = modifier
     ) {
         loginScreen(

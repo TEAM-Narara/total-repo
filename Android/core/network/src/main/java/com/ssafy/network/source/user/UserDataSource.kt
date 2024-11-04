@@ -19,4 +19,6 @@ interface UserDataSource {
 
     suspend fun register(registerDTO: RegisterDTO): Response<ApiResponse<User>>
 
+    suspend fun logout(): Response<ApiResponse<Unit>>
+
 }
