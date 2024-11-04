@@ -12,6 +12,7 @@ import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.with.BoardDetail
 import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.WorkspaceInBoard
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BoardDao {
@@ -48,7 +49,7 @@ interface BoardDao {
         FROM board 
         WHERE workspaceId == :workspaceId And isStatus != 'DELETE' And isClosed == 0
     """)
-    suspend fun getAllBoards(workspaceId: Long): List<Board>
+    fun getAllBoards(workspaceId: Long): Flow<List<Board>>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -56,7 +57,7 @@ interface BoardDao {
         FROM board 
         WHERE isStatus != 'DELETE' And isClosed == 1
     """)
-    suspend fun getAllBoardsArchived(): List<Board>
+    fun getAllBoardsArchived(): Flow<List<Board>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

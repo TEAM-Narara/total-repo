@@ -10,6 +10,7 @@ import androidx.room.Update
 import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.with.BoardInList
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MemberBackgroundDao {
@@ -44,7 +45,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE isStatus != 'DELETE'
         """)
-    suspend fun getAllMemberBackgrounds(): List<MemberBackground>
+    fun getAllMemberBackgrounds(): Flow<List<MemberBackground>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.ABORT)

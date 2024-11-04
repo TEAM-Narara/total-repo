@@ -9,6 +9,7 @@ import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.with.AlertWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlertDao {
@@ -16,11 +17,8 @@ interface AlertDao {
     suspend fun getAllAlerts(): List<Alert>
 
     @Transaction
-    @Query("""
-        SELECT *
-        FROM alert 
-    """)
-    suspend fun getAllAlertsWithMemberInfo(): List<AlertWithMemberInfo>
+    @Query("SELECT * FROM alert")
+    fun getAllAlertsWithMemberInfo(): Flow<List<AlertWithMemberInfo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlerts(attachments: List<Alert>): List<Long>

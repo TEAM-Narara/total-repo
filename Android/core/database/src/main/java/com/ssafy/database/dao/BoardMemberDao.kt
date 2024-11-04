@@ -10,6 +10,7 @@ import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BoardMemberDao {
@@ -37,7 +38,7 @@ interface BoardMemberDao {
         FROM board_member 
         WHERE boardId == :boardId
     """)
-    suspend fun getBoardMembers(boardId: Long): List<BoardMemberWithMemberInfo>
+    suspend fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
 
     // 보드 알람 조회
     @Query("""

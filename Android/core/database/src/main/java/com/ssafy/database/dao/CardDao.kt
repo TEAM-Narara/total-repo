@@ -12,6 +12,7 @@ import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardDetail
 import com.ssafy.database.dto.with.ListInCards
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CardDao {
@@ -48,7 +49,7 @@ interface CardDao {
         FROM card 
         WHERE listId == :listId And isStatus != 'DELETE' And isArchived == 0
     """)
-    suspend fun getAllCards(listId: Long): List<Card>
+    fun getAllCards(listId: Long): Flow<List<Card>>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -56,7 +57,7 @@ interface CardDao {
         FROM card 
         WHERE isStatus != 'DELETE' And isArchived == 1
     """)
-    suspend fun getAllCardsArchived(): List<Card>
+    fun getAllCardsArchived(): Flow<List<Card>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -11,6 +11,7 @@ import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.with.WorkspaceDetail
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WorkspaceDao {
@@ -42,12 +43,8 @@ interface WorkspaceDao {
     suspend fun getWorkspaceDetail(workspaceId: Long): WorkspaceDetail
 
     // Drawable에서 볼 것
-    @Query("""
-        SELECT * 
-        FROM workspace 
-        WHERE isStatus != 'DELETE'
-    """)
-    suspend fun getAllWorkspaces(): List<Workspace>
+    @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")
+    fun getAllWorkspaces(): Flow<List<Workspace>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

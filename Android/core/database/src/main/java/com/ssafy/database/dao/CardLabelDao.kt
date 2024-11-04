@@ -10,6 +10,7 @@ import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.CardLabelWithLabelInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CardLabelDao {
@@ -37,7 +38,7 @@ interface CardLabelDao {
         FROM card_label 
         WHERE cardId == :cardId And isStatus == 'DELETE'
     """)
-    suspend fun getAllCardLabels(cardId: Long): List<CardLabelWithLabelInfo>
+    fun getAllCardLabels(cardId: Long): Flow<List<CardLabelWithLabelInfo>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

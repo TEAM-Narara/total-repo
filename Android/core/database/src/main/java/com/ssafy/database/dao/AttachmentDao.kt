@@ -10,6 +10,7 @@ import androidx.room.Update
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.Reply
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AttachmentDao {
@@ -36,7 +37,7 @@ interface AttachmentDao {
     suspend fun getAttachment(id: Long): Attachment
 
     @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isStatus != 'DELETE'")
-    suspend fun getAllAttachments(cardId: Long): List<Attachment>
+    fun getAllAttachments(cardId: Long): Flow<List<Attachment>>
     
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

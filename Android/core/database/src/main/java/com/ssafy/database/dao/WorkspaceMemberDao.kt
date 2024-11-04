@@ -9,13 +9,13 @@ import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.WorkspaceMember
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WorkspaceMemberDao {
 
     // 서버에 연산할 워크스페이스 멤버 조회
-    @Query("""
-        SELECT * 
+    @Query("""SELECT * 
         FROM workspace_member
         WHERE isStatus != 'STAY'
     """)
@@ -28,7 +28,7 @@ interface WorkspaceMemberDao {
         FROM workspace_member 
         WHERE workspaceId = :workspaceId
     """)
-    suspend fun getWorkspaceMembers(workspaceId: Long): List<WorkspaceMemberWithMemberInfo>
+    fun getWorkspaceMembers(workspaceId: Long): Flow<List<WorkspaceMemberWithMemberInfo>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

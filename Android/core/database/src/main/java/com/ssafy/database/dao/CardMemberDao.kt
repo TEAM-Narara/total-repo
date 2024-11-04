@@ -10,6 +10,7 @@ import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CardMemberDao {
@@ -39,7 +40,7 @@ interface CardMemberDao {
         WHERE cardId == :cardId AND isRepresentative == 1
     """
     )
-    suspend fun getCardRepresentatives(cardId: Long): List<CardMemberWithMemberInfo>
+    fun getCardRepresentatives(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
     
     // 카드 멤버들 조회
     @Transaction
@@ -48,7 +49,7 @@ interface CardMemberDao {
         FROM card_member 
         WHERE cardId == :cardId
     """)
-    suspend fun getCardMembers(cardId: Long): List<CardMemberWithMemberInfo>
+    fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
