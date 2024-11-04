@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":core:ui"))
 
     implementation(project(":domain:logout"))
+    implementation(project(":domain:workspace"))
 
     // Coil
     implementation(libs.coil.compose)

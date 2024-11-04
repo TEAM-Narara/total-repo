@@ -3,6 +3,7 @@ package com.ssafy.network.module
 import com.ssafy.network.api.AuthAPI
 import com.ssafy.network.api.GitHubAPI
 import com.ssafy.network.api.UserAPI
+import com.ssafy.network.api.WorkspaceAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +27,9 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideUserAPI(@UserRetrofit retrofit: Retrofit): UserAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideWorkspaceAPI(@UserRetrofit retrofit: Retrofit): WorkspaceAPI = retrofit.create()
+
 }

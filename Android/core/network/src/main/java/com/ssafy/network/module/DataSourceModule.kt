@@ -6,6 +6,8 @@ import com.ssafy.network.source.github.GitHubDataSource
 import com.ssafy.network.source.github.GitHubDataSourceImpl
 import com.ssafy.network.source.user.UserDataSource
 import com.ssafy.network.source.user.UserDataSourceImpl
+import com.ssafy.network.source.workspace.WorkspaceDataSource
+import com.ssafy.network.source.workspace.WorkspaceDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,5 +29,9 @@ abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindAuthDataSource(authDataSourceImpl: AuthDataSourceImpl): AuthDataSource
+
+    @Singleton
+    @Binds
+    abstract fun bindWorkspaceDataSource(workspaceDataSourceImpl: WorkspaceDataSourceImpl): WorkspaceDataSource
 
 }
