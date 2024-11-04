@@ -4,6 +4,7 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
+import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -38,6 +39,12 @@ public class CardMemberServiceImpl implements CardMemberService {
                 );
     }
 
+    @Override
+    public void updateCardMembers(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
+        Card card = validateCardExists(updateCardMemberRequestDto.cardId());
+
+    }
+
     // 카드 존재 확인 및 조회
     private Card validateCardExists(Long cardId) {
         return cardRepository.findById(cardId)
@@ -65,4 +72,5 @@ public class CardMemberServiceImpl implements CardMemberService {
                 .build();
         cardMemberRepository.save(newCardMember);
     }
+
 }
