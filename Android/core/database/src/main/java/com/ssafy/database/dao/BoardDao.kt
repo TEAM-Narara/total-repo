@@ -16,23 +16,23 @@ import com.ssafy.database.dto.with.WorkspaceInBoard
 @Dao
 interface BoardDao {
 
-    // 로컬 보드 아래 모든 것 조회
+    // 로컬에서 오프라인으로 생성한 보드 하위 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM board
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalBoard(): List<BoardInList>
+    suspend fun getAllLocalBoards(): List<BoardInList>
 
-    // 서버 보드 조회
+    // 서버에 연산할 보드 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM board
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteBoard(): List<Board>
+    suspend fun getAllRemoteBoards(): List<Board>
 
     // 보드 상세 조회
     @Transaction

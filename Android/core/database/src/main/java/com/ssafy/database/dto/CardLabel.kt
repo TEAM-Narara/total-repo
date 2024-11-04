@@ -8,5 +8,7 @@ data class CardLabel(
     @PrimaryKey val id: Long = 0L,
     val labelId: Long = 0L,
     val cardId: Long = 0L,
-    val isActivated: Boolean = true
+    val isActivated: Boolean = true,
+
+    val isStatus: String = "STAY"
 )

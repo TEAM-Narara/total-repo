@@ -24,17 +24,24 @@ import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.CardMember
+import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.Member
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.SbListMember
+import com.ssafy.database.dto.SbListMemberAlarm
 import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.WorkspaceMember
 
-@Database(entities = [Alert::class, Attachment::class, Board::class, BoardMember::class, BoardMemberAlarm::class,
-    Card::class, CardLabel::class, CardMember::class, Label::class, SbList::class, Member::class,
-    MemberBackground::class, Reply::class, Workspace::class, WorkspaceMember::class], version = 1)
+@Database(entities = [
+    Workspace::class, WorkspaceMember::class,
+    Member::class, MemberBackground::class,
+    SbList::class, SbListMember::class, SbListMemberAlarm::class,
+    Board::class, BoardMember::class, BoardMemberAlarm::class, Label::class,
+    Card::class, CardLabel::class, CardMember::class, CardMemberAlarm::class, Attachment::class,
+    Reply::class, Alert::class], version = 1)
 abstract class SBDatabase : RoomDatabase() {
     abstract fun AlertDao(): AlertDao
     abstract fun AttachmentDao(): AttachmentDao

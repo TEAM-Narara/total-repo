@@ -15,7 +15,7 @@ import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 @Dao
 interface WorkspaceDao {
 
-    // 로컬 워크스페이스 아래 모든 것 조회
+    // 로컬에서 오프라인으로 생성한 워크스페이스 하위 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -24,12 +24,12 @@ interface WorkspaceDao {
     """)
     suspend fun getAllLocalWorkspace(): List<WorkspaceInBoard>
 
-    // 서버 워크스페이스 조회
+    // 서버에 연산할 워크스페이스 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM workspace
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteWorkspace(): List<Workspace>
 

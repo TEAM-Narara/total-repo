@@ -12,7 +12,7 @@ import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 
 interface ListMemberDao {
 
-    // 서버 리스트 멤버 조회
+    // 서버에 연산할 리스트 멤버 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -21,7 +21,7 @@ interface ListMemberDao {
     """)
     suspend fun getAllRemoteListMember(): List<SbListMember>
 
-    // 서버 리스트 멤버 알람 조회
+    // 서버에 연산할 리스트 멤버 알람 조회
     @Transaction
     @Query("""
         SELECT * 

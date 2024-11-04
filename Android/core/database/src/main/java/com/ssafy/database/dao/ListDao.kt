@@ -16,7 +16,7 @@ import com.ssafy.database.dto.with.ListInCards
 @Dao
 interface ListDao {
 
-    // 로컬 리스트 아래 모든 것 조회
+    // 로컬에서 오프라인으로 생성한 리스트 하위 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -25,12 +25,12 @@ interface ListDao {
     """)
     suspend fun getAllLocalList(): List<ListInCards>
 
-    // 서버 리스트 조회
+    // 서버에 연산할 리스트 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM list
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteList(): List<SbList>
 

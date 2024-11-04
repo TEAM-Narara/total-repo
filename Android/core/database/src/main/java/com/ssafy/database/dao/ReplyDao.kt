@@ -13,7 +13,7 @@ import com.ssafy.database.dto.Reply
 @Dao
 interface ReplyDao {
 
-    // 로컬 댓글 조회
+    // 로컬에서 생성한 오프라인 댓글 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -22,12 +22,12 @@ interface ReplyDao {
     """)
     suspend fun getAllLocalReply(): List<Reply>
 
-    // 서버 댓글 조회
+    // 서버에 연산할 댓글 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM reply
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteReply(): List<Reply>
 

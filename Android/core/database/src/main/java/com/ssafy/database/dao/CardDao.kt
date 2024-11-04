@@ -16,7 +16,7 @@ import com.ssafy.database.dto.with.ListInCards
 @Dao
 interface CardDao {
 
-    // 로컬 리스트 아래 모든 것 조회
+    // 로컬에서 오프라인으로 생성한 카드 하위 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -25,12 +25,12 @@ interface CardDao {
     """)
     suspend fun getAllLocalCard(): List<CardAllInfo>
 
-    // 서버 리스트 조회
+    // 서버에 연산할 카드 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM card
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteCard(): List<Card>
 

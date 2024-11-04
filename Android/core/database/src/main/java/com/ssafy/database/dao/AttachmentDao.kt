@@ -14,21 +14,31 @@ import com.ssafy.database.dto.Reply
 @Dao
 interface AttachmentDao {
 
-    // 로컬 첨부파일 조회
+    // 로컬에서 오프라인으로 생성한 첨부파일 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM attachment
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalAttachment(): List<Attachment>
+    suspend fun getAllLocalAttachments(): List<Attachment>
+
+    // 서버에 연산할 첨부파일 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM attachment
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+    """)
+    suspend fun getAllRemoteAttachments(): List<Attachment>
 
     @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
     suspend fun getAttachment(id: Long): Attachment
 
-    @Query("SELECT * FROM attachment WHERE isStatus != 'DELETE'")
-    suspend fun getAllAttachments(): List<Attachment>
-
+    @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isStatus != 'DELETE'")
+    suspend fun getAllAttachments(cardId: Long): List<Attachment>
+    
+    // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttachment(attachment: Attachment): Long
 

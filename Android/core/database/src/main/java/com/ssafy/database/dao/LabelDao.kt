@@ -14,23 +14,23 @@ import com.ssafy.database.dto.with.CardAllInfo
 @Dao
 interface LabelDao {
 
-    // 로컬 라벨 조회
+    // 로컬에서 오프라인으로 생성한 라벨 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM label
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalLabel(): List<Label>
+    suspend fun getAllLocalLabels(): List<Label>
 
-    // 서버 라벨 조회
+    // 서버에 연산할 라벨 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM label
-        WHERE isStatus != 'CREATE' AND isStatus != 'STAY'
+        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteLabel(): List<Label>
+    suspend fun getAllRemoteLabels(): List<Label>
 
     // 보드 라벨 모두 조회
     @Query("""
