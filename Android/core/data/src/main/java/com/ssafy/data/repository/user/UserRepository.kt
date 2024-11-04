@@ -18,4 +18,6 @@ interface UserRepository {
 
     suspend fun register(registerDTO: RegisterDTO): Flow<User>
 
+    suspend fun logout(): Flow<Unit>
+
 }

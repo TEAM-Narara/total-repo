@@ -18,11 +18,6 @@ class AuthInterceptor @Inject constructor(
             apiResponse.saveToken()
         }
 
-        // TODO 리프레시 토큰도 만료 된 경우에 대한 로직 처리 필요
-        if(false){
-            AuthManager.sendNoAuthEvent()
-        }
-
         if (response.code == UNAUTHORIZED) {
             getNewToken()
             return chain.addToken()
@@ -52,7 +47,10 @@ class AuthInterceptor @Inject constructor(
 
     private fun getNewToken() = runBlocking {
         val refreshToken = dataStoreRepository.getRefreshToken()
-        authDataSource.reissue(refreshToken).raw().saveToken()
+        val response = authDataSource.reissue(refreshToken)
+
+        if (response.code() == UNAUTHORIZED) return@runBlocking AuthManager.sendNoAuthEvent()
+        else response.raw().saveToken()
     }
 
     companion object {

@@ -53,7 +53,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:ui"))
 
     // 기능
     implementation(project(":feature:login"))
@@ -61,13 +60,16 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:card"))
     implementation(project(":feature:notification"))
+    implementation(project(":domain:logout"))
 
     // DTO
     implementation(project(":core:model"))
+    implementation(project(":core:ui"))
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Navigator
     implementation(libs.androidx.navigation.compose)
