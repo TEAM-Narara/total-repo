@@ -8,6 +8,8 @@ import com.ssafy.data.repository.comment.CommentRepository
 import com.ssafy.data.repository.comment.CommentRepositoryImpl
 import com.ssafy.data.repository.github.GitHubRepository
 import com.ssafy.data.repository.github.GitHubRepositoryImpl
+import com.ssafy.data.repository.list.ListRepository
+import com.ssafy.data.repository.list.ListRepositoryImpl
 import com.ssafy.data.repository.member.MemberRepository
 import com.ssafy.data.repository.member.MemberRepositoryImpl
 import com.ssafy.data.repository.user.UserRepository
@@ -51,5 +53,9 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindCardRepository(cardRepositoryImpl: CardRepositoryImpl): CardRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindListRepository(listRepositoryImpl: ListRepositoryImpl): ListRepository
 
 }
