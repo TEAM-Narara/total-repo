@@ -2,7 +2,6 @@ package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
