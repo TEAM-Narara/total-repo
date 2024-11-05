@@ -11,6 +11,7 @@ import com.narara.superboard.member.interfaces.dto.MemberProfile;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,18 +20,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuth2UserServiceImpl implements OAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate(); // @Bean으로 주입받도록 수정
 
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String naverUserInfoUri;
@@ -44,7 +49,6 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     @Override
     public MemberLoginResponseDto getUserInfo(String accessToken, String provider) {
         Map<String, Object> attributes = fetchUserInfo(accessToken, provider);
-
         MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
         Member member = saveOrUpdateMember(memberProfile, provider);
 
@@ -55,12 +59,16 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     }
 
     private Map<String, Object> fetchUserInfo(String accessToken, String provider) {
+
         String userInfoUri = getUserInfoUri(provider);
         HttpEntity<String> entity = new HttpEntity<>(createHeaders(accessToken));
 
-        // Make request to provider's user info endpoint
-        ResponseEntity<Map> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
-        return response.getBody();
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Failed to fetch user info from provider");
+        }
     }
 
     private String getUserInfoUri(String provider) {
@@ -80,27 +88,32 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     }
 
     private Member validateExistingMember(Member existingMember, String provider, MemberProfile memberProfile) {
+
         if (!existingMember.getLoginType().name().equalsIgnoreCase(provider)) {
+
             throw new AlreadyRegisteredLoginException(memberProfile.email(), existingMember.getLoginType().name());
         }
         return existingMember;
     }
 
     private Member createNewMember(MemberProfile memberProfile, String provider) {
+
         Member newMember = Member.builder()
                 .nickname(memberProfile.nickname())
                 .email(memberProfile.email())
                 .loginType(LoginType.valueOf(provider.toUpperCase()))
                 .build();
+
         return memberRepository.save(newMember);
     }
 
     private TokenDto generateTokenDto(Member member) {
+
         Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId().toString(), null, new ArrayList<>());
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(authentication);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+
         return new TokenDto(jwtAccessToken, jwtRefreshToken);
     }
-
 
 }

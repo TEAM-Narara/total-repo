@@ -1,13 +1,16 @@
 package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
-import com.narara.superboard.card.CardAction;
+import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.list.entity.List;
+import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
@@ -16,7 +19,6 @@ import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,6 +51,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private CardService cardService;
 
+    @Mock
+    private CardHistoryRepository cardHistoryRepository;
+
     @Test
     @DisplayName("댓글 생성시, 카드가 존재하지 않을 때 NotFoundEntityException 발생")
     void shouldThrowExceptionWhenCardDoesNotExist() {
@@ -68,8 +73,31 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     void shouldCreateReplySuccessfullyWhenValidDataIsGiven() {
         // given
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(1L, "Valid content");
-        Card card = Card.builder().id(requestDto.cardId()).name("Test Card").build();
-        Reply expectedReply = Reply.builder().id(1L).content(requestDto.content()).card(card).build();
+
+        // Board 객체 생성
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .lastListOrder(0L) // 초기값 설정
+                .build();
+
+        // List 객체 생성 (createList 메서드 활용)
+        ListCreateRequestDto listRequestDto = new ListCreateRequestDto(board.getId(), "Test List");
+        List list = List.createList(listRequestDto, board);
+
+        // Card 객체 생성 (List 설정 포함)
+        Card card = Card.builder()
+                .id(requestDto.cardId())
+                .name("Test Card")
+                .list(list) // List 설정
+                .build();
+
+        Reply expectedReply = Reply.builder()
+                .id(1L)
+                .content(requestDto.content())
+                .card(card)
+                .build();
+
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 검증 로직을 모킹
@@ -229,7 +257,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         when(replyRepository.findAllByCard(card)).thenReturn(Collections.emptyList());
 
         // when
-        List<Reply> replies = replyService.getRepliesByCardId(cardId);
+        java.util.List<Reply> replies = replyService.getRepliesByCardId(cardId);
 
         // then
         assertTrue(replies.isEmpty(), "댓글 리스트가 비어 있어야 합니다.");
@@ -246,14 +274,14 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
         Reply reply1 = Reply.builder().id(1L).content("First reply").card(card).build();
         Reply reply2 = Reply.builder().id(2L).content("Second reply").card(card).build();
-        List<Reply> replyList = Arrays.asList(reply1, reply2);
+        java.util.List<Reply> replyList = Arrays.asList(reply1, reply2);
 
         // Mocking
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         when(replyRepository.findAllByCard(card)).thenReturn(replyList);
 
         // when
-        List<Reply> replies = replyService.getRepliesByCardId(cardId);
+        java.util.List<Reply> replies = replyService.getRepliesByCardId(cardId);
 
         // then
         assertEquals(2, replies.size(), "댓글 리스트 크기는 2여야 합니다.");

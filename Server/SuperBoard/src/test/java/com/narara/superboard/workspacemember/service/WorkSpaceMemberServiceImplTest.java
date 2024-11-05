@@ -5,6 +5,7 @@ import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -37,7 +38,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("멤버의 워크스페이스 리스트 조회 성공 테스트")
     void testGetMemberWorkspaceListSuccess() {
         // given
-        Long memberId = 1L;
+        Member member = new Member(1L , "시현", "sisi@naver.com");
 
         // Mock된 WorkSpace 데이터 생성
         WorkSpace mockWorkSpace1 = new WorkSpace(1L, "워크스페이스 1", 1L);
@@ -51,10 +52,10 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         List<WorkSpaceMember> mockWorkSpaceMemberList = List.of(mockWorkSpaceMember1, mockWorkSpaceMember2);
 
         // workSpaceMemberRepository의 동작 설정
-        when(workSpaceMemberRepository.findAllByMemberId(memberId)).thenReturn(mockWorkSpaceMemberList);
+        when(workSpaceMemberRepository.findAllByMember(member)).thenReturn(mockWorkSpaceMemberList);
 
         // when
-        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(memberId);
+        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(member);
 
         // then
         assertEquals(2, result.workSpaceResponseDtoList().size());
@@ -62,10 +63,10 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("워크스페이스 2", result.workSpaceResponseDtoList().get(1).name());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceResponseDto.class));
+        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceNameHolder.class));
 
         // workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
-        verify(workSpaceMemberRepository, times(1)).findAllByMemberId(memberId);
+        verify(workSpaceMemberRepository, times(1)).findAllByMember(member);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.narara.superboard.attachment;
+package com.narara.superboard.attachment.entity;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.entity.BaseTimeEntity;
@@ -27,9 +27,11 @@ public class Attachment extends BaseTimeEntity {
 
     // 현재는 IMAGE만 받아오지만 추후 확장성을 위해 설계
     @Column(name = "type", nullable = false)
-    private String type; // 파일 타입 (IMAGE, DOCS 등)
+    @Builder.Default
+    private String type = "IMAGE"; // 파일 타입 (IMAGE, DOCS 등)
 
     // 이 부분은 중복 체크인것 같음. 그치만 인덱싱에 사용할 수도 있을 것 같다.
     @Column(name = "is_cover", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isCover; // 커버 이미지 여부
+    @Builder.Default
+    private Boolean isCover = false; // 커버 이미지 여부
 }

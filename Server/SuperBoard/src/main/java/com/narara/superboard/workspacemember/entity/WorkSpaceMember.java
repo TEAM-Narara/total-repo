@@ -1,7 +1,5 @@
 package com.narara.superboard.workspacemember.entity;
 
-import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
@@ -11,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -36,6 +35,15 @@ public class WorkSpaceMember extends BaseTimeEntity {
     @Column(name = "authority", nullable = false, length = 50)
     private Authority authority;  // 권한 (ADMIN, MEMBER)
 
+    @Builder.Default
+    @Column(name = "\"offset\"")
+    private Long offset = 0L;
+
+    @Setter
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isDeleted = false;
+
     public WorkSpaceMember(WorkSpace workSpace) {
         this.workSpace = workSpace;
     }
@@ -45,11 +53,20 @@ public class WorkSpaceMember extends BaseTimeEntity {
                 .member(member)
                 .workSpace(workSpace)
                 .authority(Authority.ADMIN)
+                .offset(1L)
                 .build();
     }
 
     public WorkSpaceMember(Member member, Authority authority) {
         this.member = member;
         this.authority = authority;
+    }
+
+    public void editAuthority(Authority authority) {
+        this.authority = authority;
+    }
+
+    public void deleted() {
+        this.isDeleted = true;
     }
 }

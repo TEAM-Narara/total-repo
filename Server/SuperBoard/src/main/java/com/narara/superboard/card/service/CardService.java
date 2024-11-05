@@ -1,6 +1,5 @@
 package com.narara.superboard.card.service;
 
-import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
