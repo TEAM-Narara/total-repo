@@ -11,6 +11,7 @@ import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.ListDao
+import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dao.ReplyDao
@@ -52,6 +53,7 @@ abstract class SBDatabase : RoomDatabase() {
     abstract fun CardMemberDao(): CardMemberDao
     abstract fun LabelDao(): LabelDao
     abstract fun ListDao(): ListDao
+    abstract fun ListMemberDao(): ListMemberDao
     abstract fun MemberBackgroundDao(): MemberBackgroundDao
     abstract fun MemberDao(): MemberDao
     abstract fun ReplyDao(): ReplyDao

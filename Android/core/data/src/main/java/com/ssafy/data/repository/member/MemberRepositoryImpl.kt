@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.user.User
 import com.ssafy.network.source.member.MemberDataSource
@@ -32,11 +31,9 @@ class MemberRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            memberDataSource.updateMember(memberUpdateRequestDto)
-                .toFlow()
-                .map {
-                    TODO("Room DB에 User 정보를 업데이트합니다.")
-                }
+            memberDataSource.updateMember(memberUpdateRequestDto).map {
+                TODO("Room DB에 User 정보를 업데이트합니다.")
+            }
         } else {
             TODO("Room DB에 User 정보를 업데이트합니다.")
         }

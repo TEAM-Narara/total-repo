@@ -10,12 +10,12 @@ import androidx.room.Update
 import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.with.BoardInList
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MemberBackgroundDao {
 
     // 로컬에서 오프라인으로 생성한 멤버 배경 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM member_background
@@ -24,7 +24,6 @@ interface MemberBackgroundDao {
     suspend fun getAllLocalMemberBackgrounds(): List<MemberBackground>
 
     // 서버에 연산할 멤버 배경 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM member_background
@@ -46,7 +45,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE isStatus != 'DELETE'
         """)
-    suspend fun getAllMemberBackgrounds(): List<MemberBackground>
+    fun getAllMemberBackgrounds(): Flow<List<MemberBackground>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.ABORT)

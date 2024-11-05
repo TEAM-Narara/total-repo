@@ -10,11 +10,12 @@ import androidx.room.Update
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.Reply
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AttachmentDao {
 
-    // 로컬에서 오프라인으로 생성한 첨부파일 조회
+    // 로컬에서 생성한 오프라인 첨부파일 조회
     @Transaction
     @Query("""
         SELECT * 
@@ -32,13 +33,18 @@ interface AttachmentDao {
     """)
     suspend fun getAllRemoteAttachments(): List<Attachment>
 
+    // 첨부파일 단일 조회
     @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
-    suspend fun getAttachment(id: Long): Attachment
+    fun getAttachment(id: Long): Flow<Attachment>
 
+    // 카드의 커버이미지 조회
+    @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isCover == 1 AND isStatus != 'DELETE'")
+    fun getCoverAttachment(cardId: Long): Flow<Attachment>
+
+    // 카드의 첨부파일 조회
     @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isStatus != 'DELETE'")
-    suspend fun getAllAttachments(cardId: Long): List<Attachment>
-    
-    // 로컬에서 생성
+    fun getAllAttachments(cardId: Long): Flow<List<Attachment>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttachment(attachment: Attachment): Long
 

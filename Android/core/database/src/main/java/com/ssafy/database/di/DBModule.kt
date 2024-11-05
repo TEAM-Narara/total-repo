@@ -11,6 +11,7 @@ import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.ListDao
+import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dao.ReplyDao
@@ -71,6 +72,10 @@ object DBModule {
     @Singleton
     @Provides
     fun provideListDao(appDatabase: SBDatabase): ListDao = appDatabase.ListDao()
+
+    @Singleton
+    @Provides
+    fun provideListMemberDao(appDatabase: SBDatabase): ListMemberDao = appDatabase.ListMemberDao()
 
     @Singleton
     @Provides

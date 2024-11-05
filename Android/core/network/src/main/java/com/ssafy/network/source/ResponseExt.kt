@@ -1,6 +1,5 @@
-package com.ssafy.data.response
+package com.ssafy.network.source
 
-import com.ssafy.network.source.ApiResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject

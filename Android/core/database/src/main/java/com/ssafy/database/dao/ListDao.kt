@@ -12,6 +12,7 @@ import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.ListInCardThumbnails
 import com.ssafy.database.dto.with.ListInCards
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListDao {
@@ -26,7 +27,6 @@ interface ListDao {
     suspend fun getAllLocalList(): List<ListInCards>
 
     // 서버에 연산할 리스트 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM list
@@ -35,28 +35,31 @@ interface ListDao {
     suspend fun getAllRemoteList(): List<SbList>
 
     // 리스트 단일 조회
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 
         WHERE id == :listId And isStatus != 'DELETE' And isArchived == 0
     """)
-    suspend fun getList(listId: Long): List<ListInCardThumbnails>
+    fun getList(listId: Long): Flow<List<ListInCardThumbnails>>
 
     // 현재 보드에서 볼 것
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 
         WHERE boardId == :boardId And isStatus != 'DELETE' And isArchived == 0
     """)
-    suspend fun getAllLists(boardId: Long): List<ListInCardThumbnails>
+    fun getAllLists(boardId: Long): Flow<List<ListInCardThumbnails>>
 
     // 아카이브에서 볼 것
+    @Transaction
     @Query("""
         SELECT * 
         FROM list 
         WHERE isStatus != 'DELETE' And isArchived == 1
     """)
-    suspend fun getAllListsArchived(): List<ListInCardThumbnails>
+    fun getAllListsArchived(): Flow<List<ListInCardThumbnails>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

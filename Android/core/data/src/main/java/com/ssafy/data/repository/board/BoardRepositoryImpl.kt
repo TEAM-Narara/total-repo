@@ -1,7 +1,6 @@
 package com.ssafy.data.repository.board
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.network.source.board.BoardDataSource
@@ -20,7 +19,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun createBoard(isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.createBoard().toFlow()
+                boardDataSource.createBoard()
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
             }
@@ -34,7 +33,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.deleteBoard(id).toFlow()
+                boardDataSource.deleteBoard(id)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
             }
@@ -43,7 +42,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.updateBoard(boardDTO.id, boardDTO).toFlow()
+                boardDataSource.updateBoard(boardDTO.id, boardDTO)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
             }
@@ -52,7 +51,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.setBoardArchive(id).toFlow()
+                boardDataSource.setBoardArchive(id)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
             }
@@ -76,7 +75,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.toggleWatchBoard(id).toFlow()
+                boardDataSource.toggleWatchBoard(id)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
             }

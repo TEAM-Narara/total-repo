@@ -1,7 +1,7 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
+
 import com.ssafy.model.list.ListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.network.source.list.ListDataSource
@@ -22,7 +22,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(listRequestDto).toFlow()
+            listDataSource.createList(listRequestDto)
         } else {
             TODO("Room DB가 연동되면 생성 로직을 구현해주세요")
         }
@@ -34,7 +34,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.updateList(listId, listRequestDto).toFlow()
+            listDataSource.updateList(listId, listRequestDto)
         } else {
             TODO("Room DB가 연동되면 수정 로직을 구현해주세요")
         }
@@ -43,7 +43,7 @@ class ListRepositoryImpl @Inject constructor(
     override suspend fun setListArchive(listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                listDataSource.setListArchive(listId).toFlow()
+                listDataSource.setListArchive(listId)
             } else {
                 TODO("Room DB가 연동되면 아카이브 로직을 구현해주세요")
             }

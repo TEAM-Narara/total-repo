@@ -1,14 +1,12 @@
 package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,7 +22,7 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.createCard(cardRequestDto).toFlow()
+            cardDataSource.createCard(cardRequestDto)
         } else {
             TODO("Room DB가 연결되면 생성로직을 구현해주세요.")
         }
@@ -33,7 +31,7 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                cardDataSource.deleteCard(cardId).toFlow()
+                cardDataSource.deleteCard(cardId)
             } else {
                 TODO("Room DB가 연결되면 삭제로직을 구현해주세요.")
             }
@@ -45,7 +43,7 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.updateCard(cardId, cardUpdateRequestDto).toFlow()
+            cardDataSource.updateCard(cardId, cardUpdateRequestDto)
         } else {
             TODO("Room DB가 연결되면 수정로직을 구현해주세요.")
         }
@@ -54,7 +52,7 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun setCardArchive(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                cardDataSource.setCardArchive(cardId).toFlow()
+                cardDataSource.setCardArchive(cardId)
             } else {
                 TODO("Room DB가 연결되면 아카이브로직을 구현해주세요.")
             }

@@ -1,30 +1,30 @@
 package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import com.ssafy.model.board.BoardDetailResponseDtoList
+import com.ssafy.model.board.MemberListResponseDTO
+import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
 
-    suspend fun createBoard(): Response<ApiResponse<Unit>>
+    suspend fun createBoard(): Flow<Unit>
 
-    suspend fun getBoard(id: Long): Response<ApiResponse<BoardDTO>>
+    suspend fun getBoard(id: Long): Flow<BoardDTO>
 
-    suspend fun deleteBoard(id: Long): Response<ApiResponse<Unit>>
+    suspend fun deleteBoard(id: Long): Flow<Unit>
 
-    suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Response<ApiResponse<Unit>>
+    suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Flow<Unit>
 
-    suspend fun setBoardArchive(boardId: Long): Response<ApiResponse<Unit>>
+    suspend fun setBoardArchive(boardId: Long): Flow<Unit>
 
-    suspend fun getBoardsByWorkspace(workspaceId: Long): Response<ApiResponse<List<BoardDTO>>>
+    suspend fun getBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList>
 
-    suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Response<ApiResponse<List<BoardDTO>>>
+    suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList>
 
-    suspend fun getWatchStatus(boardId: Long): Response<ApiResponse<Boolean>>
+    suspend fun getWatchStatus(boardId: Long): Flow<Boolean>
 
-    suspend fun toggleWatchBoard(boardId: Long): Response<ApiResponse<Unit>>
+    suspend fun toggleWatchBoard(boardId: Long): Flow<Unit>
 
-    suspend fun getBoardMembers(boardId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
+    suspend fun getBoardMembers(boardId: Long): Flow<MemberListResponseDTO>
 
 }

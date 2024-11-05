@@ -1,6 +1,9 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
+
+import com.ssafy.model.board.MemberListResponseDTO
+import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.data.response.toFlow
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -18,10 +21,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WorkspaceRepository {
 
-    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
+    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<WorkSpaceListResponseDTO> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.getWorkspaceList().toFlow()
+                workspaceDataSource.getWorkspaceList()
+                TODO("이렇게 서버로부터 받아온 내 워크스페이스 목록 DB에 저장하기")
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 가져오는 로직을 추가해주세요.")
             }
@@ -32,7 +36,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.createWorkspace(workspaceRequestDTO).toFlow()
+            workspaceDataSource.createWorkspace(workspaceRequestDTO)
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
         }
@@ -41,7 +45,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.deleteWorkspace(workspaceId).toFlow()
+                workspaceDataSource.deleteWorkspace(workspaceId)
 
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
@@ -54,7 +58,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.updateWorkspace(workspaceId, workspaceRequestDTO).toFlow()
+            workspaceDataSource.updateWorkspace(workspaceId, workspaceRequestDTO)
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 수정하는 로직을 추가해주세요.")
         }

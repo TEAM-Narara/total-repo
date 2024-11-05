@@ -3,22 +3,21 @@ package com.ssafy.network.source.card
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 
 interface CardDataSource {
 
-    suspend fun createCard(cardRequestDto: CardRequestDto): Response<ApiResponse<Unit>>
+    suspend fun createCard(cardRequestDto: CardRequestDto): Flow<Unit>
 
-    suspend fun deleteCard(cardId: Long): Response<ApiResponse<Unit>>
+    suspend fun deleteCard(cardId: Long): Flow<Unit>
 
     suspend fun updateCard(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
-    ): Response<ApiResponse<Unit>>
+    ): Flow<Unit>
 
-    suspend fun setCardArchive(cardId: Long): Response<ApiResponse<Unit>>
+    suspend fun setCardArchive(cardId: Long): Flow<Unit>
 
-    suspend fun getArchivedCards(boardId: Long): Response<ApiResponse<List<CardResponseDto>>>
+    suspend fun getArchivedCards(boardId: Long): Flow<List<CardResponseDto>>
 
 }
