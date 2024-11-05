@@ -3,7 +3,7 @@ package com.narara.superboard.common.application.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
+import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -198,7 +198,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
@@ -224,7 +224,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
@@ -252,7 +252,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
@@ -278,7 +278,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
