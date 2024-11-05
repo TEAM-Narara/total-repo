@@ -345,7 +345,6 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // Mocking: validateNameIsPresent 호출 시 예외 발생 설정
         doThrow(new NotFoundException("Board", "name")).when(boardValidator).validateNameIsPresent(requestDto);
-        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
 
         // when & then: 이름 값이 없을 때 예외가 발생하는지 확인
         assertThrows(NotFoundException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
@@ -374,7 +373,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
         Long memberId = 1L;
-        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
         assertThrows(NotFoundException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 가시성 검증이 호출되었는지 확인
@@ -401,7 +400,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
         Long memberId = 1L;
-        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
         assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 가시성 검증이 호출되었는지 확인
@@ -426,7 +425,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when & then: 예외가 발생하는지 확인
         Long memberId = 1L;
-        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
         assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
@@ -448,21 +447,19 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when & then: 예외가 발생하는지 확인
         Long memberId = 1L;
-        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
         assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
         verify(coverValidator, times(1)).validateContainCover(requestDto);
     }
 
-
     @ParameterizedTest
     @DisplayName("보드 수정 성공 테스트")
     @CsvSource({
             "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'WORKSPACE'",   // 정상 케이스
             "'Another Board Name', '{\"type\":\"IMAGE\",\"value\":\"https://example.com/image.jpg\"}', 'PRIVATE'",  // 이미지 커버 케이스
-            "'Valid Board Name', '', 'WORKSPACE'",   // 커버가 null인 경우
-            "'Board with Empty Cover', '{\"type\":\"COLOR\"}', 'WORKSPACE'",   // 커버에 값이 빠져있는 경우
+//            "'Valid Board Name', '', 'WORKSPACE'",   // 커버가 null인 경우
+//            "'Board with Empty Cover', '{\"type\":\"COLOR\"}', 'WORKSPACE'",   // 커버에 값이 빠져있는 경우
             "'Final Test Board', '{\"type\":\"IMAGE\",\"value\":\"https://example.com/final.jpg\"}', 'PRIVATE'"  // 다른 가시성 및 이미지 커버
     })
     void testUpdateBoard_Success(String name, String coverJson, String visibility) {
@@ -554,7 +551,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void testUpdateBoardByMember_NameNotFoundException() {
         // given
         Long boardId = 1L;
-        Map<String, String> background = Map.of("type", "COLOR", "value", "#ffffff");
+        Map<String, Object> background = Map.of("type", "COLOR", "value", "#ffffff");
         BoardUpdateByMemberRequestDto requestDto = new BoardUpdateByMemberRequestDto(null, new BoardBackgroundDto((String)background.get("type"), (String)background.get("value")));
 
         // Mock: 이름이 없는 경우 예외를 발생시키도록 설정

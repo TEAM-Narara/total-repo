@@ -191,8 +191,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     private static Stream<Arguments> provideValidUpdateCardCases() {
-        Map<String, String> background = Map.of("type", "COLOR", "value", "#FFFFFF");
-        Map<String, String> background2 = Map.of("type", "IMAGE", "value", "https://example.com/image.png");
+        Map<String, Object> background = Map.of("type", "COLOR", "value", "#FFFFFF");
+        Map<String, Object> background2 = Map.of("type", "IMAGE", "value", "https://example.com/image.png");
         return Stream.of(
                 // 모든 필드가 업데이트된 경우
                 Arguments.of(

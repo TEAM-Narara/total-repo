@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.narara.superboard.common.interfaces.dto.CoverHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class CoverValidator {
 
@@ -27,20 +29,20 @@ public class CoverValidator {
             put("type", cardUpdateRequestDto.cover().type());
             put("value", cardUpdateRequestDto.cover().value());
         }};
-        if (cover != null) {
-            validateCoverTypeIsEmpty(cover);
-            validateCoverValueIsEmpty(cover);
-            validateCoverTypeIsValid(cover.get("type").toString());
-        }
+
+        validateCoverTypeIsEmpty(cover);
+        validateCoverValueIsEmpty(cover);
+        validateCoverTypeIsValid(cover);
     }
 
 
     // CoverHandler.getType()
-    public void validateCoverTypeIsValid(String coverTypeValue) {
+    public void validateCoverTypeIsValid(Map<String, Object> cover) {
         // 1. coverTypeValue가 null인 경우 예외 발생
-        if (coverTypeValue == null || coverTypeValue.isEmpty()) {
+        if (cover == null || cover.isEmpty()) {
             throw new NotFoundCoverTypeException();
         }
+        String coverTypeValue = (String)cover.get("type");
 
         // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
         boolean isValid = false;
@@ -70,11 +72,10 @@ public class CoverValidator {
     }
 
     public void validateCoverValueIsEmpty(Map<String, Object> cover) {
-        if (!cover.containsKey("value")) {
+        if (!cover.containsKey("value") || cover.get("value") == null) {
             throw new NotFoundCoverValueException();
         }
     }
-
 
     // TODO: color는 #FFF 이렇게오고 image는 https로 시작하는지 확인하는 로직 추가
 

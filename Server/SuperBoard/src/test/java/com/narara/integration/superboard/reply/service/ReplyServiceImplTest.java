@@ -70,7 +70,7 @@ class ReplyServiceImplTest extends IntegrationTest {
         WorkSpace savedWorkSpace = workSpaceRepository.save(workSpace);
 
         // Board 생성 및 저장
-        Map<String, String> background = Map.of("type", "IMAGE", "value", "https://...");
+        Map<String, Object> background = Map.of("type", "IMAGE", "value", "https://...");
         BoardCreateRequestDto boardRequest = new BoardCreateRequestDto(
                 savedWorkSpace.getId(),
                 "보드 이름",
