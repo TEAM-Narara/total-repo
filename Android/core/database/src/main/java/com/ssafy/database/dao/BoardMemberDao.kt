@@ -5,10 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.BoardMemberAlarm
-import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 

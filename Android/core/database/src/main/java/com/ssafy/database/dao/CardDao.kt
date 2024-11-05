@@ -31,15 +31,6 @@ interface CardDao {
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteCard(): List<Card>
-
-    // 카드 상세 조회
-//    @Transaction
-//    @Query("""
-//        SELECT * 
-//        FROM card 
-//        WHERE id == :cardId
-//    """)
-//    suspend fun getCardDetail(cardId: Long): CardDetail
     
     // 카드 단일 조회
     @Transaction

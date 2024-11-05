@@ -35,15 +35,6 @@ interface WorkspaceDao {
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
     fun getWorkspace(workspaceId: Long): Flow<Workspace>
 
-    // 워크스페이스 상세 조회
-//    @Transaction
-//    @Query("""
-//        SELECT *
-//        FROM workspace
-//        WHERE id == :workspaceId
-//    """)
-//    suspend fun getWorkspaceDetail(workspaceId: Long): WorkspaceDetail
-
     // Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")
     fun getAllWorkspaces(): Flow<List<Workspace>>

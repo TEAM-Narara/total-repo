@@ -7,9 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
-import com.ssafy.database.dto.Reply
 import kotlinx.coroutines.flow.Flow
 
 @Dao

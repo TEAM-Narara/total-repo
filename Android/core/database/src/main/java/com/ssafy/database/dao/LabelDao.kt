@@ -6,10 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Card
-import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.Label
-import com.ssafy.database.dto.with.CardAllInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
