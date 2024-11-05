@@ -1,8 +1,7 @@
 package com.ssafy.data.repository.board
 
 import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.MemberListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
@@ -17,14 +16,14 @@ interface BoardRepository {
 
     suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getBoardsByWorkspace(id: Long): Flow<BoardDetailResponseDtoList>
+    suspend fun getBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
-    suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<BoardDetailResponseDtoList>
+    suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
     suspend fun getWatchStatus(id: Long): Flow<Boolean>
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getBoardMembers(id: Long): Flow<MemberListResponseDTO>
+    suspend fun getBoardMembers(id: Long): Flow<List<MemberResponseDTO>>
 
 }

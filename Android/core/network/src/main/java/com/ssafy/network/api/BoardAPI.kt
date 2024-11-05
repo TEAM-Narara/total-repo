@@ -1,8 +1,7 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.MemberListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -34,10 +33,10 @@ interface BoardAPI {
     suspend fun setBoardArchive(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>
 
     @GET("api/v1/boards/workspace/{workspaceId}")
-    suspend fun getBoardsByWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<BoardDetailResponseDtoList>>
+    suspend fun getBoardsByWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<List<BoardDTO>>>
 
     @GET("api/v1/boards/workspace/{workspaceId}/archive")
-    suspend fun getArchivedBoardsByWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<BoardDetailResponseDtoList>>
+    suspend fun getArchivedBoardsByWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<List<BoardDTO>>>
 
     @GET("api/v1/boards/{boardId}/member/watch-status")
     suspend fun getWatchStatus(@Path("boardId") boardId: Long): Response<ApiResponse<Boolean>>
@@ -46,6 +45,6 @@ interface BoardAPI {
     suspend fun toggleWatchBoard(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>
 
     @GET("api/v1/boards/{boardId}/members")
-    suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<MemberListResponseDTO>>
+    suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
 
 }
