@@ -1,19 +1,14 @@
 package com.narara.superboard.reply.service;
 
-import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
-import com.narara.superboard.card.service.CardHistoryService;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
 import com.narara.superboard.common.document.Target;
-import com.narara.superboard.common.document.Who;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
