@@ -41,6 +41,9 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
 
+    implementation(project(":domain:logout"))
+    implementation(project(":domain:workspace"))
+
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

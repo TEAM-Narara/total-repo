@@ -44,16 +44,19 @@ import com.ssafy.designsystem.values.backgroundColorList
 fun CreateLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<LabelData>,
+    onConfirm: (Long, String) -> Unit,
 ) {
+    var color by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
+    var description by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.description ?: "") }
+
     BaseDialog(
         modifier = modifier,
         dialogState = dialogState,
         title = "라벨 생성",
-        confirmText = "생성"
+        confirmText = "생성",
+        onConfirm = { onConfirm(color!!, description) },
+        validation = { color != null },
     ) {
-        var color by remember { mutableStateOf(dialogState.property?.color) }
-        var description by remember { mutableStateOf(dialogState.property?.description) }
-
         Column {
             Text(
                 text = "색상",
@@ -92,7 +95,7 @@ fun CreateLabelDialog(
             Spacer(modifier = Modifier.height(PaddingDefault))
             EditText(
                 title = "설명",
-                text = description ?: "",
+                text = description,
                 onTextChange = { description = it },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -104,5 +107,8 @@ fun CreateLabelDialog(
 @Composable
 private fun CreateLabelDialogPreview() {
     val dialogState = rememberDialogState<LabelData>()
-    CreateLabelDialog(dialogState = dialogState.apply { show() })
+    CreateLabelDialog(
+        dialogState = dialogState.apply { show() },
+        onConfirm = { _, _ -> },
+    )
 }

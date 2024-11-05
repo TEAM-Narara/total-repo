@@ -46,6 +46,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+    implementation(project(":core:datastore"))
 
     //Hilt
     implementation(libs.hilt.android)
@@ -58,10 +59,16 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.squareup.logging.interceptor)
 
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.krossbow.stomp.core)
+    implementation(libs.krossbow.websocket.okhttp)
 }

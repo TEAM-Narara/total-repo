@@ -41,9 +41,9 @@ fun LabelScreen(
 ) {
     val labelList by viewModel.labelList.collectAsStateWithLifecycle()
 
-    val createDialogState = rememberDialogState(viewModel::createLabel)
-    val modifyDialogState = rememberDialogState<LabelData> { viewModel.updateLabel(it.id, it) }
-    val deleteDialogState = rememberDialogState(viewModel::deleteLabel)
+    val createDialogState = rememberDialogState<LabelData>()
+    val modifyDialogState = rememberDialogState<LabelData>()
+    val deleteDialogState = rememberDialogState<Long>()
 
     Scaffold(
         modifier = modifier,
@@ -61,9 +61,9 @@ fun LabelScreen(
         }
     }
 
-    CreateLabelDialog(dialogState = createDialogState)
-    ModifyLabelDialog(dialogState = modifyDialogState)
-    DeleteLabelDialog(dialogState = deleteDialogState)
+    CreateLabelDialog(dialogState = createDialogState, onConfirm = viewModel::createLabel)
+    ModifyLabelDialog(dialogState = modifyDialogState, onConfirm = viewModel::updateLabel)
+    DeleteLabelDialog(dialogState = deleteDialogState, onConfirm = viewModel::deleteLabel)
 }
 
 @Composable

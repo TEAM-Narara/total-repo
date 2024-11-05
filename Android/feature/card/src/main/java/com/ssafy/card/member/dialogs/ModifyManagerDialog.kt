@@ -44,7 +44,7 @@ fun ModifyManagerDialog(
 @Composable
 private fun ModifyManagerDialogPrev() {
     ModifyManagerDialog(
-        dialogState = rememberDialogState().apply { show() },
+        dialogState = rememberDialogState<Unit>().apply { show() },
         memberList = (0..10L).map {
             ManagerData(
                 id = it,

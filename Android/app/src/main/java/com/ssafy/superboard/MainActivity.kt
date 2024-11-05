@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.superboard.navigation.SuperBoardNavHost
@@ -66,7 +67,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SuperBoardApp(navController: NavHostController = rememberNavController()) {
-        SuperBoardNavHost(navController = navController)
+    fun SuperBoardApp(
+        navController: NavHostController = rememberNavController(),
+        viewModel: MainViewModel = hiltViewModel()
+    ) {
+        SuperBoardNavHost(navController = navController, viewModel = viewModel)
     }
 }

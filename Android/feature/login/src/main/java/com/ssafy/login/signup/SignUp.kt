@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import com.ssafy.designsystem.component.EditText
 import com.ssafy.designsystem.component.FilledButton
 import com.ssafy.designsystem.values.BorderDefault
 import com.ssafy.designsystem.values.CornerSmall
+import com.ssafy.designsystem.values.LightDarkGray
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingXLarge
@@ -38,6 +40,8 @@ import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.model.user.signup.RegisterDTO
+import com.ssafy.model.user.signup.SignState
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -45,7 +49,7 @@ import com.ssafy.ui.uistate.UiState
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
-    moveToLogInScreen: () -> Unit
+    moveToHomeScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.resetUiState() }
@@ -54,10 +58,11 @@ fun SignUpScreen(
     val signState by viewModel.signState.collectAsStateWithLifecycle()
 
     SignUpScreen(
-        moveToLogInScreen = moveToLogInScreen,
         time = time,
         signState = signState,
-        changeState = viewModel::changeState
+        checkEmail = viewModel::checkEmail,
+        verifyEmail = viewModel::verifyEmail,
+        register = { registerDTO -> viewModel.register(registerDTO, moveToHomeScreen) }
     )
 
     when (uiState) {
@@ -70,10 +75,11 @@ fun SignUpScreen(
 
 @Composable
 private fun SignUpScreen(
-    moveToLogInScreen: () -> Unit,
     time: String,
     signState: SignState,
-    changeState: (SignInfo) -> Unit
+    checkEmail: (String) -> Unit,
+    verifyEmail: (String, String) -> Unit,
+    register: (RegisterDTO) -> Unit,
 ) {
     val (email, setEmail) = remember { mutableStateOf("") }
     val (password, setPassword) = remember { mutableStateOf("") }
@@ -129,20 +135,25 @@ private fun SignUpScreen(
                 onTextChange = setAuthNumber
             )
 
-            if (signState == SignState.AUTH) {
+            if (signState == SignState.VERIFY) {
                 Text(text = time)
             }
 
-            val text = if (signState == SignState.CHECK) "확인" else "인증"
+            val text = if (signState == SignState.VERIFY) "인증" else "확인"
 
             OutlinedButton(
                 modifier = Modifier.width(80.dp),
                 onClick = {
-                    val signInfo = SignInfo(email, password, nickname, authNumber)
-                    changeState(signInfo)
+                    when (signState) {
+                        SignState.CHECK -> checkEmail(email)
+                        SignState.VERIFY -> verifyEmail(email, authNumber)
+                        else -> {}
+                    }
                 },
                 shape = RoundedCornerShape(CornerSmall),
-                border = BorderStroke(width = BorderDefault, color = Primary)
+                border = BorderStroke(width = BorderDefault, color = Primary),
+                colors = ButtonDefaults.outlinedButtonColors(disabledContainerColor = LightDarkGray),
+                enabled = signState != SignState.REGISTER
             ) {
                 Text(
                     text = text,
@@ -151,7 +162,15 @@ private fun SignUpScreen(
                 )
             }
         }
-        FilledButton(onClick = { moveToLogInScreen() }, text = "로그인")
+
+        FilledButton(
+            onClick = {
+                val registerDTO = RegisterDTO(email, password, nickname)
+                register(registerDTO)
+            },
+            text = "회원가입",
+            enabled = signState == SignState.REGISTER
+        )
     }
 }
 
@@ -159,5 +178,7 @@ private fun SignUpScreen(
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
-    SignUpScreen {}
+    SignUpScreen(
+        moveToHomeScreen = {}
+    )
 }
