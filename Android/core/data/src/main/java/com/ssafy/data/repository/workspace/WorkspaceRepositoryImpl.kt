@@ -5,11 +5,9 @@ import com.ssafy.data.response.toFlow
 import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
-import com.ssafy.model.workspace.WorkspaceResponseDto
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,11 +32,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.createWorkspace(workspaceRequestDTO)
-                .toFlow()
-                .map { workspaceResponseDto: WorkspaceResponseDto ->
-                    TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
-                }
+            workspaceDataSource.createWorkspace(workspaceRequestDTO).toFlow()
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
         }
@@ -47,11 +41,8 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.deleteWorkspace(workspaceId)
-                    .toFlow()
-                    .map {
-                        TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
-                    }
+                workspaceDataSource.deleteWorkspace(workspaceId).toFlow()
+
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
             }
@@ -63,11 +54,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.updateWorkspace(workspaceId, workspaceRequestDTO)
-                .toFlow()
-                .map { response: WorkspaceResponseDto ->
-                    TODO("Room DB 연동이 되면 로컬 데이터를 수정하는 로직을 추가해주세요.")
-                }
+            workspaceDataSource.updateWorkspace(workspaceId, workspaceRequestDTO).toFlow()
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 수정하는 로직을 추가해주세요.")
         }
