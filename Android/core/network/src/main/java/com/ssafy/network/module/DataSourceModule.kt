@@ -4,6 +4,8 @@ import com.ssafy.network.source.auth.AuthDataSource
 import com.ssafy.network.source.auth.AuthDataSourceImpl
 import com.ssafy.network.source.board.BoardDataSource
 import com.ssafy.network.source.board.BoardDataSourceImpl
+import com.ssafy.network.source.comment.CommentDataSource
+import com.ssafy.network.source.comment.CommentDataSourceImpl
 import com.ssafy.network.source.github.GitHubDataSource
 import com.ssafy.network.source.github.GitHubDataSourceImpl
 import com.ssafy.network.source.member.MemberDataSource
@@ -45,5 +47,9 @@ abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindMemberDataSource(memberDataSourceImpl: MemberDataSourceImpl): MemberDataSource
+
+    @Singleton
+    @Binds
+    abstract fun bindCommentDataSource(commentDataSourceImpl: CommentDataSourceImpl): CommentDataSource
 
 }
