@@ -4,10 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "list",
-    indices = [Index(value = ["boardId"])]
-)
+@Entity(tableName = "list")
 data class SbList(
     @PrimaryKey(autoGenerate = true)  val id: Long = 0L,
     val boardId: Long = 0L,
