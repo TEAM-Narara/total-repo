@@ -37,7 +37,7 @@ public interface BoardAPI {
     ResponseEntity<DefaultResponse<Void>> deleteBoard(@PathVariable Long boardId);
 
     @PatchMapping("/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 수정")
     ResponseEntity<DefaultResponse<BoardDetailResponseDto>> updateBoard(
             @PathVariable Long boardId,
