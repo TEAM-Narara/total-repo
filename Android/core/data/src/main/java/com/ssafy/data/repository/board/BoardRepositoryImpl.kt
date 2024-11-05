@@ -19,12 +19,12 @@ class BoardRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
-    override suspend fun createBoard(isConnected: Boolean): Flow<BoardDTO> =
+    override suspend fun createBoard(isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 boardDataSource.createBoard()
                     .toFlow()
-                    .map { boardDTO: BoardDTO ->
+                    .map {
                         TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
                     }
             } else {
@@ -50,12 +50,12 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<BoardDTO> =
+    override suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 boardDataSource.updateBoard(boardDTO.id, boardDTO)
                     .toFlow()
-                    .map { boardDTO: BoardDTO ->
+                    .map {
                         TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
                     }
             } else {

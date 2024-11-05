@@ -9,7 +9,7 @@ class CreateBoardUseCase @Inject constructor(
     private val boardRepository: BoardRepository
 ) {
 
-    suspend operator fun invoke(isConnected: Boolean): Flow<BoardDTO> {
+    suspend operator fun invoke(isConnected: Boolean): Flow<Unit> {
         return boardRepository.createBoard(isConnected)
     }
 

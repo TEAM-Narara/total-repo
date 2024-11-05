@@ -9,7 +9,7 @@ class UpdateBoardUseCase @Inject constructor(
     private val boardRepository: BoardRepository
 ) {
 
-    suspend operator fun invoke(boardDTO: BoardDTO, isConnected: Boolean): Flow<BoardDTO> {
+    suspend operator fun invoke(boardDTO: BoardDTO, isConnected: Boolean): Flow<Unit> {
         return boardRepository.updateBoard(boardDTO, isConnected)
     }
 

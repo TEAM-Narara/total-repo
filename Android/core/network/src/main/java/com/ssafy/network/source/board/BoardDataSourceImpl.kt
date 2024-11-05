@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : BoardDataSource {
 
-    override suspend fun createBoard(): Response<ApiResponse<BoardDTO>> =
+    override suspend fun createBoard(): Response<ApiResponse<Unit>> =
         boardAPI.createBoard()
 
     override suspend fun getBoard(id: Long): Response<ApiResponse<BoardDTO>> =
@@ -22,7 +22,7 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
     override suspend fun updateBoard(
         id: Long,
         boardDTO: BoardDTO
-    ): Response<ApiResponse<BoardDTO>> = boardAPI.updateBoard(id, boardDTO)
+    ): Response<ApiResponse<Unit>> = boardAPI.updateBoard(id, boardDTO)
 
     override suspend fun setBoardArchive(boardId: Long): Response<ApiResponse<Unit>> =
         boardAPI.setBoardArchive(boardId)
@@ -32,7 +32,6 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
 
     override suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Response<ApiResponse<BoardDetailResponseDtoList>> =
         boardAPI.getArchivedBoardsByWorkspace(workspaceId)
-
 
     override suspend fun getWatchStatus(boardId: Long): Response<ApiResponse<Boolean>> =
         boardAPI.getWatchStatus(boardId)

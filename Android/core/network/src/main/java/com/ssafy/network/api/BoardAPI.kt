@@ -16,7 +16,7 @@ import retrofit2.http.Path
 interface BoardAPI {
 
     @POST("api/v1/boards")
-    suspend fun createBoard(): Response<ApiResponse<BoardDTO>>
+    suspend fun createBoard(): Response<ApiResponse<Unit>>
 
     @GET("api/v1/boards/{boardId}")
     suspend fun getBoard(@Path("boardId") id: Long): Response<ApiResponse<BoardDTO>>
@@ -28,7 +28,7 @@ interface BoardAPI {
     suspend fun updateBoard(
         @Path("boardId") id: Long,
         @Body boardDTO: BoardDTO
-    ): Response<ApiResponse<BoardDTO>>
+    ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/boards/{boardId}/archive")
     suspend fun setBoardArchive(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>

@@ -8,13 +8,13 @@ import retrofit2.Response
 
 interface BoardDataSource {
 
-    suspend fun createBoard(): Response<ApiResponse<BoardDTO>>
+    suspend fun createBoard(): Response<ApiResponse<Unit>>
 
     suspend fun getBoard(id: Long): Response<ApiResponse<BoardDTO>>
 
     suspend fun deleteBoard(id: Long): Response<ApiResponse<Unit>>
 
-    suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Response<ApiResponse<BoardDTO>>
+    suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Response<ApiResponse<Unit>>
 
     suspend fun setBoardArchive(boardId: Long): Response<ApiResponse<Unit>>
 

@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
 
-    suspend fun createBoard(isConnected: Boolean): Flow<BoardDTO>
+    suspend fun createBoard(isConnected: Boolean): Flow<Unit>
 
     suspend fun getBoard(id: Long): Flow<BoardDTO>
 
     suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<BoardDTO>
+    suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Unit>
 
     suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit>
 
