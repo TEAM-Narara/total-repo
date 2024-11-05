@@ -133,6 +133,11 @@ public class BoardServiceImpl implements BoardService {
 
         Board board = getBoard(boardId);
 
+        // 권한 검사를 할 때 Authority가 null인 경우 AccessDeniedException을 던지도록 추가
+        if (boardMember.getAuthority() == null) {
+            throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
+        }
+
         if (boardMember.getAuthority().equals(Authority.MEMBER)) {
             return board.updateBoardByMember(boardUpdateRequestDto);
         } else if (boardMember.getAuthority().equals(Authority.ADMIN)) {
