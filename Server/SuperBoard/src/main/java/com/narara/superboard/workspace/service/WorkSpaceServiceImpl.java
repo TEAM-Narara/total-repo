@@ -2,6 +2,7 @@ package com.narara.superboard.workspace.service;
 
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -14,7 +15,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         BoardCollectionResponseDto boardCollectionResponseDto =
                 boardService.getBoardCollectionResponseDto(workSpaceId);
-        WorkspaceMemberCollectionResponseDto workspaceMemberCollectionResponseDto =
+        MemberCollectionResponseDto workspaceMemberCollectionResponseDto =
                 workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
 
         WorkSpaceDetailResponseDto workspaceDetailResponseDto = WorkSpaceDetailResponseDto.builder()

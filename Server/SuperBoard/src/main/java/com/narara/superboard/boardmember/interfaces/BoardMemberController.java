@@ -1,6 +1,6 @@
 package com.narara.superboard.boardmember.interfaces;
 
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.service.BoardMemberService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
@@ -18,11 +18,11 @@ public class BoardMemberController implements BoardMemberAPI{
     private final BoardMemberService boardMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<BoardMemberCollectionResponseDto>> getBoardMembers(Long boardId) {
-        BoardMemberCollectionResponseDto boardMemberCollectionResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
+    public ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getBoardMembers(Long boardId) {
+        MemberCollectionResponseDto memberCollectionResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
                 boardId);
         return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, boardMemberCollectionResponseDto)
+                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, memberCollectionResponseDto)
                 , HttpStatus.OK);
     }
 

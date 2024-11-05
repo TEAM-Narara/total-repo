@@ -1,9 +1,9 @@
 package com.narara.superboard.workspacemember.interfaces;
 
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ public interface WorkSpaceMemberAPI {
 
     @Operation(summary = "워크스페이스 멤버 조회", description = "워크스페이스 ID를 통해 멤버 리스트를 조회합니다.")
     @GetMapping("/workspaces/{workspaceId}/members")
-    ResponseEntity<DefaultResponse<WorkspaceMemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
+    ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
             @Parameter(description = "조회할 워크스페이스의 ID", required = true) @PathVariable Long workspaceId
     );
 

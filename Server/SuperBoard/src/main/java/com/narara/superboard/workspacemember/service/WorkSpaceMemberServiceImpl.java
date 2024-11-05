@@ -1,5 +1,7 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -11,8 +13,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,25 +34,24 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 //    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
-    public WorkspaceMemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
+    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
         List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId);
 
-        List<WorkSpaceMemberDetailResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
+        List<MemberResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
 
         for (WorkSpaceMember workSpaceMember : WorkSpaceMemberList) {
-            WorkSpaceMemberDetailResponseDto workspaceMemberDetailResponseDto =
-                    WorkSpaceMemberDetailResponseDto.builder()
-                            .memberId(workSpaceMember.getMember().getId())
-                            .memberEmail(workSpaceMember.getMember().getEmail())
-                            .memberNickname(workSpaceMember.getMember().getNickname())
-                            .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
-                            .authority(workSpaceMember.getAuthority().toString())
-                            .build();
+            MemberResponseDto dto = MemberResponseDto.builder()
+                    .memberId(workSpaceMember.getMember().getId())
+                    .memberEmail(workSpaceMember.getMember().getEmail())
+                    .memberNickname(workSpaceMember.getMember().getNickname())
+                    .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
+                    .authority(workSpaceMember.getAuthority().toString())
+                    .build();
 
-            workspaceDetailResponseDtoList.add(workspaceMemberDetailResponseDto);
+            workspaceDetailResponseDtoList.add(dto);
         }
 
-        return new WorkspaceMemberCollectionResponseDto(workspaceDetailResponseDtoList);
+        return new MemberCollectionResponseDto(workspaceDetailResponseDtoList);
     }
 
     @Override
