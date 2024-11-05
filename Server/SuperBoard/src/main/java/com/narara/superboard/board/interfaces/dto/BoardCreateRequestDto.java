@@ -6,5 +6,5 @@ public record BoardCreateRequestDto(
         Long workSpaceId,
         String name,
         String visibility,
-        BoardBackgroundDto background) implements BoardCoreHolder {
+        CoverDto background) implements BoardCoreHolder {
 }
