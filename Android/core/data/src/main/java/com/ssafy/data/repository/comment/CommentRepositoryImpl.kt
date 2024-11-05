@@ -1,7 +1,7 @@
 package com.ssafy.data.repository.comment
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
+
 import com.ssafy.model.comment.CommentRequestDto
 import com.ssafy.model.comment.UpdateCommentDto
 import com.ssafy.network.source.comment.CommentDataSource
@@ -23,7 +23,7 @@ class CommentRepositoryImpl @Inject constructor(
     ): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                commentDataSource.createComment(commentRequestDto).toFlow()
+                commentDataSource.createComment(commentRequestDto)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
             }
@@ -32,7 +32,7 @@ class CommentRepositoryImpl @Inject constructor(
     override suspend fun deleteComment(commentId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                commentDataSource.deleteComment(commentId).toFlow()
+                commentDataSource.deleteComment(commentId)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
             }
@@ -44,7 +44,7 @@ class CommentRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            commentDataSource.updateComment(commentId, UpdateCommentDto(content)).toFlow()
+            commentDataSource.updateComment(commentId, UpdateCommentDto(content))
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
         }

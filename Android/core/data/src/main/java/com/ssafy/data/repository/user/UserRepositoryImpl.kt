@@ -1,7 +1,7 @@
 package com.ssafy.data.repository.user
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.response.toFlow
+
 import com.ssafy.model.user.User
 import com.ssafy.model.user.signup.RegisterDTO
 import com.ssafy.network.source.user.UserDataSource
@@ -19,43 +19,43 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun loginWithGitHub(token: String): Flow<User> {
         val response = withContext(ioDispatcher) { userDataSource.loginWithGitHub(token) }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun loginWithNaver(token: String): Flow<User> {
         val response = withContext(ioDispatcher) { userDataSource.loginWithNaver(token) }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun login(email: String, password: String): Flow<User> {
         val response = withContext(ioDispatcher) { userDataSource.login(email, password) }
-        return response.toFlow()
+        return response
     }
 
 
     override suspend fun sendEmailCode(email: String): Flow<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.sendEmailCode(email) }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun verifyEmailCode(email: String, code: String): Flow<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.verifyEmailCode(email, code) }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun register(registerDTO: RegisterDTO): Flow<User> {
         val response = withContext(ioDispatcher) { userDataSource.register(registerDTO) }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun logout(): Flow<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.logout() }
-        return response.toFlow()
+        return response
     }
 
     override suspend fun withdrawal(): Flow<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.withdrawal() }
-        return response.toFlow()
+        return response
     }
 
 }
