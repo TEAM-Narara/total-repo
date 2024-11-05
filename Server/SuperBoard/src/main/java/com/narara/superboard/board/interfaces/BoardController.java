@@ -45,11 +45,7 @@ public class BoardController implements BoardAPI {
             @AuthenticationPrincipal Member member,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody BoardCreateRequestDto boardCreateRequestDto) {
-        System.out.println(userDetails);
-        System.out.println(userDetails.getMember());
-        System.out.println("MEMBER : +" + member);
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
-        System.out.println(memberId);
         Long boardId = boardService.createBoard(member, boardCreateRequestDto);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardId), HttpStatus.CREATED);
     }

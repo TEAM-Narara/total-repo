@@ -40,15 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // @AuthenticationPrincipal annotation 을 사용한 인증 객체 생성
 
             Long userId = jwtTokenProvider.getMemberIdFromToken(accessToken);
-            System.out.println("setAuthenticationContext userid : " + userId);
+
             // 사용자 ID로 UserDetails 객체 생성
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(String.valueOf(userId));
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            System.out.println(authentication);
             CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-            System.out.println(principal);
             // SecurityContext에 인증 객체 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
