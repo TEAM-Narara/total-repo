@@ -142,6 +142,7 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
     }
 
+    @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 
         // 보드가 존재하는지 검증
