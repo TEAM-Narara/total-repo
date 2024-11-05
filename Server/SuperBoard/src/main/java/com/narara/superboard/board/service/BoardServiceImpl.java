@@ -1,14 +1,11 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
-import com.narara.superboard.card.CardAction;
-import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -31,6 +28,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
+//    private final WorkspaceOffsetService workspaceOffsetService;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -75,10 +73,12 @@ public class BoardServiceImpl implements BoardService {
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
         boardMemberRepository.save(boardMemberByAdmin);
 
+        //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
+        board.getWorkSpace().addOffset(); //workspace offset++
+//        workspaceOffsetService.saveAddBoardDiff(board);
+
         return saveBoard.getId();
     }
-
-
 
     @Override
     public Board getBoard(Long boardId) {
@@ -90,6 +90,10 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Long boardId) {
         Board board = getBoard(boardId);
         board.deleted();
+
+        //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
+        board.getWorkSpace().addOffset();
+//        workspaceOffsetService.saveDeleteBoardDiff(board);
     }
 
     @Override

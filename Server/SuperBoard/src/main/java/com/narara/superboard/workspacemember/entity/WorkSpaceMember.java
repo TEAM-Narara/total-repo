@@ -35,6 +35,10 @@ public class WorkSpaceMember extends BaseTimeEntity {
     @Column(name = "authority", nullable = false, length = 50)
     private Authority authority;  // 권한 (ADMIN, MEMBER)
 
+    @Builder.Default
+    @Column(name = "\"offset\"")
+    private Long offset = 0L;
+
     @Setter
     @Builder.Default
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
@@ -49,6 +53,7 @@ public class WorkSpaceMember extends BaseTimeEntity {
                 .member(member)
                 .workSpace(workSpace)
                 .authority(Authority.ADMIN)
+                .offset(1L)
                 .build();
     }
 
