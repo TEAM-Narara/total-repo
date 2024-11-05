@@ -37,7 +37,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE id == :id And isStatus != 'DELETE'
         """)
-    suspend fun getMemberBackground(id: Long): MemberBackground
+    fun getMemberBackground(id: Long): Flow<MemberBackground>
     
     // 멤버 배경 모두 조회
     @Query("""

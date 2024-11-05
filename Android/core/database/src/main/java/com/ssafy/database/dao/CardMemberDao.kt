@@ -5,8 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
@@ -35,19 +33,38 @@ interface CardMemberDao {
     @Transaction
     @Query(
         """
-        SELECT *
+        SELECT 
+            card_member.id AS card_member_id,
+            card_member.memberId AS card_member_memberId,
+            card_member.cardId AS card_member_cardId,
+            card_member.isRepresentative AS card_member_isRepresentative,
+            card_member.isStatus AS card_member_isStatus,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
         FROM card_member 
-        WHERE cardId == :cardId AND isRepresentative == 1
-    """
-    )
+        INNER JOIN member ON member.id = card_member.memberId
+        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE' AND isRepresentative == 1
+    """)
     fun getCardRepresentatives(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
     
     // 카드 멤버들 조회
     @Transaction
     @Query("""
-        SELECT *
+        SELECT 
+            card_member.id AS card_member_id,
+            card_member.memberId AS card_member_memberId,
+            card_member.cardId AS card_member_cardId,
+            card_member.isRepresentative AS card_member_isRepresentative,
+            card_member.isStatus AS card_member_isStatus,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
         FROM card_member 
-        WHERE cardId == :cardId
+        INNER JOIN member ON member.id = card_member.memberId
+        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE'
     """)
     fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
 

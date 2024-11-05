@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.MemberBackground
@@ -14,8 +15,18 @@ import kotlinx.coroutines.flow.Flow
 interface AlertDao {
 
     // 알람 멤버 조회
+    @Transaction
     @Query("""
-        SELECT alert.*, member.*
+        SELECT 
+            alert.id AS alert_id,
+            alert.memberId AS alert_memberId,
+            alert.title AS alert_title,
+            alert.body AS alert_body,
+            alert.createAt AS alert_createAt,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
         FROM alert
         INNER JOIN member ON member.id = alert.memberId
     """)

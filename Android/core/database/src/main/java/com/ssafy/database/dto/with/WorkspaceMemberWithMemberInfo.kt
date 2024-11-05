@@ -6,11 +6,9 @@ import com.ssafy.database.dto.Member
 import com.ssafy.database.dto.WorkspaceMember
 
 data class WorkspaceMemberWithMemberInfo(
-    @Embedded val workspaceMember: WorkspaceMember,
+    @Embedded(prefix = "workspace_member_")
+    val workspaceMember: WorkspaceMember,
 
-    @Relation(
-        parentColumn = "memberId",
-        entityColumn = "id"
-    )
+    @Embedded(prefix = "member_")
     val member: Member
 )

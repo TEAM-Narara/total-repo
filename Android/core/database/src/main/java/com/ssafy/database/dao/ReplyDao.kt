@@ -20,7 +20,7 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalReply(): List<Reply>
+    suspend fun getAllLocalReplies(): List<Reply>
 
     // 서버에 연산할 댓글 조회
     @Query("""
@@ -28,14 +28,14 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteReply(): List<Reply>
+    suspend fun getAllRemoteReplies(): List<Reply>
 
     // 카드에서 볼 댓글
     @Query("""
         SELECT * 
         FROM reply 
         WHERE cardId == :cardId And isStatus != 'DELETE'
-        ORDER BY id DESC
+        ORDER BY createAt DESC
     """)
     fun getAllReplies(cardId: Long): Flow<List<Reply>>
 

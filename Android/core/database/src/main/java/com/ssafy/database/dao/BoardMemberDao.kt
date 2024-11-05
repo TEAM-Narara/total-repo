@@ -34,9 +34,19 @@ interface BoardMemberDao {
     // 보드 멤버 조회
     @Transaction
     @Query("""
-        SELECT *
+        SELECT 
+            board_member.id AS board_member_id,
+            board_member.memberId AS board_member_memberId,
+            board_member.boardId AS board_member_boardId,
+            board_member.authority AS board_member_authority,
+            board_member.isStatus AS board_member_isStatus,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
         FROM board_member 
-        WHERE boardId == :boardId AND isStatus != 'DELETE'
+        INNER JOIN member ON member.id = board_member.memberId
+        WHERE board_member.boardId = :boardId AND board_member.isStatus != 'DELETE'
     """)
     fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
 

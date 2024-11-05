@@ -6,11 +6,7 @@ import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Member
 
 data class AlertWithMemberInfo(
-    @Embedded val alert: Alert,
+    @Embedded(prefix = "alert_") val alert: Alert,
 
-    @Relation(
-        parentColumn = "memberId",
-        entityColumn = "id"
-    )
-    val member: Member
+    @Embedded(prefix = "member_") val member: Member
 )

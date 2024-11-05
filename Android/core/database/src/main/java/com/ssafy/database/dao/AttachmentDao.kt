@@ -22,7 +22,7 @@ interface AttachmentDao {
         FROM attachment
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalAttachments(): List<Attachment>
+    suspend fun getAllLocalAttachments(): List<Attachment>?
 
     // 서버에 연산할 첨부파일 조회
     @Transaction
@@ -31,11 +31,11 @@ interface AttachmentDao {
         FROM attachment
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteAttachments(): List<Attachment>
+    suspend fun getAllRemoteAttachments(): List<Attachment>?
 
     // 첨부파일 단일 조회
     @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
-    fun getAttachment(id: Long): Flow<Attachment>
+    fun getAttachment(id: Long): Flow<Attachment>?
 
     // 카드의 커버이미지 조회
     @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isCover == 1 AND isStatus != 'DELETE'")

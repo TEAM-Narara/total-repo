@@ -6,9 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.CardLabel
-import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.CardLabelWithLabelInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -34,9 +32,20 @@ interface CardLabelDao {
     // 카드 라벨 모두 조회
     @Transaction
     @Query("""
-        SELECT * 
-        FROM card_label 
-        WHERE cardId == :cardId And isStatus == 'DELETE'
+        SELECT 
+            card_label.id AS card_label_id,
+            card_label.labelId AS card_label_labelId,
+            card_label.cardId AS card_label_cardId,
+            card_label.isActivated AS card_label_isActivated,
+            card_label.isStatus AS card_label_isStatus,
+            label.id AS label_id,
+            label.boardId AS label_boardId,
+            label.name AS label_name,
+            label.color AS label_color,
+            label.isStatus AS label_isStatus
+        FROM card_label
+        INNER JOIN label ON label.id = card_label.labelId
+        WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE'
     """)
     fun getAllCardLabels(cardId: Long): Flow<List<CardLabelWithLabelInfo>>
 
