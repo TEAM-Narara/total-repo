@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CrossOrigin
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/reply")
 public class ReplyController implements ReplyAPI {
 
     private final ReplyService replyService;

@@ -26,7 +26,6 @@ import java.util.List;
 @CrossOrigin
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/card")
 public class CardController implements CardAPI {
 
     private final CardService cardService;
