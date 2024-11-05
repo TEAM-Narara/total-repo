@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@Tag(name = "보드 멤버 API", description = "보드 멤버 관련 기능을 제공하는 API")
+@Tag(name = "보드 회원", description = "보드 멤버 관련 기능을 제공하는 API")
 @RequestMapping("/api/v1/boards/{boardId}")
 public interface BoardMemberAPI {
 

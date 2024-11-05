@@ -41,6 +41,7 @@ public class BoardController implements BoardAPI {
     public ResponseEntity<DefaultResponse<Long>> createBoard(
             @AuthenticationPrincipal Member member,
             @RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+        System.out.println("MEMBER : +" + member);
         Long boardId = boardService.createBoard(member, boardCreateRequestDto);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardId), HttpStatus.CREATED);
     }

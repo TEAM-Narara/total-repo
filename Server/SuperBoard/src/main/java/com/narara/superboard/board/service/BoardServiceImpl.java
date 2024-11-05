@@ -88,7 +88,6 @@ public class BoardServiceImpl implements BoardService {
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
 //        workspaceOffsetService.saveAddBoardDiff(board);
-
         return saveBoard.getId();
     }
 
