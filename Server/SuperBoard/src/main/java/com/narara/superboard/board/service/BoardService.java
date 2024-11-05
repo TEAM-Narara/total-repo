@@ -1,14 +1,12 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
-import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
+import com.narara.superboard.board.interfaces.dto.*;
 
-import com.narara.superboard.card.CardAction;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
+
 import java.util.List;
 
 public interface BoardService {
@@ -30,4 +28,5 @@ public interface BoardService {
 
     void checkBoardMember(Board board, Member member, Action action);
 
+    MyBoardCollectionResponse getMyBoardList(Long memberId);
 }

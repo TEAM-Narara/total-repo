@@ -1,9 +1,9 @@
 package com.narara.superboard.workspacemember.interfaces;
 
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDeleteRequest;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberListDto;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberRequest;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +13,6 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class WorkspaceMemberController implements WorkSpaceMemberAPI {
+public class WorkSpaceMemberController implements WorkSpaceMemberAPI {
     private final WorkSpaceMemberService workSpaceMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<WorkspaceMemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
+    public ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
             Long workspaceId) {
-        WorkspaceMemberCollectionResponseDto responseDto = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(
+        MemberCollectionResponseDto responseDto = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(
                 workspaceId);
         return new ResponseEntity<>(DefaultResponse.res(
                 StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
@@ -99,11 +98,11 @@ public class WorkspaceMemberController implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 조회")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") // MEMBER만 조회가능
     @GetMapping("/{workspaceId}/members")
-    public ResponseEntity<WorkspaceMemberListDto> getWorkspaceMember(@PathVariable Long workspaceId) {
+    public ResponseEntity<MemberCollectionResponseDto> getWorkspaceMember(@PathVariable Long workspaceId) {
         List<WorkSpaceMember> workSpaceMember = workSpaceMemberService.getWorkspaceMember(workspaceId);
 
         return ResponseEntity.ok(
-                WorkspaceMemberListDto.from(workSpaceMember)
+                MemberCollectionResponseDto.from(workSpaceMember)
         );
     }
 }

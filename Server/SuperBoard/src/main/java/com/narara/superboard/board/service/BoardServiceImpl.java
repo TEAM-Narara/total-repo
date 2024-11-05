@@ -18,6 +18,7 @@ import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -162,5 +163,13 @@ public class BoardServiceImpl implements BoardService {
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);
+    }
+
+    @Override
+    public MyBoardCollectionResponse getMyBoardList(Long memberId) {
+        List<BoardMember> boardMemberList = boardMemberRepository.findByMemberId(memberId);
+
+        MyBoardCollectionResponse myBoardCollectionResponse = MyBoardCollectionResponse.of(boardMemberList);
+        return myBoardCollectionResponse;
     }
 }
