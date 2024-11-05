@@ -95,12 +95,12 @@ public class Board extends BaseTimeEntity {
         this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         return this;
     }
-    public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
+    public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = new HashMap<>(){{
-            put("type", boardUpdateByMemberRequestDto.background().type());
-            put("value", boardUpdateByMemberRequestDto.background().value());
+            put("type", boardUpdateRequestDto.background().type());
+            put("value", boardUpdateRequestDto.background().value());
         }};
-        this.name = boardUpdateByMemberRequestDto.name();
+        this.name = boardUpdateRequestDto.name();
         return this;
     }
 

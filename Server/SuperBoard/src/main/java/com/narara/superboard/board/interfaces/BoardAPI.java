@@ -24,8 +24,6 @@ public interface BoardAPI {
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
     ResponseEntity<DefaultResponse<Long>> createBoard(
-            @AuthenticationPrincipal Member member,
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody BoardCreateRequestDto boardCreateRequestDto);
 
     @GetMapping("/{boardId}")
@@ -45,12 +43,12 @@ public interface BoardAPI {
             @PathVariable Long boardId,
             @RequestBody BoardUpdateRequestDto boardUpdateRequestDto);
 
-    @PatchMapping("/{boardId}/member")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
-    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
-            @PathVariable Long boardId,
-            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
+//    @PatchMapping("/{boardId}/member")
+//    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
+//    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
+//    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
+//            @PathVariable Long boardId,
+//            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
 
     @GetMapping("/workspace/{workspaceId}/archived")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
