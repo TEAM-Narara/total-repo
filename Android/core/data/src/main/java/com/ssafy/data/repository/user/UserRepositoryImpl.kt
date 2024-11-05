@@ -52,4 +52,10 @@ class UserRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { userDataSource.logout() }
         return response.toFlow()
     }
+
+    override suspend fun withdrawal(): Flow<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.withdrawal() }
+        return response.toFlow()
+    }
+
 }

@@ -21,4 +21,6 @@ interface UserDataSource {
 
     suspend fun logout(): Response<ApiResponse<Unit>>
 
+    suspend fun withdrawal(): Response<ApiResponse<Unit>>
+
 }

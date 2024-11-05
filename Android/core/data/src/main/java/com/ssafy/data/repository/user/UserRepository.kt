@@ -20,4 +20,6 @@ interface UserRepository {
 
     suspend fun logout(): Flow<Unit>
 
+    suspend fun withdrawal(): Flow<Unit>
+
 }

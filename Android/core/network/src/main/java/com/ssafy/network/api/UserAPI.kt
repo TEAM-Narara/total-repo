@@ -36,4 +36,7 @@ interface UserAPI {
     @GET("api/v1/members/logout")
     suspend fun logout(): Response<ApiResponse<Unit>>
 
+    @GET("api/v1/members/withdrawal")
+    suspend fun withdrawal(): Response<ApiResponse<Unit>>
+
 }
