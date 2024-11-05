@@ -1,6 +1,7 @@
 package com.ssafy.network.socket
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ssafy.network.module.AuthInterceptorOkHttpClient
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -46,10 +47,11 @@ class StompClientManager @Inject constructor(
         }
     }
 
-    suspend fun<T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<T> {
+    suspend fun <T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<StompResponse<T>> {
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
-            gson.fromJson(it.bodyAsText, clazz)
+            val type = TypeToken.getParameterized(StompResponse::class.java, clazz).type
+            gson.fromJson(it.bodyAsText, type)
         }
     }
 
