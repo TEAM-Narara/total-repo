@@ -5,6 +5,8 @@ import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.member.enums.OAuthAttributes;
 import com.narara.superboard.member.exception.AlreadyRegisteredLoginException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
+import com.narara.superboard.member.interfaces.dto.MemberDto;
+import com.narara.superboard.member.interfaces.dto.MemberLoginResponseDto;
 import com.narara.superboard.member.interfaces.dto.MemberProfile;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.util.JwtTokenProvider;
@@ -40,13 +42,16 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     private static final String PROVIDER_GITHUB = "github";
 
     @Override
-    public TokenDto getUserInfo(String accessToken, String provider) {
+    public MemberLoginResponseDto getUserInfo(String accessToken, String provider) {
         Map<String, Object> attributes = fetchUserInfo(accessToken, provider);
 
         MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
         Member member = saveOrUpdateMember(memberProfile, provider);
 
-        return generateTokenDto(member);
+        MemberDto memberDto = new MemberDto(member.getId(), member.getEmail(), member.getNickname(), member.getProfileImgUrl());
+        TokenDto tokenDto = generateTokenDto(member);
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     private Map<String, Object> fetchUserInfo(String accessToken, String provider) {

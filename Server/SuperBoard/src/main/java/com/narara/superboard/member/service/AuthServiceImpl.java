@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         TokenDto tokenDto = createTokens(newMember);
         saveRefreshToken(newMember, tokenDto.refreshToken());
 
-        MemberDto memberDto = new MemberDto(newMember.getEmail(), newMember.getNickname(),
+        MemberDto memberDto = new MemberDto(newMember.getId(),newMember.getEmail(), newMember.getNickname(),
                 newMember.getProfileImgUrl());
 
         return new MemberLoginResponseDto(memberDto, tokenDto);
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
         TokenDto tokenDto = createTokens(member);
         saveRefreshToken(member, tokenDto.refreshToken());
 
-        MemberDto memberDto = new MemberDto(member.getEmail(), member.getNickname(),
+        MemberDto memberDto = new MemberDto(member.getId(), member.getEmail(), member.getNickname(),
                 member.getProfileImgUrl());
 
         return new MemberLoginResponseDto(memberDto, tokenDto);
