@@ -7,10 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.SbList
-import com.ssafy.database.dto.with.BoardInList
-import com.ssafy.database.dto.with.ListInCardThumbnails
 import com.ssafy.database.dto.with.ListInCards
 import kotlinx.coroutines.flow.Flow
 
@@ -41,7 +38,7 @@ interface ListDao {
         FROM list 
         WHERE id == :listId And isStatus != 'DELETE' And isArchived == 0
     """)
-    fun getList(listId: Long): Flow<List<ListInCardThumbnails>>
+    fun getList(listId: Long): Flow<List<SbList>>
 
     // 현재 보드에서 볼 것
     @Transaction

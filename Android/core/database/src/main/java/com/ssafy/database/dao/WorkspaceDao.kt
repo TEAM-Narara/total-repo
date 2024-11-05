@@ -8,9 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Workspace
-import com.ssafy.database.dto.with.WorkspaceDetail
 import com.ssafy.database.dto.with.WorkspaceInBoard
-import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao

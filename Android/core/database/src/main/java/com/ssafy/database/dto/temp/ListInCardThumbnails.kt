@@ -1,8 +1,6 @@
-package com.ssafy.database.dto.with
+package com.ssafy.database.dto.temp
 
 import androidx.room.Embedded
-import androidx.room.Relation
-import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.SbList
 
 data class ListInCardThumbnails(

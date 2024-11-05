@@ -8,11 +8,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Card
-import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.with.CardAllInfo
-import com.ssafy.database.dto.with.CardDetail
 import com.ssafy.database.dto.with.CardWithListAndBoardName
-import com.ssafy.database.dto.with.ListInCards
 import kotlinx.coroutines.flow.Flow
 
 @Dao
