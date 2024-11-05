@@ -10,6 +10,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,7 +72,11 @@ public class Board extends BaseTimeEntity {
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
         return Board.builder()
-                .cover(boardCreateRequestDto.background())
+                .cover(boardCreateRequestDto.background() != null
+                        ? Map.of(
+                        "type", boardCreateRequestDto.background().type(),
+                        "value", boardCreateRequestDto.background().value())
+                        : null)
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
@@ -82,16 +87,21 @@ public class Board extends BaseTimeEntity {
     }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = boardUpdateRequestDto.background();
+        this.cover = new HashMap<>(){{
+            put("type", boardUpdateRequestDto.background().type());
+            put("value", boardUpdateRequestDto.background().value());
+        }};
         this.name = boardUpdateRequestDto.name();
         this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         return this;
     }
     public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
-        this.cover = boardUpdateByMemberRequestDto.background();
+        this.cover = new HashMap<>(){{
+            put("type", boardUpdateByMemberRequestDto.background().type());
+            put("value", boardUpdateByMemberRequestDto.background().value());
+        }};
         this.name = boardUpdateByMemberRequestDto.name();
         return this;
-
     }
 
     public void changeArchiveStatus() {

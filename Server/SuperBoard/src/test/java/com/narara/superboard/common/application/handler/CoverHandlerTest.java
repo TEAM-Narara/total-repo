@@ -79,7 +79,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
         // when: CoverValidator 메서드들이 제대로 호출되는지 설정
         doNothing().when(coverValidator).validateCoversEmpty(validCover);
         doNothing().when(coverValidator).validateCoverTypeIsEmpty(validCover);
-        doNothing().when(coverValidator).validateCoverTypeIsValid(type);
+        doNothing().when(coverValidator).validateCoverTypeIsValid(validCover);
 
         // then: CoverHandler의 getType 메서드가 제대로 커버 타입을 반환하는지 검증
         CoverType result = coverHandler.getType(validCover);
@@ -88,7 +88,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
         // 검증: 메서드들이 한 번씩 호출되었는지 확인
         verify(coverValidator, times(1)).validateCoversEmpty(validCover);
         verify(coverValidator, times(1)).validateCoverTypeIsEmpty(validCover);
-        verify(coverValidator, times(1)).validateCoverTypeIsValid(type);
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(validCover);
     }
 
     @Test
@@ -102,7 +102,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
         // when: void 메서드를 모킹할 때는 doNothing()을 사용
         doNothing().when(coverValidator).validateCoversEmpty(validCover);
         doNothing().when(coverValidator).validateCoverTypeIsEmpty(validCover);
-        doNothing().when(coverValidator).validateCoverTypeIsValid("COLOR");
+        doNothing().when(coverValidator).validateCoverTypeIsValid(validCover);
 
         // then
         String result = coverHandler.getTypeValue(validCover);
@@ -111,7 +111,7 @@ class CoverHandlerTest implements MockSuperBoardUnitTests {
         // 메서드가 제대로 호출되었는지 검증
         verify(coverValidator, times(1)).validateCoversEmpty(validCover);
         verify(coverValidator, times(1)).validateCoverTypeIsEmpty(validCover);
-        verify(coverValidator, times(1)).validateCoverTypeIsValid("COLOR");
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(validCover);
     }
 
     @ParameterizedTest

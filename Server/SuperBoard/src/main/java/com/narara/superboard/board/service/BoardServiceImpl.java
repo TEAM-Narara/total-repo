@@ -11,16 +11,21 @@ import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.member.exception.MemberNotFoundException;
+import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
@@ -43,6 +49,7 @@ public class BoardServiceImpl implements BoardService {
     private final NameValidator nameValidator;
 
     private final CoverHandler coverHandler;
+    private final MemberRepository memberRepository;
 
     private final ListRepository listRepository;
     private final ReplyRepository replyRepository;
@@ -69,11 +76,14 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto) {
+    public Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto) {
         boardValidator.validateNameIsPresent(boardCreateRequestDto);
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
         // TODO: background가 존재하면 background에 대한 검증 추가하기
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
@@ -81,14 +91,14 @@ public class BoardServiceImpl implements BoardService {
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
 
         Board saveBoard = boardRepository.save(board);
-
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
         boardMemberRepository.save(boardMemberByAdmin);
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
 //        workspaceOffsetService.saveAddBoardDiff(board);
-        return saveBoard.getId();
+
+        return saveBoard;
     }
 
     @Override
@@ -108,13 +118,20 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
+    public Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
         boardValidator.validateNameIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
 
         if (boardUpdateRequestDto.cover() != null) {
             coverValidator.validateContainCover(boardUpdateRequestDto);
+        }
+
+        BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
+                .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
+
+        if (boardUpdateRequestDto.visibility() != null && boardMember.getAuthority().equals(Authority.MEMBER)) {
+            throw new AccessDeniedException("visibility를 수정할 수 있는 권한이 없습니다");
         }
 
         Board board = getBoard(boardId);

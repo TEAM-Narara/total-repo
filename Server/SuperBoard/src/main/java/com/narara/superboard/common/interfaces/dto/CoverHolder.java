@@ -1,9 +1,9 @@
 package com.narara.superboard.common.interfaces.dto;
 
-import java.util.Map;
+import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
 
 public interface CoverHolder {
 
-    Map<String, Object> cover();
+    BoardBackgroundDto cover();
 
 }

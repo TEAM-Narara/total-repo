@@ -1,5 +1,7 @@
 package com.narara.superboard.workspacemember.service;
 
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -10,8 +12,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -82,12 +82,12 @@ class WorkSpaceMemberServiceTest {
                 .willReturn(Arrays.asList(workSpaceMember));
 
         // when
-        WorkspaceMemberCollectionResponseDto result =
+        MemberCollectionResponseDto result =
                 workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(WORKSPACE_ID_1);
 
         // then
-        assertThat(result.workspaceMemberList()).hasSize(1);
-        WorkSpaceMemberDetailResponseDto dto = result.workspaceMemberList().get(0);
+        assertThat(result.memberListResponse()).hasSize(1);
+        MemberResponseDto dto = result.memberListResponse().get(0);
         assertThat(dto.memberEmail()).isEqualTo("test@test.com");
         assertThat(dto.memberNickname()).isEqualTo("tester");
         assertThat(dto.authority()).isEqualTo("MEMBER");

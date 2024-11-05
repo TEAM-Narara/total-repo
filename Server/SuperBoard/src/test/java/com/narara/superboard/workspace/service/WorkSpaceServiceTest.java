@@ -5,6 +5,8 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -15,8 +17,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -203,7 +203,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
         WorkSpace mockWorkSpace =  new WorkSpace(workspaceId, "시현의 워크스페이스", 1L);
         BoardCollectionResponseDto mockBoardCollectionResponseDto = createMockBoardCollection();
-        WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto = createMockMemberCollection();
+        MemberCollectionResponseDto mockMemberCollectionResponseDto = createMockMemberCollection();
 
         // Mocking: repository, boardService, workSpaceMemberService, workSpaceValidator 동작 설정
         mockDependencies(workspaceId, mockWorkSpace, mockBoardCollectionResponseDto, mockMemberCollectionResponseDto);
@@ -234,17 +234,17 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                 .build();
     }
 
-    private WorkspaceMemberCollectionResponseDto createMockMemberCollection() {
-        return WorkspaceMemberCollectionResponseDto.builder()
-                .workspaceMemberList(List.of(
-                        WorkSpaceMemberDetailResponseDto.builder()
+    private MemberCollectionResponseDto createMockMemberCollection() {
+        return MemberCollectionResponseDto.builder()
+                .memberListResponse(List.of(
+                        MemberResponseDto.builder()
                                 .memberId(1L)
                                 .memberEmail("asdf@eawefsdz")
                                 .memberNickname("조시현")
                                 .memberProfileImgUrl("http~~")
                                 .authority("ADMIN")
                                 .build(),
-                        WorkSpaceMemberDetailResponseDto.builder()
+                        MemberResponseDto.builder()
                                 .memberId(2L)
                                 .memberEmail("qwer@eawefsdz")
                                 .memberNickname("주효림")
@@ -257,7 +257,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     private void mockDependencies(Long workspaceId, WorkSpace mockWorkSpace,
                                   BoardCollectionResponseDto mockBoardCollectionResponseDto,
-                                  WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto) {
+                                  MemberCollectionResponseDto mockMemberCollectionResponseDto) {
         when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
         when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(mockBoardCollectionResponseDto);
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
@@ -265,7 +265,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     private void assertWorkspaceDetail(WorkSpaceDetailResponseDto result, WorkSpace mockWorkSpace,
                                        BoardCollectionResponseDto mockBoardCollectionResponseDto,
-                                       WorkspaceMemberCollectionResponseDto mockMemberCollectionResponseDto) {
+                                       MemberCollectionResponseDto mockMemberCollectionResponseDto) {
         assertEquals(mockWorkSpace.getId(), result.workSpaceId());
         assertEquals(mockWorkSpace.getName(), result.name());
         assertEquals(mockBoardCollectionResponseDto, result.boardList());
