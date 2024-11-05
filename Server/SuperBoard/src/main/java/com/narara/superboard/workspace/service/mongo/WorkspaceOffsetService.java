@@ -1,5 +1,7 @@
 package com.narara.superboard.workspace.service.mongo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.BoardAction;
 import com.narara.superboard.board.interfaces.dto.websocket.BoardUpdateData;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +43,9 @@ public class WorkspaceOffsetService {
     public static final String BOARD_NAME_COLUMN = "boardName";
     private final MongoTemplate mongoTemplate;
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final KafkaTemplate<String,String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     public void saveEditWorkspaceDiff(WorkSpace workspace) {
         WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
@@ -62,9 +68,26 @@ public class WorkspaceOffsetService {
 
         workspaceOffset.getDiffList().add(diffInfo);
 
-        messagingTemplate.convertAndSend("/topic/workspace/" + workspace.getId(), diffInfo);
+        // TODO : 워크 스페이스 이름 수정시, 카프카로 메시지 전송
+        String topic = "workspace-" + workspace.getId();
+        sendMessageToKafka(topic,diffInfo);
+
+        // messagingTemplate.convertAndSend("/topic/workspace/" + workspace.getId(), diffInfo);
 
 //        mongoTemplate.save(workspaceOffset);
+    }
+
+    private <T> void sendMessageToKafka(String topic, T object) {
+        // DiffInfo 객체를 JSON 문자열로 변환
+        String jsonMessage = null;
+        try {
+            jsonMessage = objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        // Kafka에 메시지 전송
+        kafkaTemplate.send(topic, jsonMessage);
+        System.out.println("Message sent to Kafka: " + jsonMessage);
     }
 
     private WorkspaceOffset getWorkspaceOffset(Long workspace) {

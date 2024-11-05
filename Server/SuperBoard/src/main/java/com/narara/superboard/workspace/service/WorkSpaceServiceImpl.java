@@ -4,6 +4,7 @@ import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.common.application.kafka.KafkaConsumerService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -21,6 +22,10 @@ import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepos
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +45,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
     private final WorkspaceOffsetService workspaceOffsetService;
 
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaConsumerService kafkaConsumerService;
+    private final KafkaAdmin kafkaAdmin;
+
     @Override
     @Transactional
     public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
@@ -53,6 +62,29 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace newWorkSpace = workSpaceRepository.save(workSpace);
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
+
+        // TODO : Kafka 토픽 생성 및 Consumer group Listener 설정
+
+        String topicName = "workspace-" + newWorkSpace.getId();
+
+        // Kafka: 워크스페이스용 토픽 생성
+        // 토픽 이름 : workspace-1 ,파티션 수 :10개, 복제 개수 : 1개 (단일 브로커)
+        // kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
+
+        try {
+            // 메시지 전송 시 예외 처리 추가
+            System.out.println("11111111111111112111111");
+            kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+        } catch (Exception e) {
+            System.err.println("Failed to send message to topic " + topicName + ": " + e.getMessage());
+            // 필요한 경우 재시도 로직 추가
+        }
+        // kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+
+        System.out.println("22222222222");
+
+        // 새로운 멤버를 Kafka Consumer Group에 등록
+        kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
 
         return newWorkSpace;
     }
