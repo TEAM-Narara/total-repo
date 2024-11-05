@@ -12,7 +12,7 @@ import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import java.util.List;
 
 public interface BoardService {
-    BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
+    List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId);
 
     Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto);
 

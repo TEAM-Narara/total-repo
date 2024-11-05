@@ -32,9 +32,9 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")
-    public ResponseEntity<DefaultResponse<BoardCollectionResponseDto>> getBoardCollection(
+    public ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(
             @PathVariable Long workspaceId) {
-        BoardCollectionResponseDto boardCollection = boardService.getBoardCollectionResponseDto(workspaceId);
+        List<BoardDetailResponseDto> boardCollection = boardService.getBoardCollectionResponseDto(workspaceId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, boardCollection), HttpStatus.OK);
     }
 
@@ -92,16 +92,14 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "아카이브된 보드 조회", description = "워크스페이스 ID를 사용하여 아카이브된 보드 목록을 조회합니다.")
-    public ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId) {
+    public ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId) {
         List<Board> archivedBoards = boardService.getArchivedBoards(workspaceId);
         List<BoardSimpleResponseDto> boardSimpleResponseDtoList = new ArrayList<>();
         for (Board board : archivedBoards) {
             boardSimpleResponseDtoList.add(BoardSimpleResponseDto.of(board, coverHandler));
         }
 
-        BoardArchiveCollectionResponseDto dto = new BoardArchiveCollectionResponseDto(boardSimpleResponseDtoList);
-
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, dto), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, boardSimpleResponseDtoList), HttpStatus.OK);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class BoardServiceImpl implements BoardService {
     private final CardRepository cardRepository;
 
     @Override
-    public BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId) {
+    public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId) {
         List<Board> BoardList = boardRepository.findAllByWorkSpaceId(workSpaceId);
 
         List<BoardDetailResponseDto> boardDetailResponseDtoList = new ArrayList<>();
@@ -73,7 +73,7 @@ public class BoardServiceImpl implements BoardService {
             boardDetailResponseDtoList.add(boardDto);
         }
 
-        return new BoardCollectionResponseDto(boardDetailResponseDtoList);
+        return boardDetailResponseDtoList;
     }
 
     @Override
