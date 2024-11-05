@@ -40,11 +40,14 @@ public class CardMemberServiceImpl implements CardMemberService {
     }
 
     @Override
-    public void updateCardMembers(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
+    public void setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
-        // 1. updateCardMemberRequestDto에 cardId,memberId,is_alert 를 받아옴
+        Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
+
+        // 1. updateCardMemberRequestDto에 cardId,memberId 를 받아옴
         // 2. cardId,memberId 유효성 확인
-        // 3. cardMember에 (cardId,memberId)에 해당하는 값이 없으면
+        // 3. cardMember에 (cardId,memberId)에 해당하는 값이 없으면 cardMember에 추가하고 is_representative = true, is_alert = true로 설정
+        // 4. cardMember에 값이 있는 경우 is_representative 값 반대로 변경
     }
 
     // 카드 존재 확인 및 조회

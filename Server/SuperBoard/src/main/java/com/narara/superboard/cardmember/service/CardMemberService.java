@@ -5,5 +5,5 @@ import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDt
 public interface CardMemberService {
     boolean getCardMemberIsAlert(Long memberId, Long cardId);
     void setCardMemberIsAlert(Long memberId, Long cardId);
-    void updateCardMembers(UpdateCardMemberRequestDto updateCardMemberRequestDto);
+    void setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto);
 }

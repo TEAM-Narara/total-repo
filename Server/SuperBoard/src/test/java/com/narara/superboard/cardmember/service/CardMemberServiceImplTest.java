@@ -4,6 +4,7 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
+import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,6 +169,97 @@ class CardMemberServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> cardMemberService.setCardMemberIsAlert(memberId, cardId));
         verify(cardRepository, times(1)).existsById(cardId);
         verify(cardMemberRepository, never()).findByCardIdAndMemberId(anyLong(), anyLong());
+        verify(cardMemberRepository, never()).save(any(CardMember.class));
+    }
+
+    /**
+     *  카드 담당자 수정 TEST ---------------------------------------------------------------------
+     */
+    @Test
+    @DisplayName("카드 멤버 추가 또는 알림 상태 업데이트")
+    void updateCardMembers() {
+        // given
+        long cardId = 1L;
+        long memberId = 1L;
+        boolean isAlert = false; // 요청 DTO의 초기 알림 상태 값
+
+        UpdateCardMemberRequestDto updateCardMemberRequestDto = new UpdateCardMemberRequestDto(cardId, memberId, isAlert);
+
+        Card card = new Card(cardId,null,"dd","dd",null,null,null,null,null,null,null,null,null);
+        Member member = new Member(memberId,"dd","ddd@naver.com");
+
+        CardMember cardMember = new CardMember(member, card, isAlert);
+
+        // cardId 유효성 확인을 위해 카드가 존재한다고 가정
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+
+        // 3번 조건: cardMember에 (cardId, memberId) 값이 없는 경우 새로 추가
+        when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.empty());
+
+        // 4번 조건: cardMember가 이미 존재하는 경우 알림 상태 반대로 변경
+        when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.of(cardMember));
+
+        // when
+        cardMemberService.updateCardMembers(updateCardMemberRequestDto);
+
+        // then
+        if (cardMemberRepository.findByCardIdAndMemberId(cardId, memberId).isEmpty()) {
+            verify(cardMemberRepository, times(1)).save(any(CardMember.class));
+        } else {
+            verify(cardMemberRepository, times(1)).save(cardMember);
+            assertEquals(!isAlert, cardMember.isAlert()); // 알림 상태가 반대로 변경되었는지 확인
+        }
+    }
+
+    @Test
+    @DisplayName("카드가 존재하지 않을 때 예외 발생 테스트")
+    void updateCardMembers_cardNotFound() {
+        // given
+        long cardId = 1L;
+        long memberId = 1L;
+        boolean isAlert = false;
+
+        UpdateCardMemberRequestDto updateCardMemberRequestDto = new UpdateCardMemberRequestDto(cardId, memberId, isAlert);
+
+        // 카드가 존재하지 않는 경우
+        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+
+        // when & then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            cardMemberService.updateCardMembers(updateCardMemberRequestDto);
+        });
+
+        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardMemberRepository, never()).findByCardIdAndMemberId(anyLong(), anyLong());
+        verify(cardMemberRepository, never()).save(any(CardMember.class));
+    }
+
+    @Test
+    @DisplayName("멤버가 유효하지 않은 경우 예외 발생 테스트")
+    void updateCardMembers_invalidMember() {
+        // given
+        long cardId = 1L;
+        long memberId = 2L; // 유효하지 않은 멤버 ID
+        boolean isAlert = false;
+
+        UpdateCardMemberRequestDto updateCardMemberRequestDto = new UpdateCardMemberRequestDto(cardId, memberId, isAlert);
+
+        Card card = new Card();
+        card.setId(cardId);
+
+        // 카드가 존재하지만 멤버가 유효하지 않은 경우
+        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.empty());
+
+        // when & then
+        Exception exception = assertThrows(MemberNotFoundException.class, () -> {
+            cardService.updateCardMembers(updateCardMemberRequestDto);
+        });
+
+        // 메시지 검증
+        assertEquals("Member not found with ID: " + memberId, exception.getMessage());
+        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardMemberRepository, times(1)).findByCardIdAndMemberId(cardId, memberId);
         verify(cardMemberRepository, never()).save(any(CardMember.class));
     }
 }
