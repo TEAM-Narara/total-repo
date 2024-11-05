@@ -8,14 +8,14 @@ import retrofit2.Response
 
 interface CardDataSource {
 
-    suspend fun createCard(cardRequestDto: CardRequestDto): Response<ApiResponse<CardResponseDto>>
+    suspend fun createCard(cardRequestDto: CardRequestDto): Response<ApiResponse<Unit>>
 
     suspend fun deleteCard(cardId: Long): Response<ApiResponse<Unit>>
 
     suspend fun updateCard(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
-    ): Response<ApiResponse<CardResponseDto>>
+    ): Response<ApiResponse<Unit>>
 
     suspend fun setCardArchive(cardId: Long): Response<ApiResponse<Unit>>
 

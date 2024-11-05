@@ -24,11 +24,7 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.createCard(cardRequestDto)
-                .toFlow()
-                .map { cardResponseDto: CardResponseDto ->
-                    TODO("Room DB가 연결되면 생성로직을 구현해주세요.")
-                }
+            cardDataSource.createCard(cardRequestDto).toFlow()
         } else {
             TODO("Room DB가 연결되면 생성로직을 구현해주세요.")
         }
@@ -37,11 +33,7 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                cardDataSource.deleteCard(cardId)
-                    .toFlow()
-                    .map {
-                        TODO("Room DB가 연결되면 삭제로직을 구현해주세요.")
-                    }
+                cardDataSource.deleteCard(cardId).toFlow()
             } else {
                 TODO("Room DB가 연결되면 삭제로직을 구현해주세요.")
             }
@@ -53,11 +45,7 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.updateCard(cardId, cardUpdateRequestDto)
-                .toFlow()
-                .map { cardResponseDto: CardResponseDto ->
-                    TODO("Room DB가 연결되면 수정로직을 구현해주세요.")
-                }
+            cardDataSource.updateCard(cardId, cardUpdateRequestDto).toFlow()
         } else {
             TODO("Room DB가 연결되면 수정로직을 구현해주세요.")
         }
@@ -66,11 +54,7 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun setCardArchive(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                cardDataSource.setCardArchive(cardId)
-                    .toFlow()
-                    .map {
-                        TODO("Room DB가 연결되면 아카이브로직을 구현해주세요.")
-                    }
+                cardDataSource.setCardArchive(cardId).toFlow()
             } else {
                 TODO("Room DB가 연결되면 아카이브로직을 구현해주세요.")
             }

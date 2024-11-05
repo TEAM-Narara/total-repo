@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : CardDataSource {
 
-    override suspend fun createCard(cardRequestDto: CardRequestDto): Response<ApiResponse<CardResponseDto>> =
+    override suspend fun createCard(cardRequestDto: CardRequestDto): Response<ApiResponse<Unit>> =
         cardAPI.createCard(cardRequestDto)
 
     override suspend fun deleteCard(cardId: Long): Response<ApiResponse<Unit>> =
@@ -19,7 +19,7 @@ class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : Car
     override suspend fun updateCard(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
-    ): Response<ApiResponse<CardResponseDto>> = cardAPI.updateCard(cardId, cardUpdateRequestDto)
+    ): Response<ApiResponse<Unit>> = cardAPI.updateCard(cardId, cardUpdateRequestDto)
 
     override suspend fun setCardArchive(cardId: Long): Response<ApiResponse<Unit>> =
         cardAPI.setCardArchive(cardId)

@@ -15,7 +15,7 @@ import retrofit2.http.Path
 interface CardAPI {
 
     @POST("api/v1/card")
-    suspend fun createCard(@Body cardRequestDto: CardRequestDto): Response<ApiResponse<CardResponseDto>>
+    suspend fun createCard(@Body cardRequestDto: CardRequestDto): Response<ApiResponse<Unit>>
 
     @DELETE("api/v1/card/{cardId}")
     suspend fun deleteCard(@Path("cardId") cardId: Long): Response<ApiResponse<Unit>>
@@ -24,7 +24,7 @@ interface CardAPI {
     suspend fun updateCard(
         @Path("cardId") cardId: Long,
         @Body cardUpdateRequestDto: CardUpdateRequestDto
-    ): Response<ApiResponse<CardResponseDto>>
+    ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/card/{cardId}/archive")
     suspend fun setCardArchive(@Path("cardId") cardId: Long): Response<ApiResponse<Unit>>
