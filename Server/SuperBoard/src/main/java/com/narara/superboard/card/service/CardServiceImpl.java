@@ -50,10 +50,11 @@ public class CardServiceImpl implements CardService {
 
         Card card = Card.createCard(cardCreateRequestDto, list);
 
-        CardMember cardMember = CardMember.createCardMember(card, member);
+        Card savedCard = cardRepository.save(card);
+        CardMember cardMember = CardMember.createCardMember(savedCard, member);
         cardMemberRepository.save(cardMember);
 
-        return cardRepository.save(card);
+        return savedCard;
     }
 
     @Override
