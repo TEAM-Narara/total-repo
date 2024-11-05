@@ -18,7 +18,6 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
-import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
@@ -47,6 +46,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,6 +90,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
      * <p>
      * new Board()는 실제 로직을 테스트할 때 사용되는 실제 객체 생성 방법 메서드 호출 검증 불가능, 메서드 동작을 제어 불가능
      */
+    @Mock
+    private BoardMember boardMember;
+
     @Mock
     private Board board;
 
@@ -576,7 +579,6 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> background = Map.of("type", "COLOR", "value", "#ffffff");
         BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(null,
                 new CoverDto((String) background.get("type"), (String) background.get("value")), null);
-        Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mock: 이름이 없는 경우 예외를 발생시키도록 설정
         doThrow(new BoardNameNotFoundException()).when(boardValidator).validateNameIsPresent(requestDto);
@@ -751,4 +753,72 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(0, responseDto.totalElements());
         assertEquals(0, responseDto.totalPages());
     }
+
+    @Test
+    @DisplayName("MEMBER 권한으로 보드 업데이트 테스트")
+    void testUpdateBoardByMember() {
+        // given
+        Long memberId = 1L;
+        Long boardId = 2L;
+        BoardUpdateRequestDto dto = mock(BoardUpdateRequestDto.class);
+
+        // mock 설정
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(boardMember));
+        when(boardMember.getAuthority()).thenReturn(Authority.MEMBER);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // when
+        boardService.updateBoard(memberId, boardId, dto);
+
+        // then
+        verify(boardValidator).validateNameIsPresent(dto);
+        verify(boardValidator).validateVisibilityIsPresent(dto);
+        verify(boardValidator).validateVisibilityIsValid(dto);
+        verify(board).updateBoardByMember(dto);
+        verify(board, never()).updateBoardByAdmin(dto);  // ADMIN 업데이트는 호출되지 않음
+    }
+
+    @Test
+    @DisplayName("ADMIN 권한으로 보드 업데이트 테스트")
+    void testUpdateBoardByAdmin() {
+        // given
+        Long memberId = 1L;
+        Long boardId = 2L;
+        BoardUpdateRequestDto dto = mock(BoardUpdateRequestDto.class);
+
+        // mock 설정
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(boardMember));
+        when(boardMember.getAuthority()).thenReturn(Authority.ADMIN);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+
+        // when
+        boardService.updateBoard(memberId, boardId, dto);
+
+        // then
+        verify(boardValidator).validateNameIsPresent(dto);
+        verify(boardValidator).validateVisibilityIsPresent(dto);
+        verify(boardValidator).validateVisibilityIsValid(dto);
+        verify(board).updateBoardByAdmin(dto);
+        verify(board, never()).updateBoardByMember(dto);  // MEMBER 업데이트는 호출되지 않음
+    }
+
+    @Test
+    @DisplayName("잘못된 권한으로 보드 업데이트 시 AccessDeniedException 발생")
+    void testUpdateBoardWithInvalidAuthority() {
+        // given
+        Long memberId = 1L;
+        Long boardId = 2L;
+        BoardUpdateRequestDto dto = mock(BoardUpdateRequestDto.class);
+
+        // mock 설정 - Board와 BoardMember가 존재하도록 설정
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board)); // Board 객체 반환
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(boardMember));
+
+        // 잘못된 권한 설정
+        when(boardMember.getAuthority()).thenReturn(null);  // 잘못된 권한
+
+        // when & then
+        assertThrows(AccessDeniedException.class, () -> boardService.updateBoard(memberId, boardId, dto));
+    }
+
 }
