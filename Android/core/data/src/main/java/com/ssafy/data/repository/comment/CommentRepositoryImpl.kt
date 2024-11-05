@@ -3,12 +3,10 @@ package com.ssafy.data.repository.comment
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.response.toFlow
 import com.ssafy.model.comment.CommentRequestDto
-import com.ssafy.model.comment.CommentResponseDto
 import com.ssafy.model.comment.UpdateCommentDto
 import com.ssafy.network.source.comment.CommentDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,11 +23,7 @@ class CommentRepositoryImpl @Inject constructor(
     ): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                commentDataSource.createComment(commentRequestDto)
-                    .toFlow()
-                    .map { comment: CommentResponseDto ->
-                        TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
-                    }
+                commentDataSource.createComment(commentRequestDto).toFlow()
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
             }
@@ -38,11 +32,7 @@ class CommentRepositoryImpl @Inject constructor(
     override suspend fun deleteComment(commentId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                commentDataSource.deleteComment(commentId)
-                    .toFlow()
-                    .map {
-                        TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
-                    }
+                commentDataSource.deleteComment(commentId).toFlow()
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 삭제하는 로직을 추가해주세요.")
             }
@@ -54,11 +44,7 @@ class CommentRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            commentDataSource.updateComment(commentId, UpdateCommentDto(content))
-                .toFlow()
-                .map { comment: CommentResponseDto ->
-                    TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
-                }
+            commentDataSource.updateComment(commentId, UpdateCommentDto(content)).toFlow()
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
         }
