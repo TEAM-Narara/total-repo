@@ -13,6 +13,7 @@ import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -36,7 +37,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final BoardService boardService;
     private final WorkSpaceMemberService workSpaceMemberService;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
-//    private final WorkspaceOffsetService workspaceOffsetService;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
     @Transactional
@@ -109,7 +110,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.updateWorkSpace(name); //offset++
 
-//        workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
+        workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
 
         return workSpace;
     }
