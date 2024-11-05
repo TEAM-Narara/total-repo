@@ -1,5 +1,8 @@
 package com.narara.superboard.workspace.interfaces;
 
+import com.narara.superboard.common.interfaces.response.DefaultResponse;
+import com.narara.superboard.common.interfaces.response.ResponseMessage;
+import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.service.MemberService;
 import com.narara.superboard.member.util.JwtTokenProvider;
@@ -33,7 +36,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 생성")
     @PostMapping
-    public ResponseEntity<WorkspaceCreateData> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceCreateData>> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
 
         WorkSpace workSpace = workSpaceService.createWorkSpace(
@@ -41,7 +44,8 @@ public class WorkSpaceController implements WorkSpaceAPI {
                 workspaceCreateRequestDto
         );
 
-        return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
+        WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
     }
 
     @Operation(summary = "워크스페이스 삭제")
@@ -50,26 +54,28 @@ public class WorkSpaceController implements WorkSpaceAPI {
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
         workSpaceService.deleteWorkSpace(workspaceId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_DELETE_SUCCESS));
     }
 
     @Operation(summary = "워크스페이스 수정")
     @PatchMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
-    public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceCreateData>> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
         WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
+        WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
 
-        return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
     }
 
     @Operation(summary = "나의 워크스페이스 리스트 조회")
     @GetMapping
-    public ResponseEntity<List<WorkSpaceResponseDto>> getWorkspaceListByMember() {
+    public ResponseEntity<DefaultResponse<List<WorkSpaceResponseDto>>> getWorkspaceListByMember() {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMemberId(memberId);
         WorkSpaceListResponseDto workSpaceListResponseDto = WorkSpaceListResponseDto.from(workSpaceMemberList);
+        List<WorkSpaceResponseDto> workSpaceResponseDtos = workSpaceListResponseDto.workSpaceResponseDtoList();
 
-        return ResponseEntity.ok(workSpaceListResponseDto.workSpaceResponseDtoList());
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workSpaceResponseDtos));
     }
 
 //    @Operation(summary = "특정 offset 이후 데이터 싹 조회")

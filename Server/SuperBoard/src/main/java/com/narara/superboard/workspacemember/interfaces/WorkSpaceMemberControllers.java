@@ -56,13 +56,17 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 권한 수정")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
     @PatchMapping("/{workspaceId}/members")
-    public ResponseEntity<WorkspaceMemberDto> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(requestDto.memberId(), workspaceId, requestDto.authority());
 
         return ResponseEntity.ok(
-                new WorkspaceMemberDto(
-                        workSpaceMember.getMember().getId(),
-                        workSpaceMember.getAuthority()
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.WORKSPACE_UPDATE_SUCCESS,
+                        new WorkspaceMemberDto(
+                            workSpaceMember.getMember().getId(),
+                            workSpaceMember.getAuthority()
+                    )
                 )
         );
     }
@@ -70,14 +74,18 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 추가")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 추가가능
     @PostMapping("/{workspaceId}/members")
-    public ResponseEntity<WorkspaceMemberDto> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
                 requestDto.authority());
 
         return ResponseEntity.ok(
-                new WorkspaceMemberDto(
-                        workSpaceMember.getMember().getId(),
-                        workSpaceMember.getAuthority()
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS,
+                        new WorkspaceMemberDto(
+                            workSpaceMember.getMember().getId(),
+                          workSpaceMember.getAuthority()
+                        )
                 )
         );
     }
@@ -85,25 +93,25 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 삭제")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
     @DeleteMapping("/{workspaceId}/members")
-    public ResponseEntity<WorkspaceMemberDto> deleteWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> deleteWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(workspaceId, requestDto.memberId());
 
         return ResponseEntity.ok(
-                new WorkspaceMemberDto(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, new WorkspaceMemberDto(
                         workSpaceMember.getMember().getId(),
                         workSpaceMember.getAuthority()
-                )
+                ))
         );
     }
 
     @Operation(summary = "워크스페이스 멤버 조회")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") // MEMBER만 조회가능
     @GetMapping("/{workspaceId}/members")
-    public ResponseEntity<MemberCollectionResponseDto> getWorkspaceMember(@PathVariable Long workspaceId) {
+    public ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getWorkspaceMember(@PathVariable Long workspaceId) {
         List<WorkSpaceMember> workSpaceMember = workSpaceMemberService.getWorkspaceMember(workspaceId);
 
         return ResponseEntity.ok(
-                MemberCollectionResponseDto.from(workSpaceMember)
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, MemberCollectionResponseDto.from(workSpaceMember))
         );
     }
 }
