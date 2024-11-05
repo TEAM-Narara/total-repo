@@ -29,18 +29,18 @@ import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.TextXXLarge
 import com.ssafy.designsystem.values.White
+import com.ssafy.model.workspace.WorkSpaceDTO
 
 @Composable
 fun DrawerSheet(
     modifier: Modifier = Modifier,
     nickname: String,
     email: String,
-    // TODO : workspaceList를 받아와서 보여주기
-    workspaceList: List<String>,
+    workspaceList: List<WorkSpaceDTO>,
     icon: @Composable () -> Unit,
-    onWorkSpaceClick: (String) -> Unit,
+    onWorkSpaceClick: (Long) -> Unit,
     onAddWorkSpaceClick: () -> Unit,
-    onMyBoardClick: () -> Unit,
+    moveToJoinedBoard: () -> Unit,
     onMyCardClick: () -> Unit,
     onSettingClick: () -> Unit,
     onLogoutClick: () -> Unit
@@ -67,7 +67,7 @@ fun DrawerSheet(
                 modifier = Modifier.background(color = Gray),
                 sheetIcon = Icons.Default.Inbox,
                 sheetName = "Boards",
-                onSheetItemClick = { onMyBoardClick() }
+                onSheetItemClick = { moveToJoinedBoard() }
             )
 
             Row(
@@ -96,8 +96,8 @@ fun DrawerSheet(
                 SheetItem(
                     hasDivider = true,
                     sheetIcon = Icons.Default.Groups,
-                    sheetName = workspace,
-                    onSheetItemClick = { onWorkSpaceClick(workspace) }
+                    sheetName = workspace.name,
+                    onSheetItemClick = { onWorkSpaceClick(workspace.workSpaceId) }
                 )
             }
 

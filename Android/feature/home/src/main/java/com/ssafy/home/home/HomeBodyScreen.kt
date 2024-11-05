@@ -9,19 +9,21 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.BoardItem
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.Yellow
+import com.ssafy.model.board.BoardDTO
 
 @Composable
 fun HomeBodyScreen(
     modifier: Modifier = Modifier,
-    boards: List<Any>,
+    boards: List<BoardDTO>,
     spanCount: Int,
-    moveToBoardScreen: (Long) -> Unit
+    moveToBoardScreen: (Long) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -43,12 +45,12 @@ fun HomeBodyScreen(
         }
 
         items(boards.size) {
-            // TODO : Board에 대한 정보를 전달합니다.
+            val board = boards[it]
             BoardItem(
-                title = "Board $it",
+                title = board.name ?: "보드-${it}",
                 onBoardClick = { moveToBoardScreen(it.toLong()) },
-                containerColor = Yellow,
-                onMenuClick = { /*TODO*/ },
+                containerColor = board.backgroundValue?.toLongOrNull()?.let(::Color) ?: Yellow,
+                onMenuClick = { /* TODO 보드의 설정 화면이 있나? 이거 왜있지. */ },
             )
         }
     }

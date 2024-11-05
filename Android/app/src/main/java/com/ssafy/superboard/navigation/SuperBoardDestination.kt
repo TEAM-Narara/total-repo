@@ -41,6 +41,7 @@ import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.auth.AuthManager
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
 import com.ssafy.superboard.MainViewModel
 import com.ssafy.ui.uistate.ErrorScreen
@@ -100,6 +101,9 @@ fun SuperBoardNavHost(
             },
             moveToSearchScreen = {
                 navController.navigate(SearchWorkspace)
+            },
+            moveToAlarmScreen = {
+                navController.navigate(Notification)
             }
         )
 
