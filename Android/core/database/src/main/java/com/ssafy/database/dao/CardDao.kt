@@ -48,16 +48,16 @@ interface CardDao {
         FROM card 
         WHERE id == :cardId
     """)
-    suspend fun getCard(cardId: Long): Flow<Card>
+    fun getCard(cardId: Long): Flow<Card>
     
     // 카드 상위의 List, Board 이름 조회
     @Transaction
     @Query("""
         SELECT 
-            card.id AS card_id,
-            card.name AS card_name,
-            list.name AS list_name,
-            board.name AS board_name
+            card.id AS cardId,
+            card.name AS cardName,
+            list.name AS listName,
+            board.name AS boardName
         FROM card
         INNER JOIN list ON list.id = card.listId
         INNER JOIN board ON board.id = list.boardId
