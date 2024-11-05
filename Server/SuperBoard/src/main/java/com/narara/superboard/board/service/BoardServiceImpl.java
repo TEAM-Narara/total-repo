@@ -3,6 +3,7 @@ package com.narara.superboard.board.service;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.infrastructure.BoardSearchRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
@@ -24,6 +25,7 @@ import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -55,6 +57,7 @@ public class BoardServiceImpl implements BoardService {
     private final ListRepository listRepository;
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
+    private final BoardSearchRepository boardSearchRepository;
 
     @Override
     public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId) {
@@ -178,10 +181,18 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public MyBoardCollectionResponse getMyBoardList(Long memberId) {
-        List<BoardMember> boardMemberList = boardMemberRepository.findByMemberId(memberId);
+    public MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword) {
+        MyBoardCollectionResponse myBoardCollectionResponse;
 
-        MyBoardCollectionResponse myBoardCollectionResponse = MyBoardCollectionResponse.of(boardMemberList);
+        if (keyword == null) {
+            List<BoardMember> boardMemberList = boardMemberRepository.findByMemberId(memberId);
+            myBoardCollectionResponse = MyBoardCollectionResponse.of(boardMemberList);
+        } else {
+            List<MyBoardWorkspaceCollectionDto> boardMemberList = boardSearchRepository.searchBoardsAndWorkspaces(
+                    keyword, memberId);
+            myBoardCollectionResponse = new MyBoardCollectionResponse(boardMemberList);
+        }
+
         return myBoardCollectionResponse;
     }
 

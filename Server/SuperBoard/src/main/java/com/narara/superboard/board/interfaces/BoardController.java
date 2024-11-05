@@ -8,8 +8,6 @@ import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.common.service.IAuthenticationFacade;
-import com.narara.superboard.member.service.MemberService;
-import com.narara.superboard.member.service.MemberServiceImpl;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -110,10 +108,10 @@ public class BoardController implements BoardAPI {
     }
 
     @GetMapping
-    @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다")
-    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList() {
+    @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다. keyword가 null이면 전체조회")
+    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false)String keyword) {
         Long memberId = getMemberId();
-        MyBoardCollectionResponse myBoardList = boardService.getMyBoardList(memberId);
+        MyBoardCollectionResponse myBoardList = boardService.getMyBoardList(memberId, keyword);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, myBoardList), HttpStatus.OK);
     }

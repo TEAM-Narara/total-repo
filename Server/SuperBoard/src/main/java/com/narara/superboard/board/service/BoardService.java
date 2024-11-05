@@ -30,9 +30,7 @@ public interface BoardService {
 
     PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable);
 
-
-
     void checkBoardMember(Board board, Member member, Action action);
 
-    MyBoardCollectionResponse getMyBoardList(Long memberId);
+    MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword);
 }
