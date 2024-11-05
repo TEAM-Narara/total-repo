@@ -2,6 +2,7 @@ package com.ssafy.network.module
 
 import com.ssafy.network.api.AuthAPI
 import com.ssafy.network.api.BoardAPI
+import com.ssafy.network.api.CardAPI
 import com.ssafy.network.api.CommentAPI
 import com.ssafy.network.api.GitHubAPI
 import com.ssafy.network.api.MemberAPI
@@ -46,5 +47,9 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideCommentAPI(@UserRetrofit retrofit: Retrofit): CommentAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideCardAPI(@UserRetrofit retrofit: Retrofit): CardAPI = retrofit.create()
 
 }
