@@ -30,9 +30,9 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")
-    public ResponseEntity<DefaultResponse<BoardCollectionResponseDto>> getBoardCollection(
+    public ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(
             @PathVariable Long workspaceId) {
-        BoardCollectionResponseDto boardCollection = boardService.getBoardCollectionResponseDto(workspaceId);
+        List<BoardDetailResponseDto> boardCollection = boardService.getBoardCollectionResponseDto(workspaceId).boardDetailResponseDtoList();
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, boardCollection), HttpStatus.OK);
     }
 

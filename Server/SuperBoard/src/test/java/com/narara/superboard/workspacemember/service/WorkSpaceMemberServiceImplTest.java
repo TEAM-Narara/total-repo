@@ -5,6 +5,7 @@ import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -62,7 +63,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("워크스페이스 2", result.workSpaceResponseDtoList().get(1).name());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(String.class));
+        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceNameHolder.class));
 
         // workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).findAllByMember(member);
