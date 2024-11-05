@@ -10,6 +10,7 @@ import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.CardAllInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LabelDao {
@@ -24,7 +25,6 @@ interface LabelDao {
     suspend fun getAllLocalLabels(): List<Label>
 
     // 서버에 연산할 라벨 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM label
@@ -38,7 +38,7 @@ interface LabelDao {
         FROM label 
         WHERE boardId == :boardId
     """)
-    suspend fun getAllLabels(boardId: Long): List<Label>
+    fun getAllLabels(boardId: Long): Flow<List<Label>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

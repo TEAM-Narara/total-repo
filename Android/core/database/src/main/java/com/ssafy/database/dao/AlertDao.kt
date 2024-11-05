@@ -8,17 +8,18 @@ import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.MemberBackground
 import com.ssafy.database.dto.with.AlertWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlertDao {
-    @Query("SELECT * FROM alert")
-    suspend fun getAllAlerts(): List<Alert>
 
+    // 알람 멤버 조회
     @Query("""
-        SELECT *
-        FROM alert 
+        SELECT alert.*, member.*
+        FROM alert
+        INNER JOIN member ON member.id = alert.memberId
     """)
-    suspend fun getAllAlertsWithMemberInfo(): List<AlertWithMemberInfo>
+    fun getAllAlertsWithMemberInfo(): Flow<List<AlertWithMemberInfo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlerts(attachments: List<Alert>): List<Long>

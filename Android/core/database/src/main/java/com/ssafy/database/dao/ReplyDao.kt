@@ -9,12 +9,12 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.Reply
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReplyDao {
 
     // 로컬에서 생성한 오프라인 댓글 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM reply
@@ -23,7 +23,6 @@ interface ReplyDao {
     suspend fun getAllLocalReply(): List<Reply>
 
     // 서버에 연산할 댓글 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM reply
@@ -38,7 +37,7 @@ interface ReplyDao {
         WHERE cardId == :cardId And isStatus != 'DELETE'
         ORDER BY id DESC
     """)
-    suspend fun getAllReplies(cardId: Long): List<Reply>
+    fun getAllReplies(cardId: Long): Flow<List<Reply>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

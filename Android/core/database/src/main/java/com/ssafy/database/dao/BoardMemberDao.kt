@@ -10,12 +10,12 @@ import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BoardMemberDao {
 
     // 서버에 연산할 보드 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board_member
@@ -24,7 +24,6 @@ interface BoardMemberDao {
     suspend fun getAllRemoteBoardMember(): List<BoardMember>
 
     // 서버에 연산할 내 보드별 알람 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board_member_alarm
@@ -33,12 +32,13 @@ interface BoardMemberDao {
     suspend fun getAllRemoteBoardMemberAlarm(): List<BoardMemberAlarm>
 
     // 보드 멤버 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM board_member 
-        WHERE boardId == :boardId
+        WHERE boardId == :boardId AND isStatus != 'DELETE'
     """)
-    suspend fun getBoardMembers(boardId: Long): List<BoardMemberWithMemberInfo>
+    fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
 
     // 보드 알람 조회
     @Query("""
@@ -46,7 +46,7 @@ interface BoardMemberDao {
         FROM board_member_alarm 
         WHERE boardId == :boardId
     """)
-    suspend fun getBoardMemberAlarm(boardId: Long): BoardMemberAlarm
+    fun getBoardMemberAlarm(boardId: Long): Flow<BoardMemberAlarm>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

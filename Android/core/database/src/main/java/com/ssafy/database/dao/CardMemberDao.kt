@@ -10,12 +10,12 @@ import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.CardMemberAlarm
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CardMemberDao {
 
     // 서버에 연산할 카드 멤버 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_member
@@ -24,7 +24,6 @@ interface CardMemberDao {
     suspend fun getAllRemoteCardMember(): List<CardMember>
 
     // 서버에 연산할 카드 멤버 알람 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM card_member_alarm
@@ -33,6 +32,7 @@ interface CardMemberDao {
     suspend fun getAllRemoteCardMemberAlarm(): List<CardMemberAlarm>
     
     // 담당자 조회
+    @Transaction
     @Query(
         """
         SELECT *
@@ -40,15 +40,16 @@ interface CardMemberDao {
         WHERE cardId == :cardId AND isRepresentative == 1
     """
     )
-    suspend fun getCardRepresentatives(cardId: Long): List<CardMemberWithMemberInfo>
+    fun getCardRepresentatives(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
     
     // 카드 멤버들 조회
+    @Transaction
     @Query("""
         SELECT *
         FROM card_member 
         WHERE cardId == :cardId
     """)
-    suspend fun getCardMembers(cardId: Long): List<CardMemberWithMemberInfo>
+    fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

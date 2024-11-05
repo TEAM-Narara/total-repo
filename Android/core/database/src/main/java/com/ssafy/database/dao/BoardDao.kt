@@ -5,13 +5,19 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.ssafy.database.dto.Board
+import com.ssafy.database.dto.BoardMember
+import com.ssafy.database.dto.BoardMemberAlarm
 import com.ssafy.database.dto.Workspace
 import com.ssafy.database.dto.with.BoardDetail
 import com.ssafy.database.dto.with.BoardInList
+import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BoardDao {
@@ -26,7 +32,6 @@ interface BoardDao {
     suspend fun getAllLocalBoards(): List<BoardInList>
 
     // 서버에 연산할 보드 조회
-    @Transaction
     @Query("""
         SELECT * 
         FROM board
@@ -34,14 +39,9 @@ interface BoardDao {
     """)
     suspend fun getAllRemoteBoards(): List<Board>
 
-    // 보드 상세 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM board 
-        WHERE id == :boardId
-    """)
-    suspend fun getBoardDetail(boardId: Long): BoardDetail
+    // 보드 단일 조회
+    @Query("SELECT * FROM board WHERE id = :boardId")
+    fun getBoard(boardId: Long): Flow<Board>
 
     // 워크스페이스에서 볼 것
     @Query("""
@@ -49,7 +49,7 @@ interface BoardDao {
         FROM board 
         WHERE workspaceId == :workspaceId And isStatus != 'DELETE' And isClosed == 0
     """)
-    suspend fun getAllBoards(workspaceId: Long): List<Board>
+    fun getAllBoards(workspaceId: Long): Flow<List<Board>>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -57,7 +57,7 @@ interface BoardDao {
         FROM board 
         WHERE isStatus != 'DELETE' And isClosed == 1
     """)
-    suspend fun getAllBoardsArchived(): List<Board>
+    fun getAllBoardsArchived(): Flow<List<Board>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
