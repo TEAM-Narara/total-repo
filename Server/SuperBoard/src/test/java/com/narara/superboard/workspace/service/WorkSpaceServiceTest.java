@@ -78,7 +78,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
         // then
         // 메서드가 한 번 호출되었는지 확인
-        verify(workSpaceValidator, times(1)).validateNameIsPresent(workspaceCreateDto);
+        verify(workSpaceValidator, times(1)).validateNameIsPresent(workspaceCreateDto.name());
         verify(workSpaceRepository, times(1)).save(any());
         verify(workSpaceMemberRepository, times(1)).save(any());
     }
@@ -108,7 +108,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                 .thenReturn(Optional.of(existingWorkspace));
 
         // When
-        WorkSpace result = workSpaceService.updateWorkSpace(workspaceId, updateRequest);
+        WorkSpace result = workSpaceService.updateWorkSpace(workspaceId, updateRequest.name());
 
         // Then
         assertAll(
@@ -272,7 +272,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         assertEquals(mockMemberCollectionResponseDto, result.workspaceMemberList());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(1)).validateNameIsPresent(result);
+        verify(workSpaceValidator, times(1)).validateNameIsPresent(result.name());
     }
 
 

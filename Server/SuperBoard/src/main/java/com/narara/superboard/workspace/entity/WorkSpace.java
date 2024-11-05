@@ -47,9 +47,9 @@ public class WorkSpace extends BaseTimeEntity {
                 .build();
     }
 
-    public WorkSpace updateWorkSpace(WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) {
-        this.name = workspaceUpdateRequestDto.name();
-//        this.description = workspaceUpdateRequestDto.description();
+    public WorkSpace updateWorkSpace(String workspaceName) {
+        this.name = workspaceName;
+        this.offset++;
         return this;
     }
 
@@ -64,9 +64,10 @@ public class WorkSpace extends BaseTimeEntity {
 
     public void deleted() {
         this.isDeleted = true;
+        this.offset++;
     }
 
-    public void edit(String name) {
-        this.name = name;
+    public void addOffset() {
+        this.offset++;
     }
 }

@@ -62,7 +62,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("워크스페이스 2", result.workSpaceResponseDtoList().get(1).name());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceResponseDto.class));
+        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(String.class));
 
         // workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).findAllByMember(member);

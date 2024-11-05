@@ -28,7 +28,7 @@ class WorkSpaceValidatorTest implements MockSuperBoardUnitTests {
     void testWorkSpaceEntityCreation(String name, String description) {
         WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
 
-        assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceCreateDto));
+        assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceCreateDto.name()));
     }
 
     @DisplayName("수정 DTO에 이름이 없으면 에러가 발생한다.")
@@ -40,6 +40,6 @@ class WorkSpaceValidatorTest implements MockSuperBoardUnitTests {
     void testWorkSpaceEntityUpdate(String name, String description) {
         WorkSpaceUpdateRequestDto workspaceUpdateRequestDto = new WorkSpaceUpdateRequestDto(name);
 
-        assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto));
+        assertThrows(WorkspaceNameNotFoundException.class, () -> workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto.name()));
     }
 }
