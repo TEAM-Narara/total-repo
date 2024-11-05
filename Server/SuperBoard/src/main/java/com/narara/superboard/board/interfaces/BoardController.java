@@ -4,9 +4,11 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.entity.CustomUserDetails;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +29,7 @@ public class BoardController implements BoardAPI {
 
     private final BoardService boardService;
     private final CoverHandler coverHandler;
+    private final IAuthenticationFacade authenticationFacade;
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")
@@ -40,8 +43,13 @@ public class BoardController implements BoardAPI {
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
     public ResponseEntity<DefaultResponse<Long>> createBoard(
             @AuthenticationPrincipal Member member,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+        System.out.println(userDetails);
+        System.out.println(userDetails.getMember());
         System.out.println("MEMBER : +" + member);
+        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+        System.out.println(memberId);
         Long boardId = boardService.createBoard(member, boardCreateRequestDto);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardId), HttpStatus.CREATED);
     }

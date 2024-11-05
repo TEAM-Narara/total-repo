@@ -13,15 +13,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Member extends BaseTimeEntity {
+public class Member extends BaseTimeEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -118,5 +123,15 @@ public class Member extends BaseTimeEntity {
                 .loginType(this.loginType)
                 .refreshToken(this.refreshToken)
                 .build();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("MEMBER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return String.valueOf(id);
     }
 }

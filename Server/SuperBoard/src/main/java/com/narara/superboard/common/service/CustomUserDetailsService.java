@@ -46,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> authorities = getUserAuthorities(member);
 
         // CustomUserDetails 객체 생성 후 반환
-        return new CustomUserDetails(member.getId(), authorities);
+        return new CustomUserDetails(member, member.getId(), authorities);
     }
 
     /**
@@ -67,6 +67,28 @@ public class CustomUserDetailsService implements UserDetailsService {
 //
 //        // 두 리스트를 결합하여 반환
 //        workspaceAuthorities.addAll(boardAuthorities);
-        return null;
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        // 예시: 기본적으로 ROLE_USER 권한 추가
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+//        // 필요한 경우 추가 권한들을 불러오고, authorities 리스트에 추가합니다.
+//        // 예: 워크스페이스 및 보드 권한 설정 로직 (해당 권한 정보가 Member 객체에 포함되어 있는 경우)
+//        if (member.getWorkspaceMemberList() != null) {
+//            authorities.addAll(member.getWorkspaceMemberList().stream()
+//                    .map(role -> new SimpleGrantedAuthority("ROLE_WORKSPACE_" + role.getAuthority() + "_ID_" + role.getWorkSpace().getId()))
+//                    .toList());
+//        }
+//
+//        if (member.getBoardMemberList() != null) {
+//            authorities.addAll(member.getBoardMemberList().stream()
+//                    .map(role -> new SimpleGrantedAuthority("ROLE_BOARD_" + role.getAuthority() + "_ID_" + role.getBoard().getId()))
+//                    .toList());
+//        }
+
+        return authorities;
+
+//        return null;
     }
 }

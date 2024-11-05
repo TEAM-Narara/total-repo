@@ -4,14 +4,20 @@ import com.narara.superboard.common.config.jwt.JwtAuthenticationFilter;
 import com.narara.superboard.common.exception.security.CustomAccessDeniedHandler;
 import com.narara.superboard.common.exception.security.CustomAuthenticationEntryPoint;
 import com.narara.superboard.common.service.CustomPermissionEvaluator;
+import com.narara.superboard.common.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -39,6 +45,7 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomPermissionEvaluator customPermissionEvaluator;
+    private final CustomUserDetailsService customUserDetailsService;
 
     // /error, /favicon.ico에 대한 경로 열어주지 않으면 401로 계속 뜸
     @Bean
@@ -91,4 +98,10 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Autowired
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserDetailsService);
+    }
+
 }

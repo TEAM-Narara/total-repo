@@ -1,6 +1,7 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.common.entity.CustomUserDetails;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ public interface BoardAPI {
     @Operation(summary = "보드 생성")
     ResponseEntity<DefaultResponse<Long>> createBoard(
             @AuthenticationPrincipal Member member,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody BoardCreateRequestDto boardCreateRequestDto);
 
     @GetMapping("/{boardId}")
