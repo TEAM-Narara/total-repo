@@ -1,35 +1,23 @@
 package com.narara.superboard.member.service;
 
-import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.enums.LoginType;
 import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.InvalidCredentialsException;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
-import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
-import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
-import com.narara.superboard.member.interfaces.dto.TokenDto;
-import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
+import com.narara.superboard.member.interfaces.dto.*;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.service.WorkSpaceService;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -42,22 +30,25 @@ public class AuthServiceImpl implements AuthService {
     private final WorkSpaceService workSpaceService;
 
     @Override
-    public TokenDto register(MemberCreateRequestDto memberCreateRequestDto) {
+    public MemberLoginResponseDto register(MemberCreateRequestDto memberCreateRequestDto) {
         memberValidator.registerValidate(memberCreateRequestDto);
 
         Member newMember = createNewMember(memberCreateRequestDto);
         // 워크 스페이스 생성
-        workSpaceService.createWorkSpace(newMember,
+        workSpaceService.createWorkSpace(newMember.getId(),
                 new WorkSpaceCreateRequestDto(newMember.getNickname()+"의 워크스페이스"));
 
         TokenDto tokenDto = createTokens(newMember);
         saveRefreshToken(newMember, tokenDto.refreshToken());
 
-        return tokenDto;
+        MemberDto memberDto = new MemberDto(newMember.getEmail(), newMember.getNickname(),
+                newMember.getProfileImgUrl());
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     @Override
-    public TokenDto login(MemberLoginRequestDto memberLoginRequestDto) {
+    public MemberLoginResponseDto login(MemberLoginRequestDto memberLoginRequestDto) {
         memberValidator.loginValidate(memberLoginRequestDto);
 
         Member member = findMemberByEmail(memberLoginRequestDto.email());
@@ -67,7 +58,10 @@ public class AuthServiceImpl implements AuthService {
         TokenDto tokenDto = createTokens(member);
         saveRefreshToken(member, tokenDto.refreshToken());
 
-        return tokenDto;
+        MemberDto memberDto = new MemberDto(member.getEmail(), member.getNickname(),
+                member.getProfileImgUrl());
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     @Override

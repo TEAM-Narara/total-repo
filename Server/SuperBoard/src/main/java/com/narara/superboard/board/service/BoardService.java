@@ -6,6 +6,7 @@ import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.member.entity.Member;
 import org.springframework.data.domain.Pageable;
 
+import com.narara.superboard.websocket.constant.Action;
 import java.util.List;
 
 public interface BoardService {
@@ -28,5 +29,7 @@ public interface BoardService {
     PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable);
 
 
+
+    void checkBoardMember(Board board, Member member, Action action);
 
 }

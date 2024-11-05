@@ -1,8 +1,10 @@
 package com.narara.superboard.reply.service;
 
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
@@ -12,6 +14,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
+import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,8 @@ import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
+
+    private final CardService cardService;
 
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
@@ -36,7 +41,7 @@ public class ReplyServiceImpl implements ReplyService{
         Card card = cardRepository.findById(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
-//        TODO: 댓글을 포함하는 보드의 권한이 있는지 확인
+        cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
 
@@ -45,7 +50,6 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Reply getReply(Long replyId) {
-//        TODO: 댓글을 포함하는 보드의 권한이 있는지 확인
         return replyRepository.findById(replyId)
                 .orElseThrow(() -> new NotFoundEntityException(replyId, "댓글"));
     }

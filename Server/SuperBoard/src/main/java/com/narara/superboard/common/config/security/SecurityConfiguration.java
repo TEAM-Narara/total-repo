@@ -65,7 +65,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("api/v1/members/register","api/v1/members/login"
                                         ,"api/v1/members/reissue","api/v1/members/email-code"
-                                ,"api/v1/members/email-code/verify").permitAll()
+                                ,"api/v1/members/email-code/verify","api/v1/members/oauth2/login/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 // jwt 관련 설정

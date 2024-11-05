@@ -1,23 +1,23 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
-import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
+import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import lombok.RequiredArgsConstructor;
@@ -98,7 +98,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void deleteBoard(Long boardId) {
         Board board = getBoard(boardId);
-        boardRepository.delete(board);
+        board.deleted();
     }
 
     @Override
@@ -142,6 +142,16 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
     }
 
+    @Override
+    public void checkBoardMember(Board board, Member member, Action action) {
+        java.util.List<BoardMember> boardMemberList = board.getBoardMemberList();
+        for (BoardMember boardMember : boardMemberList) {
+            if (boardMember.getMember().getId().equals(member.getId())) {
+                return;
+            }
+        }
+        throw new UnauthorizedException(member.getNickname(), action);
+    }
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 

@@ -24,7 +24,6 @@ public class WorkSpace extends BaseTimeEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -37,6 +36,9 @@ public class WorkSpace extends BaseTimeEntity {
     @Builder.Default
     @Column(name = "\"offset\"")
     private Long offset = 0L;
+
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     public static WorkSpace createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         return WorkSpace.builder()
@@ -58,5 +60,13 @@ public class WorkSpace extends BaseTimeEntity {
         this.name = name;
         this.workspaceMemberList = null;
         this.offset = offset;
+    }
+
+    public void deleted() {
+        this.isDeleted = true;
+    }
+
+    public void edit(String name) {
+        this.name = name;
     }
 }

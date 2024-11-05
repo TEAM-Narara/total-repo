@@ -2,10 +2,19 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
+    id "org.sonarqube" version "5.0.0.4638"
 }
 
 group = 'com.narara'
 version = '0.0.1-SNAPSHOT'
+// jacocoDir 디렉토리 정의
+ext {
+    jacocoDir = new File(buildDir, "customJacocoReportDir")
+}
+if (!ext.jacocoDir.exists()) {
+    ext.jacocoDir.mkdirs()
+}
 
 java {
     toolchain {
@@ -25,19 +34,22 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    annotationProcessor 'org.projectlombok:lombok'
+
+    // junit
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     // hibernate
     implementation 'org.hibernate:hibernate-core:6.6.1.Final'
@@ -65,6 +77,24 @@ dependencies {
     // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // queryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // controller test
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+
+    // Mongo DB
+//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    //Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    //jsonObject
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    implementation 'org.json:json:20211205'
 }
 
 test{
@@ -79,6 +109,8 @@ test{
     systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
     // JVM이 사용 가능한 CPU 코어 수 중 절반을 사용
     maxParallelForks = (Runtime.runtime.availableProcessors() / 2) ?: 1
+
+    finalizedBy jacocoTestReport
 }
 
 tasks.register('copyYML', Copy) {
@@ -100,6 +132,7 @@ tasks.named('build') {
 tasks.named('test') {
     dependsOn('copyTestYML')
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
 tasks.named('processResources') {
@@ -109,3 +142,7 @@ tasks.named('processResources') {
 tasks.named('processTestResources') {
     dependsOn 'copyTestYML' // processTestResources가 copyTestYML에 의존성을 가지도록 설정
 }
+
+apply from: 'querydsl.gradle'
+apply from: 'jacoco.gradle'
+apply from: 'sonarqube.gradle'

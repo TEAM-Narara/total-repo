@@ -6,6 +6,7 @@ import com.narara.superboard.member.exception.*;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.member.interfaces.dto.MemberCreateRequestDto;
 import com.narara.superboard.member.interfaces.dto.MemberLoginRequestDto;
+import com.narara.superboard.member.interfaces.dto.MemberLoginResponseDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.validator.MemberValidator;
 import com.narara.superboard.member.util.JwtTokenProvider;
@@ -91,7 +92,7 @@ class AuthServiceImplTest {
 
         // 6. MemberValidator가 검증을 호출했는지 확인
         verify(memberValidator, times(1)).registerValidate(requestDto); // 유효성 검증 호출 확인
-        verify(workSpaceService, times(1)).createWorkSpace(any(Member.class),any(WorkSpaceCreateRequestDto.class)); // 유효성 검증 호출 확인
+        verify(workSpaceService, times(1)).createWorkSpace(any(Long.class),any(WorkSpaceCreateRequestDto.class)); // 유효성 검증 호출 확인
 
         // 6. 결과 검증
         // 호출되었는지 확인
@@ -193,11 +194,11 @@ class AuthServiceImplTest {
         when(jwtTokenProvider.generateRefreshToken(any())).thenReturn("refresh-token");
 
         // When: 로그인 시도
-        TokenDto token = authService.login(requestDto);
+        MemberLoginResponseDto memberLoginResponseDto = authService.login(requestDto);
 
         // Then: 로그인 성공 (JWT 토큰 생성 확인)
-        assertNotNull(token.accessToken());
-        assertNotNull(token.refreshToken());
+        assertNotNull(memberLoginResponseDto.tokenDto().accessToken());
+        assertNotNull(memberLoginResponseDto.tokenDto().refreshToken());
         verify(memberRepository, times(1)).findByEmail(email);
         verify(passwordEncoder, times(1)).matches(password, existingMember.getPassword());
         verify(jwtTokenProvider, times(1)).generateAccessToken(any());
