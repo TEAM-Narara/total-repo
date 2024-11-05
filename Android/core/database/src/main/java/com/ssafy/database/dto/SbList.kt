@@ -1,9 +1,13 @@
 package com.ssafy.database.dto
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "list")
+@Entity(
+    tableName = "list",
+    indices = [Index(value = ["boardId"])]
+)
 data class SbList(
     @PrimaryKey(autoGenerate = true)  val id: Long = 0L,
     val boardId: Long = 0L,

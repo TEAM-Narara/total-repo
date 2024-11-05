@@ -1,9 +1,13 @@
 package com.ssafy.database.dto
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "card_member")
+@Entity(
+    tableName = "card_member",
+    indices = [Index(value = ["cardId"]), Index(value = ["memberId"])]
+)
 data class CardMember(
     @PrimaryKey val id: Long = 0L,
     val memberId: Long = 0L,

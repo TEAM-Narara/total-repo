@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.piece.ReplyCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,6 +30,15 @@ interface ReplyDao {
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteReplies(): List<Reply>
+
+    // 댓글 수 조회
+    @Query("""
+        SELECT cardId, COUNT(*) AS count 
+        FROM reply
+        WHERE isStatus != 'DELETE'
+        GROUP BY cardId
+    """)
+    fun getReplyCounts(): Flow<List<ReplyCount>>
 
     // 카드에서 볼 댓글
     @Query("""

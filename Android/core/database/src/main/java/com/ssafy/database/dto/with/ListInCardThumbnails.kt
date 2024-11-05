@@ -6,12 +6,6 @@ import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.SbList
 
 data class ListInCardThumbnails(
-    @Embedded val sbList: SbList,
-
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "listId",
-        entity = Card::class
-    )
-    val cardThumbnails: List<CardThumbnail>,
+    @Embedded(prefix = "list_") val sbList: SbList,
+    val cards: List<CardDetail>
 )

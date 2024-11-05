@@ -29,7 +29,7 @@ interface CardLabelDao {
     """)
     suspend fun getAllRemoteCardLabels(): List<CardLabel>
 
-    // 카드 라벨 모두 조회
+    // 카드의 라벨을 조회
     @Transaction
     @Query("""
         SELECT 
@@ -47,7 +47,27 @@ interface CardLabelDao {
         INNER JOIN label ON label.id = card_label.labelId
         WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE'
     """)
-    fun getAllCardLabels(cardId: Long): Flow<List<CardLabelWithLabelInfo>>
+    fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelInfo>>
+
+    // 카드들의 라벨들 조회
+    @Transaction
+    @Query("""
+        SELECT 
+            card_label.id AS card_label_id,
+            card_label.labelId AS card_label_labelId,
+            card_label.cardId AS card_label_cardId,
+            card_label.isActivated AS card_label_isActivated,
+            card_label.isStatus AS card_label_isStatus,
+            label.id AS label_id,
+            label.boardId AS label_boardId,
+            label.name AS label_name,
+            label.color AS label_color,
+            label.isStatus AS label_isStatus
+        FROM card_label
+        INNER JOIN label ON label.id = card_label.labelId
+        WHERE card_label.cardId IN (:cardIds) AND card_label.isStatus != 'DELETE'
+    """)
+    fun getAllCardLabelsInCards(cardIds: List<Long>): Flow<List<CardLabelWithLabelInfo>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

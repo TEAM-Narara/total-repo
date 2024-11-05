@@ -68,19 +68,34 @@ interface CardDao {
     """)
     fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>
 
-    // 워크스페이스에서 볼 것
+    // 리스트 내에 카드들 조회
     @Query("""
         SELECT * 
         FROM card 
-        WHERE listId == :listId And isStatus != 'DELETE' And isArchived == 0
+        WHERE listId == :listId
+            And isStatus != 'DELETE' 
+            And isArchived == 0
+        ORDER BY myOrder
     """)
-    fun getAllCards(listId: Long): Flow<List<Card>>
+    fun getAllCardsInList(listId: Long): Flow<List<Card>>
+
+    // 리스트들 내에 카드들 조회
+    @Query("""
+        SELECT * 
+        FROM card 
+        WHERE listId IN (:listIds) 
+            And isStatus != 'DELETE' 
+            And isArchived == 0
+        ORDER BY myOrder
+    """)
+    fun getAllCardsInLists(listIds: List<Long>): Flow<List<Card>>
 
     // 아카이브에서 볼 것
     @Query("""
         SELECT * 
         FROM card 
         WHERE isStatus != 'DELETE' And isArchived == 1
+        ORDER BY myOrder
     """)
     fun getAllCardsArchived(): Flow<List<Card>>
 
