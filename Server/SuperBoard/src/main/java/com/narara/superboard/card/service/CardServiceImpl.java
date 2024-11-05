@@ -74,7 +74,10 @@ public class CardServiceImpl implements CardService {
     public Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto) {
         Card card = getCard(cardId);
         checkBoardMember(card, member, EDIT_CARD);
-        coverValidator.validateCardCover(cardUpdateRequestDto);
+
+        if (cardUpdateRequestDto.cover() != null) {
+            coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
+        }
 
         return card.updateCard(cardUpdateRequestDto);
     }

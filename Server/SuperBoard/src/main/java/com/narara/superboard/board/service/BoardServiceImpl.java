@@ -125,7 +125,7 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
 
         if (boardUpdateRequestDto.cover() != null) {
-            coverValidator.validateContainCover(boardUpdateRequestDto);
+            coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
         }
 
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
