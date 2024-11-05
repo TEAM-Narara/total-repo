@@ -13,7 +13,8 @@ data class BoardDetail(
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId",
-        entity = BoardMember::class
+        entity = BoardMember::class,
+        projection = ["id", "memberId", "boardId", "authority", "isStatus"]
     )
     val boardMembers: List<BoardMemberWithMemberInfo>,
 

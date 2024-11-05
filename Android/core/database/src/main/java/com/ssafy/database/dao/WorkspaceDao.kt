@@ -33,6 +33,10 @@ interface WorkspaceDao {
     """)
     suspend fun getAllRemoteWorkspace(): List<Workspace>
 
+    // 워크스페이스 단일 조회
+    @Query("SELECT * FROM workspace WHERE id = :workspaceId")
+    fun getWorkspace(workspaceId: Long): Flow<Workspace>
+
     // 워크스페이스 상세 조회
     @Transaction
     @Query("""

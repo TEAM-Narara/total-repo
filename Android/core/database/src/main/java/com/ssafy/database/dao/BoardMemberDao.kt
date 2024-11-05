@@ -36,9 +36,9 @@ interface BoardMemberDao {
     @Query("""
         SELECT *
         FROM board_member 
-        WHERE boardId == :boardId
+        WHERE boardId == :boardId AND isStatus != 'DELETE'
     """)
-    suspend fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
+    fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
 
     // 보드 알람 조회
     @Query("""
@@ -46,7 +46,7 @@ interface BoardMemberDao {
         FROM board_member_alarm 
         WHERE boardId == :boardId
     """)
-    suspend fun getBoardMemberAlarm(boardId: Long): BoardMemberAlarm
+    fun getBoardMemberAlarm(boardId: Long): Flow<BoardMemberAlarm>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

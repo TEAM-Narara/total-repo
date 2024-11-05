@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import com.ssafy.database.dto.Alert
 import com.ssafy.database.dto.Attachment
 import com.ssafy.database.dto.MemberBackground
@@ -13,11 +12,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlertDao {
-    @Query("SELECT * FROM alert")
-    suspend fun getAllAlerts(): List<Alert>
 
-    @Transaction
-    @Query("SELECT * FROM alert")
+    // 알람 멤버 조회
+    @Query("""
+        SELECT alert.*, member.*
+        FROM alert
+        INNER JOIN member ON member.id = alert.memberId
+    """)
     fun getAllAlertsWithMemberInfo(): Flow<List<AlertWithMemberInfo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
