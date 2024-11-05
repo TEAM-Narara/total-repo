@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.user.User
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class MemberPagingSource @Inject constructor(
@@ -15,11 +16,12 @@ class MemberPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, User> {
         val page = params.key ?: 0
         val pageDto = PageDto(page, params.loadSize, sort)
+
         return runCatching {
-            memberDataSource.searchMembers(keyword, pageDto)
+            memberDataSource.searchMembers(keyword, pageDto).firstOrNull()
         }.fold(
             onSuccess = { response ->
-                val repos: List<User> = response.body()?.data ?: emptyList()
+                val repos: List<User> = response ?: emptyList()
                 val nextKey = if (repos.isEmpty()) null else page + (params.loadSize / PAGE_SIZE)
                 val prevKey = if (page == 0) null else page - 1
                 LoadResult.Page(repos, prevKey, nextKey)

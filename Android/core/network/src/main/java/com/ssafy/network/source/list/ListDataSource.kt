@@ -2,20 +2,19 @@ package com.ssafy.network.source.list
 
 import com.ssafy.model.list.ListRequestDto
 import com.ssafy.model.list.ListResponseDto
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 
 interface ListDataSource {
 
-    suspend fun createList(listRequestDto: ListRequestDto): Response<ApiResponse<Unit>>
+    suspend fun createList(listRequestDto: ListRequestDto): Flow<Unit>
 
     suspend fun updateList(
         listId: Long,
         listRequestDto: ListRequestDto
-    ): Response<ApiResponse<Unit>>
+    ): Flow<Unit>
 
-    suspend fun setListArchive(listId: Long): Response<ApiResponse<Unit>>
+    suspend fun setListArchive(listId: Long): Flow<Unit>
 
-    suspend fun getArchivedLists(boardId: Long): Response<ApiResponse<List<ListResponseDto>>>
+    suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>>
 
 }

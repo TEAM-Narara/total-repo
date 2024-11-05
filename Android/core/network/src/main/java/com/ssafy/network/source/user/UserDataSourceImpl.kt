@@ -3,36 +3,36 @@ package com.ssafy.network.source.user
 import com.ssafy.model.user.User
 import com.ssafy.model.user.signup.RegisterDTO
 import com.ssafy.network.api.UserAPI
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import com.ssafy.network.source.toFlow
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : UserDataSource {
 
-    override suspend fun loginWithGitHub(token: String): Response<ApiResponse<User>> =
-        userAPI.loginWithGitHub(token)
+    override suspend fun loginWithGitHub(token: String): Flow<User> =
+        userAPI.loginWithGitHub(token).toFlow()
 
-    override suspend fun loginWithNaver(token: String): Response<ApiResponse<User>> =
-        userAPI.loginWithNaver(token)
+    override suspend fun loginWithNaver(token: String): Flow<User> =
+        userAPI.loginWithNaver(token).toFlow()
 
-    override suspend fun login(email: String, password: String): Response<ApiResponse<User>> {
+    override suspend fun login(email: String, password: String): Flow<User> {
         val map = mapOf("email" to email, "password" to password)
-        return userAPI.login(map)
+        return userAPI.login(map).toFlow()
     }
 
-    override suspend fun sendEmailCode(email: String): Response<ApiResponse<Unit>> =
-        userAPI.sendEmailCode(email)
+    override suspend fun sendEmailCode(email: String): Flow<Unit> =
+        userAPI.sendEmailCode(email).toFlow()
 
-    override suspend fun verifyEmailCode(email: String, code: String): Response<ApiResponse<Unit>> =
-        userAPI.verifyEmailCode(email, code)
+    override suspend fun verifyEmailCode(email: String, code: String): Flow<Unit> =
+        userAPI.verifyEmailCode(email, code).toFlow()
 
-    override suspend fun register(registerDTO: RegisterDTO): Response<ApiResponse<User>> =
-        userAPI.register(registerDTO)
+    override suspend fun register(registerDTO: RegisterDTO): Flow<User> =
+        userAPI.register(registerDTO).toFlow()
 
-    override suspend fun logout(): Response<ApiResponse<Unit>> =
-        userAPI.logout()
+    override suspend fun logout(): Flow<Unit> =
+        userAPI.logout().toFlow()
 
-    override suspend fun withdrawal(): Response<ApiResponse<Unit>> =
-        userAPI.withdrawal()
+    override suspend fun withdrawal(): Flow<Unit> =
+        userAPI.withdrawal().toFlow()
 
 }

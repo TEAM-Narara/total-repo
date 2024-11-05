@@ -3,15 +3,14 @@ package com.ssafy.network.source.member
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.user.User
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 
 interface MemberDataSource {
 
-    suspend fun getMembers(): Response<ApiResponse<User>>
+    suspend fun getMembers(): Flow<User>
 
-    suspend fun updateMember(memberUpdateRequestDto: MemberUpdateRequestDto): Response<ApiResponse<Unit>>
+    suspend fun updateMember(memberUpdateRequestDto: MemberUpdateRequestDto): Flow<Unit>
 
-    suspend fun searchMembers(keyword: String, pageDto: PageDto): Response<ApiResponse<List<User>>>
+    suspend fun searchMembers(keyword: String, pageDto: PageDto): Flow<List<User>>
 
 }

@@ -3,24 +3,23 @@ package com.ssafy.network.source.workspace
 import com.ssafy.model.board.MemberListResponseDTO
 import com.ssafy.model.workspace.WorkSpaceListResponseDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
-import com.ssafy.network.source.ApiResponse
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 
 interface WorkspaceDataSource {
 
-    suspend fun getWorkspaceList(): Response<ApiResponse<WorkSpaceListResponseDTO>>
+    suspend fun getWorkspaceList(): Flow<WorkSpaceListResponseDTO>
 
-    suspend fun createWorkspace(workspaceRequestDTO: WorkspaceRequestDTO): Response<ApiResponse<Unit>>
+    suspend fun createWorkspace(workspaceRequestDTO: WorkspaceRequestDTO): Flow<Unit>
 
-    suspend fun deleteWorkspace(workspaceId: Long): Response<ApiResponse<Unit>>
+    suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit>
 
     suspend fun updateWorkspace(
         workspaceId: Long,
         workspaceRequestDTO: WorkspaceRequestDTO
-    ): Response<ApiResponse<Unit>>
+    ): Flow<Unit>
 
-    suspend fun getWorkspaceMembers(workspaceId: Long): Response<ApiResponse<MemberListResponseDTO>>
+    suspend fun getWorkspaceMembers(workspaceId: Long): Flow<MemberListResponseDTO>
 
-    suspend fun getWorkspacesByMember(memberId: Long): Response<ApiResponse<WorkSpaceListResponseDTO>>
+    suspend fun getWorkspacesByMember(memberId: Long): Flow<WorkSpaceListResponseDTO>
 
 }
