@@ -24,7 +24,6 @@ interface AlertDao {
             alert.body AS alert_body,
             alert.createAt AS alert_createAt,
             alert.updateAt AS alert_updateAt,
-            alert.status AS alert_status,
             member.id AS member_id,
             member.email AS member_email,
             member.nickname AS member_nickname,

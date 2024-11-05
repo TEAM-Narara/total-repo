@@ -11,6 +11,4 @@ data class Alert(
     val body: String? = null,
     val createAt: Long = 0L,
     val updateAt: Long = 0L,
-
-    val status: String = ""
 )
