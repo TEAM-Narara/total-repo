@@ -18,23 +18,25 @@ import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepos
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class WorkSpaceServiceImpl implements WorkSpaceService {
-
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final BoardService boardService;
     private final WorkSpaceMemberService workSpaceMemberService;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
+//    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
     @Transactional
@@ -47,26 +49,19 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);
 
         WorkSpace newWorkSpace = workSpaceRepository.save(workSpace);
-        WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member);
+        WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
+
         return newWorkSpace;
-    }
-
-    @Override
-    @Transactional
-    public WorkSpace updateWorkSpace(Long workSpaceId, WorkSpaceUpdateRequestDto workspaceUpdateRequestDto) throws WorkspaceNameNotFoundException{
-        workSpaceValidator.validateNameIsPresent(workspaceUpdateRequestDto);
-
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
-
-        return workSpace.updateWorkSpace(workspaceUpdateRequestDto);
     }
 
     @Override
     @Transactional
     public void deleteWorkSpace(Long workSpaceId) {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
-        workSpace.deleted(); //삭제 처리
+        workSpace.deleted(); //삭제 처리 offset++
+
+//        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override
@@ -109,11 +104,12 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Transactional
     @Override
-    public WorkSpace editWorkspace(Long memberId, Long workspaceId, String name) {
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new MemberNotFoundException(memberId));
+    public WorkSpace updateWorkSpace(Long workspaceId, String name) {
+        workSpaceValidator.validateNameIsPresent(new WorkSpaceUpdateRequestDto(name));
+        WorkSpace workSpace = getWorkSpace(workspaceId);
+        workSpace.updateWorkSpace(name); //offset++
 
-        workSpace.edit(name);
+//        workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
 
         return workSpace;
     }

@@ -28,6 +28,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
     private final JwtTokenProvider jwtTokenProvider;
     private final IAuthenticationFacade authenticationFacade;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
+//    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Operation(summary = "워크스페이스 생성")
     @PostMapping
@@ -46,7 +47,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @DeleteMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //ADMIN만 가능
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
-//        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         workSpaceService.deleteWorkSpace(workspaceId);
 
         return ResponseEntity.ok().build();
@@ -56,8 +56,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @PatchMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
     public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
-        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
-        WorkSpace workSpace = workSpaceService.editWorkspace(memberId, workspaceId, requestDto.name());
+        WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
     }
@@ -71,4 +70,15 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
         return ResponseEntity.ok(workSpaceListResponseDto);
     }
+
+//    @Operation(summary = "특정 offset 이후 데이터 싹 조회")
+//    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
+//    @GetMapping("/{workspaceId}/diffs")
+//    public ResponseEntity<List<WorkspaceDiffDto>> getDiffs(
+//            @PathVariable Long workspaceId,
+//            @RequestParam(required = false, defaultValue = "0") Long fromOffset
+//    ) {
+//        List<WorkspaceDiffDto> diffs = workspaceOffsetService.getDiffListFromOffset(workspaceId, fromOffset);
+//        return ResponseEntity.ok(diffs);
+//    }
 }
