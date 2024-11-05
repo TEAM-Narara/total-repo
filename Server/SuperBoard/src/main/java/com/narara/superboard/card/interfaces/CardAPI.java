@@ -1,9 +1,6 @@
 package com.narara.superboard.card.interfaces;
 
-import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
-import com.narara.superboard.card.interfaces.dto.CardDetailResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardSimpleResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +29,7 @@ public interface CardAPI {
             @RequestBody CardUpdateRequestDto cardUpdateRequestDto);
 
     @GetMapping("/archived/{boardId}")
-    ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getArchivedCardList(
+    ResponseEntity<DefaultResponse<CardArchiveCollectionResponseDto>> getArchivedCardList(
             @AuthenticationPrincipal Member member,
             @PathVariable Long boardId);
 

@@ -51,7 +51,7 @@ public interface BoardAPI {
     @GetMapping("/workspace/{workspaceId}/archived")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "아카이브된 보드 조회")
-    ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId);
+    ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId);
 
     @PatchMapping("/{boardId}/archive")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")

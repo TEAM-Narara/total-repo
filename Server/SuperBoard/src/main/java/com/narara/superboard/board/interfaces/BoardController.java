@@ -93,13 +93,16 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "아카이브된 보드 조회", description = "워크스페이스 ID를 사용하여 아카이브된 보드 목록을 조회합니다.")
-    public ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId) {
+    public ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId) {
         List<Board> archivedBoards = boardService.getArchivedBoards(workspaceId);
         List<BoardSimpleResponseDto> boardSimpleResponseDtoList = new ArrayList<>();
         for (Board board : archivedBoards) {
             boardSimpleResponseDtoList.add(BoardSimpleResponseDto.of(board, coverHandler));
         }
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, boardSimpleResponseDtoList), HttpStatus.OK);
+
+        BoardArchiveCollectionResponseDto dto = new BoardArchiveCollectionResponseDto(boardSimpleResponseDtoList);
+
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, dto), HttpStatus.OK);
     }
 
     @Override
