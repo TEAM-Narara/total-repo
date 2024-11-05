@@ -7,7 +7,6 @@ import com.ssafy.model.list.ListResponseDto
 import com.ssafy.network.source.list.ListDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,11 +22,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(listRequestDto)
-                .toFlow()
-                .map { listResponseDto: ListResponseDto ->
-                    TODO("Room DB가 연동되면 생성 로직을 구현해주세요")
-                }
+            listDataSource.createList(listRequestDto).toFlow()
         } else {
             TODO("Room DB가 연동되면 생성 로직을 구현해주세요")
         }
@@ -39,11 +34,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.updateList(listId, listRequestDto)
-                .toFlow()
-                .map { listResponseDto: ListResponseDto ->
-                    TODO("Room DB가 연동되면 수정 로직을 구현해주세요")
-                }
+            listDataSource.updateList(listId, listRequestDto).toFlow()
         } else {
             TODO("Room DB가 연동되면 수정 로직을 구현해주세요")
         }
@@ -52,11 +43,7 @@ class ListRepositoryImpl @Inject constructor(
     override suspend fun setListArchive(listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                listDataSource.setListArchive(listId)
-                    .toFlow()
-                    .map { listResponseDto: ListResponseDto ->
-                        TODO("Room DB가 연동되면 아카이브 로직을 구현해주세요")
-                    }
+                listDataSource.setListArchive(listId).toFlow()
             } else {
                 TODO("Room DB가 연동되면 아카이브 로직을 구현해주세요")
             }
