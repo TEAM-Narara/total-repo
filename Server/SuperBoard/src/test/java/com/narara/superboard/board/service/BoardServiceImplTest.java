@@ -434,7 +434,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 new CoverDto((String) coverWithoutType.get("type"), (String) coverWithoutType.get("value")), "PRIVATE");
 
         // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
-        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
+        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateCoverTypeIsValid(requestDto.cover());
 
         // when & then: 예외가 발생하는지 확인
         Long memberId = 1L;
@@ -442,7 +442,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertThrows(NotFoundCoverTypeException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
-        verify(coverValidator, times(1)).validateContainCover(requestDto);
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(requestDto.cover());
     }
 
     @Test
@@ -458,14 +458,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 "PRIVATE");
 
         // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
-        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
+        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateCoverTypeIsValid(requestDto.cover());
 
         // when & then: 예외가 발생하는지 확인
         Long memberId = 1L;
         assertThrows(NotFoundCoverValueException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
-        verify(coverValidator, times(1)).validateContainCover(requestDto);
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(requestDto.cover());
     }
 
     @ParameterizedTest
@@ -499,7 +499,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // 커버가 있을 때만 검증하도록 설정
         if (cover != null) {
-            doNothing().when(coverValidator).validateContainCover(requestDto);
+            doNothing().when(coverValidator).validateCoverTypeIsValid(requestDto.cover());
         }
 
         // when
@@ -516,9 +516,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // 커버가 존재하는 경우에만 커버 검증 호출 확인
         if (cover != null) {
-            verify(coverValidator, times(1)).validateContainCover(requestDto);
+            verify(coverValidator, times(1)).validateCoverTypeIsValid(requestDto.cover());
         } else {
-            verify(coverValidator, never()).validateContainCover(requestDto);
+            verify(coverValidator, never()).validateCoverTypeIsValid(requestDto.cover());
         }
 
         // 보드 수정 로직이 호출되었는지 확인
@@ -538,14 +538,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 new CoverDto(null, (String) coverWithoutType.get("value")), null);
 
         // Mock: validateCoverTypeIsEmpty에서 커버에 type 필드가 없으면 예외 발생
-        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateContainCover(requestDto);
+        doThrow(new NotFoundCoverTypeException()).when(coverValidator).validateCoverTypeIsValid(requestDto.cover());
 
         // when & then: 예외가 발생하는지 확인
         assertThrows(NotFoundCoverTypeException.class,
                 () -> boardService.updateBoard(member.getId(), boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
-        verify(coverValidator, times(1)).validateContainCover(requestDto);
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(requestDto.cover());
     }
 
     @Test
@@ -561,14 +561,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 new CoverDto((String) coverWithoutValue.get("type"), (String) coverWithoutValue.get("value")), null);
 
         // Mock: validateCoverValueIsEmpty에서 커버에 value 필드가 없으면 예외 발생
-        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateContainCover(requestDto);
+        doThrow(new NotFoundCoverValueException()).when(coverValidator).validateCoverTypeIsValid(requestDto.cover());
 
         // when & then: 예외가 발생하는지 확인
         assertThrows(NotFoundCoverValueException.class,
                 () -> boardService.updateBoard(member.getId(), boardId, requestDto));
 
         // verify: coverValidator가 호출되었는지 확인
-        verify(coverValidator, times(1)).validateContainCover(requestDto);
+        verify(coverValidator, times(1)).validateCoverTypeIsValid(requestDto.cover());
     }
 
     @Test
