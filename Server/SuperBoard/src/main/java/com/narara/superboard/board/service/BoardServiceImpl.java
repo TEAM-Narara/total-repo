@@ -23,6 +23,7 @@ import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.websocket.constant.Action;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -56,7 +57,7 @@ public class BoardServiceImpl implements BoardService {
     private final CardRepository cardRepository;
 
     @Override
-    public BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId) {
+    public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId) {
         List<Board> BoardList = boardRepository.findAllByWorkSpaceId(workSpaceId);
 
         List<BoardDetailResponseDto> boardDetailResponseDtoList = new ArrayList<>();
@@ -72,7 +73,7 @@ public class BoardServiceImpl implements BoardService {
             boardDetailResponseDtoList.add(boardDto);
         }
 
-        return new BoardCollectionResponseDto(boardDetailResponseDtoList);
+        return boardDetailResponseDtoList;
     }
 
     @Override
@@ -175,6 +176,15 @@ public class BoardServiceImpl implements BoardService {
         }
         throw new UnauthorizedException(member.getNickname(), action);
     }
+
+    @Override
+    public MyBoardCollectionResponse getMyBoardList(Long memberId) {
+        List<BoardMember> boardMemberList = boardMemberRepository.findByMemberId(memberId);
+
+        MyBoardCollectionResponse myBoardCollectionResponse = MyBoardCollectionResponse.of(boardMemberList);
+        return myBoardCollectionResponse;
+    }
+
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 
@@ -209,5 +219,4 @@ public class BoardServiceImpl implements BoardService {
                 reply.getCard().getList().getName()
         );
     }
-
 }
