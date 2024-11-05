@@ -21,6 +21,7 @@ public class CardMemberServiceImpl implements CardMemberService {
     @Override
     public boolean getCardMemberIsAlert(Long memberId, Long cardId) {
         validateCardExists(cardId);
+        validateMemberExists(memberId);
 
         return cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
                 .map(CardMember::isAlert)
@@ -44,10 +45,12 @@ public class CardMemberServiceImpl implements CardMemberService {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
         Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
 
-        // 1. updateCardMemberRequestDto에 cardId,memberId 를 받아옴
-        // 2. cardId,memberId 유효성 확인
-        // 3. cardMember에 (cardId,memberId)에 해당하는 값이 없으면 cardMember에 추가하고 is_representative = true, is_alert = true로 설정
-        // 4. cardMember에 값이 있는 경우 is_representative 값 반대로 변경
+        cardMemberRepository.findByCardIdAndMemberId(
+                updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
+                .ifPresentOrElse(
+                        this::toggleRepresentativeAndSave,
+                        () -> addNewRepresentativeCardMember(member, card)
+                );
     }
 
     // 카드 존재 확인 및 조회
@@ -68,12 +71,30 @@ public class CardMemberServiceImpl implements CardMemberService {
         cardMemberRepository.save(cardMember);
     }
 
+    // CardMember 객체의 isRepresentative 상태를 반대로 변경하고, isAlert도 동일한 값으로 설정 후 저장
+    private void toggleRepresentativeAndSave(CardMember cardMember) {
+        cardMember.changeIsRepresentative();
+        cardMember.setAlert(cardMember.isRepresentative());
+        cardMemberRepository.save(cardMember);
+    }
+
     // 새로운 CardMember 추가 및 저장
     private void addNewCardMember(Member member, Card card) {
         CardMember newCardMember = CardMember.builder()
                 .member(member)
                 .card(card)
                 .isAlert(true)
+                .build();
+        cardMemberRepository.save(newCardMember);
+    }
+
+    // 새로운 CardMember 추가 및 저장
+    private void addNewRepresentativeCardMember(Member member, Card card) {
+        CardMember newCardMember = CardMember.builder()
+                .member(member)
+                .card(card)
+                .isAlert(true)
+                .isRepresentative(true)
                 .build();
         cardMemberRepository.save(newCardMember);
     }

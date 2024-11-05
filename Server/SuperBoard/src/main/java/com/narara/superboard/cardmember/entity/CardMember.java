@@ -4,10 +4,8 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.stereotype.Service;
 
 @Entity
 @Getter
@@ -30,7 +28,11 @@ public class CardMember extends BaseTimeEntity {
     private Card card;  // 워크스페이스 ID
 
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
+    @Setter
     private boolean isAlert;
+
+    @Column(name = "is_representative", nullable = false, columnDefinition = "boolean default false")
+    private boolean isRepresentative;
 
     public static CardMember createCardMember(Card card, Member member){
         return CardMember.builder()
@@ -51,9 +53,20 @@ public class CardMember extends BaseTimeEntity {
         this.isAlert = !isAlert;
     }
 
+    public void changeIsRepresentative() {
+        this.isRepresentative = !isRepresentative;
+    }
+
     public CardMember(Member member, Card card, boolean isAlert) {
         this.member = member;
         this.card = card;
         this.isAlert = isAlert;
+    }
+
+    public CardMember(Member member, Card card,boolean isAlert, boolean isRepresentative) {
+        this.member = member;
+        this.card = card;
+        this.isAlert = isAlert;
+        this.isRepresentative = isRepresentative;
     }
 }
