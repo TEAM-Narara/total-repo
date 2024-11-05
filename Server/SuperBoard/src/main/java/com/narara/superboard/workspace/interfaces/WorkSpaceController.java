@@ -47,7 +47,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @DeleteMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //ADMIN만 가능
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
-//        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         workSpaceService.deleteWorkSpace(workspaceId);
 
         return ResponseEntity.ok().build();
@@ -57,7 +56,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @PatchMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
     public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
-        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
