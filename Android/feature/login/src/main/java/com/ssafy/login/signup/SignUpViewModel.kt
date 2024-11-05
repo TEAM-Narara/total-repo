@@ -69,9 +69,7 @@ class SignUpViewModel @Inject constructor(
                 _signState.update { SignState.CHECK }
                 stopTimer()
             }
-        ).collect {
-            moveToHome()
-        }
+        ).collect { withMain { moveToHome() } }
     }
 
     private fun startTimer() = timer.start()
