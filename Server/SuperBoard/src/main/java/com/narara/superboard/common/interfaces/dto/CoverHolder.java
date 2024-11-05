@@ -1,9 +1,9 @@
 package com.narara.superboard.common.interfaces.dto;
 
-import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
+import com.narara.superboard.board.interfaces.dto.CoverDto;
 
 public interface CoverHolder {
 
-    BoardBackgroundDto cover();
+    CoverDto cover();
 
 }
