@@ -33,7 +33,17 @@ import java.util.Collections;
                 @Server(url = "/", description = "통합 API 서버")
         },
         tags = {
+                @Tag(name = "인증", description = "인증관련 API"),
+                @Tag(name = "이메일", description = "이메일 관련 API"),
+                @Tag(name = "회원"),
                 @Tag(name = "워크스페이스"),
+                @Tag(name = "보드"),
+                @Tag(name = "리스트"),
+                @Tag(name = "카드"),
+                @Tag(name = "댓글"),
+                @Tag(name = "워크스페이스 회원"),
+                @Tag(name = "보드 회원"),
+                @Tag(name = "리스트 회원"),
         }
 )
 public class SwaggerConfiguration {

@@ -7,6 +7,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -47,7 +48,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @DeleteMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //ADMIN만 가능
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
-//        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         workSpaceService.deleteWorkSpace(workspaceId);
 
         return ResponseEntity.ok().build();
@@ -57,7 +57,6 @@ public class WorkSpaceController implements WorkSpaceAPI {
     @PatchMapping("/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
     public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
-        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
@@ -65,12 +64,12 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "나의 워크스페이스 리스트 조회")
     @GetMapping
-    public ResponseEntity<WorkSpaceListResponseDto> getWorkspaceListByMember() {
+    public ResponseEntity<List<WorkSpaceResponseDto>> getWorkspaceListByMember() {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
         List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMemberId(memberId);
         WorkSpaceListResponseDto workSpaceListResponseDto = WorkSpaceListResponseDto.from(workSpaceMemberList);
 
-        return ResponseEntity.ok(workSpaceListResponseDto);
+        return ResponseEntity.ok(workSpaceListResponseDto.workSpaceResponseDtoList());
     }
 
 //    @Operation(summary = "특정 offset 이후 데이터 싹 조회")

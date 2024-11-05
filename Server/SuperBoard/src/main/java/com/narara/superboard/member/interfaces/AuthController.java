@@ -56,12 +56,11 @@ public class AuthController implements AuthAPI{
     @Override
     public ResponseEntity<?> oauth2Login(String accessToken, String provider) {
         MemberLoginResponseDto memberLoginResponseDto = oAuth2UserService.getUserInfo(accessToken, provider);
-        TokenDto tokens = memberLoginResponseDto.tokenDto();
 
         // 위의 소셜의 사용자 데이터를 가지고 토큰 발급
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + tokens.accessToken());
-        headers.add("Refresh-Token", tokens.refreshToken());
+        headers.add("Authorization", "Bearer " + memberLoginResponseDto.tokenDto().accessToken());
+        headers.add("Refresh-Token", memberLoginResponseDto.tokenDto().refreshToken());
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS,memberLoginResponseDto.memberDto()), headers,HttpStatus.OK);
     }

@@ -48,14 +48,14 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
 
     @Override
     public MemberLoginResponseDto getUserInfo(String accessToken, String provider) {
-
         Map<String, Object> attributes = fetchUserInfo(accessToken, provider);
         MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
         Member member = saveOrUpdateMember(memberProfile, provider);
 
+        MemberDto memberDto = new MemberDto(member.getId(), member.getEmail(), member.getNickname(), member.getProfileImgUrl());
         TokenDto tokenDto = generateTokenDto(member);
-        return new MemberLoginResponseDto(new MemberDto(member.getEmail(),member.getNickname(),member.getProfileImgUrl()),
-                tokenDto);
+
+        return new MemberLoginResponseDto(memberDto, tokenDto);
     }
 
     private Map<String, Object> fetchUserInfo(String accessToken, String provider) {

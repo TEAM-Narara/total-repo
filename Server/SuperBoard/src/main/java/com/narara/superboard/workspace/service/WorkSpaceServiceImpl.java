@@ -12,6 +12,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -40,7 +41,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     @Transactional
     public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
-        workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto.name());
+        workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
@@ -85,7 +86,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
                 .workspaceMemberList(workspaceMemberCollectionResponseDto)
                 .build();
 
-        workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto.name());
+        workSpaceValidator.validateNameIsPresent(workspaceDetailResponseDto);
 
         return workspaceDetailResponseDto;
     }
@@ -104,10 +105,8 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Transactional
     @Override
     public WorkSpace updateWorkSpace(Long workspaceId, String name) {
-        workSpaceValidator.validateNameIsPresent(name);
-
+        workSpaceValidator.validateNameIsPresent(new WorkSpaceUpdateRequestDto(name));
         WorkSpace workSpace = getWorkSpace(workspaceId);
-
         workSpace.updateWorkSpace(name); //offset++
 
 //        workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
