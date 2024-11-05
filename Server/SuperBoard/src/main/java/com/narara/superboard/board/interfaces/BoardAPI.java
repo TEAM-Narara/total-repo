@@ -17,7 +17,7 @@ public interface BoardAPI {
     @GetMapping("/workspace/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "워크스페이스의 모든 보드 조회")
-    ResponseEntity<DefaultResponse<BoardCollectionResponseDto>> getBoardCollection(@PathVariable Long workspaceId);
+    ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(@PathVariable Long workspaceId);
 
     @PostMapping
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
@@ -51,7 +51,7 @@ public interface BoardAPI {
     @GetMapping("/workspace/{workspaceId}/archived")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "아카이브된 보드 조회")
-    ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId);
+    ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId);
 
     @PatchMapping("/{boardId}/archive")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")

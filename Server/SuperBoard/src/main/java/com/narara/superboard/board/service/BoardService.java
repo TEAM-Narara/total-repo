@@ -7,10 +7,12 @@ import com.narara.superboard.member.entity.Member;
 import org.springframework.data.domain.Pageable;
 
 import com.narara.superboard.websocket.constant.Action;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
+
 import java.util.List;
 
 public interface BoardService {
-    BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
+    List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId);
 
     Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto);
 
@@ -32,4 +34,5 @@ public interface BoardService {
 
     void checkBoardMember(Board board, Member member, Action action);
 
+    MyBoardCollectionResponse getMyBoardList(Long memberId);
 }

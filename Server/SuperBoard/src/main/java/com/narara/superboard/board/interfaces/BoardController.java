@@ -10,6 +10,7 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.service.MemberService;
 import com.narara.superboard.member.service.MemberServiceImpl;
+import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,22 +32,22 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")
-    public ResponseEntity<DefaultResponse<BoardCollectionResponseDto>> getBoardCollection(
+    public ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(
             @PathVariable Long workspaceId) {
-        BoardCollectionResponseDto boardCollection = boardService.getBoardCollectionResponseDto(workspaceId);
+        List<BoardDetailResponseDto> boardCollection = boardService.getBoardCollectionResponseDto(workspaceId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, boardCollection), HttpStatus.OK);
     }
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
     public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
-        Long memberId = getUserId();
+        Long memberId = getMemberId();
         Board board = boardService.createBoard(memberId, boardCreateRequestDto);
         BoardDetailResponseDto dto  = BoardDetailResponseDto.of(board);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, dto), HttpStatus.CREATED);
     }
 
-    private Long getUserId() {
+    private Long getMemberId() {
         return authenticationFacade.getAuthenticatedUser().getUserId();
     }
 
@@ -73,7 +74,7 @@ public class BoardController implements BoardAPI {
     public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> updateBoard(
             @PathVariable Long boardId,
             @RequestBody BoardUpdateRequestDto boardUpdateRequestDto) {
-        Long memberId = getUserId();
+        Long memberId = getMemberId();
         Board updatedBoard = boardService.updateBoard(memberId, boardId, boardUpdateRequestDto);
         BoardDetailResponseDto boardDetailResponseDto = BoardDetailResponseDto.of(updatedBoard, coverHandler);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ADMIN_UPDATE_SUCCESS, boardDetailResponseDto), HttpStatus.OK);
@@ -91,16 +92,14 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "아카이브된 보드 조회", description = "워크스페이스 ID를 사용하여 아카이브된 보드 목록을 조회합니다.")
-    public ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId) {
+    public ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId) {
         List<Board> archivedBoards = boardService.getArchivedBoards(workspaceId);
         List<BoardSimpleResponseDto> boardSimpleResponseDtoList = new ArrayList<>();
         for (Board board : archivedBoards) {
             boardSimpleResponseDtoList.add(BoardSimpleResponseDto.of(board, coverHandler));
         }
 
-        BoardArchiveCollectionResponseDto dto = new BoardArchiveCollectionResponseDto(boardSimpleResponseDtoList);
-
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, dto), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVED_FETCH_SUCCESS, boardSimpleResponseDtoList), HttpStatus.OK);
     }
 
     @Override
@@ -108,5 +107,14 @@ public class BoardController implements BoardAPI {
     public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@PathVariable Long boardId) {
         boardService.changeArchiveStatus(boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVE_STATUS_CHANGED), HttpStatus.OK);
+    }
+
+    @GetMapping
+    @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다")
+    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList() {
+        Long memberId = getMemberId();
+        MyBoardCollectionResponse myBoardList = boardService.getMyBoardList(memberId);
+
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, myBoardList), HttpStatus.OK);
     }
 }
