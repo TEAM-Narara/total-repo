@@ -22,8 +22,6 @@ public interface BoardService {
 
     Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
 
-    Board updateBoardByMember(Long boardId, BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
-
     List<Board> getArchivedBoards(Long workspaceId);
 
     void changeArchiveStatus(Long boardId);

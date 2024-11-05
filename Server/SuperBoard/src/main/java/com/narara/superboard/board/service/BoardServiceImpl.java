@@ -131,26 +131,20 @@ public class BoardServiceImpl implements BoardService {
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
                 .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
 
-        if (boardUpdateRequestDto.visibility() != null && boardMember.getAuthority().equals(Authority.MEMBER)) {
-            throw new AccessDeniedException("visibility를 수정할 수 있는 권한이 없습니다");
-        }
-
         Board board = getBoard(boardId);
 
-        return board.updateBoardByAdmin(boardUpdateRequestDto);
-    }
-
-    @Override
-    public Board updateBoardByMember(Long boardId, BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
-        nameValidator.validateNameIsEmpty(boardUpdateByMemberRequestDto);
-
-        if (boardUpdateByMemberRequestDto.cover() != null) {
-            coverValidator.validateContainCover(boardUpdateByMemberRequestDto);
+        // 권한 검사를 할 때 Authority가 null인 경우 AccessDeniedException을 던지도록 추가
+        if (boardMember.getAuthority() == null) {
+            throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
         }
 
-        Board board = getBoard(boardId);
+        if (boardMember.getAuthority().equals(Authority.MEMBER)) {
+            return board.updateBoardByMember(boardUpdateRequestDto);
+        } else if (boardMember.getAuthority().equals(Authority.ADMIN)) {
+            return board.updateBoardByAdmin(boardUpdateRequestDto);
+        }
 
-        return board.updateBoardByMember(boardUpdateByMemberRequestDto);
+        throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
     }
 
     // 아카이브된 보드 리스트 조회

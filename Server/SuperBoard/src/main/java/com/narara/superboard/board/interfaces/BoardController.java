@@ -8,14 +8,14 @@ import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.common.service.IAuthenticationFacade;
-import com.narara.superboard.member.service.MemberService;
-import com.narara.superboard.member.service.MemberServiceImpl;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -40,11 +40,11 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
-    public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<Long>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
         Long memberId = getMemberId();
         Board board = boardService.createBoard(memberId, boardCreateRequestDto);
-        BoardDetailResponseDto dto  = BoardDetailResponseDto.of(board);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, dto), HttpStatus.CREATED);
+
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, board.getId()), HttpStatus.CREATED);
     }
 
     private Long getMemberId() {
