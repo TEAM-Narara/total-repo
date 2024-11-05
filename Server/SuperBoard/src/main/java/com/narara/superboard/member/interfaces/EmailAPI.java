@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@Tag(name = "EMAIL API", description = "이메일 관련 API")
+@Tag(name = "이메일", description = "이메일 관련 API")
 @RequestMapping("/api/v1/members")
 public interface EmailAPI {
 

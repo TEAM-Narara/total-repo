@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Slf4j
+/**
+ * 가장 구체적인 핸들러부터 실행
+ */
 @ControllerAdvice
 public class GlobalExceptionAdvice {
 
@@ -27,7 +30,7 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.FORBIDDEN, ex.getMessage()), HttpStatus.FORBIDDEN);
     }
-    
+
     //잘못된 입력
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> handleAccessDeniedException(HttpMessageNotReadableException ex) {
@@ -58,7 +61,7 @@ public class GlobalExceptionAdvice {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token-Invalid", "");
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers,HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
@@ -71,16 +74,21 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleIllegalArgumentException(TokenException ex) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token-Invalid", "");
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers,HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AlreadyRegisteredLoginException.class)
     public ResponseEntity<?> handleIllegalArgumentException(AlreadyRegisteredLoginException ex) {
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage(),ex.getLoginType()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage(), ex.getLoginType()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RedisException.class)
     public ResponseEntity<?> handleIllegalArgumentException(RedisException ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(Exception ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

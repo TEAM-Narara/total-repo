@@ -28,9 +28,7 @@ import java.util.List;
 public class BoardController implements BoardAPI {
     private final IAuthenticationFacade authenticationFacade;
     private final BoardService boardService;
-    private final MemberService memberService;
     private final CoverHandler coverHandler;
-    private final MemberServiceImpl memberServiceImpl;
 
     @Override
     @Operation(summary = "보드 컬렉션 조회", description = "워크스페이스 ID를 사용하여 워크스페이스 내의 모든 보드를 조회합니다.")

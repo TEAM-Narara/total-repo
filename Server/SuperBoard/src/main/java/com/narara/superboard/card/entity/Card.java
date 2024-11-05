@@ -1,6 +1,6 @@
 package com.narara.superboard.card.entity;
 
-import com.narara.superboard.attachment.Attachment;
+import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardlabel.entity.CardLabel;

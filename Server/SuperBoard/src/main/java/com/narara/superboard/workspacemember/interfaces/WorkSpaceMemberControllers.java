@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class WorkSpaceMemberController implements WorkSpaceMemberAPI {
+public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     private final WorkSpaceMemberService workSpaceMemberService;
 
     @Override
@@ -36,6 +36,7 @@ public class WorkSpaceMemberController implements WorkSpaceMemberAPI {
             Long workspaceId) {
         MemberCollectionResponseDto responseDto = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(
                 workspaceId);
+
         return new ResponseEntity<>(DefaultResponse.res(
                 StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
                 , HttpStatus.OK);
@@ -106,4 +107,3 @@ public class WorkSpaceMemberController implements WorkSpaceMemberAPI {
         );
     }
 }
-

@@ -12,4 +12,7 @@ public interface ReplyService {
     Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto);
     Reply deleteReply(Member member, Long replyId);
     List<Reply> getRepliesByCardId(Long cardId);
+
+    
+
 }
