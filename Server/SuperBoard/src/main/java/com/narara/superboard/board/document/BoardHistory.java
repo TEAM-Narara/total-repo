@@ -5,6 +5,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.document.Who;
+import com.narara.superboard.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,16 +27,16 @@ public class BoardHistory {
     private Where where; // 어디서
     private EventType eventType; // 이벤트 유형 (CREATE, UPDATE, DELETE 등) // 무엇을
     private EventData eventData; // 데이터 유형 (CARD, BOARD, LABEL 등) // 어떻게
-    private Target eventDetails; // 기타 등등...
+    private Target target; // 기타 등등...
 
-    public static BoardHistory createBoardHistory(Who who, Long when, Board board, EventType eventType, EventData eventData, Target eventDetails) {
+    public static BoardHistory createBoardHistory(Member member, Long when, Board board, EventType eventType, EventData eventData, Target target) {
         return BoardHistory.builder()
-                .who(who)
+                .who(Who.of(member))
                 .when(when)
                 .where(Where.of(board))
                 .eventType(eventType)
                 .eventData(eventData)
-                .eventDetails(eventDetails)
+                .target(target)
                 .build();
     }
 }
