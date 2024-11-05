@@ -1,8 +1,7 @@
 package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.MemberListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
@@ -17,14 +16,14 @@ interface BoardDataSource {
 
     suspend fun setBoardArchive(boardId: Long): Flow<Unit>
 
-    suspend fun getBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList>
+    suspend fun getBoardsByWorkspace(workspaceId: Long): Flow<List<BoardDTO>>
 
-    suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList>
+    suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Flow<List<BoardDTO>>
 
     suspend fun getWatchStatus(boardId: Long): Flow<Boolean>
 
     suspend fun toggleWatchBoard(boardId: Long): Flow<Unit>
 
-    suspend fun getBoardMembers(boardId: Long): Flow<MemberListResponseDTO>
+    suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
 
 }

@@ -1,10 +1,6 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
-
-import com.ssafy.model.board.MemberListResponseDTO
-import com.ssafy.model.workspace.WorkSpaceListResponseDTO
-import com.ssafy.data.response.toFlow
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
@@ -21,7 +17,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WorkspaceRepository {
 
-    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<WorkSpaceListResponseDTO> =
+    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 workspaceDataSource.getWorkspaceList()

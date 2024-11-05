@@ -1,8 +1,7 @@
 package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.BoardDetailResponseDtoList
-import com.ssafy.model.board.MemberListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.source.toFlow
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +22,10 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
     override suspend fun setBoardArchive(boardId: Long): Flow<Unit> =
         boardAPI.setBoardArchive(boardId).toFlow()
 
-    override suspend fun getBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList> =
+    override suspend fun getBoardsByWorkspace(workspaceId: Long): Flow<List<BoardDTO>> =
         boardAPI.getBoardsByWorkspace(workspaceId).toFlow()
 
-    override suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Flow<BoardDetailResponseDtoList> =
+    override suspend fun getArchivedBoardsByWorkspace(workspaceId: Long): Flow<List<BoardDTO>> =
         boardAPI.getArchivedBoardsByWorkspace(workspaceId).toFlow()
 
     override suspend fun getWatchStatus(boardId: Long): Flow<Boolean> =
@@ -35,7 +34,7 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
     override suspend fun toggleWatchBoard(boardId: Long): Flow<Unit> =
         boardAPI.toggleWatchBoard(boardId).toFlow()
 
-    override suspend fun getBoardMembers(boardId: Long): Flow<MemberListResponseDTO> =
+    override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
         boardAPI.getBoardMembers(boardId).toFlow()
 
 }
