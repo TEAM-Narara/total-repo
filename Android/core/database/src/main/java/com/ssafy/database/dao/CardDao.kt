@@ -11,6 +11,7 @@ import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardDetail
+import com.ssafy.database.dto.with.CardWithListAndBoardName
 import com.ssafy.database.dto.with.ListInCards
 import kotlinx.coroutines.flow.Flow
 
@@ -35,13 +36,37 @@ interface CardDao {
     suspend fun getAllRemoteCard(): List<Card>
 
     // 카드 상세 조회
+//    @Transaction
+//    @Query("""
+//        SELECT * 
+//        FROM card 
+//        WHERE id == :cardId
+//    """)
+//    suspend fun getCardDetail(cardId: Long): CardDetail
+    
+    // 카드 단일 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM card 
         WHERE id == :cardId
     """)
-    suspend fun getCardDetail(cardId: Long): CardDetail
+    suspend fun getCard(cardId: Long): Flow<Card>
+    
+    // 카드 상위의 List, Board 이름 조회
+    @Transaction
+    @Query("""
+        SELECT 
+            card.id AS card_id,
+            card.name AS card_name,
+            list.name AS list_name,
+            board.name AS board_name
+        FROM card
+        INNER JOIN list ON list.id = card.listId
+        INNER JOIN board ON board.id = list.boardId
+        WHERE card.id = :cardId
+    """)
+    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>
 
     // 워크스페이스에서 볼 것
     @Query("""
