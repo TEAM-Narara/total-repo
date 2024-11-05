@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Member extends BaseTimeEntity implements UserDetails {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -123,15 +123,5 @@ public class Member extends BaseTimeEntity implements UserDetails {
                 .loginType(this.loginType)
                 .refreshToken(this.refreshToken)
                 .build();
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("MEMBER"));
-    }
-
-    @Override
-    public String getUsername() {
-        return String.valueOf(id);
     }
 }
