@@ -1,67 +1,85 @@
 package com.narara.superboard.workspace.interfaces;
 
-import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.common.service.IAuthenticationFacade;
+import com.narara.superboard.member.service.MemberService;
+import com.narara.superboard.member.util.JwtTokenProvider;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
 import com.narara.superboard.workspace.service.WorkSpaceService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateData;
-import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceController implements WorkSpaceAPI {
-
     private final WorkSpaceService workSpaceService;
+    private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final IAuthenticationFacade authenticationFacade;
+    private final WorkSpaceMemberRepository workSpaceMemberRepository;
+//    private final WorkspaceOffsetService workspaceOffsetService;
 
-    @Tag(name = "나의 워크스페이스 리스트 조회")
-    @GetMapping
-    public ResponseEntity<WorkSpaceListResponseDto> getWorkspaceListByMember() {
-        //userId 기반, 내가 권한이 있는 워크스페이스 조회
-        WorkSpaceListResponseDto workSpaceListResponseDto = new WorkSpaceListResponseDto(
-                List.of(
-                        new WorkSpaceResponseDto(1L, "워크스페이스1"),
-                        new WorkSpaceResponseDto(2L, "워크스페이스2")
-                )
-        );
-
-        return ResponseEntity.ok(workSpaceListResponseDto);
-    }
-
-    @Tag(name = "워크스페이스 생성")
+    @Operation(summary = "워크스페이스 생성")
     @PostMapping
-    public ResponseEntity<WorkspaceCreateData> createWorkSpace(Member member, WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+    public ResponseEntity<WorkspaceCreateData> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+
         WorkSpace workSpace = workSpaceService.createWorkSpace(
-                new Member(),
-                new WorkSpaceCreateRequestDto("새로운 워크스페이스")
+                memberId,
+                workspaceCreateRequestDto
         );
 
         return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
     }
 
-    @Tag(name = "나의 워크스페이스 리스트 조회")
-    @GetMapping("/{workspaceId}")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')")
-    public ResponseEntity<WorkSpaceListResponseDto> getWorkspaceListByMember(@PathVariable Long workspaceId) {
-        // Sample data, replace with actual service logic
-        WorkSpaceListResponseDto workSpaceListResponseDto = new WorkSpaceListResponseDto(
-                List.of(
-                        new WorkSpaceResponseDto(1L, "워크스페이스1"),
-                        new WorkSpaceResponseDto(2L, "워크스페이스2")
-                )
-        );
+    @Operation(summary = "워크스페이스 삭제")
+    @DeleteMapping("/{workspaceId}")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //ADMIN만 가능
+    public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId) {
+        workSpaceService.deleteWorkSpace(workspaceId);
 
-        return ResponseEntity.ok(workSpaceListResponseDto);
+        return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "워크스페이스 수정")
+    @PatchMapping("/{workspaceId}")
+    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
+    public ResponseEntity<WorkspaceCreateData> editWorkspace(@PathVariable Long workspaceId, @RequestBody WorkSpaceUpdateRequestDto requestDto) {
+        WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
+
+        return ResponseEntity.ok(new WorkspaceCreateData(workSpace.getId(), workSpace.getName()));
+    }
+
+    @Operation(summary = "나의 워크스페이스 리스트 조회")
+    @GetMapping
+    public ResponseEntity<List<WorkSpaceResponseDto>> getWorkspaceListByMember() {
+        Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
+        List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMemberId(memberId);
+        WorkSpaceListResponseDto workSpaceListResponseDto = WorkSpaceListResponseDto.from(workSpaceMemberList);
+
+        return ResponseEntity.ok(workSpaceListResponseDto.workSpaceResponseDtoList());
+    }
+
+//    @Operation(summary = "특정 offset 이후 데이터 싹 조회")
+//    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')") //MEMBER와 ADMIN만 가능
+//    @GetMapping("/{workspaceId}/diffs")
+//    public ResponseEntity<List<WorkspaceDiffDto>> getDiffs(
+//            @PathVariable Long workspaceId,
+//            @RequestParam(required = false, defaultValue = "0") Long fromOffset
+//    ) {
+//        List<WorkspaceDiffDto> diffs = workspaceOffsetService.getDiffListFromOffset(workspaceId, fromOffset);
+//        return ResponseEntity.ok(diffs);
+//    }
 }

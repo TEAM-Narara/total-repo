@@ -27,7 +27,7 @@ public class AuthController implements AuthAPI{
     private final AuthService authService;
     @Autowired
     private final IAuthenticationFacade authenticationFacade;
-    private OAuth2UserService oAuth2UserService;
+    private final OAuth2UserService oAuth2UserService;
 
     @Override
     public ResponseEntity<?> login(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {

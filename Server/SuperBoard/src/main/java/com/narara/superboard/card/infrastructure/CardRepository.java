@@ -13,4 +13,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     // cardId로 보드 엔티티 전체 조회
     @Query("SELECT c.list.board FROM Card c WHERE c.id = :cardId")
     Board findBoardByCardId(@Param("cardId") Long cardId);
+
+    java.util.List<Card> findAllByList(List list);
 }
