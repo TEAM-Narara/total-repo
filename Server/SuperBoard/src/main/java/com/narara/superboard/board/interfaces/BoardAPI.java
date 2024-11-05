@@ -17,14 +17,12 @@ public interface BoardAPI {
     @GetMapping("/workspace/{workspaceId}")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "워크스페이스의 모든 보드 조회")
-    ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(@PathVariable Long workspaceId);
+    ResponseEntity<DefaultResponse<BoardCollectionResponseDto>> getBoardCollection(@PathVariable Long workspaceId);
 
-    @PostMapping("/")
+    @PostMapping
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
-    ResponseEntity<DefaultResponse<Long>> createBoard(
-            @AuthenticationPrincipal Member member,
-            @RequestBody BoardCreateRequestDto boardCreateRequestDto);
+    ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto);
 
     @GetMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
@@ -37,23 +35,23 @@ public interface BoardAPI {
     ResponseEntity<DefaultResponse<Void>> deleteBoard(@PathVariable Long boardId);
 
     @PatchMapping("/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 수정")
     ResponseEntity<DefaultResponse<BoardDetailResponseDto>> updateBoard(
             @PathVariable Long boardId,
             @RequestBody BoardUpdateRequestDto boardUpdateRequestDto);
 
-    @PatchMapping("/{boardId}/member")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
-    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
-            @PathVariable Long boardId,
-            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
+//    @PatchMapping("/{boardId}/member")
+//    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
+//    @Operation(summary = "사용자가 자신의 보드 설정을 업데이트")
+//    ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
+//            @PathVariable Long boardId,
+//            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
 
     @GetMapping("/workspace/{workspaceId}/archived")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "아카이브된 보드 조회")
-    ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId);
+    ResponseEntity<DefaultResponse<BoardArchiveCollectionResponseDto>> getArchivedBoards(@PathVariable Long workspaceId);
 
     @PatchMapping("/{boardId}/archive")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")

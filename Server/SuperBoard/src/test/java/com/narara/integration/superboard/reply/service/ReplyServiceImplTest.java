@@ -3,6 +3,7 @@ package com.narara.integration.superboard.reply.service;
 import com.narara.integration.IntegrationTest;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -69,11 +70,12 @@ class ReplyServiceImplTest extends IntegrationTest {
         WorkSpace savedWorkSpace = workSpaceRepository.save(workSpace);
 
         // Board 생성 및 저장
+        Map<String, Object> background = Map.of("type", "IMAGE", "value", "https://...");
         BoardCreateRequestDto boardRequest = new BoardCreateRequestDto(
                 savedWorkSpace.getId(),
                 "보드 이름",
                 "WORKSPACE",
-                Map.of("type", "IMAGE", "value","https://...")
+                new BoardBackgroundDto((String)background.get("type"), (String)background.get("value"))
         );
         Board board = Board.createBoard(boardRequest, savedWorkSpace);
         boardRepository.save(board);

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1/reply")
 public interface ReplyAPI {
 
-    @PostMapping("/")
+    @PostMapping
     ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto);
 
     @PatchMapping("/{replyId}")

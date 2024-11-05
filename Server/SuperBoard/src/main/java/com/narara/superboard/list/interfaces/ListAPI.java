@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/list")
 public interface ListAPI {
 
-    @PostMapping("/")
+    @PostMapping
     ResponseEntity<DefaultResponse<ListSimpleResponseDto>> createList(@AuthenticationPrincipal Member member, @RequestBody ListCreateRequestDto listCreateRequestDto);
 
     @PatchMapping("/{listId}")

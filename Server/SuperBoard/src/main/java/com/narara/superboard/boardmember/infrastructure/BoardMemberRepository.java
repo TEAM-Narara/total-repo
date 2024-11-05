@@ -13,4 +13,5 @@ public interface BoardMemberRepository extends JpaRepository<BoardMember,Long> {
     boolean existsByMemberAndBoardAndAuthority(Member member, Board board, Authority authority);
     List<BoardMember> findAllByBoardId(Long boardId);
     Optional<BoardMember> findByBoardIdAndMember(Long boardId, Member member);
+    Optional<BoardMember> findFirstByBoard_IdAndMember_Id(Long boardId, Long memberId);
 }

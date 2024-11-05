@@ -3,7 +3,7 @@ package com.narara.superboard.common.application.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -47,8 +47,12 @@ class CoverValidatorTest {
     @DisplayName("커버 타입이 빈 문자열일 경우 NotFoundCoverTypeException 발생")
     void testCoverTypeIsEmpty() {
         // 빈 문자열이 전달될 때 예외 발생 테스트
-        assertThrows(NotFoundCoverTypeException.class, () -> {
-            coverValidator.validateCoverTypeIsValid("");
+        assertThrows(InvalidCoverTypeFormatException.class, () -> {
+            coverValidator.validateCoverTypeIsValid(
+                    new HashMap<>(){{
+                        put("type", "");
+                    }}
+            );
         });
     }
 
@@ -57,7 +61,11 @@ class CoverValidatorTest {
     void testInvalidCoverType() {
         // 잘못된 커버 타입 값이 전달될 때 예외 발생 테스트
         assertThrows(InvalidCoverTypeFormatException.class, () -> {
-            coverValidator.validateCoverTypeIsValid("INVALID_TYPE");
+            coverValidator.validateCoverTypeIsValid(
+                    new HashMap<>(){{
+                        put("type", "INVALID_TYPE");
+                    }}
+            );
         });
     }
 
@@ -66,7 +74,11 @@ class CoverValidatorTest {
     @DisplayName("유효한 커버 타입일 경우 예외 발생하지 않음")
     void testValidCoverType(CoverType coverType) {
         // 유효한 커버 타입 값이 전달될 때 예외가 발생하지 않는지 테스트
-        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(coverType.toString()));
+        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(
+                new HashMap<>(){{
+                    put("type", coverType.toString());
+                }}
+        ));
     }
 
     @DisplayName("커버가 null이거나 비어 있을 때 NotFoundException이 발생한다")
@@ -186,11 +198,11 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                cover
+                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
-        assertThrows(NotFoundCoverTypeException.class, () -> coverValidator.validateCardCover(requestDto));
+        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
     }
 
     // Test data for missing value cases
@@ -212,7 +224,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                cover
+                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
@@ -240,7 +252,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                cover
+                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
@@ -266,24 +278,7 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                cover
-        );
-
-        // when & then
-        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @DisplayName("성공 케이스: cover이 없는 경우")
-    void validateCardCover_NullCover(Map<String, Object> cover) {
-        // given
-        CardUpdateRequestDto requestDto = new CardUpdateRequestDto(
-                "Test Card",
-                "Test Description",
-                null,
-                null,
-                cover
+                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then

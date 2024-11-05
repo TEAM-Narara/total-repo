@@ -12,13 +12,13 @@ import java.util.List;
 public interface BoardService {
     BoardCollectionResponseDto getBoardCollectionResponseDto(Long workSpaceId);
 
-    Long createBoard(Member member, BoardCreateRequestDto boardCreateRequestDto);
+    Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto);
 
     Board getBoard(Long boardId);
 
     void deleteBoard(Long boardId);
 
-    Board updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
+    Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
 
     Board updateBoardByMember(Long boardId, BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto);
 

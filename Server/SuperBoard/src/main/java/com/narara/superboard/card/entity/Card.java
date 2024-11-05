@@ -8,6 +8,7 @@ import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
+import java.util.HashMap;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -86,7 +87,11 @@ public class Card extends BaseTimeEntity {
             this.description = requestDto.description();
         }
         if (requestDto.cover() != null) {
-            this.cover = requestDto.cover();
+            this.cover = new HashMap<>(){{
+                put("type", requestDto.cover().type());
+                put("value", requestDto.cover().value());
+            }};
+//            this.cover = requestDto.d();
         }
         if (requestDto.startAt() != null) {
             this.startAt = requestDto.startAt();
