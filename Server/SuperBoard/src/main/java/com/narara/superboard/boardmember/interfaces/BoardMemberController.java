@@ -1,6 +1,7 @@
 package com.narara.superboard.boardmember.interfaces;
 
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.service.BoardMemberService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class BoardMemberController implements BoardMemberAPI{
@@ -18,11 +21,11 @@ public class BoardMemberController implements BoardMemberAPI{
     private final BoardMemberService boardMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<BoardMemberCollectionResponseDto>> getBoardMembers(Long boardId) {
-        BoardMemberCollectionResponseDto boardMemberCollectionResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
-                boardId);
+    public ResponseEntity<DefaultResponse<List<BoardMemberResponseDto>>> getBoardMembers(Long boardId) {
+        List<BoardMemberResponseDto> boardMemberResponseDtoList = boardMemberService.getBoardMemberCollectionResponseDto(
+                boardId).boardMemberResponseDtoList();
         return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, boardMemberCollectionResponseDto)
+                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, boardMemberResponseDtoList)
                 , HttpStatus.OK);
     }
 
