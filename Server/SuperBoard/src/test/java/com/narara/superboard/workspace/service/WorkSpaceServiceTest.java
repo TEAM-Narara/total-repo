@@ -264,7 +264,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                                   MemberCollectionResponseDto mockMemberCollectionResponseDto) {
         when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
         when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(
-                mockBoardCollectionResponseDto.boardDetailResponseDtoList());
+                mockBoardCollectionResponseDto.stream().toList());
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
     }
 
