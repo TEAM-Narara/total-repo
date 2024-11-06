@@ -87,20 +87,29 @@ public class Board extends BaseTimeEntity implements Identifiable {
     }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = new HashMap<>(){{
-            put("type", boardUpdateRequestDto.background().type());
-            put("value", boardUpdateRequestDto.background().value());
-        }};
-        this.name = boardUpdateRequestDto.name();
-        this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
+        if (boardUpdateRequestDto.cover() != null) {
+            this.cover = new HashMap<>();
+            this.cover.put("type", boardUpdateRequestDto.cover().type());
+            this.cover.put("value", boardUpdateRequestDto.cover().value());
+        }
+        if (!(boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+            this.name = boardUpdateRequestDto.name();
+        }
+        if (!(boardUpdateRequestDto.visibility().isEmpty() || boardUpdateRequestDto.visibility().isBlank())) {
+            this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
+        }
         return this;
     }
+
     public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = new HashMap<>(){{
-            put("type", boardUpdateRequestDto.background().type());
-            put("value", boardUpdateRequestDto.background().value());
-        }};
-        this.name = boardUpdateRequestDto.name();
+        if (boardUpdateRequestDto.cover() != null) {
+            this.cover = new HashMap<>();
+            this.cover.put("type", boardUpdateRequestDto.cover().type());
+            this.cover.put("value", boardUpdateRequestDto.cover().value());
+        }
+        if (!(boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+            this.name = boardUpdateRequestDto.name();
+        }
         return this;
     }
 
@@ -112,7 +121,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
         this.listOrderVersion += 1;
     }
 
-    public Board deleted(){
+    public Board deleted() {
         this.isDeleted = true;
         return this;
     }
@@ -123,7 +132,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
         this.cover = cover;
     }
 
-    public Board(Long id, String name){
+    public Board(Long id, String name) {
         this.id = id;
         this.name = name;
     }
