@@ -1,10 +1,16 @@
 package com.narara.superboard.cardmember.service;
 
+import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
+import com.narara.superboard.common.document.AdditionalDetails;
+import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -17,6 +23,7 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final CardMemberRepository cardMemberRepository;
     private final MemberRepository memberRepository;
     private final CardRepository cardRepository;
+    private final CardHistoryRepository cardHistoryRepository;
 
     @Override
     public boolean getCardMemberIsAlert(Long memberId, Long cardId) {
@@ -46,11 +53,40 @@ public class CardMemberServiceImpl implements CardMemberService {
         Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
 
         cardMemberRepository.findByCardIdAndMemberId(
-                updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
+                        updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
                 .ifPresentOrElse(
-                        this::toggleRepresentativeAndSave,
-                        () -> addNewRepresentativeCardMember(member, card)
+                        cardMember -> {
+                            toggleRepresentativeAndSave(cardMember);
+
+                            // 로그 기록 추가
+                            RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
+                                    member.getId(), card.getId(), cardMember.isRepresentative());
+                            Target target = Target.of(card, repStatusChangeInfo);
+
+                            CardHistory cardHistory = CardHistory.careateCardHistory(
+                                    member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                                    EventType.UPDATE, EventData.CARD_MANAGER, target);
+
+                            cardHistoryRepository.save(cardHistory);
+                        },
+                        () -> addNewRepresentativeCardMemberWithLog(member, card)
                 );
+    }
+
+    // CardMember 대표 멤버 추가와 로그 저장을 함께 수행
+    private void addNewRepresentativeCardMemberWithLog(Member member, Card card) {
+        CardMember newCardMember = addNewRepresentativeCardMember(member, card);
+
+        // 로그 기록 추가
+        RepresentativeStatusChangeInfo newRepCardMemberInfo = new RepresentativeStatusChangeInfo(
+                member.getId(), card.getId(), newCardMember.isRepresentative());
+        Target target = Target.of(card, newRepCardMemberInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                EventType.ADD, EventData.CARD_MANAGER, target);
+
+        cardHistoryRepository.save(cardHistory);
     }
 
     // 카드 존재 확인 및 조회
@@ -89,7 +125,7 @@ public class CardMemberServiceImpl implements CardMemberService {
     }
 
     // 새로운 CardMember 추가 및 저장
-    private void addNewRepresentativeCardMember(Member member, Card card) {
+    private CardMember addNewRepresentativeCardMember(Member member, Card card) {
         CardMember newCardMember = CardMember.builder()
                 .member(member)
                 .card(card)
@@ -97,6 +133,23 @@ public class CardMemberServiceImpl implements CardMemberService {
                 .isRepresentative(true)
                 .build();
         cardMemberRepository.save(newCardMember);
+        return newCardMember;
+    }
+
+    // CardMember 알림 상태 변경 관련 정보
+    public record AlertStatusChangeInfo(
+            Long memberId,
+            Long cardId,
+            boolean isAlert
+    ) implements AdditionalDetails {
+    }
+
+    // CardMember 대표 상태 변경 관련 정보
+    public record RepresentativeStatusChangeInfo(
+            Long memberId,
+            Long cardId,
+            boolean isRepresentative
+    ) implements AdditionalDetails {
     }
 
 }
