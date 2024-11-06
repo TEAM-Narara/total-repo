@@ -34,9 +34,18 @@ interface ListMemberDao {
     // 리스트 멤버들 조회
     @Transaction
     @Query("""
-        SELECT *
-        FROM list_member
-        WHERE listId == :listId
+        SELECT 
+            list_member.id AS list_member_id,
+            list_member.memberId AS list_member_memberId,
+            list_member.listId AS list_member_listId,
+            list_member.isStatus AS list_member_isStatus,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
+        FROM list_member 
+        INNER JOIN member ON member.id = list_member.memberId
+        WHERE list_member.listId = :listId AND list_member.isStatus != 'DELETE'
     """)
     fun getListMembers(listId: Long): Flow<List<ListMemberWithMemberInfo>>
 

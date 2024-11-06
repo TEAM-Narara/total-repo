@@ -1,6 +1,7 @@
 package com.ssafy.database.dto
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "card")

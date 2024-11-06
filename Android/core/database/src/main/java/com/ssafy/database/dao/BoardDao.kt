@@ -5,18 +5,10 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.room.Update
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.ssafy.database.dto.Board
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.BoardMemberAlarm
-import com.ssafy.database.dto.Workspace
-import com.ssafy.database.dto.with.BoardDetail
 import com.ssafy.database.dto.with.BoardInList
-import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
-import com.ssafy.database.dto.with.WorkspaceInBoard
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.ssafy.database.dto.Member
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MemberDao {
@@ -16,7 +17,7 @@ interface MemberDao {
         FROM member 
         WHERE id == :memberId
     """)
-    suspend fun getMembers(memberId: Long): Member
+    fun getMembers(memberId: Long): Flow<Member>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -5,11 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Board
 import com.ssafy.database.dto.MemberBackground
-import com.ssafy.database.dto.with.BoardInList
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,7 +34,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE id == :id And isStatus != 'DELETE'
         """)
-    suspend fun getMemberBackground(id: Long): MemberBackground
+    fun getMemberBackground(id: Long): Flow<MemberBackground>
     
     // 멤버 배경 모두 조회
     @Query("""

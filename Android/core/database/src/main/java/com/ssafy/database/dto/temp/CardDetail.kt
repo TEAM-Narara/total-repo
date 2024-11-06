@@ -1,4 +1,4 @@
-package com.ssafy.database.dto.with
+package com.ssafy.database.dto.temp
 
 import androidx.room.Embedded
 import androidx.room.Relation
@@ -7,6 +7,8 @@ import com.ssafy.database.dto.Card
 import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.with.CardLabelWithLabelInfo
+import com.ssafy.database.dto.with.CardMemberWithMemberInfo
 
 data class CardDetail(
     @Embedded val card: Card,

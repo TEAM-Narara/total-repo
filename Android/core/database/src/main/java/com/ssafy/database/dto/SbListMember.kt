@@ -13,10 +13,9 @@ data class SbListMember(
 )
 
 // 내 리스트들의 알람
-@Entity(tableName = "list_member_alarm",
-    primaryKeys = ["listId"])
+@Entity(tableName = "list_member_alarm")
 data class SbListMemberAlarm(
-    val listId: Long = 0L,
+    @PrimaryKey val listId: Long = 0L,
     val isAlert: Boolean = false,
 
     val isStatus: String = "STAY"
