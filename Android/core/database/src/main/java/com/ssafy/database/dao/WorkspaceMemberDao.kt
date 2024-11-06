@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,15 @@ interface WorkspaceMemberDao {
         WHERE workspace_member.workspaceId = :workspaceId AND workspace_member.isStatus != 'DELETE'
     """)
     fun getWorkspaceMembers(workspaceId: Long): Flow<List<WorkspaceMemberWithMemberInfo>>
+
+    @Transaction
+    @Query("""
+        SELECT workspace.* 
+        FROM workspace 
+        INNER JOIN workspace_member ON workspace.id = workspace_member.workspaceId 
+        WHERE workspace_member.memberId = :memberId
+    """)
+    fun getWorkspacesByMember(memberId: Long): Flow<List<WorkspaceEntity>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
