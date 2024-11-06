@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Workspace
+import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import kotlinx.coroutines.flow.Flow
 
@@ -21,7 +21,7 @@ interface WorkspaceDao {
         FROM workspace 
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalWorkspaces(): List<WorkspaceInBoard>
+    suspend fun getAllLocalCreateWorkspaces(): List<WorkspaceInBoard>
 
     // 서버에 연산할 워크스페이스 조회
     @Query("""
@@ -29,33 +29,33 @@ interface WorkspaceDao {
         FROM workspace
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteWorkspaces(): List<Workspace>
+    suspend fun getAllLocalOperationWorkspaces(): List<WorkspaceEntity>
 
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
-    fun getWorkspace(workspaceId: Long): Flow<Workspace>
+    fun getWorkspace(workspaceId: Long): WorkspaceEntity
 
     // Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")
-    fun getAllWorkspaces(): Flow<List<Workspace>>
+    fun getAllWorkspaces(): Flow<List<WorkspaceEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkspace(workspace: Workspace): Long
+    suspend fun insertWorkspace(workspace: WorkspaceEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkspaces(workspaces: List<Workspace>): List<Long>
+    suspend fun insertWorkspaces(workspaces: List<WorkspaceEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM workspace WHERE id NOT IN (:ids)")
     suspend fun deleteWorkspacesNotIn(ids: List<Long>)
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
-    @Update
-    suspend fun updateWorkspace(workspace: Workspace)
+    @Query("UPDATE workspace SET name = :name WHERE id = :workspaceId")
+    suspend fun updateWorkspace(workspaceId: Long, name: String)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteWorkspace(workspace: Workspace)
+    suspend fun deleteWorkspace(workspace: WorkspaceEntity)
 }

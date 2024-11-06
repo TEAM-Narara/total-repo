@@ -2,45 +2,45 @@ package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.ssafy.database.dto.Attachment
-import com.ssafy.database.dto.Card
-import com.ssafy.database.dto.CardLabel
-import com.ssafy.database.dto.CardMember
-import com.ssafy.database.dto.CardMemberAlarm
-import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.AttachmentEntity
+import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardLabelEntity
+import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
+import com.ssafy.database.dto.ReplyEntity
 
 data class CardAllInfo(
-    @Embedded val card: Card,
+    @Embedded val card: CardEntity,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId",
-        entity = CardLabel::class
+        entity = CardLabelEntity::class
     )
-    val cardLabels: List<CardLabel>,
+    val cardLabels: List<CardLabelEntity>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId",
-        entity = CardMember::class
+        entity = CardMemberEntity::class
     )
-    val cardMembers: List<CardMember>,
+    val cardMembers: List<CardMemberEntity>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId"
     )
-    val cardMemberAlarm: CardMemberAlarm?,
+    val cardMemberAlarm: CardMemberAlarmEntity?,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId",
     )
-    val cardAttachment: List<Attachment>,
+    val cardAttachment: List<AttachmentEntity>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "cardId",
     )
-    val cardReplies: List<Reply>,
+    val cardReplies: List<ReplyEntity>,
 )

@@ -16,7 +16,7 @@ class WorkspaceDataSourceImpl @Inject constructor(
     override suspend fun getWorkspaceList(): Flow<List<WorkSpaceDTO>> =
         safeApiCall { workspaceAPI.getWorkspaces() }.toFlow()
 
-    override suspend fun createWorkspace(name: String): Flow<Unit> =
+    override suspend fun createWorkspace(name: String): Flow<Long> =
         safeApiCall { workspaceAPI.createWorkspace(name) }.toFlow()
 
     override suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit> =
@@ -24,9 +24,9 @@ class WorkspaceDataSourceImpl @Inject constructor(
 
     override suspend fun updateWorkspace(
         workspaceId: Long,
-        workspaceRequestDTO: WorkspaceRequestDTO
+        name: String
     ): Flow<Unit> =
-        safeApiCall { workspaceAPI.updateWorkspace(workspaceId, workspaceRequestDTO) }.toFlow()
+        safeApiCall { workspaceAPI.updateWorkspace(workspaceId, name) }.toFlow()
 
     override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>> =
         safeApiCall { workspaceAPI.getWorkspaceMembers(workspaceId) }.toFlow()

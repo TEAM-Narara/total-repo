@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "list_member")
-data class SbListMember(
+data class ListMemberEntity(
     @PrimaryKey val id: Long = 0L,
     val memberId: Long = 0L,
     val listId: Long = 0L,
@@ -14,7 +14,7 @@ data class SbListMember(
 
 // 내 리스트들의 알람
 @Entity(tableName = "list_member_alarm")
-data class SbListMemberAlarm(
+data class ListMemberAlarmEntity(
     @PrimaryKey val listId: Long = 0L,
     val isAlert: Boolean = false,
 
