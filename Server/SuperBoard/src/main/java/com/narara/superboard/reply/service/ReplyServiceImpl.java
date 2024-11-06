@@ -65,8 +65,8 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
-//        throw new CustomTestException();
-        return savedReply;
+        throw new CustomTestException();
+//        return savedReply;
     }
 
     @Override
