@@ -1,7 +1,7 @@
 package com.ssafy.network.api
 
-import com.ssafy.model.board.MemberListResponseDTO
-import com.ssafy.model.workspace.WorkSpaceListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
@@ -15,7 +15,7 @@ import retrofit2.http.Path
 interface WorkspaceAPI {
 
     @GET("api/v1/workspaces")
-    suspend fun getWorkspaces(): Response<ApiResponse<WorkSpaceListResponseDTO>>
+    suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")
     suspend fun createWorkspace(@Body workspaceRequestDTO: WorkspaceRequestDTO): Response<ApiResponse<Unit>>
@@ -30,8 +30,8 @@ interface WorkspaceAPI {
     ): Response<ApiResponse<Unit>>
 
     @GET("api/v1/workspaces/{workspaceId}/members")
-    suspend fun getWorkspaceMembers(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<MemberListResponseDTO>>
+    suspend fun getWorkspaceMembers(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
 
     @GET("api/v1/members/{memberId}/workspaces")
-    suspend fun getWorkspacesByMember(@Path("memberId") memberId: Long): Response<ApiResponse<WorkSpaceListResponseDTO>>
+    suspend fun getWorkspacesByMember(@Path("memberId") memberId: Long): Response<ApiResponse<List<WorkSpaceDTO>>>
 }

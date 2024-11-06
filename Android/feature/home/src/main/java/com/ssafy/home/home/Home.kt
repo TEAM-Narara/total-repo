@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -15,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +28,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.drawer.DrawerSheet
+import com.ssafy.model.board.BoardDTO
+import com.ssafy.model.user.User
+import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -34,14 +40,16 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: (List<String>) -> Unit,
+    moveToCreateNewBoardScreen: (List<WorkSpaceDTO>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
     moveToMyCardScreen: () -> Unit,
     moveToUpdateProfile: () -> Unit,
-    moveToSearchScreen: () -> Unit
+    moveToSearchScreen: () -> Unit,
+    moveToAlarmScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val homeData by viewModel.homeData.collectAsStateWithLifecycle()
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -53,15 +61,20 @@ fun HomeScreen(
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     HomeScreen(
-        workSpace = Any(),
+        workSpaceList = homeData.workspaceList,
+        user = homeData.user,
+        boardsBySelectedWorkSpace = homeData.boardsBySelectedWorkSpace,
         moveToBoardScreen = moveToBoardScreen,
-        moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
-        moveToCreateNewWorkSpaceScreen = { /*TODO 새 워크 스페이스 만들기 */ },
+        moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(homeData.workspaceList) },
         moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
         moveToSettingScreen = moveToSettingScreen,
         moveToMyCardScreen = moveToMyCardScreen,
         moveToUpdateProfile = moveToUpdateProfile,
         moveToSearchScreen = moveToSearchScreen,
+        moveToAlarmScreen = moveToAlarmScreen,
+        moveToJoinedBoard = { /*TODO 가입한 보드 화면으로 이동 */ },
+        addNewWorkSpace = viewModel::createWorkSpace,
+        chaneSelectedWorkSpace = viewModel::chaneSelectedWorkSpace
     )
 
     when (uiState) {
@@ -74,23 +87,25 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
-    workSpace: Any?,
+    workSpaceList: List<WorkSpaceDTO>,
+    boardsBySelectedWorkSpace: List<BoardDTO>,
+    user: User,
     moveToBoardScreen: (Long) -> Unit,
-    moveToCreateNewBoardScreen: (List<String>) -> Unit,
-    moveToCreateNewWorkSpaceScreen: () -> Unit,
+    moveToCreateNewBoardScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: () -> Unit,
     moveToMyCardScreen: () -> Unit,
     moveToUpdateProfile: () -> Unit,
-    moveToSearchScreen: () -> Unit
+    moveToSearchScreen: () -> Unit,
+    moveToAlarmScreen: () -> Unit,
+    moveToJoinedBoard: () -> Unit,
+    addNewWorkSpace: () -> Unit,
+    chaneSelectedWorkSpace: (Long) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val spanCount = if (isPortrait) 2 else 4
     val scope = rememberCoroutineScope()
-
-    val url =
-        "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z"
 
     BackHandler(enabled = drawerState.isOpen) {
         scope.launch {
@@ -104,20 +119,21 @@ private fun HomeScreen(
             DrawerSheet(
                 icon = {
                     AsyncImage(
-                        model = url,
+                        model = user.profileImage,
                         contentDescription = null,
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        placeholder = rememberVectorPainter(Icons.Default.AccountCircle),
                     )
                 },
-                nickname = "손오공",
-                email = "monkey@naver.com",
-                workspaceList = List(4) { "손오공's workspace" },
-                onAddWorkSpaceClick = { /*TODO*/ },
-                onMyBoardClick = { /*TODO*/ },
+                nickname = user.nickname,
+                email = user.email,
+                workspaceList = workSpaceList,
+                onAddWorkSpaceClick = addNewWorkSpace,
+                moveToJoinedBoard = moveToJoinedBoard,
                 onMyCardClick = moveToMyCardScreen,
                 onSettingClick = moveToUpdateProfile,
                 onLogoutClick = moveToLoginScreen,
-                onWorkSpaceClick = { /*TODO*/ }
+                onWorkSpaceClick = chaneSelectedWorkSpace
             )
         }
     ) {
@@ -125,37 +141,32 @@ private fun HomeScreen(
             containerColor = White,
             topBar = {
                 MainTopBar(
+                    title = "${user.nickname}의 워크 스페이스",
                     onDrawerClick = { scope.launch { drawerState.open() } },
-                    onSearchClick = { moveToSearchScreen() },
-                    onAlarmClick = { /*TODO*/ },
+                    onSearchClick = moveToSearchScreen,
+                    onAlarmClick = moveToAlarmScreen,
                     onMenuClick = moveToSettingScreen
                 )
             },
             floatingActionButton = {
-                if (workSpace != null) {
+                if (workSpaceList.isEmpty()) {
                     AddNewBoardFloatingButton(
-                        moveToCreateNewBoardScreen = {
-                            moveToCreateNewBoardScreen(
-                                // TODO : WorkSpaceList에 대한 DTO 변경 필요
-                                List(4) { "workspace-$it" }
-                            )
-                        }
+                        moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
                     )
                 }
             }
         ) { innerPadding ->
-            if (workSpace != null) {
+            if (workSpaceList.isEmpty()) {
                 HomeBodyScreen(
                     modifier = Modifier.padding(innerPadding),
-                    // TODO : Board에 대한 정보를 전달합니다.
-                    boards = List(4) { Any() },
+                    boards = boardsBySelectedWorkSpace,
                     spanCount = spanCount,
                     moveToBoardScreen = moveToBoardScreen
                 )
             } else {
                 HomeEmptyScreen(
                     modifier = Modifier.padding(innerPadding),
-                    moveToCreateNewWorkSpaceScreen = moveToCreateNewWorkSpaceScreen
+                    addNewWorkSpace = addNewWorkSpace
                 )
             }
         }
@@ -166,14 +177,19 @@ private fun HomeScreen(
 @Composable
 fun GreetingPreview() {
     HomeScreen(
-        workSpace = Any(),
+        workSpaceList = emptyList(),
+        boardsBySelectedWorkSpace = emptyList(),
+        user = User("", "", null),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
-        moveToCreateNewWorkSpaceScreen = {},
         moveToLoginScreen = {},
         moveToSettingScreen = {},
         moveToMyCardScreen = {},
         moveToUpdateProfile = {},
-        moveToSearchScreen = {}
+        moveToSearchScreen = {},
+        moveToAlarmScreen = {},
+        moveToJoinedBoard = {},
+        addNewWorkSpace = {},
+        chaneSelectedWorkSpace = {}
     )
 }

@@ -1,9 +1,8 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
-
-import com.ssafy.model.board.MemberListResponseDTO
-import com.ssafy.model.workspace.WorkSpaceListResponseDTO
+import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,7 +17,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WorkspaceRepository {
 
-    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<WorkSpaceListResponseDTO> =
+    override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 workspaceDataSource.getWorkspaceList()
@@ -61,12 +60,12 @@ class WorkspaceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<MemberListResponseDTO> =
+    override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
             TODO("Room DB 연동이 되면 로컬 데이터를 가져오는 로직을 추가해주세요.")
         }
 
-    override suspend fun getWorkspacesByMember(memberId: Long): Flow<WorkSpaceListResponseDTO> =
+    override suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             TODO("Room DB 연동이 되면 로컬 데이터를 가져오는 로직을 추가해주세요.")
         }
