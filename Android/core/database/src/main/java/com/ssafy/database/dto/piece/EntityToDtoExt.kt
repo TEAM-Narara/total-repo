@@ -6,6 +6,8 @@ import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.MemberBackgroundEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.BoardInList
@@ -13,8 +15,10 @@ import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.ListInCards
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
+import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.user.User
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberDTO
@@ -26,6 +30,23 @@ import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.model.with.ReplyDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
+
+// Member
+fun MemberEntity.toDTO(): User {
+    return User(
+        nickname = this.nickname,
+        email = this.email,
+        profileImage = this.profileImageUrl
+    )
+}
+
+fun MemberBackgroundEntity.toDTO(): BackgroundDto {
+    return BackgroundDto(
+        id = this.id,
+        imgPath = this.url,
+        isStatus = this.isStatus
+    )
+}
 
 // Workspace
 
@@ -181,7 +202,8 @@ fun WorkspaceMemberWithMemberInfo.toDTO(): MemberResponseDTO {
         authority = this.workspaceMember.authority,
         memberEmail = this.member.email,
         memberNickname = this.member.nickname,
-        memberProfileImgUrl = this.member.profileImageUrl
+        memberProfileImgUrl = this.member.profileImageUrl,
+        isStatus = this.workspaceMember.isStatus
     )
 }
 

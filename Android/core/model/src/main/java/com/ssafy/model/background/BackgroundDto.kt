@@ -1,9 +1,11 @@
 package com.ssafy.model.background
 
-import kotlinx.serialization.Serializable
+import com.ssafy.model.with.DataStatus
 
-@Serializable
 data class BackgroundDto(
-    val color: Long,
-    val imgPath: String? = null,
+    val id: Long,
+    val imgPath: String,
+
+    @Transient
+    val isStatus: DataStatus = DataStatus.STAY
 )

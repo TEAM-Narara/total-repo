@@ -30,11 +30,11 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
 
-    suspend fun deleteWorkspaceMember(workspaceId: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun updateWorkspaceMember(
-        workspaceId: Long,
-        name: String,
+        id: Long,
+        authority: String,
         isConnected: Boolean
     ): Flow<Unit>
 }

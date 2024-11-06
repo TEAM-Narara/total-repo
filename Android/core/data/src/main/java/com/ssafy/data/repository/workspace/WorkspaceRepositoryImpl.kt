@@ -120,8 +120,6 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspacesByMember(memberId)
                 .map { list -> list.map { it.toDTO() } }
-
-
         }
 
     override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {

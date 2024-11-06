@@ -33,5 +33,4 @@ class WorkspaceDataSourceImpl @Inject constructor(
 
     override suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>> =
         safeApiCall { workspaceAPI.getWorkspacesByMember(memberId) }.toFlow()
-
 }
