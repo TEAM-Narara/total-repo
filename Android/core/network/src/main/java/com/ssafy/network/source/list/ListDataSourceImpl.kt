@@ -27,4 +27,8 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
 
     override suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>> =
         safeApiCall { listAPI.getArchivedLists(boardId) }.toFlow()
+
+    override suspend fun deleteListMember(id: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 }

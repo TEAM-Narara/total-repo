@@ -17,6 +17,7 @@ import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.ListInCards
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
+import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 import com.ssafy.model.background.BackgroundDto
@@ -34,6 +35,7 @@ import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.model.with.ReplyDTO
+import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -267,5 +269,30 @@ fun ListResponseDto.toEntity(): ListEntity {
         isArchived = this.isArchived,
         myOrder = this.myOrder,
         id = this.listId
+    )
+}
+
+// Reply
+fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
+    val replyEntity = ReplyEntity(
+        id = this.id,
+        cardId = this.cardId,
+        memberId = this.memberId,
+        content = this.content,
+        createAt = this.createAt,
+        updateAt = this.updateAt,
+        isStatus = this.isStatus
+    )
+
+    val memberEntity = MemberEntity(
+        id = this.memberId,
+        email = this.memberEmail,
+        nickname = this.memberNickname,
+        profileImageUrl = this.memberProfileImgUrl
+    )
+
+    return ReplyWithMemberInfo(
+        reply = replyEntity,
+        member = memberEntity
     )
 }

@@ -105,7 +105,7 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit> = flow {
         withContext(ioDispatcher) {
-            val memberBackground = getMemberBackground(id).toEntity()
+            val memberBackground = getMemberBackground(id)
 
             if(memberBackground != null) {
                 if (isConnected) {
@@ -113,7 +113,7 @@ class MemberRepositoryImpl @Inject constructor(
                 } else {
                     when(memberBackground.isStatus) {
                         DataStatus.CREATE ->
-                            memberBackgroundDao.deleteMemberBackground(memberBackground)
+                            memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
                         else ->
                             memberBackgroundDao.updateMemberBackground(id, DataStatus.DELETE.name)
                     }

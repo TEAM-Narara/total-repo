@@ -33,4 +33,12 @@ class WorkspaceDataSourceImpl @Inject constructor(
 
     override suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>> =
         safeApiCall { workspaceAPI.getWorkspacesByMember(memberId) }.toFlow()
+
+    override suspend fun deleteWorkspaceMember(id: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateWorkspaceMember(id: Long, authority: String): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 }
