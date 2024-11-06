@@ -87,6 +87,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
 
         return newWorkSpace;
+
     }
 
     @Override
