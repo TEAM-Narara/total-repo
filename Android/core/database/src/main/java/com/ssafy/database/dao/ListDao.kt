@@ -21,7 +21,7 @@ interface ListDao {
         FROM list
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalList(): List<ListInCards>
+    suspend fun getLocalCreateList(): List<ListInCards>
 
     // 서버에 연산할 리스트 조회
     @Query("""
@@ -29,7 +29,7 @@ interface ListDao {
         FROM list
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteList(): List<ListEntity>
+    suspend fun getLocalOperationList(): List<ListEntity>
 
     // 리스트 단일 조회
     @Transaction
@@ -38,7 +38,7 @@ interface ListDao {
         FROM list 
         WHERE id == :listId And isStatus != 'DELETE' And isArchived == 0
     """)
-    fun getList(listId: Long): Flow<List<ListEntity>>
+    fun getList(listId: Long): ListEntity
 
     // 현재 보드에서 볼 것
     @Transaction
@@ -59,9 +59,10 @@ interface ListDao {
         FROM list 
         WHERE isStatus != 'DELETE' 
             And isArchived == 1
+            And boardId == :boardId
         ORDER BY myOrder
     """)
-    fun getAllListsArchived(): Flow<List<ListEntity>>
+    fun getAllListsArchived(boardId: Long): Flow<List<ListEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)

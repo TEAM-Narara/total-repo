@@ -2,6 +2,7 @@ package com.ssafy.data.repository.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import kotlinx.coroutines.flow.Flow
@@ -37,4 +38,6 @@ interface WorkspaceRepository {
         authority: String,
         isConnected: Boolean
     ): Flow<Unit>
+
+    suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO>
 }
