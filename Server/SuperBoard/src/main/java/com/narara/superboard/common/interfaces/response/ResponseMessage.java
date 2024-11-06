@@ -29,6 +29,7 @@ public class ResponseMessage {
 
     // 워크스페이스 관련 상수
     public static final String WORKSPACE_CREATE_SUCCESS = "워크스페이스 생성 성공";
+    public static final String WORKSPACE_LIST_FETCH_SUCCESS = "나의 워크스페이스 리스트 조회 성공";
     public static final String WORKSPACE_UPDATE_SUCCESS = "워크스페이스 수정 성공";
     public static final String WORKSPACE_DELETE_SUCCESS = "워크스페이스 삭제 성공";
 
