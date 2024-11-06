@@ -19,6 +19,8 @@ import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.Arrays;
 import java.util.Collections;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

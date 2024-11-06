@@ -59,11 +59,11 @@ public class ReplyServiceImpl implements ReplyService{
         CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
         Target target = Target.of(savedReply, createReplyInfo);
 
-//        CardHistory cardHistory = CardHistory.careateCardHistory(
-//                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-//                EventType.CREATE, EventData.COMMENT, target);
-//
-//        cardHistoryRepository.save(cardHistory);
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
+                EventType.CREATE, EventData.COMMENT, target);
+
+        cardHistoryRepository.save(cardHistory);
 
         return savedReply;
     }
@@ -109,9 +109,10 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
+
     public class CustomTestException extends RuntimeException {
-        public CustomTestException(String message) {
-            super(message);
+        public CustomTestException() {
+            super("몽고디비 트랜잭션 연결 관련 테스트");
             System.out.println("excetion");
         }
     }
