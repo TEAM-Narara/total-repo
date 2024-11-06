@@ -157,7 +157,9 @@ public class BoardServiceImpl implements BoardService {
 
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
                 .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
-
+        if (boardMember.getAuthority() == null){
+            throw  new AccessDeniedException("보드에 대한 권한이 없습니다");
+        }
         Board board = getBoard(boardId);
         Board updatedBoard;
 
