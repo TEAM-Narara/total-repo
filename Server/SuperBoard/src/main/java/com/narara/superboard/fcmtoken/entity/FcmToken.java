@@ -24,4 +24,8 @@ public class FcmToken extends BaseTimeEntity {
     @Column(name = "registration_token", nullable = false)
     private String registrationToken;
 
+    public void changeRegistrationToken(String registrationToken) {
+        this.registrationToken = registrationToken;
+    }
+
 }
