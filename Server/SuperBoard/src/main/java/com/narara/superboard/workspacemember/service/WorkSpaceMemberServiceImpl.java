@@ -82,6 +82,16 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
+
+        if (authority.equals(Authority.MEMBER)) {
+            //권한을 MEBMER로 바꾸는 경우 Workspace Admin이 한 명 이상인지 검증
+            boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(
+                    workSpaceMember.getWorkSpace());
+            if (!workspaceHasOneMember) {
+                throw new EmptyWorkspaceMemberException();
+            }
+        }
+
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
