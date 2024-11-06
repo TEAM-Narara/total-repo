@@ -9,7 +9,6 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -79,7 +78,6 @@ class WorkspaceRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun updateWorkspace(
         workspaceId: Long,
         name: String,
@@ -105,5 +103,4 @@ class WorkspaceRepositoryImpl @Inject constructor(
             workspaceMemberDao.getWorkspacesByMember(memberId)
                 .map { list -> list.map { it.toDTO() } }
         }
-
 }
