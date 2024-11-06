@@ -3,7 +3,7 @@ package com.narara.superboard.board.service.validator;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
 import com.narara.superboard.board.exception.BoardVisibilityNotFoundException;
-import com.narara.superboard.board.interfaces.dto.CoverDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.exception.BoardNameNotFoundException;
 import org.junit.jupiter.api.DisplayName;

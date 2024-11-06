@@ -2,9 +2,10 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.interfaces.dto.CoverDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
@@ -60,6 +61,10 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private ListService listService; // 추가: listService를 Mock으로 설정
 
+    @Mock
+    private CardHistoryRepository cardHistoryRepository; // 추가: listService를 Mock으로 설정
+
+
     @InjectMocks
     private CardServiceImpl cardService; // 실제 인스턴스 생성 후 Mock 주입
 
@@ -71,10 +76,18 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         String cardName = "Test Card";
         CardCreateRequestDto cardCreateRequestDto = new CardCreateRequestDto(1L, cardName);
 
+        // Board 객체 생성 및 설정
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .build();
+
+        // List 객체 생성 시 Board 설정
         List list = List.builder()
                 .id(1L)
                 .name("Test List")
                 .lastCardOrder(0L)
+                .board(board) // Board 설정 추가
                 .build();
 
         when(listRepository.findById(1L)).thenReturn(Optional.ofNullable(list));
@@ -107,6 +120,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         verify(cardRepository, times(1)).save(any(Card.class));
         verify(cardMemberRepository, times(1)).save(any(CardMember.class));
     }
+
 
     @ParameterizedTest
     @DisplayName("리스트가 존재하지 않을 때 실패")

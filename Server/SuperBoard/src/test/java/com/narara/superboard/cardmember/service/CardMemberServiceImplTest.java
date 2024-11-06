@@ -1,13 +1,15 @@
 package com.narara.superboard.cardmember.service;
 
+import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.list.entity.List;
 import com.narara.superboard.member.entity.Member;
-import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,9 @@ class CardMemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private CardHistoryRepository cardHistoryRepository;
+
 
     @InjectMocks
     private CardMemberServiceImpl cardMemberService;
@@ -43,17 +48,32 @@ class CardMemberServiceImplTest {
         Long cardId = 1L;
         Long memberId = 1L;
 
-        // Member 및 Card 객체 초기화
-        member = new Member(memberId, "username", "password");
+        // Board 객체 생성
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .build();
+
+        // List 객체 생성 및 Board 설정
+        List list = List.builder()
+                .id(1L)
+                .name("Test List")
+                .board(board)  // Board와 연결
+                .build();
+
+        // Card 객체 생성 및 List 설정
         card = Card.builder()
                 .id(cardId)
-                .name("dd")
-                .myOrder(1L)
-                .myOrder(0L)
+                .name("Test Card")
+                .list(list)  // List와 연결
                 .isDeleted(false)
                 .isArchived(false)
                 .build();
+
+        // Member 객체 생성
+        member = new Member(memberId, "username", "password");
     }
+
 
     @Test
     @DisplayName("카드 개인 알림 설정 조회 성공 테스트 - 카드와 멤버가 존재하고, watch 상태가 true일 때 true를 반환")
@@ -195,22 +215,20 @@ class CardMemberServiceImplTest {
     @DisplayName("카드 멤버 추가 또는 대표 상태 업데이트")
     void setCardMemberIsRepresentative() {
         // given
-        long cardId = 1L;
-        long memberId = 1L;
+        long cardId = card.getId();
+        long memberId = member.getId();
         boolean isRepresentative = true; // 요청 DTO의 초기 대표 상태 값
-        boolean isAlert = true;
 
         UpdateCardMemberRequestDto updateCardMemberRequestDto = new UpdateCardMemberRequestDto(cardId, memberId);
 
-        Card card = new Card(cardId, null, "dd", "dd", null, null, null, null, null, null, null, null, null);
-        Member member = new Member(memberId, "dd", "ddd@naver.com");
-
-        CardMember cardMember = new CardMember(member, card, isAlert,isRepresentative);
+        // CardMember 객체 생성
+        CardMember cardMember = new CardMember(member, card, true, isRepresentative);
 
         // 카드와 멤버 유효성 확인
         when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
+        // 카드 멤버가 없는 경우 새로 추가
         // 3번 조건: 카드 멤버가 없는 경우 새로 추가
         when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.empty());
 
@@ -228,6 +246,7 @@ class CardMemberServiceImplTest {
             assertEquals(!isRepresentative, cardMember.isRepresentative()); // 대표 상태가 반대로 변경되었는지 확인
         }
     }
+
 
     @Test
     @DisplayName("카드가 존재하지 않을 때 예외 발생 테스트")
