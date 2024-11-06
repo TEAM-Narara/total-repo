@@ -505,7 +505,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // when
         Long memberId = 1L;
         when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(
-                Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+                Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true, false)));
         Board updatedBoard = boardService.updateBoard(memberId, boardId, requestDto);
 
         // then
