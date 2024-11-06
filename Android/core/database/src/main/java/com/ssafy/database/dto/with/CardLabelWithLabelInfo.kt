@@ -6,11 +6,8 @@ import com.ssafy.database.dto.CardLabel
 import com.ssafy.database.dto.Label
 
 data class CardLabelWithLabelInfo(
-    @Embedded val cardLabel: CardLabel,
-
-    @Relation(
-        parentColumn = "labelId",
-        entityColumn = "id"
-    )
+    @Embedded(prefix = "card_label_")
+    val cardLabel: CardLabel,
+    @Embedded(prefix = "label_")
     val label: Label
 )

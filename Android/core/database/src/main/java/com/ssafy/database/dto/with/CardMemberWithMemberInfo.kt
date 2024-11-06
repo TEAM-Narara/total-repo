@@ -2,15 +2,14 @@ package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.CardMember
 import com.ssafy.database.dto.Member
 
 data class CardMemberWithMemberInfo(
-    @Embedded val cardMember: CardMember,
+    @Embedded(prefix = "card_member_")
+    val cardMember: CardMember,
 
-    @Relation(
-        parentColumn = "memberId",
-        entityColumn = "id"
-    )
+    @Embedded(prefix = "member_")
     val member: Member
 )

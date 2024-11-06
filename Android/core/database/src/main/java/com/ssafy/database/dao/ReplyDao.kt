@@ -5,10 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Label
 import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.piece.ReplyCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,7 +19,7 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalReply(): List<Reply>
+    suspend fun getAllLocalReplies(): List<Reply>
 
     // 서버에 연산할 댓글 조회
     @Query("""
@@ -28,14 +27,23 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteReply(): List<Reply>
+    suspend fun getAllRemoteReplies(): List<Reply>
+
+    // 댓글 수 조회
+    @Query("""
+        SELECT cardId, COUNT(*) AS count 
+        FROM reply
+        WHERE isStatus != 'DELETE'
+        GROUP BY cardId
+    """)
+    fun getReplyCounts(): Flow<List<ReplyCount>>
 
     // 카드에서 볼 댓글
     @Query("""
         SELECT * 
         FROM reply 
         WHERE cardId == :cardId And isStatus != 'DELETE'
-        ORDER BY id DESC
+        ORDER BY createAt DESC
     """)
     fun getAllReplies(cardId: Long): Flow<List<Reply>>
 

@@ -6,11 +6,9 @@ import com.ssafy.database.dto.BoardMember
 import com.ssafy.database.dto.Member
 
 data class BoardMemberWithMemberInfo(
-    @Embedded val boardMember: BoardMember,
+    @Embedded(prefix = "board_member_")
+    val boardMember: BoardMember,
 
-    @Relation(
-        parentColumn = "memberId",
-        entityColumn = "id"
-    )
+    @Embedded(prefix = "member_")
     val member: Member
 )

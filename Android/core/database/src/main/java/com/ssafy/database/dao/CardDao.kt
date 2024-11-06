@@ -8,10 +8,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.Card
-import com.ssafy.database.dto.SbList
 import com.ssafy.database.dto.with.CardAllInfo
-import com.ssafy.database.dto.with.CardDetail
-import com.ssafy.database.dto.with.ListInCards
+import com.ssafy.database.dto.with.CardWithListAndBoardName
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -33,29 +31,59 @@ interface CardDao {
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
     suspend fun getAllRemoteCard(): List<Card>
-
-    // 카드 상세 조회
+    
+    // 카드 단일 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM card 
         WHERE id == :cardId
     """)
-    suspend fun getCardDetail(cardId: Long): CardDetail
+    fun getCard(cardId: Long): Flow<Card>
+    
+    // 카드 상위의 List, Board 이름 조회
+    @Transaction
+    @Query("""
+        SELECT 
+            card.id AS cardId,
+            card.name AS cardName,
+            list.name AS listName,
+            board.name AS boardName
+        FROM card
+        INNER JOIN list ON list.id = card.listId
+        INNER JOIN board ON board.id = list.boardId
+        WHERE card.id = :cardId
+    """)
+    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>
 
-    // 워크스페이스에서 볼 것
+    // 리스트 내에 카드들 조회
     @Query("""
         SELECT * 
         FROM card 
-        WHERE listId == :listId And isStatus != 'DELETE' And isArchived == 0
+        WHERE listId == :listId
+            And isStatus != 'DELETE' 
+            And isArchived == 0
+        ORDER BY myOrder
     """)
-    fun getAllCards(listId: Long): Flow<List<Card>>
+    fun getAllCardsInList(listId: Long): Flow<List<Card>>
+
+    // 리스트들 내에 카드들 조회
+    @Query("""
+        SELECT * 
+        FROM card 
+        WHERE listId IN (:listIds) 
+            And isStatus != 'DELETE' 
+            And isArchived == 0
+        ORDER BY myOrder
+    """)
+    fun getAllCardsInLists(listIds: List<Long>): Flow<List<Card>>
 
     // 아카이브에서 볼 것
     @Query("""
         SELECT * 
         FROM card 
         WHERE isStatus != 'DELETE' And isArchived == 1
+        ORDER BY myOrder
     """)
     fun getAllCardsArchived(): Flow<List<Card>>
 
