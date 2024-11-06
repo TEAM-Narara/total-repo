@@ -87,7 +87,7 @@ class AttachmentServiceImplTest {
         assertNotNull(result);
         assertEquals("http://example.com/image.jpg", result.getUrl());
         assertFalse(result.getIsCover());
-        verify(cardRepository, times(1)).save(testCard);
+        verify(cardRepository, never()).save(testCard);
         verify(attachmentRepository, times(1)).save(any(Attachment.class));
     }
 
@@ -101,7 +101,7 @@ class AttachmentServiceImplTest {
         Exception exception = assertThrows(NotFoundEntityException.class, () ->
                 attachmentService.addAttachment(999L, "http://example.com/image.jpg"));
 
-        assertEquals("카드 ID가 999인 엔티티를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: 999", exception.getMessage());
         verify(attachmentRepository, never()).save(any(Attachment.class));
     }
 
@@ -191,27 +191,34 @@ class AttachmentServiceImplTest {
      * Tests for updateAttachmentIsCover
      */
     @Test
-    @DisplayName("첨부파일 커버 여부를 토글하여 업데이트")
-    void testUpdateAttachmentIsCover_Success() {
+    @DisplayName("첨부파일 커버 여부를 토글하여 업데이트 - 커버 상태가 false에서 true로 변경")
+    void testUpdateAttachmentIsCover_ToggleOn() {
         // Arrange
+        testAttachment.setIsCover(false); // Initially not set as cover
+        testCard.setCover(null);
+
         when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
 
         // Act
         attachmentService.updateAttachmentIsCover(testAttachment.getId());
 
         // Assert
         assertTrue(testAttachment.getIsCover());
+        assertEquals(Map.of(testAttachment.getType(), testAttachment.getUrl()), testCard.getCover());
         verify(attachmentRepository, times(1)).save(testAttachment);
         verify(cardRepository, times(1)).save(testCard);
     }
 
     @Test
-    @DisplayName("첨부파일의 기존 커버 상태가 true에서 false로 변경")
+    @DisplayName("첨부파일 커버 여부를 토글하여 업데이트 - 커버 상태가 true에서 false로 변경")
     void testUpdateAttachmentIsCover_ToggleOff() {
         // Arrange
-        testAttachment.setIsCover(true);  // Initially set to cover
+        testAttachment.setIsCover(true); // Initially set as cover
+        testCard.setCover(Map.of(testAttachment.getType(), testAttachment.getUrl())); // Set cover
 
         when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
 
         // Act
         attachmentService.updateAttachmentIsCover(testAttachment.getId());
