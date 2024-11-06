@@ -23,9 +23,11 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
 import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
+
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class ReplyServiceImpl implements ReplyService{
     private final ContentValidator contentValidator;
 
     @Override
+    @Transactional
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
@@ -62,7 +65,8 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
-        return savedReply;
+        throw new CustomTestException("Test exception: Reply creation failed.");
+//        return savedReply;
     }
 
     @Override
@@ -106,4 +110,12 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
+    public class CustomTestException extends RuntimeException {
+        public CustomTestException(String message) {
+            super(message);
+            System.out.println("excetion");
+        }
+    }
+
 }
+
