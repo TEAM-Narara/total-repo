@@ -59,12 +59,13 @@ public class ReplyServiceImpl implements ReplyService{
         CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
         Target target = Target.of(savedReply, createReplyInfo);
 
-//        CardHistory cardHistory = CardHistory.careateCardHistory(
-//                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-//                EventType.CREATE, EventData.COMMENT, target);
-//
-//        cardHistoryRepository.save(cardHistory);
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
+                EventType.CREATE, EventData.COMMENT, target);
 
+        cardHistoryRepository.save(cardHistory);
+
+//        throw new CustomTestException();
         return savedReply;
     }
 
@@ -112,6 +113,10 @@ public class ReplyServiceImpl implements ReplyService{
     public class CustomTestException extends RuntimeException {
         public CustomTestException(String message) {
             super(message);
+            System.out.println("excetion");
+        }
+        public CustomTestException() {
+            super("test");
             System.out.println("excetion");
         }
     }
