@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "label")
-data class Label(
+data class LabelEntity(
     @PrimaryKey val id: Long = 0L,
     val boardId: Long = 0L,
     val name: String = "",

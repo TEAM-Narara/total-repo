@@ -1,12 +1,18 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.WorkspaceDao
+import com.ssafy.database.dao.WorkspaceMemberDao
+import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,18 +20,35 @@ import javax.inject.Singleton
 @Singleton
 class WorkspaceRepositoryImpl @Inject constructor(
     private val workspaceDataSource: WorkspaceDataSource,
+    private val workspaceDao: WorkspaceDao,
+    private val workspaceMemberDao: WorkspaceMemberDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WorkspaceRepository {
 
     override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.getWorkspaceList()
-                TODO("이렇게 서버로부터 받아온 내 워크스페이스 목록 DB에 저장하기")
-            } else {
-                TODO("Room DB 연동이 되면 로컬 데이터를 가져오는 로직을 추가해주세요.")
+                workspaceDataSource.getWorkspaceList().map { dtoList ->
+                    workspaceDao.insertWorkspaces(dtoList.map { it.toEntity() })
+                }
             }
+
+            getLocalScreenWorkspaceList()
         }
+
+    override suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>> =
+        withContext(ioDispatcher) {
+            workspaceDao.getAllWorkspaces()
+                .map { entities -> entities.map { it.toDTO() } }
+        }
+
+    override suspend fun getLocalCreateWorkspaceList(): Flow<List<WorkspaceInBoardDTO>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLocalOperationWorkspaceList(): Flow<List<WorkSpaceDTO>> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun createWorkspace(
         workspaceRequestDTO: WorkspaceRequestDTO,

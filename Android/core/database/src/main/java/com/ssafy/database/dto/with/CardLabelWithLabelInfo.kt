@@ -1,13 +1,12 @@
 package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
-import androidx.room.Relation
-import com.ssafy.database.dto.CardLabel
-import com.ssafy.database.dto.Label
+import com.ssafy.database.dto.CardLabelEntity
+import com.ssafy.database.dto.LabelEntity
 
 data class CardLabelWithLabelInfo(
     @Embedded(prefix = "card_label_")
-    val cardLabel: CardLabel,
+    val cardLabel: CardLabelEntity,
     @Embedded(prefix = "label_")
-    val label: Label
+    val label: LabelEntity
 )

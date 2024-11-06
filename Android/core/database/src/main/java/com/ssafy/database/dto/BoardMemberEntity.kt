@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 // 보드에 연관된 모든 사용자
 @Entity(tableName = "board_member")
-data class BoardMember(
+data class BoardMemberEntity(
     @PrimaryKey val id: Long = 0L,
     val memberId: Long = 0L,
     val boardId: Long = 0L,
@@ -16,7 +16,7 @@ data class BoardMember(
 
 // 내 보드들의 알람
 @Entity(tableName = "board_member_alarm")
-data class BoardMemberAlarm(
+data class BoardMemberAlarmEntity(
     @PrimaryKey val boardId: Long = 0L,
     val isAlert: Boolean = false,
 

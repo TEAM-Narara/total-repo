@@ -2,16 +2,16 @@ package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.ssafy.database.dto.Board
-import com.ssafy.database.dto.Workspace
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.WorkspaceEntity
 
 data class WorkspaceInBoard(
-    @Embedded val workspace: Workspace,
+    @Embedded val workspace: WorkspaceEntity,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "workspaceId",
-        entity = Board::class
+        entity = BoardEntity::class
     )
     val board: List<BoardInList>,
 )

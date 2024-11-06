@@ -2,19 +2,19 @@ package com.ssafy.database.dto.temp
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.ssafy.database.dto.Board
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.BoardMemberAlarm
-import com.ssafy.database.dto.Workspace
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 
 data class BoardDetail(
-    @Embedded val board: Board,
+    @Embedded val board: BoardEntity,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId",
-        entity = BoardMember::class,
+        entity = BoardMemberEntity::class,
     )
     val boardMembers: List<BoardMemberWithMemberInfo>,
 
@@ -22,13 +22,13 @@ data class BoardDetail(
         parentColumn = "workspaceId",
         entityColumn = "id"
     )
-    val workspace: Workspace,
+    val workspace: WorkspaceEntity,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId"
     )
-    val boardMemberAlarm: BoardMemberAlarm?
+    val boardMemberAlarm: BoardMemberAlarmEntity?
 
     // TODO Activity
 )
