@@ -1,10 +1,7 @@
 package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.entity.Card;
-import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
-import com.narara.superboard.card.interfaces.dto.CardDetailResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardSimpleResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
@@ -29,7 +26,6 @@ import java.util.List;
 @CrossOrigin
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/card")
 public class CardController implements CardAPI {
 
     private final CardService cardService;
@@ -83,10 +79,9 @@ public class CardController implements CardAPI {
         );
     }
 
-
     @Override
     @Operation(summary = "카드 아카이브 리스트 조회", description = "")
-    public ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getArchivedCardList(
+    public ResponseEntity<DefaultResponse<CardArchiveCollectionResponseDto>> getArchivedCardList(
             @AuthenticationPrincipal Member member,
             @PathVariable Long boardId) {
 
@@ -95,9 +90,11 @@ public class CardController implements CardAPI {
         for (Card card : archivedCards) {
             cardSimpleResponseDtoList.add(CardSimpleResponseDto.of(card));
         }
+
+        CardArchiveCollectionResponseDto dto = new CardArchiveCollectionResponseDto(cardSimpleResponseDtoList);
+
         return ResponseEntity.ok(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.ARCHIVED_CARD_LIST_SUCCESS,
-                        cardSimpleResponseDtoList)
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.ARCHIVED_CARD_LIST_SUCCESS, dto)
         );
     }
 

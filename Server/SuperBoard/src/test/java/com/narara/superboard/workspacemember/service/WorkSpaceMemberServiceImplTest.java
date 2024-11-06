@@ -1,16 +1,16 @@
 package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkSpaceMemberDetailResponseDto;
-import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberCollectionResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -62,7 +62,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("워크스페이스 2", result.workSpaceResponseDtoList().get(1).name());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceResponseDto.class));
+        verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceNameHolder.class));
 
         // workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).findAllByMember(member);
@@ -88,13 +88,13 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         when(workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId)).thenReturn(mockWorkSpaceMemberList);
 
         // when: 서비스 메서드 호출
-        WorkspaceMemberCollectionResponseDto result = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+        MemberCollectionResponseDto result = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
 
         // then: 결과 검증
-        assertEquals(2, result.workspaceMemberList().size());
+        assertEquals(2, result.memberListResponse().size());
 
         // 첫 번째 멤버에 대한 검증
-        WorkSpaceMemberDetailResponseDto firstMember = result.workspaceMemberList().get(0);
+        MemberResponseDto firstMember = result.memberListResponse().get(0);
         assertEquals(1L, firstMember.memberId());
         assertEquals("user1@example.com", firstMember.memberEmail());
         assertEquals("닉네임1", firstMember.memberNickname());
@@ -102,7 +102,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("ADMIN", firstMember.authority());
 
         // 두 번째 멤버에 대한 검증
-        WorkSpaceMemberDetailResponseDto secondMember = result.workspaceMemberList().get(1);
+        MemberResponseDto secondMember = result.memberListResponse().get(1);
         assertEquals(2L, secondMember.memberId());
         assertEquals("user2@example.com", secondMember.memberEmail());
         assertEquals("닉네임2", secondMember.memberNickname());

@@ -1,17 +1,21 @@
 package com.narara.superboard.reply.service;
 
-import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.card.CardAction;
+import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
+import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
+import com.narara.superboard.reply.interfaces.dto.CreateReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
@@ -19,9 +23,11 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
 import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
+
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +37,12 @@ public class ReplyServiceImpl implements ReplyService{
 
     private final ReplyRepository replyRepository;
     private final CardRepository cardRepository;
+    private final CardHistoryRepository cardHistoryRepository;
 
     private final ContentValidator contentValidator;
 
     @Override
+    @Transactional
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
@@ -45,7 +53,19 @@ public class ReplyServiceImpl implements ReplyService{
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
 
-        return replyRepository.save(reply);
+        Reply savedReply = replyRepository.save(reply);
+
+
+        CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
+        Target target = Target.of(savedReply, createReplyInfo);
+
+//        CardHistory cardHistory = CardHistory.careateCardHistory(
+//                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
+//                EventType.CREATE, EventData.COMMENT, target);
+//
+//        cardHistoryRepository.save(cardHistory);
+
+        return savedReply;
     }
 
     @Override
@@ -89,4 +109,12 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
+    public class CustomTestException extends RuntimeException {
+        public CustomTestException(String message) {
+            super(message);
+            System.out.println("excetion");
+        }
+    }
+
 }
+

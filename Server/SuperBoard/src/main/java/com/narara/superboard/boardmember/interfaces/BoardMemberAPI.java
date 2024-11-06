@@ -1,6 +1,6 @@
 package com.narara.superboard.boardmember.interfaces;
 
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Tag(name = "보드 멤버 API", description = "보드 멤버 관련 기능을 제공하는 API")
+
+@Tag(name = "보드 회원", description = "보드 멤버 관련 기능을 제공하는 API")
 @RequestMapping("/api/v1/boards/{boardId}")
 public interface BoardMemberAPI {
 
     @Operation(summary = "보드 멤버 목록 조회", description = "지정된 보드에 속한 모든 멤버 정보를 조회합니다.")
     @GetMapping("/members")
-    ResponseEntity<DefaultResponse<BoardMemberCollectionResponseDto>> getBoardMembers(
+    ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getBoardMembers(
             @Parameter(description = "조회할 보드의 ID", required = true) @PathVariable Long boardId
     );
 

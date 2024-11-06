@@ -15,12 +15,9 @@ public class CoverHandler {
     public CoverType getType(Map<String, Object> cover) {
         coverValidator.validateCoversEmpty(cover);
         coverValidator.validateCoverTypeIsEmpty(cover);
+        coverValidator.validateCoverTypeIsValid(cover);
 
-        String result = cover.get("type").toString();
-
-        coverValidator.validateCoverTypeIsValid(result);
-
-        return CoverType.fromString(result.toUpperCase());
+        return CoverType.fromString(cover.get("type").toString().toUpperCase());
     }
 
     public String getTypeValue(Map<String, Object> cover) {

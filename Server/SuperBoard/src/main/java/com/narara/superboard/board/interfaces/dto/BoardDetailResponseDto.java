@@ -25,4 +25,17 @@ public record BoardDetailResponseDto(
                 .isClosed(board.getIsArchived())
                 .build();
     }
+
+    //coverHandler 없는 버전 TODO 개선
+    public static BoardDetailResponseDto of(Board board) {
+        return BoardDetailResponseDto.builder()
+                .id(board.getId())
+                .workspaceId(board.getWorkSpace().getId())
+                .name(board.getName())
+                .backgroundType((String)board.getCover().get("type"))
+                .backgroundValue((String)board.getCover().get("value"))
+                .visibility(board.getVisibility().name())
+                .isClosed(board.getIsArchived())
+                .build();
+    }
 }

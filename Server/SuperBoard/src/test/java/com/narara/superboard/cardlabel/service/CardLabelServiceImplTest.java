@@ -6,6 +6,7 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
+import com.narara.superboard.cardlabel.interfaces.dto.CardLabelDto;
 import com.narara.superboard.cardlabel.service.validator.CardLabelValidator;
 import com.narara.superboard.common.exception.cardlabel.MismatchedBoardException;
 import com.narara.superboard.label.entity.Label;
@@ -16,8 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -189,32 +189,134 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         verify(cardLabelRepository, times(1)).findByCardAndLabel(card, label);
     }
 
+    /**
+     * 카드 라벨 조회(전체 라벨+내가 선택한 라벨) TEST ------------------------------------------------------
+     */
     @Test
-    @DisplayName("성공 테스트: 특정 Card에 연결된 CardLabel 목록 반환")
-    void getCardLabels_Success() {
-        // given
-        Card card = Card.builder().id(1L).build();
-        Label label1 = Label.builder().id(1L).build();
-        Label label2 = Label.builder().id(2L).build();
+    @DisplayName("카드 라벨 전체 조회 성공 테스트")
+    public void testGetCardLabels_SomeLabelsUsedByCard() {
+        // Arrange
+        Long cardId = 1L;
+        Long boardId = 2L;
 
-        CardLabel cardLabel1 = CardLabel.createCardLabel(card, label1);
-        CardLabel cardLabel2 = CardLabel.createCardLabel(card, label2);
+        Board board = Board.builder()
+                .id(boardId)
+                .cover(null)
+                .name("dd")
+                .build();
 
-        List<CardLabel> expectedCardLabels = List.of(cardLabel1, cardLabel2);
+        // 카드 ID에 해당하는 보드 ID를 조회하는 부분을 모킹합니다.
+        when(cardRepository.findBoardByCardId(cardId)).thenReturn(board);
 
-        // findByCard가 예상되는 CardLabel 목록을 반환하도록 모킹
-        when(cardLabelRepository.findByCard(card)).thenReturn(expectedCardLabels);
+        // 보드에 연결된 라벨 목록을 모킹합니다.
+        List<Label> boardLabels = Arrays.asList(
+                new Label(1L, board,"Label1", 1L),
+                new Label(2L,board, "Label2", 2L),
+                new Label(3L,board, "Label3", 3L)
+        );
 
-        // when
-        List<CardLabel> result = cardLabelService.getCardLabels(card);
+        when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
 
-        // then
-        assertNotNull(result, "CardLabel 목록이 null이 아니어야 합니다.");
-        assertEquals(expectedCardLabels.size(), result.size(), "반환된 CardLabel 목록의 크기가 예상 크기와 일치해야 합니다.");
-        assertEquals(expectedCardLabels, result, "반환된 CardLabel 목록이 예상 목록과 일치해야 합니다.");
+        // 카드에 사용된 라벨 ID 목록을 모킹합니다. 카드가 Label1과 Label3을 사용한다고 가정합니다.
+        Set<Long> cardLabelIds = Set.of(1L, 3L);
+        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(cardLabelIds);
 
-        // 검증: findByCard가 1회 호출됨
-        verify(cardLabelRepository, times(1)).findByCard(card);
+        // Act
+        List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
+
+        // Assert
+        assertEquals(3, cardLabels.size());  // 보드에 있는 라벨이 총 3개이므로, 3개의 DTO가 반환됩니다.
+
+        assertTrue(cardLabels.get(0).isCardLabel());  // Label1은 카드에 사용됩니다.
+        assertFalse(cardLabels.get(1).isCardLabel()); // Label2는 사용되지 않습니다.
+        assertTrue(cardLabels.get(2).isCardLabel());  // Label3은 카드에 사용됩니다.
+
+        // DTO에 라벨 정보가 정확히 포함되었는지 추가 검증
+        assertEquals("Label1", cardLabels.get(0).name(), "Label1의 이름이 정확히 포함되어야 합니다.");
+        assertEquals(1L, cardLabels.get(0).labelId(), "Label1의 ID가 정확히 포함되어야 합니다.");
     }
+
+    @Test
+    @DisplayName("카드가 보드에 속하지 않는 경우 - 데이터 무결성 예외 발생")
+    public void testGetCardLabels_CardNotAssociatedWithBoard() {
+        // Arrange
+        Long cardId = 1L;
+
+        // 카드 ID로 보드를 찾지 못하도록 모킹합니다.
+        when(cardRepository.findBoardByCardId(cardId)).thenReturn(null);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            cardLabelService.getCardLabelCollection(cardId);
+        });
+
+        assertEquals("ID가 " + cardId + "인 카드가 보드와 연결되지 않았습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("보드에 라벨이 없는 경우 - 빈 리스트 반환")
+    public void testGetCardLabels_NoLabelsOnBoard() {
+        // Arrange
+        Long cardId = 1L;
+        Long boardId = 2L;
+
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+        when(cardRepository.findBoardByCardId(cardId)).thenReturn(board);
+
+        // 보드에 연결된 라벨이 없도록 모킹합니다.
+        when(labelRepository.findAllByBoard(board)).thenReturn(Collections.emptyList());
+
+        // Act
+        List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
+
+        // Assert
+        assertTrue(cardLabels.isEmpty(), "라벨이 없는 경우 빈 리스트가 반환되어야 합니다.");
+    }
+
+    @Test
+    @DisplayName("카드가 사용하는 라벨이 없는 경우 - 모든 라벨이 미사용으로 표시")
+    public void testGetCardLabels_NoLabelsUsedByCard() {
+        // Arrange
+        Long cardId = 1L;
+        Long boardId = 2L;
+
+        Board board = Board.builder().id(boardId).name("Test Board").build();
+        when(cardRepository.findBoardByCardId(cardId)).thenReturn(board);
+
+        List<Label> boardLabels = Arrays.asList(
+                new Label(1L, board, "Label1", 1L),
+                new Label(2L, board, "Label2", 2L)
+        );
+        when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
+
+        // 카드에 연결된 라벨이 없도록 빈 Set을 모킹합니다.
+        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(Collections.emptySet());
+
+        // Act
+        List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
+
+        // Assert
+        assertEquals(2, cardLabels.size(), "보드에 있는 라벨의 개수와 일치해야 합니다.");
+        assertFalse(cardLabels.get(0).isCardLabel(), "Label1은 사용되지 않아야 합니다.");
+        assertFalse(cardLabels.get(1).isCardLabel(), "Label2도 사용되지 않아야 합니다.");
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 카드 ID - 데이터 무결성 예외 발생")
+    public void testGetCardLabels_InvalidCardId() {
+        // Arrange
+        Long invalidCardId = 99L;
+
+        // 유효하지 않은 카드 ID로 보드를 찾지 못하도록 모킹합니다.
+        when(cardRepository.findBoardByCardId(invalidCardId)).thenReturn(null);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            cardLabelService.getCardLabelCollection(invalidCardId);
+        });
+
+        assertEquals("ID가 " + invalidCardId + "인 카드가 보드와 연결되지 않았습니다.", exception.getMessage());
+    }
+
 
 }

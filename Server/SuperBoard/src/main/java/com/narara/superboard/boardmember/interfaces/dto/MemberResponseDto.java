@@ -3,7 +3,7 @@ package com.narara.superboard.boardmember.interfaces.dto;
 import lombok.Builder;
 
 @Builder
-public record BoardMemberResponseDto(
+public record MemberResponseDto(
         Long memberId,
         String memberEmail,
         String memberNickname,

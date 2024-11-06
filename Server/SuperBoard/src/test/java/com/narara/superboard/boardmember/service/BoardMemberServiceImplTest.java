@@ -9,10 +9,10 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -52,13 +52,13 @@ class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
         when(boardMemberRepository.findAllByBoardId(boardId)).thenReturn(mockBoardMemberList);
 
         // when: 서비스 메서드 호출
-        BoardMemberCollectionResponseDto result = boardMemberService.getBoardMemberCollectionResponseDto(boardId);
+        MemberCollectionResponseDto result = boardMemberService.getBoardMemberCollectionResponseDto(boardId);
 
         // then: 결과 검증
-        assertEquals(2, result.boardMemberResponseDtoList().size());
+        assertEquals(2, result.memberListResponse().size());
 
         // 첫 번째 멤버에 대한 검증
-        BoardMemberResponseDto firstMember = result.boardMemberResponseDtoList().get(0);
+        MemberResponseDto firstMember = result.memberListResponse().get(0);
         assertEquals(1L, firstMember.memberId());
         assertEquals("user1@example.com", firstMember.memberEmail());
         assertEquals("닉네임1", firstMember.memberNickname());
@@ -66,7 +66,7 @@ class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("ADMIN", firstMember.authority());
 
         // 두 번째 멤버에 대한 검증
-        BoardMemberResponseDto secondMember = result.boardMemberResponseDtoList().get(1);
+        MemberResponseDto secondMember = result.memberListResponse().get(1);
         assertEquals(2L, secondMember.memberId());
         assertEquals("user2@example.com", secondMember.memberEmail());
         assertEquals("닉네임2", secondMember.memberNickname());

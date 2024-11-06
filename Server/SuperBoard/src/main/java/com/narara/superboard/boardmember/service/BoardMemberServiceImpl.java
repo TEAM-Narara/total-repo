@@ -1,9 +1,9 @@
 package com.narara.superboard.boardmember.service;
 
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +20,14 @@ public class BoardMemberServiceImpl implements BoardMemberService{
     private final BoardMemberRepository boardMemberRepository;
     
     @Override
-    public BoardMemberCollectionResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
+    public MemberCollectionResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
         List<BoardMember> BoardMemberList = boardMemberRepository.findAllByBoardId(boardId);
 
-        List<BoardMemberResponseDto> boardDetailResponseDtoList = new ArrayList<>();
+        List<MemberResponseDto> boardDetailResponseDtoList = new ArrayList<>();
 
         for (BoardMember boardMember : BoardMemberList) {
-            BoardMemberResponseDto boardMemberDetailResponseDto =
-                    BoardMemberResponseDto.builder()
+            MemberResponseDto boardMemberDetailResponseDto =
+                    MemberResponseDto.builder()
                             .memberId(boardMember.getMember().getId())
                             .memberEmail(boardMember.getMember().getEmail())
                             .memberNickname(boardMember.getMember().getNickname())
@@ -38,7 +38,7 @@ public class BoardMemberServiceImpl implements BoardMemberService{
             boardDetailResponseDtoList.add(boardMemberDetailResponseDto);
         }
 
-        return new BoardMemberCollectionResponseDto(boardDetailResponseDtoList);
+        return new MemberCollectionResponseDto(boardDetailResponseDtoList);
     }
 
     public BoardMember getBoardMember(Long boardId, Member member) {

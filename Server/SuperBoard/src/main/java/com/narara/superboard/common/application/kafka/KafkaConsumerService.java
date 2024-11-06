@@ -11,7 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 //import org.springframework.kafka.support.Acknowledgment;
 //import org.springframework.kafka.support.KafkaHeaders;
 //import org.springframework.messaging.handler.annotation.Header;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.MessageListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 //import static com.joyride.alert.util.LogUtil.printLog;
 
@@ -26,6 +37,48 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaConsumerService {
+
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ConsumerFactory<String, String> consumerFactory;
+
+    /**
+     * 새로운 멤버를 Kafka Consumer Group에 등록하고, 메시지를 STOMP로 전송하는 Kafka Listener 생성
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @param memberId    멤버 ID
+     */
+    public void registerMemberListener(Long workspaceId, Long memberId) {
+        String topic = "workspace-" + workspaceId;
+        String groupId = "member-" + memberId;
+
+        // Kafka Listener 컨테이너 팩토리 설정
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(createConsumerFactory(groupId));
+
+        // Kafka 메시지를 수신하여 STOMP로 전송하는 메시지 리스너 설정
+        ConcurrentMessageListenerContainer<String, String> container = factory.createContainer(topic);
+        container.setupMessageListener((MessageListener<String, String>) record -> {
+            String message = record.value();
+            String destination = "topic/workspace/" + workspaceId + "/member/" + memberId;
+
+            // STOMP로 메시지 전송
+            messagingTemplate.convertAndSend(destination, message);
+            System.out.println("Message sent to STOMP: " + message + " for member " + memberId);
+        });
+
+        // Kafka Listener 컨테이너 시작
+        container.start();
+    }
+
+    // 멤버별 Consumer Group을 위한 Kafka ConsumerFactory 생성
+    private ConsumerFactory<String, String> createConsumerFactory(String groupId) {
+        // 기존 설정을 복사하여 새 설정 생성
+        Map<String, Object> props = new HashMap<>(consumerFactory.getConfigurationProperties());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+
+        // 새로운 ConsumerFactory 인스턴스 생성
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
 
 //    private final AlertService alertService;
 //    private final TopicUtil topicUtil;

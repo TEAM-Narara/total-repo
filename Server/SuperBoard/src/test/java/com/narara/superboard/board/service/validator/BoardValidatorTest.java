@@ -3,6 +3,7 @@ package com.narara.superboard.board.service.validator;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
 import com.narara.superboard.board.exception.BoardVisibilityNotFoundException;
+import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.exception.BoardNameNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +28,7 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoName")
     void testBoardEntityCreationByName(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
 
         assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
     }
@@ -43,7 +44,7 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoVisibility")
     void testBoardEntityCreationByVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
 
         assertThrows(BoardVisibilityNotFoundException.class, () -> boardValidator.validateVisibilityIsPresent(boardCreateDto));
     }
@@ -59,7 +60,7 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByInvalidVisibility")
     void testBoardEntityCreationByInvalidVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, background);
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
 
         assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardValidator.validateVisibilityIsValid(boardCreateDto));
     }

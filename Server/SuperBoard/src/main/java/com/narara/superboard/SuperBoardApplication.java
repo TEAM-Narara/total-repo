@@ -11,5 +11,4 @@ public class SuperBoardApplication {
     public static void main(String[] args) {
         SpringApplication.run(SuperBoardApplication.class, args);
     }
-
 }

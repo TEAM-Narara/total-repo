@@ -33,8 +33,10 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Value("${spring.jwt.secretKey}")
     private String key; //비밀키
     private SecretKey secretKey;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60L; //1분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 3L; //3분
+    @Value("${token.expire-time.access-token}")
+    private long ACCESS_TOKEN_EXPIRE_TIME;
+    @Value("${token.expire-time.refresh-token}")
+    private long REFRESH_TOKEN_EXPIRE_TIME;
 
     private final MemberRepository memberRepository;
 

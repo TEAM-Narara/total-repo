@@ -4,6 +4,7 @@ import com.narara.superboard.common.config.jwt.JwtAuthenticationFilter;
 import com.narara.superboard.common.exception.security.CustomAccessDeniedHandler;
 import com.narara.superboard.common.exception.security.CustomAuthenticationEntryPoint;
 import com.narara.superboard.common.service.CustomPermissionEvaluator;
+import com.narara.superboard.common.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,13 +40,17 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomPermissionEvaluator customPermissionEvaluator;
+    private final CustomUserDetailsService customUserDetailsService;
 
     // /error, /favicon.ico에 대한 경로 열어주지 않으면 401로 계속 뜸
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico","/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**");
+                .requestMatchers(
+                        "/ws/**", "/index.html", //웹소켓 엔드포인트
+                        "/error", "/favicon.ico","/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**"
+                );
     }
 
     @Bean
@@ -91,4 +96,5 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
