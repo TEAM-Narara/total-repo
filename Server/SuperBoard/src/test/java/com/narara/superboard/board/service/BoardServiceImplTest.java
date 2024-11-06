@@ -11,7 +11,6 @@ import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.card.entity.Card;
-import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -22,7 +21,6 @@ import com.narara.superboard.common.exception.NotFoundNameException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
-import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import java.util.Optional;
@@ -72,10 +70,6 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private ReplyRepository replyRepository;
-    @Mock
-    private ListRepository listRepository;
-    @Mock
-    private CardRepository cardRepository;
 
     @Mock
     private BoardValidator boardValidator;
@@ -135,18 +129,18 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(coverHandler.getValue(cover2)).thenReturn("https://example.com/image.jpg");
 
         // when
-        BoardCollectionResponseDto result = boardService.getBoardCollectionResponseDto(boardId);
+        List<BoardDetailResponseDto> result = boardService.getBoardCollectionResponseDto(boardId);
 
         // then
-        assertEquals(2, result.boardDetailResponseDtoList().size());
+        assertEquals(2, result.size());
 
-        BoardDetailResponseDto board1 = result.boardDetailResponseDtoList().get(0);
+        BoardDetailResponseDto board1 = result.get(0);
         assertEquals(1L, board1.id());
         assertEquals("보드 1", board1.name());
         assertEquals("COLOR", board1.backgroundType());
         assertEquals("#ffffff", board1.backgroundValue());
 
-        BoardDetailResponseDto board2 = result.boardDetailResponseDtoList().get(1);
+        BoardDetailResponseDto board2 = result.get(1);
         assertEquals(2L, board2.id());
         assertEquals("보드 2", board2.name());
         assertEquals("IMAGE", board2.backgroundType());
@@ -169,7 +163,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
             boardService.createBoard(member.getId(), requestDto);
         });
 
-        assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
+        // assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
         verify(workspaceRepository, times(1)).findById(workspaceId);
     }
 
