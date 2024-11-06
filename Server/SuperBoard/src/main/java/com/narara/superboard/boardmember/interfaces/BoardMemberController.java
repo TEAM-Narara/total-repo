@@ -51,25 +51,20 @@ public class BoardMemberController implements BoardMemberAPI{
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
     @PostMapping("/member")
     public ResponseEntity<DefaultResponse> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
-        try {
-            BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
+        BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
 
-            return ResponseEntity.ok(
-                    DefaultResponse.res(
-                            StatusCode.OK,
-                            ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
-                            MemberResponseDto.builder()
-                                    .memberId(boardMember.getMember().getId())
-                                    .memberEmail(boardMember.getMember().getEmail())
-                                    .memberNickname(boardMember.getMember().getNickname())
-                                    .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
-                                    .authority(boardMember.getAuthority().name())
-                                    .build()
-                    )
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("sdf");
-        }
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .build()
+                )
+        );
     }
 }
