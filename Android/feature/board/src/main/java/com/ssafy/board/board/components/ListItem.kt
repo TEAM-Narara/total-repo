@@ -66,24 +66,24 @@ fun ListItem(
                     dropStrategy = DropStrategy.CenterDistance,
                     onDragEnter = { state ->
                         collectionState.value = collection.toMutableList().apply {
-                            val index = indexOf(cardData)
-                            if (index == -1) return@apply
+                            val targetIndex = indexOf(cardData)
+                            if (targetIndex == -1) return@apply
 
                             if (!remove(state.data)) {
                                 cardCollections[state.data.listId]?.let {
                                     it.value = it.value.toMutableList().apply {
                                         remove(state.data)
                                     }
+                                    onListChanged(listData.id)
                                 }
                             }
 
-                            add(index, state.data.apply { this.listId = listData.id })
-                            onListChanged(listData.id)
+                            add(targetIndex, state.data.apply { this.listId = listData.id })
 
                             scope.launch {
                                 handleLazyListScroll(
                                     lazyListState = cardLazyListState,
-                                    dropIndex = index,
+                                    dropIndex = targetIndex,
                                 )
                             }
                         }
