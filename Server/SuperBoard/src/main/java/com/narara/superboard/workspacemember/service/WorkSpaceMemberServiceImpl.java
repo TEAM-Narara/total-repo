@@ -46,6 +46,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                     .memberNickname(workSpaceMember.getMember().getNickname())
                     .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
                     .authority(workSpaceMember.getAuthority().toString())
+                    .isDeleted(workSpaceMember.getIsDeleted())
                     .build();
 
             workspaceDetailResponseDtoList.add(dto);

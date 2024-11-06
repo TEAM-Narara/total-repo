@@ -65,6 +65,29 @@ public class BoardMemberController implements BoardMemberAPI{
                                 .memberNickname(boardMember.getMember().getNickname())
                                 .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
                                 .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
+                                .build()
+                )
+        );
+    }
+
+    @Operation(summary = "보드 멤버 삭제", description = "삭제한 친구를 보내줌")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
+    @DeleteMapping("/member")
+    public ResponseEntity<DefaultResponse> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+        BoardMember boardMember = boardMemberService.deleteMember(boardId, dto.memberId());
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
                                 .build()
                 )
         );
@@ -86,6 +109,7 @@ public class BoardMemberController implements BoardMemberAPI{
                                 .memberNickname(boardMember.getMember().getNickname())
                                 .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
                                 .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
                                 .build()
                 )
         );

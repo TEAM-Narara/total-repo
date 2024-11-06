@@ -64,4 +64,8 @@ public class BoardMember extends BaseTimeEntity {
     public void editAuthority(Authority authority) {
         this.authority = authority;
     }
+
+    public void deleted() {
+        this.isDeleted = true;
+    }
 }

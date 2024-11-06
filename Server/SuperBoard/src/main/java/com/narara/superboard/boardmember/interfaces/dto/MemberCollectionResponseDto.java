@@ -18,6 +18,7 @@ public record MemberCollectionResponseDto(List<MemberResponseDto> memberListResp
                             .memberNickname(workSpaceMember.getMember().getNickname())
                             .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
                             .authority(workSpaceMember.getAuthority().toString())
+                            .isDeleted(workSpaceMember.getIsDeleted())
                             .build()
             );
         }

@@ -11,4 +11,5 @@ public interface BoardMemberService {
     void updateWatchStatus(Long boardId, Member member);
     BoardMember addBoardMember(Long boardId, Long inviteMemberId);
     BoardMember editBoardMemberAuthority(Long boardId, Long editMember, Authority authority);
+    BoardMember deleteMember(Long boardId, Long deleteMemberId);
 }

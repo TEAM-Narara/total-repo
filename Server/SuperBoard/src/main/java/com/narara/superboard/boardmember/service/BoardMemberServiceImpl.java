@@ -39,6 +39,7 @@ public class BoardMemberServiceImpl implements BoardMemberService{
                             .memberNickname(boardMember.getMember().getNickname())
                             .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
                             .authority(boardMember.getAuthority().toString())
+                            .isDeleted(boardMember.getIsDeleted())
                             .build();
 
             boardDetailResponseDtoList.add(boardMemberDetailResponseDto);
@@ -110,6 +111,18 @@ public class BoardMemberServiceImpl implements BoardMemberService{
         BoardMember boardMember = getBoardMember(board, editMember);
 
         boardMember.editAuthority(authority);
+
+        return boardMember;
+    }
+
+    @Override
+    @Transactional
+    public BoardMember deleteMember(Long boardId, Long deleteMemberId) {
+        Board board = getBoard(boardId);
+        Member deleteMember = getMember(deleteMemberId);
+        BoardMember boardMember = getBoardMember(board, deleteMember);
+
+        boardMember.deleted();
 
         return boardMember;
     }

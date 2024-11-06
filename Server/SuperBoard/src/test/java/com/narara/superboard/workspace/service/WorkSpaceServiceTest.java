@@ -247,6 +247,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                                 .memberNickname("조시현")
                                 .memberProfileImgUrl("http~~")
                                 .authority("ADMIN")
+                                .isDeleted(false)
                                 .build(),
                         MemberResponseDto.builder()
                                 .memberId(2L)
@@ -254,6 +255,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                                 .memberNickname("주효림")
                                 .memberProfileImgUrl("http~~")
                                 .authority("MEMBER")
+                                .isDeleted(false)
                                 .build()
                 ))
                 .build();
