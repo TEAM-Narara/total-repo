@@ -19,11 +19,11 @@ public class CardMember extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본 키
 
-    @JoinColumn(name = "member", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;  // 멤버 ID
 
-    @JoinColumn(name = "card", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "card_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;  // 워크스페이스 ID
 
