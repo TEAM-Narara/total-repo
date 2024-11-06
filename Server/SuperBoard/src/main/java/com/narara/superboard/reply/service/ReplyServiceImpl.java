@@ -95,7 +95,7 @@ public class ReplyServiceImpl implements ReplyService{
         Target target = Target.of(reply, updateReplyInfo);
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, reply.getUpdatedAt(), reply.getCard().getList().getBoard(), reply.getCard(),
+                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.UPDATE, EventData.COMMENT, target);
 
         cardHistoryRepository.save(cardHistory);
