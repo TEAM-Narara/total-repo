@@ -58,7 +58,10 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) { viewModel.resetUiState() }
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.getHomeInfo()
+    }
 
     HomeScreen(
         workSpaceList = homeData.workspaceList,
