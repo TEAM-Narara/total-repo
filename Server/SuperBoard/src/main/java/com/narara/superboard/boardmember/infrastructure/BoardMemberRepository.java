@@ -13,7 +13,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface BoardMemberRepository extends JpaRepository<BoardMember,Long> {
     boolean existsByMemberAndBoardAndAuthority(Member member, Board board, Authority authority);
+
     List<BoardMember> findAllByBoardId(Long boardId);
+
+    // 필요한 경우 Member 목록만 조회
+    @Query("select bm.member from BoardMember bm " +
+            "where bm.board.id = :boardId and bm.isDeleted = false")
+    List<Member> findAllMembersByBoardId(@Param("boardId") Long boardId);
+
     Optional<BoardMember> findByBoardIdAndMemberAndIsDeletedIsFalse(Long boardId, Member member);
     Optional<BoardMember> findFirstByBoardAndMemberAndIsDeletedIsFalse(Board board, Member member);
     Optional<BoardMember> findFirstByBoard_IdAndMember_Id(Long boardId, Long memberId);

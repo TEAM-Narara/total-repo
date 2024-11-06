@@ -1,10 +1,7 @@
 package com.narara.superboard.boardmember.interfaces;
 
 import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.boardmember.interfaces.dto.AddMemberDto;
-import com.narara.superboard.boardmember.interfaces.dto.EditBoardMemberAuthorityDto;
-import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
-import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.*;
 import com.narara.superboard.boardmember.service.BoardMemberService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
@@ -24,12 +21,16 @@ public class BoardMemberController implements BoardMemberAPI{
     private final BoardMemberService boardMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getBoardMembers(Long boardId) {
-        MemberCollectionResponseDto memberCollectionResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
+    public ResponseEntity<DefaultResponse<BoardMemberResponseDto>> getBoardMembers(Long boardId) {
+        BoardMemberResponseDto boardMemberResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
                 boardId);
-        return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, memberCollectionResponseDto)
-                , HttpStatus.OK);
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS,
+                        boardMemberResponseDto
+                ));
     }
 
     @Override
@@ -80,7 +81,7 @@ public class BoardMemberController implements BoardMemberAPI{
         return ResponseEntity.ok(
                 DefaultResponse.res(
                         StatusCode.OK,
-                        ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
+                        ResponseMessage.BOARD_MEMBER_DELETE_SUCCESS,
                         MemberResponseDto.builder()
                                 .memberId(boardMember.getMember().getId())
                                 .memberEmail(boardMember.getMember().getEmail())

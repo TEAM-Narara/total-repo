@@ -1,22 +1,31 @@
 package com.narara.superboard.boardmember.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
-import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
-import jakarta.transaction.Transactional;
+import com.narara.superboard.workspace.entity.WorkSpace;
+import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class BoardMemberServiceImpl implements BoardMemberService{
@@ -24,28 +33,57 @@ public class BoardMemberServiceImpl implements BoardMemberService{
     private final BoardMemberRepository boardMemberRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final WorkSpaceMemberRepository workSpaceMemberRepository;
 
     @Override
-    public MemberCollectionResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
-        List<BoardMember> BoardMemberList = boardMemberRepository.findAllByBoardId(boardId);
+    public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "board"));
+        WorkSpace workSpace = board.getWorkSpace();
 
-        List<MemberResponseDto> boardDetailResponseDtoList = new ArrayList<>();
+        List<Member> boardMemberList = boardMemberRepository.findAllMembersByBoardId(boardId);
 
-        for (BoardMember boardMember : BoardMemberList) {
+        List<MemberResponseDto> boardDetailResponseDtoList = getMemberResponseDtos(boardMemberList);
+        List<MemberResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
+
+        if (board.getVisibility().equals(Visibility.WORKSPACE)) {
+            List<Member> workspaceMemberList = workSpaceMemberRepository.findAllMembersByWorkspaceId(workSpace.getId());
+
+            // 3. Board 멤버를 Set으로 변환 (contains 연산 최적화)
+            Set<Member> boardMemberSet = new HashSet<>(boardMemberList);
+
+            // 4. Workspace에만 속한 멤버 필터링 (Board 멤버가 아닌 멤버만 선택)
+            List<Member> workspaceOnlyMembers = workspaceMemberList.stream()
+                    .filter(workspaceMember -> !boardMemberSet.contains(workspaceMember))
+                    .collect(Collectors.toList());
+
+            workspaceDetailResponseDtoList = getMemberResponseDtos(workspaceOnlyMembers);
+        }
+
+        return new BoardMemberResponseDto(
+                workspaceDetailResponseDtoList,
+                boardDetailResponseDtoList
+        );
+    }
+
+    private static List<MemberResponseDto> getMemberResponseDtos(List<Member> workspaceMemberList) {
+        List<MemberResponseDto> boardDetailResponseDtoList;
+        boardDetailResponseDtoList = new ArrayList<>();
+
+        for (Member member : workspaceMemberList) {
             MemberResponseDto boardMemberDetailResponseDto =
                     MemberResponseDto.builder()
-                            .memberId(boardMember.getMember().getId())
-                            .memberEmail(boardMember.getMember().getEmail())
-                            .memberNickname(boardMember.getMember().getNickname())
-                            .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
-                            .authority(boardMember.getAuthority().toString())
-                            .isDeleted(boardMember.getIsDeleted())
+                            .memberId(member.getId())
+                            .memberEmail(member.getEmail())
+                            .memberNickname(member.getNickname())
+                            .memberProfileImgUrl(member.getProfileImgUrl())
+//                                .authority(boardMember.getAuthority().toString())
+//                                .isDeleted(boardMember.getIsDeleted())
                             .build();
 
             boardDetailResponseDtoList.add(boardMemberDetailResponseDto);
         }
-
-        return new MemberCollectionResponseDto(boardDetailResponseDtoList);
+        return boardDetailResponseDtoList;
     }
 
     public BoardMember getBoardMember(Long boardId, Member member) {

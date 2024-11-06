@@ -183,7 +183,9 @@ public class BoardServiceImpl implements BoardService {
             myBoardCollectionResponse = MyBoardCollectionResponse.of(boardMemberList);
         } else {
             List<MyBoardWorkspaceCollectionDto> boardMemberList = boardSearchRepository.searchBoardsAndWorkspaces(
-                    keyword, memberId);
+                    keyword,
+                    memberId
+            );
             myBoardCollectionResponse = new MyBoardCollectionResponse(boardMemberList);
         }
 

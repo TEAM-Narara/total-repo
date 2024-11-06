@@ -1,6 +1,6 @@
 package com.narara.superboard.boardmember.interfaces;
 
-import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,7 @@ public interface BoardMemberAPI {
 
     @Operation(summary = "보드 멤버 목록 조회", description = "지정된 보드에 속한 모든 멤버 정보를 조회합니다.")
     @GetMapping("/members")
-    ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getBoardMembers(
+    ResponseEntity<DefaultResponse<BoardMemberResponseDto>> getBoardMembers(
             @Parameter(description = "조회할 보드의 ID", required = true) @PathVariable Long boardId
     );
 
