@@ -18,13 +18,13 @@ public interface BoardService {
 
     Board getBoard(Long boardId);
 
-    void deleteBoard(Long boardId);
+    void deleteBoard(Member member, Long boardId);
 
     Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto);
 
     List<Board> getArchivedBoards(Long workspaceId);
 
-    void changeArchiveStatus(Long boardId);
+    void changeArchiveStatus(Member member, Long boardId);
 
     PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable);
 

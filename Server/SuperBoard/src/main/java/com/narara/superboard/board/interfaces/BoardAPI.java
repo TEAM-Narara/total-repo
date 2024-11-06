@@ -34,7 +34,7 @@ public interface BoardAPI {
     @DeleteMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')")
     @Operation(summary = "보드 삭제")
-    ResponseEntity<DefaultResponse<Void>> deleteBoard(@PathVariable Long boardId);
+    ResponseEntity<DefaultResponse<Void>> deleteBoard(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
 
     @PatchMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
@@ -58,5 +58,5 @@ public interface BoardAPI {
     @PatchMapping("/{boardId}/archive")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 아카이브 상태 변경")
-    ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@PathVariable Long boardId);
+    ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
 }
