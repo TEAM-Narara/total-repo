@@ -1,6 +1,5 @@
 package com.narara.superboard.workspace.service;
 
-import com.narara.superboard.board.interfaces.dto.BoardCollectionResponseDto;
 import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
@@ -22,15 +21,23 @@ import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepos
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.common.KafkaException;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -72,22 +79,78 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         // kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
 
         try {
-            // 메시지 전송 시 예외 처리 추가
-            System.out.println("11111111111111112111111");
-            kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+            kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
+            // 토픽 생성 확인 후 메시지 전송토픽 생성 확인 후 메시지 전송
+            if (waitForTopicCreation(topicName)) {
+                kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+            } else {
+                System.out.println("토픽 생성에 실패했거나 시간 초과가 발생했습니다.");
+            }
         } catch (Exception e) {
             System.err.println("Failed to send message to topic " + topicName + ": " + e.getMessage());
             // 필요한 경우 재시도 로직 추가
+//            for (int retry = 1; retry <= 3; retry++) {
+//                try {
+//                    kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+//                    System.out.println("Message sent to topic on retry " + retry + ": " + topicName);
+//                    break;
+//                } catch (Exception retryException) {
+//                    System.err.println("Retry " + retry + " failed for topic " + topicName + ": " + retryException.getMessage());
+//                }
+//            }
         }
-        // kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
-
-        System.out.println("22222222222");
 
         // 새로운 멤버를 Kafka Consumer Group에 등록
         kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
 
         return newWorkSpace;
     }
+
+    private boolean waitForTopicCreation(String topicName) {
+        // Kafka Admin 설정을 가져옵니다.
+        Map<String, Object> config = kafkaAdmin.getConfigurationProperties();
+        try (AdminClient adminClient = AdminClient.create(config)) {
+            int attempts = 0;
+            while (attempts < 2) {
+                attempts++;
+                try {
+                    // 주어진 토픽 이름으로 Kafka 토픽을 설명하는 요청을 보냅니다.
+                    DescribeTopicsResult result = adminClient.describeTopics(Collections.singletonList(topicName));
+                    // KafkaFuture 객체가 완료될 때까지 최대 2초 동안 기다리며, 이 시간이 초과되면 TimeoutException이 발생
+                    Map<String, TopicDescription> descriptions = result.allTopicNames().get(2, TimeUnit.SECONDS);
+
+                    // 토픽이 존재하면 준비가 완료된 것으로 간주하고 true를 반환합니다.
+                    if (descriptions.containsKey(topicName)) {
+                        System.out.println("토픽 " + topicName + "이(가) 준비되었습니다.");
+                        return true;
+                    }
+                } catch (InterruptedException | ExecutionException | java.util.concurrent.TimeoutException e) {
+                    System.out.println("토픽 생성 대기 중입니다. 시도 횟수: " + attempts);
+                    Thread.sleep(1000);
+                }
+            }
+        } catch (KafkaException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+
+
+//    public void createTopicIfNotExists(String topicName) {
+//        try {
+//            Map<String, TopicDescription> topics = kafkaAdmin.describeTopics(new String[]{topicName});
+//
+//            // topicName이 Map에 포함되어 있는지 확인
+//            if (!topics.containsKey(topicName)) {
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            // 예외 처리 추가 (필요 시 로깅 또는 오류 처리 로직 작성)
+//        }
+//    }
+
 
     @Override
     @Transactional
@@ -130,7 +193,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public List<WorkSpace> getWorkspaceByMember(Long memberId) {
         List<WorkSpaceMember> allByMemberId = workSpaceMemberRepository.findAllByMemberId(memberId);
         List<WorkSpace> workspaceList = new ArrayList<>();
-        for (WorkSpaceMember workSpaceMember: allByMemberId) {
+        for (WorkSpaceMember workSpaceMember : allByMemberId) {
             workspaceList.add(workSpaceMember.getWorkSpace());
         }
 
