@@ -2,7 +2,6 @@ package com.narara.superboard.board.entity;
 
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
-import com.narara.superboard.board.interfaces.dto.BoardUpdateByMemberRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.entity.BaseTimeEntity;
@@ -95,12 +94,12 @@ public class Board extends BaseTimeEntity {
         this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         return this;
     }
-    public Board updateBoardByMember(BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
+    public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.cover = new HashMap<>(){{
-            put("type", boardUpdateByMemberRequestDto.background().type());
-            put("value", boardUpdateByMemberRequestDto.background().value());
+            put("type", boardUpdateRequestDto.background().type());
+            put("value", boardUpdateRequestDto.background().value());
         }};
-        this.name = boardUpdateByMemberRequestDto.name();
+        this.name = boardUpdateRequestDto.name();
         return this;
     }
 

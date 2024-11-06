@@ -1,6 +1,7 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.common.entity.CustomUserDetails;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,10 +20,11 @@ public interface BoardAPI {
     @Operation(summary = "워크스페이스의 모든 보드 조회")
     ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(@PathVariable Long workspaceId);
 
-    @PostMapping
+    @PostMapping("/")
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
-    ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto);
+    ResponseEntity<DefaultResponse<Long>> createBoard(
+            @RequestBody BoardCreateRequestDto boardCreateRequestDto);
 
     @GetMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")

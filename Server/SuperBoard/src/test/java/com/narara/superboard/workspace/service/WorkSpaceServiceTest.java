@@ -14,6 +14,8 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
+import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
@@ -48,6 +50,9 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 
     @Mock
     private WorkSpaceMemberRepository workSpaceMemberRepository;
+
+    @Mock
+    private WorkspaceOffsetService workspaceOffsetService;
 
     @Mock
     private WorkSpaceRepository workSpaceRepository; // 의존성을 Mocking
@@ -258,7 +263,8 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                                   List<BoardDetailResponseDto> mockBoardCollectionResponseDto,
                                   MemberCollectionResponseDto mockMemberCollectionResponseDto) {
         when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
-        when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(mockBoardCollectionResponseDto);
+        when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(
+                mockBoardCollectionResponseDto.boardDetailResponseDtoList());
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
     }
 

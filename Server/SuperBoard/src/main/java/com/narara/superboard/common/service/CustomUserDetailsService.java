@@ -46,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> authorities = getUserAuthorities(member);
 
         // CustomUserDetails 객체 생성 후 반환
-        return new CustomUserDetails(member.getId(), authorities);
+        return new CustomUserDetails(member, member.getId(), authorities);
     }
 
     /**
@@ -55,7 +55,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @return
      */
     private List<GrantedAuthority> getUserAuthorities(Member member) {
-
+        // 기존 코드
 //        // 워크스페이스와 보드에서의 권한을 가져옴
 //        List<GrantedAuthority> workspaceAuthorities = member.getWorkspaceMemberList().stream()
 //                .map(role -> new SimpleGrantedAuthority("ROLE_WORKSPACE_" + role.getAuthority() + "_ID_" + role.getWorkSpace().getId()))
@@ -67,6 +67,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 //
 //        // 두 리스트를 결합하여 반환
 //        workspaceAuthorities.addAll(boardAuthorities);
-        return null;
+//        return null;
+
+        // 그냥 비어있는건 아닌 듯 해서 넣은 코드
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        // 예시: 기본적으로 ROLE_USER 권한 추가
+        authorities.add(new SimpleGrantedAuthority("ROLE_MEMBER"));
+        return authorities;
     }
 }

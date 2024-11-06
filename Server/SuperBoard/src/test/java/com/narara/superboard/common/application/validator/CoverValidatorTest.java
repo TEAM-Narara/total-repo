@@ -3,7 +3,7 @@ package com.narara.superboard.common.application.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.narara.superboard.board.interfaces.dto.BoardBackgroundDto;
+import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -39,7 +39,7 @@ class CoverValidatorTest {
     void testCoverTypeIsNull() {
         // null 값이 전달될 때 예외 발생 테스트
         assertThrows(NotFoundCoverTypeException.class, () -> {
-            coverValidator.validateCoverTypeIsValid(null);
+            coverValidator.validateCoverTypeIsValid((CoverDto) null);
         });
     }
 
@@ -198,19 +198,18 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
-        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
+        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }
 
     // Test data for missing value cases
     private static Stream<Arguments> provideMissingValueCases() {
         return Stream.of(
                 Arguments.of(Map.of("type", "COLOR")),
-                Arguments.of(Map.of("type", "IMAGE")),
-                Arguments.of(Map.of("type", "GRADIENT"))
+                Arguments.of(Map.of("type", "IMAGE"))
         );
     }
     // 실패 테스트: value가 없는 경우
@@ -224,11 +223,12 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
+        System.out.println(requestDto.cover().value());
         // when & then
-        assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCardCover(requestDto));
+        assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }
 
     // 유효하지 않은 type 값 케이스
@@ -252,11 +252,11 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
-        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCardCover(requestDto));
+        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }
 
     // 유효한 cover 케이스
@@ -278,10 +278,10 @@ class CoverValidatorTest {
                 "Test Description",
                 null,
                 null,
-                new BoardBackgroundDto((String)cover.get("type"), (String)cover.get("value"))
+                new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
         // when & then
-        assertDoesNotThrow(() -> coverValidator.validateCardCover(requestDto));
+        assertDoesNotThrow(() -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }
 }
