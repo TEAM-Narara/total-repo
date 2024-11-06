@@ -10,6 +10,7 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
 
+    suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Unit>
     suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
     suspend fun getLocalCreateWorkspaceList(): Flow<List<WorkspaceInBoardDTO>>

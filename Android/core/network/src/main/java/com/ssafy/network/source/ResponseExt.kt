@@ -7,11 +7,26 @@ import retrofit2.Response
 
 const val ERROR = "에러 발생"
 
-inline fun <reified T> Response<ApiResponse<T>>.toFlow(): Flow<T> = flow {
+fun <T> ApiResult<T>.toFlow(): Flow<T> = flow {
+    when (this@toFlow) {
+        is ApiResult.Success -> emit(data)
+        is ApiResult.Error -> throw exception
+    }
+}
+
+inline fun <reified T> safeApiCall(call: () -> Response<ApiResponse<T>>): ApiResult<T> {
+    return runCatching { call() }
+        .fold(
+            onSuccess = { it.toApiResult() },
+            onFailure = { error -> ApiResult.Error(RuntimeException(error.message)) }
+        )
+}
+
+inline fun <reified T> Response<ApiResponse<T>>.toApiResult(): ApiResult<T> {
 
     body()?.let {
-        if (isSuccessful) return@flow emit(it.data)
-        else throw RuntimeException(ERROR)
+        if (isSuccessful) return ApiResult.Success(it.data)
+        else return ApiResult.Error(RuntimeException(ERROR))
     }
 
     errorBody()?.let {
@@ -19,12 +34,13 @@ inline fun <reified T> Response<ApiResponse<T>>.toFlow(): Flow<T> = flow {
         val json = JSONObject(errorMessage)
         val message = json.getString("responseMessage")
 
-        if (message.isNotBlank()) throw RuntimeException(message)
-        else throw RuntimeException(ERROR)
+        if (message.isNotBlank()) return ApiResult.Error(RuntimeException(message))
+        else return ApiResult.Error(RuntimeException(ERROR))
     }
 
-    if (isSuccessful) {
-        if (T::class == Unit::class) return@flow emit(Unit as T)
-        else throw RuntimeException(ERROR)
-    } else throw RuntimeException(ERROR)
+    return if (isSuccessful) {
+        if (T::class == Unit::class) ApiResult.Success(Unit as T)
+        else ApiResult.Error(RuntimeException(ERROR))
+    } else ApiResult.Error(RuntimeException(ERROR))
+
 }

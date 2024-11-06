@@ -51,11 +51,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createWorkspace(
-        workspaceRequestDTO: WorkspaceRequestDTO,
+        name: String,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.createWorkspace(workspaceRequestDTO)
+            workspaceDataSource.createWorkspace(name)
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
         }
