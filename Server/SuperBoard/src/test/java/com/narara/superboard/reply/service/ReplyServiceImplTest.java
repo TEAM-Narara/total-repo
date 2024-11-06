@@ -70,7 +70,6 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertThrows(NotFoundEntityException.class, () -> replyService.createReply(member, requestDto));
     }
 
-    @Disabled
     @Test
     @DisplayName("유효한 데이터로 Reply 생성 성공")
     void shouldCreateReplySuccessfullyWhenValidDataIsGiven() {

@@ -65,8 +65,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
-        throw new CustomTestException();
-//        return savedReply;
+        return savedReply;
     }
 
     @Override
@@ -110,13 +109,10 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
+
     public class CustomTestException extends RuntimeException {
-        public CustomTestException(String message) {
-            super(message);
-            System.out.println("excetion");
-        }
         public CustomTestException() {
-            super("test");
+            super("몽고디비 트랜잭션 연결 관련 테스트");
             System.out.println("excetion");
         }
     }
