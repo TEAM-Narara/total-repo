@@ -50,7 +50,6 @@ fun HomeBodyScreen(
                 title = board.name ?: "보드-${it}",
                 onBoardClick = { moveToBoardScreen(it.toLong()) },
                 containerColor = board.backgroundValue?.toLongOrNull()?.let(::Color) ?: Yellow,
-                onMenuClick = { /* TODO 보드의 설정 화면이 있나? 이거 왜있지. */ },
             )
         }
     }
