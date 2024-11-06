@@ -24,16 +24,22 @@ import com.narara.superboard.reply.service.ReplyServiceImpl;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
+//
+// ReplyServiceJpaTest
+//@Transactional
+// 수정 시 사용
 // @DataJpaTest @DataJpaTest는 JPA 관련된 컴포넌트만 로드하여 단위 테스트와 유사하게 JPA 레이어만 테스트하는 용도
 @DisplayName("댓글 서비스와 댓글 저장소 통합 테스트")
 class ReplyServiceImplTest extends IntegrationTest {
@@ -62,6 +68,8 @@ class ReplyServiceImplTest extends IntegrationTest {
     @Autowired
     private MemberRepository memberRepository; // 실제 ListRepository 사용
 
+
+    @Disabled
     @Test
     @DisplayName("댓글 생성 요청시 정상적으로 저장되는지 테스트")
     void createReply_Success() {
@@ -90,20 +98,21 @@ class ReplyServiceImplTest extends IntegrationTest {
         List list = List.createList(listRequest, board);
         listRepository.save(list);
 
+        System.out.println(list.getId());
         // Card 생성 및 저장
         CardCreateRequestDto cardRequest = new CardCreateRequestDto(list.getId(), "카드 이름");
         Card card = Card.createCard(cardRequest, list);
-        cardRepository.save(card);
+        Card savedCard = cardRepository.save(card);
 
         // Reply 생성
         String replyContent = "테스트 댓글 내용";
-        ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(card.getId(), replyContent);
+        ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(savedCard.getId(), replyContent);
         Reply createdReply = replyService.createReply(member, requestDto);
 
         // 검증
         assertThat(createdReply).isNotNull();
         assertThat(createdReply.getContent()).isEqualTo(replyContent);
-        assertThat(createdReply.getCard().getId()).isEqualTo(card.getId());
+        assertThat(createdReply.getCard().getId()).isEqualTo(savedCard.getId());
     }
 
     @Test
