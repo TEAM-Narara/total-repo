@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Label
+import com.ssafy.database.dto.LabelEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,7 +19,7 @@ interface LabelDao {
         FROM label
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalLabels(): List<Label>
+    suspend fun getAllLocalLabels(): List<LabelEntity>
 
     // 서버에 연산할 라벨 조회
     @Query("""
@@ -27,7 +27,7 @@ interface LabelDao {
         FROM label
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteLabels(): List<Label>
+    suspend fun getAllRemoteLabels(): List<LabelEntity>
 
     // 보드 라벨 단일 조회
     @Query("""
@@ -35,7 +35,7 @@ interface LabelDao {
         FROM label 
         WHERE id == :id AND boardId == :boardId
     """)
-    fun getLabel(id: Long, boardId: Long): Flow<Label>
+    fun getLabel(id: Long, boardId: Long): Flow<LabelEntity>
 
     // 보드 라벨 모두 조회
     @Query("""
@@ -43,11 +43,11 @@ interface LabelDao {
         FROM label 
         WHERE boardId == :boardId And isStatus != 'DELETE'
     """)
-    fun getAllLabels(boardId: Long): Flow<List<Label>>
+    fun getAllLabels(boardId: Long): Flow<List<LabelEntity>>
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLabels(labels: List<Label>): List<Long>
+    suspend fun insertLabels(labels: List<LabelEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM label WHERE id NOT IN (:ids)")
@@ -55,5 +55,5 @@ interface LabelDao {
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
     @Update
-    suspend fun updateLabel(label: Label)
+    suspend fun updateLabel(label: LabelEntity)
 }

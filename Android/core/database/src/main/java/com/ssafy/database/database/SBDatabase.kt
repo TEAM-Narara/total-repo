@@ -17,32 +17,32 @@ import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dao.WorkspaceDao
 import com.ssafy.database.dao.WorkspaceMemberDao
-import com.ssafy.database.dto.Alert
-import com.ssafy.database.dto.Attachment
-import com.ssafy.database.dto.Board
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.BoardMemberAlarm
-import com.ssafy.database.dto.Card
-import com.ssafy.database.dto.CardLabel
-import com.ssafy.database.dto.CardMember
-import com.ssafy.database.dto.CardMemberAlarm
-import com.ssafy.database.dto.Label
-import com.ssafy.database.dto.SbList
-import com.ssafy.database.dto.Member
-import com.ssafy.database.dto.MemberBackground
-import com.ssafy.database.dto.Reply
-import com.ssafy.database.dto.SbListMember
-import com.ssafy.database.dto.SbListMemberAlarm
-import com.ssafy.database.dto.Workspace
-import com.ssafy.database.dto.WorkspaceMember
+import com.ssafy.database.dto.AlertEntity
+import com.ssafy.database.dto.AttachmentEntity
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardLabelEntity
+import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
+import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.MemberEntity
+import com.ssafy.database.dto.MemberBackgroundEntity
+import com.ssafy.database.dto.ReplyEntity
+import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
+import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 
 @Database(entities = [
-    Workspace::class, WorkspaceMember::class,
-    Member::class, MemberBackground::class,
-    SbList::class, SbListMember::class, SbListMemberAlarm::class,
-    Board::class, BoardMember::class, BoardMemberAlarm::class, Label::class,
-    Card::class, CardLabel::class, CardMember::class, CardMemberAlarm::class, Attachment::class,
-    Reply::class, Alert::class], version = 1)
+    WorkspaceEntity::class, WorkspaceMemberEntity::class,
+    MemberEntity::class, MemberBackgroundEntity::class,
+    ListEntity::class, ListMemberEntity::class, ListMemberAlarmEntity::class,
+    BoardEntity::class, BoardMemberEntity::class, BoardMemberAlarmEntity::class, LabelEntity::class,
+    CardEntity::class, CardLabelEntity::class, CardMemberEntity::class, CardMemberAlarmEntity::class, AttachmentEntity::class,
+    ReplyEntity::class, AlertEntity::class], version = 1)
 abstract class SBDatabase : RoomDatabase() {
     abstract fun AlertDao(): AlertDao
     abstract fun AttachmentDao(): AttachmentDao

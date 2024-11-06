@@ -5,7 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ssafy.database.dto.WorkspaceMember
+import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +18,7 @@ interface WorkspaceMemberDao {
         FROM workspace_member
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMember>
+    suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMemberEntity>
 
     // 워크스페이스 멤버 조회
     @Transaction
@@ -38,9 +39,18 @@ interface WorkspaceMemberDao {
     """)
     fun getWorkspaceMembers(workspaceId: Long): Flow<List<WorkspaceMemberWithMemberInfo>>
 
+    @Transaction
+    @Query("""
+        SELECT workspace.* 
+        FROM workspace 
+        INNER JOIN workspace_member ON workspace.id = workspace_member.workspaceId 
+        WHERE workspace_member.memberId = :memberId
+    """)
+    fun getWorkspacesByMember(memberId: Long): Flow<List<WorkspaceEntity>>
+
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkspaceMembers(workspaceMembers: List<WorkspaceMember>): List<Long>
+    suspend fun insertWorkspaceMembers(workspaceMembers: List<WorkspaceMemberEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM workspace_member WHERE id NOT IN (:ids)")

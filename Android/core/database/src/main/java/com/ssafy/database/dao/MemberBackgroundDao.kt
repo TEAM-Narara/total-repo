@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.ssafy.database.dto.MemberBackground
+import com.ssafy.database.dto.MemberBackgroundEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,7 +18,7 @@ interface MemberBackgroundDao {
         FROM member_background
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalMemberBackgrounds(): List<MemberBackground>
+    suspend fun getAllLocalMemberBackgrounds(): List<MemberBackgroundEntity>
 
     // 서버에 연산할 멤버 배경 조회
     @Query("""
@@ -26,7 +26,7 @@ interface MemberBackgroundDao {
         FROM member_background
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteMemberBackgrounds(): List<MemberBackground>
+    suspend fun getAllRemoteMemberBackgrounds(): List<MemberBackgroundEntity>
 
     // 멤버 배경 단일 조회
     @Query("""
@@ -34,7 +34,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE id == :id And isStatus != 'DELETE'
         """)
-    fun getMemberBackground(id: Long): Flow<MemberBackground>
+    fun getMemberBackground(id: Long): Flow<MemberBackgroundEntity>
     
     // 멤버 배경 모두 조회
     @Query("""
@@ -42,15 +42,15 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE isStatus != 'DELETE'
         """)
-    fun getAllMemberBackgrounds(): Flow<List<MemberBackground>>
+    fun getAllMemberBackgrounds(): Flow<List<MemberBackgroundEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertMemberBackground(memberBackground: MemberBackground): Long
+    suspend fun insertMemberBackground(memberBackground: MemberBackgroundEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMemberBackgrounds(memberBackgrounds: List<MemberBackground>): List<Long>
+    suspend fun insertMemberBackgrounds(memberBackgrounds: List<MemberBackgroundEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM member_background WHERE id NOT IN (:ids)")
@@ -58,9 +58,9 @@ interface MemberBackgroundDao {
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
     @Update
-    suspend fun updateMemberBackground(memberBackground: MemberBackground)
+    suspend fun updateMemberBackground(memberBackground: MemberBackgroundEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteMemberBackground(memberBackground: MemberBackground)
+    suspend fun deleteMemberBackground(memberBackground: MemberBackgroundEntity)
 }

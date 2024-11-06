@@ -11,10 +11,10 @@ class UpdateWorkspaceUseCase @Inject constructor(
 
     suspend operator fun invoke(
         workspaceId: Long,
-        workspaceRequestDTO: WorkspaceRequestDTO,
+        name: String,
         isConnected: Boolean
     ): Flow<Unit> {
-        return workspaceRepository.updateWorkspace(workspaceId, workspaceRequestDTO, isConnected)
+        return workspaceRepository.updateWorkspace(workspaceId, name, isConnected)
     }
 
 }

@@ -1,15 +1,13 @@
 package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
-import androidx.room.Relation
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.CardMember
-import com.ssafy.database.dto.Member
+import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.MemberEntity
 
 data class CardMemberWithMemberInfo(
     @Embedded(prefix = "card_member_")
-    val cardMember: CardMember,
+    val cardMember: CardMemberEntity,
 
     @Embedded(prefix = "member_")
-    val member: Member
+    val member: MemberEntity
 )

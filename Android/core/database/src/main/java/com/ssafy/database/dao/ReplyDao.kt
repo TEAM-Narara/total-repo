@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.ssafy.database.dto.Reply
+import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.piece.ReplyCount
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +19,7 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalReplies(): List<Reply>
+    suspend fun getAllLocalReplies(): List<ReplyEntity>
 
     // 서버에 연산할 댓글 조회
     @Query("""
@@ -27,7 +27,7 @@ interface ReplyDao {
         FROM reply
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteReplies(): List<Reply>
+    suspend fun getAllRemoteReplies(): List<ReplyEntity>
 
     // 댓글 수 조회
     @Query("""
@@ -45,15 +45,15 @@ interface ReplyDao {
         WHERE cardId == :cardId And isStatus != 'DELETE'
         ORDER BY createAt DESC
     """)
-    fun getAllReplies(cardId: Long): Flow<List<Reply>>
+    fun getAllReplies(cardId: Long): Flow<List<ReplyEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertReply(reply: Reply): Long
+    suspend fun insertReply(reply: ReplyEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertReplies(replies: List<Reply>): List<Long>
+    suspend fun insertReplies(replies: List<ReplyEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM reply WHERE id NOT IN (:ids)")
@@ -61,9 +61,9 @@ interface ReplyDao {
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
     @Update
-    suspend fun updateReply(reply: Reply)
+    suspend fun updateReply(reply: ReplyEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteReply(reply: Reply)
+    suspend fun deleteReply(reply: ReplyEntity)
 }
