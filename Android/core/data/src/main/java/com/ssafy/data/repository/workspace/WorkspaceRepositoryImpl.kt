@@ -21,18 +21,18 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             if (isConnected) {
                 workspaceDataSource.getWorkspaceList()
-                TODO("이렇게 서버로부터 받아온 내 워크스페이스 목록 DB에 저장하기")
+//                TODO("이렇게 서버로부터 받아온 내 워크스페이스 목록 DB에 저장하기")
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 가져오는 로직을 추가해주세요.")
             }
         }
 
     override suspend fun createWorkspace(
-        workspaceRequestDTO: WorkspaceRequestDTO,
+        name: String,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            workspaceDataSource.createWorkspace(workspaceRequestDTO)
+            workspaceDataSource.createWorkspace(name)
         } else {
             TODO("Room DB 연동이 되면 로컬 데이터를 생성하는 로직을 추가해주세요.")
         }

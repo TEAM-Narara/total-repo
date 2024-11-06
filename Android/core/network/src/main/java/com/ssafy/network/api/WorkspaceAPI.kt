@@ -11,6 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface WorkspaceAPI {
 
@@ -18,7 +19,7 @@ interface WorkspaceAPI {
     suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")
-    suspend fun createWorkspace(@Body workspaceRequestDTO: WorkspaceRequestDTO): Response<ApiResponse<Unit>>
+    suspend fun createWorkspace(@Query("name") name: String): Response<ApiResponse<Unit>>
 
     @DELETE("api/v1/workspaces/{workspaceId}")
     suspend fun deleteWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<Unit>>

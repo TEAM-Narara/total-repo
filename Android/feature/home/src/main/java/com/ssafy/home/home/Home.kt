@@ -58,7 +58,10 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) { viewModel.resetUiState() }
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.getHomeInfo()
+    }
 
     HomeScreen(
         workSpaceList = homeData.workspaceList,
@@ -149,14 +152,14 @@ private fun HomeScreen(
                 )
             },
             floatingActionButton = {
-                if (workSpaceList.isEmpty()) {
+                if (workSpaceList.isNotEmpty()) {
                     AddNewBoardFloatingButton(
                         moveToCreateNewBoardScreen = moveToCreateNewBoardScreen
                     )
                 }
             }
         ) { innerPadding ->
-            if (workSpaceList.isEmpty()) {
+            if (workSpaceList.isNotEmpty()) {
                 HomeBodyScreen(
                     modifier = Modifier.padding(innerPadding),
                     boards = boardsBySelectedWorkSpace,

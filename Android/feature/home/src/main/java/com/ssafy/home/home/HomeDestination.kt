@@ -1,6 +1,5 @@
 package com.ssafy.home.home
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -20,12 +19,8 @@ fun NavGraphBuilder.homeScreen(
     moveToAlarmScreen: () -> Unit
 ) {
     composable<Home> {
-        val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>().apply {
-            getHomeInfo()
-        }
 
         HomeScreen(
-            viewModel = viewModel,
             moveToBoardScreen = moveToBoardScreen,
             moveToCreateNewBoardScreen = moveToCreateNewBoardScreen,
             moveToLoginScreen = moveToLoginScreen,
