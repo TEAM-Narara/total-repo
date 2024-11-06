@@ -20,7 +20,7 @@ public class ListMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;  // 멤버 ID
 
-    @JoinColumn(name = "card", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "list", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private List list;  // 리스트 ID
 
