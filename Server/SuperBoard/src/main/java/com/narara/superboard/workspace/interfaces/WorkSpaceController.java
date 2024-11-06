@@ -76,7 +76,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
         WorkSpaceListResponseDto workSpaceListResponseDto = WorkSpaceListResponseDto.from(workSpaceMemberList);
         List<WorkSpaceResponseDto> workSpaceResponseDtos = workSpaceListResponseDto.workSpaceResponseDtoList();
 
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workSpaceResponseDtos));
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_LIST_FETCH_SUCCESS, workSpaceResponseDtos));
     }
 
 //    @Operation(summary = "특정 offset 이후 데이터 싹 조회")
