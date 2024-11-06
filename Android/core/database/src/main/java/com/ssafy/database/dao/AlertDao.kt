@@ -5,9 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ssafy.database.dto.Alert
-import com.ssafy.database.dto.Attachment
-import com.ssafy.database.dto.MemberBackground
+import com.ssafy.database.dto.AlertEntity
 import com.ssafy.database.dto.with.AlertWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -34,5 +32,5 @@ interface AlertDao {
     fun getAllAlertsWithMemberInfo(): Flow<List<AlertWithMemberInfo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAlerts(attachments: List<Alert>): List<Long>
+    suspend fun insertAlerts(attachments: List<AlertEntity>): List<Long>
 }

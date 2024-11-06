@@ -19,7 +19,7 @@ interface WorkspaceAPI {
     suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")
-    suspend fun createWorkspace(@Query("name") name: String): Response<ApiResponse<Unit>>
+    suspend fun createWorkspace(@Query("name") name: String): Response<ApiResponse<Long>>
 
     @DELETE("api/v1/workspaces/{workspaceId}")
     suspend fun deleteWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<Unit>>
@@ -27,7 +27,7 @@ interface WorkspaceAPI {
     @PATCH("api/v1/workspaces/{workspaceId}")
     suspend fun updateWorkspace(
         @Path("workspaceId") workspaceId: Long,
-        @Body workspaceRequestDTO: WorkspaceRequestDTO
+        @Body name: String
     ): Response<ApiResponse<Unit>>
 
     @GET("api/v1/workspaces/{workspaceId}/members")

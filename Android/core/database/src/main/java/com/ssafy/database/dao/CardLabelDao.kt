@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.CardLabel
+import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.with.CardLabelWithLabelInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +19,7 @@ interface CardLabelDao {
         FROM card_label
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalCardLabels(): List<CardLabel>
+    suspend fun getAllLocalCardLabels(): List<CardLabelEntity>
 
     // 서버에 연산할 라벨 조회
     @Query("""
@@ -27,7 +27,7 @@ interface CardLabelDao {
         FROM card_label
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteCardLabels(): List<CardLabel>
+    suspend fun getAllRemoteCardLabels(): List<CardLabelEntity>
 
     // 카드의 라벨을 조회
     @Transaction
@@ -71,11 +71,11 @@ interface CardLabelDao {
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCardLabel(cardLabel: CardLabel): Long
+    suspend fun insertCardLabel(cardLabel: CardLabelEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCardLabels(cardLabels: List<CardLabel>): List<Long>
+    suspend fun insertCardLabels(cardLabels: List<CardLabelEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM card_label WHERE id NOT IN (:ids)")
@@ -83,5 +83,5 @@ interface CardLabelDao {
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
     @Update
-    suspend fun updateCardLabel(cardLabel: CardLabel)
+    suspend fun updateCardLabel(cardLabel: CardLabelEntity)
 }

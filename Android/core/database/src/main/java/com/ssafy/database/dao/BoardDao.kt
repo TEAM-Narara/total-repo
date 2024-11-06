@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Board
+import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.with.BoardInList
 import kotlinx.coroutines.flow.Flow
 
@@ -29,11 +29,11 @@ interface BoardDao {
         FROM board
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteBoards(): List<Board>
+    suspend fun getAllRemoteBoards(): List<BoardEntity>
 
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
-    fun getBoard(boardId: Long): Flow<Board>
+    fun getBoard(boardId: Long): Flow<BoardEntity>
 
     // 워크스페이스에서 볼 것
     @Query("""
@@ -41,7 +41,7 @@ interface BoardDao {
         FROM board 
         WHERE workspaceId == :workspaceId And isStatus != 'DELETE' And isClosed == 0
     """)
-    fun getAllBoards(workspaceId: Long): Flow<List<Board>>
+    fun getAllBoards(workspaceId: Long): Flow<List<BoardEntity>>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -49,15 +49,15 @@ interface BoardDao {
         FROM board 
         WHERE isStatus != 'DELETE' And isClosed == 1
     """)
-    fun getAllBoardsArchived(): Flow<List<Board>>
+    fun getAllBoardsArchived(): Flow<List<BoardEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBoard(board: Board): Long
+    suspend fun insertBoard(board: BoardEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBoards(boards: List<Board>): List<Long>
+    suspend fun insertBoards(boards: List<BoardEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM board WHERE id NOT IN (:ids)")
@@ -66,11 +66,11 @@ interface BoardDao {
     // 1. 휴지통 이동 (isArchive: false -> isArchive: true)
     // 2. 원격 삭제 (isArchive: true -> isStatus: 'DELETE')
     @Update
-    suspend fun updateBoard(board: Board)
+    suspend fun updateBoard(board: BoardEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteBoard(board: Board)
+    suspend fun deleteBoard(board: BoardEntity)
 }
 
 // STAY(원격) -> DELETE, UPDATE

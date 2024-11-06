@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.Card
+import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardWithListAndBoardName
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +30,7 @@ interface CardDao {
         FROM card
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteCard(): List<Card>
+    suspend fun getAllRemoteCard(): List<CardEntity>
     
     // 카드 단일 조회
     @Transaction
@@ -39,7 +39,7 @@ interface CardDao {
         FROM card 
         WHERE id == :cardId
     """)
-    fun getCard(cardId: Long): Flow<Card>
+    fun getCard(cardId: Long): Flow<CardEntity>
     
     // 카드 상위의 List, Board 이름 조회
     @Transaction
@@ -65,7 +65,7 @@ interface CardDao {
             And isArchived == 0
         ORDER BY myOrder
     """)
-    fun getAllCardsInList(listId: Long): Flow<List<Card>>
+    fun getAllCardsInList(listId: Long): Flow<List<CardEntity>>
 
     // 리스트들 내에 카드들 조회
     @Query("""
@@ -76,7 +76,7 @@ interface CardDao {
             And isArchived == 0
         ORDER BY myOrder
     """)
-    fun getAllCardsInLists(listIds: List<Long>): Flow<List<Card>>
+    fun getAllCardsInLists(listIds: List<Long>): Flow<List<CardEntity>>
 
     // 아카이브에서 볼 것
     @Query("""
@@ -85,15 +85,15 @@ interface CardDao {
         WHERE isStatus != 'DELETE' And isArchived == 1
         ORDER BY myOrder
     """)
-    fun getAllCardsArchived(): Flow<List<Card>>
+    fun getAllCardsArchived(): Flow<List<CardEntity>>
 
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCard(card: Card): Long
+    suspend fun insertCard(card: CardEntity): Long
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCards(cards: List<Card>): List<Long>
+    suspend fun insertCards(cards: List<CardEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM card WHERE id NOT IN (:ids)")
@@ -102,9 +102,9 @@ interface CardDao {
     // 1. 휴지통 이동 (isArchive: false -> isArchive: true)
     // 2. 원격 삭제 (isArchive: true -> isStatus: 'DELETE')
     @Update
-    suspend fun updateCard(card: Card)
+    suspend fun updateCard(card: CardEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteCard(card: Card)
+    suspend fun deleteCard(card: CardEntity)
 }

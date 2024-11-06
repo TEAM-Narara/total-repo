@@ -2,39 +2,39 @@ package com.ssafy.database.dto.with
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.ssafy.database.dto.Board
-import com.ssafy.database.dto.BoardMember
-import com.ssafy.database.dto.BoardMemberAlarm
-import com.ssafy.database.dto.Label
-import com.ssafy.database.dto.SbList
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.ListEntity
 
 data class BoardInList(
-    @Embedded val board: Board,
+    @Embedded val board: BoardEntity,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId",
-        entity = SbList::class
+        entity = ListEntity::class
     )
     val lists: List<ListInCards>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId",
-        entity = Label::class
+        entity = LabelEntity::class
     )
-    val labels: List<Label>,
+    val labels: List<LabelEntity>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId",
-        entity = BoardMember::class
+        entity = BoardMemberEntity::class
     )
-    val boardMembers: List<BoardMember>,
+    val boardMembers: List<BoardMemberEntity>,
 
     @Relation(
         parentColumn = "id",
         entityColumn = "boardId"
     )
-    val boardMemberAlarm: BoardMemberAlarm?
+    val boardMemberAlarm: BoardMemberAlarmEntity?
 )

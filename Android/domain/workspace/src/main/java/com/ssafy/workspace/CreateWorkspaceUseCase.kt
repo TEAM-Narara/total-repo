@@ -11,7 +11,7 @@ class CreateWorkspaceUseCase @Inject constructor(
     private val workSpaceRepository: WorkspaceRepository
 ) {
 
-    suspend operator fun invoke(isConnected: Boolean): Flow<Unit> {
+    suspend operator fun invoke(isConnected: Boolean): Flow<Long> {
         val userName = dataStoreRepository.getUser().nickname
         val workspaceName = "${userName}의 워크 스페이스"
         return workSpaceRepository.createWorkspace(workspaceName, isConnected)

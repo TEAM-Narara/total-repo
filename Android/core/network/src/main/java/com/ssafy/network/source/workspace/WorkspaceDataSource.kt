@@ -9,13 +9,13 @@ interface WorkspaceDataSource {
 
     suspend fun getWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
-    suspend fun createWorkspace(name: String): Flow<Unit>
+    suspend fun createWorkspace(name: String): Flow<Long>
 
     suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit>
 
     suspend fun updateWorkspace(
         workspaceId: Long,
-        workspaceRequestDTO: WorkspaceRequestDTO
+        name: String
     ): Flow<Unit>
 
     suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>>
