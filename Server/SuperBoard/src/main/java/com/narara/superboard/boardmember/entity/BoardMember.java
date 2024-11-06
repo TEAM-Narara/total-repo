@@ -60,4 +60,8 @@ public class BoardMember extends BaseTimeEntity {
     public void changeIsAlert() {
         this.isAlert = !isAlert;
     }
+
+    public void editAuthority(Authority authority) {
+        this.authority = authority;
+    }
 }

@@ -9,6 +9,7 @@ import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -75,12 +76,8 @@ public class BoardMemberServiceImpl implements BoardMemberService{
     @Override
     @Transactional
     public BoardMember addBoardMember(Long boardId, Long inviteMemberId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NotFoundEntityException(boardId, "Borad"));
-
-        Member inviteMember = memberRepository.findById(inviteMemberId)
-                .orElseThrow(() -> new NotFoundEntityException(inviteMemberId, "Member"));
-
+        Board board = getBoard(boardId);
+        Member inviteMember = getMember(inviteMemberId);
         BoardMember boardMember = getBoardMember(board, inviteMember);
 
         //이미 보드멤버가 있으면 무시
@@ -93,5 +90,27 @@ public class BoardMemberServiceImpl implements BoardMemberService{
         boardMemberRepository.save(newBoardMember);
 
         return newBoardMember;
+    }
+
+    private Board getBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "Borad"));
+    }
+
+    private Member getMember(Long inviteMemberId) {
+        return memberRepository.findById(inviteMemberId)
+                .orElseThrow(() -> new NotFoundEntityException(inviteMemberId, "Member"));
+    }
+
+    @Override
+    @Transactional
+    public BoardMember editBoardMemberAuthority(Long boardId, Long editMemberId, Authority authority) {
+        Board board = getBoard(boardId);
+        Member editMember = getMember(editMemberId);
+        BoardMember boardMember = getBoardMember(board, editMember);
+
+        boardMember.editAuthority(authority);
+
+        return boardMember;
     }
 }

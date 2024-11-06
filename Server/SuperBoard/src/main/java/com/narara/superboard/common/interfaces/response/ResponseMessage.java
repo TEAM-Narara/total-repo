@@ -50,6 +50,7 @@ public class ResponseMessage {
     public static final String BOARD_MEMBER_FETCH_SUCCESS = "보드 멤버 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_SUCCESS = "보드 멤버 알림 상태 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_UPDATE_SUCCESS = "보드 멤버 알림 상태 업데이트 성공";
+    public static final String BOARD_MEMBER_AUTHORITY_UPDATE_SUCCESS = "보드 멤버 권한 수정 성공";
 
     // 리스트 관련 상수
     public static final String LIST_CREATE_SUCCESS = "리스트 생성 성공";

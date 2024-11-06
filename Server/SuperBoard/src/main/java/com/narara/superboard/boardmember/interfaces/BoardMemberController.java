@@ -1,6 +1,8 @@
 package com.narara.superboard.boardmember.interfaces;
 
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.interfaces.dto.AddMemberDto;
+import com.narara.superboard.boardmember.interfaces.dto.EditBoardMemberAuthorityDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.boardmember.service.BoardMemberService;
@@ -57,6 +59,27 @@ public class BoardMemberController implements BoardMemberAPI{
                 DefaultResponse.res(
                         StatusCode.OK,
                         ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .build()
+                )
+        );
+    }
+
+    @Operation(summary = "보드 멤버 권한 수정", description = "수정한 결과값을 보내줌. ADMIN만 다른 멤버의 권한 수정이 가능함")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
+    @PatchMapping("/member")
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> editBoardMemberAuthority(@PathVariable("boardId") Long boardId, @RequestBody EditBoardMemberAuthorityDto dto) {
+        BoardMember boardMember = boardMemberService.editBoardMemberAuthority(boardId, dto.memberId(), dto.authority());
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_AUTHORITY_UPDATE_SUCCESS,
                         MemberResponseDto.builder()
                                 .memberId(boardMember.getMember().getId())
                                 .memberEmail(boardMember.getMember().getEmail())

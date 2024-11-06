@@ -2,6 +2,7 @@ package com.narara.superboard.boardmember.service;
 
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 
 public interface BoardMemberService {
@@ -9,4 +10,5 @@ public interface BoardMemberService {
     Boolean getWatchStatus(Long boardId, Member member);
     void updateWatchStatus(Long boardId, Member member);
     BoardMember addBoardMember(Long boardId, Long inviteMemberId);
+    BoardMember editBoardMemberAuthority(Long boardId, Long editMember, Authority authority);
 }
