@@ -13,8 +13,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Getter

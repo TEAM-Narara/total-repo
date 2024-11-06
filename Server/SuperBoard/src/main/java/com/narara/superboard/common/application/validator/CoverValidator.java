@@ -1,5 +1,6 @@
 package com.narara.superboard.common.application.validator;
 
+import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -17,22 +18,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class CoverValidator {
 
-    public void validateContainCover(CoverHolder cover) {
-//        validateCoversEmpty(cover.cover());
-//        validateCoverTypeIsEmpty(cover.cover());
-//        validateCoverValueIsEmpty(cover.cover());
-        // TODO: validateCoverTypeIsValid(cover.cover().get("type").toString()); 추가하기.
-    }
+    public void validateCoverTypeIsValid(CoverDto cover) {
+        // 1. coverTypeValue가 null인 경우 예외 발생
+        if (cover == null) {
+            throw new NotFoundCoverTypeException();
+        }
+        String coverTypeValue = cover.type();
 
-    public void validateCardCover(CardUpdateRequestDto cardUpdateRequestDto) {
-        Map<String, Object> cover = new HashMap<>(){{
-            put("type", cardUpdateRequestDto.cover().type());
-            put("value", cardUpdateRequestDto.cover().value());
-        }};
+        // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
+        if (cover.type() == null || cover.type().trim().isEmpty()){
+            throw new InvalidCoverTypeFormatException();
+        }
 
-        validateCoverTypeIsEmpty(cover);
-        validateCoverValueIsEmpty(cover);
-        validateCoverTypeIsValid(cover);
+        boolean isValid = false;
+        for (CoverType type : CoverType.values()) {
+            if (type.toString().equals(coverTypeValue)) {
+                isValid = true;
+                break;
+            }
+        }
+
+        // 3. 유효하지 않으면 예외 발생
+        if (!isValid) {
+            throw new InvalidCoverTypeFormatException();
+        }
+
+        if (cover.type().trim().isEmpty() || cover.value() == null || cover.value().isBlank()) {
+            throw new NotFoundCoverValueException();
+        }
+
+
     }
 
 
