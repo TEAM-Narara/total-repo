@@ -1,19 +1,20 @@
 package com.ssafy.data.repository.list
 
-import com.ssafy.model.list.ListRequestDto
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.with.ListInCardsDTO
 import kotlinx.coroutines.flow.Flow
 
 interface ListRepository {
 
     suspend fun createList(
-        listRequestDto: ListRequestDto,
+        createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit>
 
     suspend fun updateList(
-        listId: Long,
-        listRequestDto: ListRequestDto,
+        updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit>
 
@@ -21,4 +22,5 @@ interface ListRepository {
 
     suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>>
 
+    suspend fun getListDetails(boardId: Long): Flow<List<ListInCardsDTO>>
 }

@@ -1,20 +1,17 @@
 package com.ssafy.network.source.list
 
-import com.ssafy.model.list.ListRequestDto
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.list.UpdateListRequestDto
 import kotlinx.coroutines.flow.Flow
 
 interface ListDataSource {
 
-    suspend fun createList(listRequestDto: ListRequestDto): Flow<Unit>
+    suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit>
 
-    suspend fun updateList(
-        listId: Long,
-        listRequestDto: ListRequestDto
-    ): Flow<Unit>
+    suspend fun updateList(updateListRequestDto: UpdateListRequestDto): Flow<Unit>
 
     suspend fun setListArchive(listId: Long): Flow<Unit>
 
     suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>>
-
 }

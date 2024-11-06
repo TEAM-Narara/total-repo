@@ -2,6 +2,7 @@ package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
@@ -18,8 +19,8 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
     override suspend fun deleteBoard(id: Long): Flow<Unit> =
         safeApiCall { boardAPI.deleteBoard(id) }.toFlow()
 
-    override suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Flow<Unit> =
-        safeApiCall { boardAPI.updateBoard(id, boardDTO) }.toFlow()
+    override suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto): Flow<Unit> =
+        safeApiCall { boardAPI.updateBoard(id, updateBoardRequestDto) }.toFlow()
 
     override suspend fun setBoardArchive(boardId: Long): Flow<Unit> =
         safeApiCall { boardAPI.setBoardArchive(boardId) }.toFlow()

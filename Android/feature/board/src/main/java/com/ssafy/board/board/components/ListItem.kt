@@ -47,7 +47,7 @@ fun ListItem(
 
     ListItem(
         modifier = modifier,
-        title = listData.title,
+        title = listData.name,
         onTitleChange = onTitleChange,
         addCard = addCard,
         addPhoto = addPhoto,
@@ -58,10 +58,10 @@ fun ListItem(
             verticalArrangement = Arrangement.spacedBy(PaddingMedium),
             contentPadding = PaddingValues(vertical = PaddingDefault)
         ) {
-            items(collection, key = { it.id }) { cardData ->
+            items(collection, key = { it.cardData.id }) { cardData ->
                 ReorderableItem(
                     state = reorderState,
-                    key = cardData.id,
+                    key = cardData.cardData.id,
                     data = cardData,
                     dropStrategy = DropStrategy.CenterDistance,
                     onDragEnter = { state ->
@@ -100,7 +100,7 @@ fun ListItem(
                                 shape = RoundedCornerShape(CornerMedium),
                             ),
                         cardData = cardData,
-                        onClick = { navigateToCardScreen(cardData.id) },
+                        onClick = { navigateToCardScreen(cardData.cardData.id) },
                     )
                 }
             }

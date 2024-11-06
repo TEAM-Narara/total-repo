@@ -61,7 +61,7 @@ fun SuperBoardNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = LogIn,
+        startDestination = Board(0L),
         modifier = modifier
     ) {
         loginScreen(

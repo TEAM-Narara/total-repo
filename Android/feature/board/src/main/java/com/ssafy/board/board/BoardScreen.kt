@@ -45,6 +45,9 @@ import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.model.board.Background
+import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.board.Visibility
 import com.ssafy.model.search.SearchParameters
 import kotlinx.coroutines.launch
 
@@ -66,9 +69,9 @@ fun BoardScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = boardData?.title ?: "",
+                title = boardData?.name ?: "",
                 onBackPressed = popBack,
-                onBoardTitleChanged = { viewModel.updateBoardTitle() },
+                onBoardNameChanged = viewModel::updateBoardName,
                 onFilterPressed = { navigateToFilterScreen(searchParameters) },
                 onNotificationPressed = navigateToNotificationScreen,
                 onMorePressed = { navigateToBoardMenuScreen() },
@@ -79,7 +82,7 @@ fun BoardScreen(
             BoardScreen(
                 modifier = Modifier.padding(paddingValues),
                 boardData = it,
-                onListTitleChanged = viewModel::updateListTitle,
+                onListTitleChanged = viewModel::updateListName,
                 onCardReordered = viewModel::updateCardOrder,
                 onListReordered = viewModel::updateListOrder,
                 navigateToCardScreen = navigateToCardScreen,
@@ -114,11 +117,11 @@ fun BoardScreen(
 private fun BoardScreen(
     modifier: Modifier = Modifier,
     boardData: BoardData,
-    onListTitleChanged: () -> Unit,
+    onListTitleChanged: (Long, String) -> Unit,
     onCardReordered: () -> Unit,
     onListReordered: () -> Unit,
     navigateToCardScreen: (Long) -> Unit,
-    addList: () -> Unit,
+    addList: (String) -> Unit,
     addCard: () -> Unit,
     addPhoto: () -> Unit,
 ) {
@@ -182,7 +185,7 @@ private fun BoardScreen(
                             listData = listData,
                             reorderState = cardDndState,
                             cardCollections = cardCollections,
-                            onTitleChange = { onListTitleChanged() },
+                            onTitleChange = { onListTitleChanged(listData.id, it) },
                             onCardReordered = { onCardReordered() },
                             navigateToCardScreen = { id -> navigateToCardScreen(id) },
                             addCard = addCard,
@@ -200,7 +203,7 @@ private fun BoardScreen(
                 }
 
                 item {
-                    AddListButton(onClick = addList)
+                    AddListButton(addList = addList)
                 }
             }
         }
@@ -213,22 +216,37 @@ private fun BoardScreenPreview() {
     BoardScreen(
         boardData = BoardData(
             id = 1,
-            title = "title",
+            name = "title",
+            workspaceId = 0,
+            background = Background(BackgroundType.COLOR, ""),
+            isClosed = false,
+            visibility = Visibility.PRIVATE,
             listCollection = (1..1).map { listData ->
                 ListData(
                     id = listData.toLong(),
-                    title = listData.toString(),
+                    name = listData.toString(),
+                    boardId = 0,
+                    myOrder = 1,
+                    isArchived = false,
                     cardCollection = (1..3).map { cardData ->
                         CardData(
                             id = (listData * 100 + cardData).toLong(),
-                            title = cardData.toString()
+                            listId = listData.toLong(),
+                            name = cardData.toString(),
+                            isWatching = true,
+                            isSynced = true,
+                            cardLabels = emptyList(),
+                            cardMembers = emptyList(),
+                            cardAttachment = emptyList(),
+                            cardReplies = emptyList(),
                         )
                     },
-                    isWatching = true
+                    isWatching = true,
+                    isSynced = false,
                 )
             }
         ),
-        onListTitleChanged = {},
+        onListTitleChanged = { _, _ -> },
         onCardReordered = {},
         onListReordered = {},
         navigateToCardScreen = {},

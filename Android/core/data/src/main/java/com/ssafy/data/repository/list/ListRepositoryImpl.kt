@@ -2,8 +2,10 @@ package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
 
-import com.ssafy.model.list.ListRequestDto
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.network.source.list.ListDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -18,23 +20,22 @@ class ListRepositoryImpl @Inject constructor(
 ) : ListRepository {
 
     override suspend fun createList(
-        listRequestDto: ListRequestDto,
+        createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(listRequestDto)
+            listDataSource.createList(createListRequestDto)
         } else {
             TODO("Room DB가 연동되면 생성 로직을 구현해주세요")
         }
     }
 
     override suspend fun updateList(
-        listId: Long,
-        listRequestDto: ListRequestDto,
+        updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.updateList(listId, listRequestDto)
+            listDataSource.updateList(updateListRequestDto)
         } else {
             TODO("Room DB가 연동되면 수정 로직을 구현해주세요")
         }
@@ -54,4 +55,7 @@ class ListRepositoryImpl @Inject constructor(
             TODO("Room DB가 연동되면 아카이브된 리스트 조회 로직을 구현해주세요")
         }
 
+    override suspend fun getListDetails(boardId: Long): Flow<List<ListInCardsDTO>> = withContext(ioDispatcher) {
+        TODO("Room DB가 연동되면 리스트 상세 조회 로직을 구현해주세요")
+    }
 }

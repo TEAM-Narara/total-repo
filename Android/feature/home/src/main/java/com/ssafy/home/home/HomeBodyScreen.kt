@@ -49,7 +49,7 @@ fun HomeBodyScreen(
             BoardItem(
                 title = board.name ?: "보드-${it}",
                 onBoardClick = { moveToBoardScreen(it.toLong()) },
-                containerColor = board.backgroundValue?.toLongOrNull()?.let(::Color) ?: Yellow,
+                containerColor = board.background?.value?.toLongOrNull()?.let(::Color) ?: Yellow,
             )
         }
     }
