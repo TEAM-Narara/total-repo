@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "list_member")
 data class ListMemberEntity(
@@ -9,7 +10,7 @@ data class ListMemberEntity(
     val memberId: Long = 0L,
     val listId: Long = 0L,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )
 
 // 내 리스트들의 알람
@@ -18,5 +19,5 @@ data class ListMemberAlarmEntity(
     @PrimaryKey val listId: Long = 0L,
     val isAlert: Boolean = false,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

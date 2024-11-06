@@ -22,4 +22,10 @@ interface WorkspaceDataSource {
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
 
+    suspend fun deleteWorkspaceMember(id: Long): Flow<Unit>
+
+    suspend fun updateWorkspaceMember(
+        id: Long,
+        authority: String,
+    ): Flow<Unit>
 }

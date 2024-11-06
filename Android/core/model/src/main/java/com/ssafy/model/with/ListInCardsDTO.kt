@@ -7,7 +7,7 @@ data class ListInCardsDTO(
     val myOrder: Long,
     val isArchived: Boolean,
 
-    @Transient val isStatus: String = "CREATE",
+    @Transient val isStatus: DataStatus = DataStatus.CREATE,
     @Transient val columnUpdate: Long = 0L,
 
     val cards: List<CardAllInfoDTO>,

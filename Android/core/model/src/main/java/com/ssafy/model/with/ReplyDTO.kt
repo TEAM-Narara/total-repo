@@ -9,5 +9,5 @@ data class ReplyDTO(
     val updateAt: Long = 0L,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

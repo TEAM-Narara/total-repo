@@ -11,7 +11,7 @@ data class BoardInListDTO(
     val visibility: String,
     val isClosed: Boolean,
 
-    @Transient val isStatus: String = "CREATE",
+    @Transient val isStatus: DataStatus = DataStatus.STAY,
     @Transient val columnUpdate: Long = 0L,
 
     val lists: List<ListInCardsDTO>,
