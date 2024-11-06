@@ -15,7 +15,7 @@ import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
-import com.narara.superboard.reply.interfaces.dto.CreateReplyInfo;
+import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
@@ -56,7 +56,7 @@ public class ReplyServiceImpl implements ReplyService{
         Reply savedReply = replyRepository.save(reply);
 
 
-        CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
+        ReplyInfo createReplyInfo = new ReplyInfo(reply.getContent());
         Target target = Target.of(savedReply, createReplyInfo);
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
@@ -88,9 +88,20 @@ public class ReplyServiceImpl implements ReplyService{
         if (!member.getId().equals(reply.getMember().getId())){
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
+        reply.updateReply(replyUpdateRequestDto);
+
+        // 업데이트 로그 기록
+        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getContent());
+        Target target = Target.of(reply, updateReplyInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, reply.getUpdatedAt(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.UPDATE, EventData.COMMENT, target);
+
+        cardHistoryRepository.save(cardHistory);
 
         // 댓글 내용 업데이트
-        return reply.updateReply(replyUpdateRequestDto);
+        return reply;
     }
 
     @Override
@@ -99,7 +110,21 @@ public class ReplyServiceImpl implements ReplyService{
         if (!member.getId().equals(reply.getMember().getId())){
             throw new UnauthorizedException(member.getNickname(), DELETE_REPLY);
         }
-        return reply.deleteReply();
+
+        // 삭제 로그 기록
+        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getContent());
+        Target target = Target.of(reply, deleteReplyInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.DELETE, EventData.COMMENT, target);
+
+        cardHistoryRepository.save(cardHistory);
+
+        // 삭제 수행
+        reply.deleteReply();
+
+        return reply;
     }
 
     @Override
@@ -108,13 +133,6 @@ public class ReplyServiceImpl implements ReplyService{
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
 
         return replyRepository.findAllByCard(card);
-    }
-
-    public class CustomTestException extends RuntimeException {
-        public CustomTestException() {
-            super("몽고디비 트랜잭션 연결 관련 테스트");
-            System.out.println("excetion");
-        }
     }
 
 }
