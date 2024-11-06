@@ -18,7 +18,7 @@ public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember
     List<WorkSpaceMember> findAllByMemberId(Long memberId);
 
     boolean existsByMemberAndWorkSpaceAndAuthority(Member member, WorkSpace workSpace, Authority authority);
-
+    boolean existsByWorkSpaceAndIsDeletedIsFalse(WorkSpace workspace);
 
     List<WorkSpaceMember> findAllByMember(Member member);
 

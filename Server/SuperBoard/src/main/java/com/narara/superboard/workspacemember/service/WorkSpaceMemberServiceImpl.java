@@ -12,6 +12,7 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -133,6 +134,13 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember deleteMember(Long workspaceId, Long memberId) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
+        WorkSpace workSpace = workSpaceMember.getWorkSpace();
+
+        boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(workSpace);
+        if (!workspaceHasOneMember) {
+            throw new EmptyWorkspaceMemberException();
+        }
+
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
