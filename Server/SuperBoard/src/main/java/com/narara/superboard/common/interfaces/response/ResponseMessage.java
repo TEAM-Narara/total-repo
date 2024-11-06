@@ -46,6 +46,7 @@ public class ResponseMessage {
     public static final String BOARD_ARCHIVE_STATUS_CHANGED = "보드 아카이브 상태 변경 성공";
 
     // 보드 멤버 관련 상수
+    public static final String BOARD_MEMBER_CREATE_SUCCESS = "보드 멤버 생성 성공";
     public static final String BOARD_MEMBER_FETCH_SUCCESS = "보드 멤버 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_SUCCESS = "보드 멤버 알림 상태 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_UPDATE_SUCCESS = "보드 멤버 알림 상태 업데이트 성공";

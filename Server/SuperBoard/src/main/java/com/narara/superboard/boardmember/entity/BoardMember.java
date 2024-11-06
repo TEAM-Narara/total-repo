@@ -36,6 +36,10 @@ public class BoardMember extends BaseTimeEntity {
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     private boolean isAlert;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isDeleted = false;
+
     public static BoardMember createBoardMemberByAdmin(Board board, Member member){
         return BoardMember.builder()
                 .board(board)
