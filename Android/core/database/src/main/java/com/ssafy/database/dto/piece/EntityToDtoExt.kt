@@ -27,6 +27,8 @@ import com.ssafy.model.with.ReplyDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 
+// Workspace
+
 fun WorkspaceEntity.toDTO(): WorkSpaceDTO {
     return WorkSpaceDTO(
         workSpaceId = this.id,
@@ -182,3 +184,5 @@ fun WorkspaceMemberWithMemberInfo.toDTO(): MemberResponseDTO {
         memberProfileImgUrl = this.member.profileImageUrl
     )
 }
+
+// List

@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "reply")
 data class ReplyEntity(
@@ -12,5 +13,5 @@ data class ReplyEntity(
     val createAt: Long = 0L,
     val updateAt: Long = 0L,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

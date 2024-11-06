@@ -7,6 +7,7 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
@@ -62,18 +63,25 @@ class WorkspaceRepositoryImpl @Inject constructor(
         if (isConnected) {
             workspaceDataSource.createWorkspace(name)
         } else {
-           flow { workspaceDao.insertWorkspace(WorkspaceEntity(name = name, authority = "ADMIN", isStatus = "CREATE")) }
+           flow { workspaceDao.insertWorkspace(WorkspaceEntity(name = name, authority = "ADMIN", isStatus = DataStatus.CREATE)) }
         }
     }
 
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> = flow {
         withContext(ioDispatcher) {
-            if (isConnected) {
-                workspaceDataSource.deleteWorkspace(workspaceId)
-            } else {
-                val workspace = workspaceDao.getWorkspace(workspaceId)
+            val workspace = workspaceDao.getWorkspace(workspaceId)
 
-                workspaceDao.deleteWorkspace(workspace)
+            if(workspace != null) {
+                if (isConnected) {
+                    workspaceDataSource.deleteWorkspace(workspaceId)
+                } else {
+                    when(workspace.isStatus) {
+                        DataStatus.CREATE ->
+                            workspaceDao.deleteLocalWorkspace(workspace)
+                        else ->
+                            workspaceDao.updateWorkspace(workspace.id, workspace.name, DataStatus.DELETE.name)
+                    }
+                }
             }
         }
     }
@@ -84,10 +92,20 @@ class WorkspaceRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = flow {
         withContext(ioDispatcher) {
-            if (isConnected) {
-                workspaceDataSource.updateWorkspace(workspaceId, name)
-            } else {
-                workspaceDao.updateWorkspace(workspaceId, name)
+            val workspace = workspaceDao.getWorkspace(workspaceId)
+
+            if(workspace != null) {
+                if (isConnected) {
+                    workspaceDataSource.updateWorkspace(workspaceId, name)
+                } else {
+                    when(workspace.isStatus) {
+                        DataStatus.STAY ->
+                            workspaceDao.updateWorkspace(workspaceId, name, DataStatus.UPDATE.name)
+                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            workspaceDao.updateWorkspace(workspaceId, name, workspace.isStatus.name)
+                        DataStatus.DELETE -> { }
+                    }
+                }
             }
         }
     }
@@ -102,5 +120,53 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspacesByMember(memberId)
                 .map { list -> list.map { it.toDTO() } }
+
+
         }
+
+    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+        withContext(ioDispatcher) {
+            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+
+            if(workspaceMember != null) {
+                if (isConnected) {
+                    workspaceDataSource.deleteWorkspaceMember(id)
+                } else {
+                    when(workspaceMember.isStatus) {
+                        DataStatus.CREATE ->
+                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+                        else ->
+                            workspaceMemberDao.updateWorkspaceMember(
+                                workspaceMember.id,
+                                DataStatus.DELETE.name,
+                                workspaceMember.authority)
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun updateWorkspaceMember(
+        id: Long,
+        authority: String,
+        isConnected: Boolean
+    ): Flow<Unit> = flow {
+        withContext(ioDispatcher) {
+            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+
+            if(workspaceMember != null) {
+                if (isConnected) {
+                    workspaceDataSource.updateWorkspaceMember(id, authority)
+                } else {
+                    when(workspaceMember.isStatus) {
+                        DataStatus.STAY ->
+                            workspaceMemberDao.updateWorkspaceMember(id = id, status = DataStatus.UPDATE.name, authority = authority)
+                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            workspaceMemberDao.updateWorkspaceMember(id = id, status =  workspaceMember.isStatus.name, authority =  authority)
+                        DataStatus.DELETE -> { }
+                    }
+                }
+            }
+        }
+    }
 }

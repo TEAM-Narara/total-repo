@@ -7,5 +7,5 @@ data class CardMemberDTO(
     val isRepresentative: Boolean = false,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

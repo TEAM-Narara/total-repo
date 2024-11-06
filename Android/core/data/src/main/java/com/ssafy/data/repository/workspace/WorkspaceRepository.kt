@@ -11,6 +11,7 @@ interface WorkspaceRepository {
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
 
     suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Long>
+
     suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
     suspend fun getLocalCreateWorkspaceList(): List<WorkspaceInBoardDTO>
@@ -29,4 +30,11 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
 
+    suspend fun deleteWorkspaceMember(workspaceId: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun updateWorkspaceMember(
+        workspaceId: Long,
+        name: String,
+        isConnected: Boolean
+    ): Flow<Unit>
 }

@@ -4,6 +4,6 @@ data class WorkspaceInBoardDTO(
     val id: Long,
     val name: String,
     val authority: String,
-    val isStatus: String = "CREATE",
+    val isStatus: DataStatus = DataStatus.CREATE,
     val boards: List<BoardInListDTO>
 )

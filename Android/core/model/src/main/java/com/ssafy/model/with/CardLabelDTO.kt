@@ -7,5 +7,5 @@ data class CardLabelDTO(
     val isActivated: Boolean = true,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

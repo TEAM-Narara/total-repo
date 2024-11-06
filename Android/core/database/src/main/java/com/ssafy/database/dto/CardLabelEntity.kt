@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "card_label")
 data class CardLabelEntity(
@@ -10,5 +11,5 @@ data class CardLabelEntity(
     val cardId: Long = 0L,
     val isActivated: Boolean = true,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

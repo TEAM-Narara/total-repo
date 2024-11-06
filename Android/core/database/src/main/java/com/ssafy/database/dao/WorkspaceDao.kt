@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import kotlinx.coroutines.flow.Flow
@@ -51,11 +50,11 @@ interface WorkspaceDao {
     @Query("DELETE FROM workspace WHERE id NOT IN (:ids)")
     suspend fun deleteWorkspacesNotIn(ids: List<Long>)
 
-    // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
-    @Query("UPDATE workspace SET name = :name WHERE id = :workspaceId")
-    suspend fun updateWorkspace(workspaceId: Long, name: String)
+    // 상태 업데이트
+    @Query("UPDATE workspace SET name = :name AND isStatus = :status WHERE id = :workspaceId")
+    suspend fun updateWorkspace(workspaceId: Long, name: String, status: String)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteWorkspace(workspace: WorkspaceEntity)
+    suspend fun deleteLocalWorkspace(workspace: WorkspaceEntity)
 }

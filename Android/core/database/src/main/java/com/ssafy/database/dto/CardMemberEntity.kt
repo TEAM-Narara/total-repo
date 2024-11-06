@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "card_member")
 data class CardMemberEntity(
@@ -10,7 +11,7 @@ data class CardMemberEntity(
     val cardId: Long = 0L,
     val isRepresentative: Boolean = false,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )
 
 // 내 카드들의 알람
@@ -19,5 +20,5 @@ data class CardMemberAlarmEntity(
     @PrimaryKey val cardId: Long = 0L,
     val isAlert: Boolean = false,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )
