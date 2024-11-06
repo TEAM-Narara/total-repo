@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkSpaceMemberServiceTest {
@@ -149,6 +150,8 @@ class WorkSpaceMemberServiceTest {
         // given
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any())).thenReturn(true);
 
         // when
         WorkSpaceMember result = workSpaceMemberService.deleteMember(WORKSPACE_ID_1, MEMBER_ID_1);

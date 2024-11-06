@@ -116,24 +116,43 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     @Test
-    @DisplayName("워크스페이스의 ADMIN은 항상 한 명 이상 존재해야함 테스트")
-    void testEmptyWorkspaceMemberException() {
+    @DisplayName("워크스페이스 멤버 권한 수정 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
+    void testEditAuthorityEmptyWorkspaceMemberException() {
         // given
         Long workSpaceId = 1L;
-        WorkSpace workSpace = new WorkSpace(
-                workSpaceId, "새로운 워크스페이스", 0L
-        );
-
-        // Mock된 Member와 WorkSpaceMember 데이터 설정
         Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
 
         WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
 
-        List<WorkSpaceMember> mockWorkSpaceMemberList = List.of(mockWorkSpaceMember1);
+        //when
+        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
+                .thenReturn(Optional.of(mockWorkSpaceMember1));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
+                .thenReturn(false);
+
+        EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
+                () -> workSpaceMemberService.editAuthority(mockMember1.getId(), workSpaceId, Authority.MEMBER));  // 예외가 발생하는지 확인
+
+        // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
+        verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());
+    }
+
+    @Test
+    @DisplayName("워크스페이스 멤버 삭제 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
+    void testEmptyWorkspaceMemberException() {
+        // given
+        Long workSpaceId = 1L;
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
+
+        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
 
         //when
         when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
                 .thenReturn(Optional.of(mockWorkSpaceMember1));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
+                .thenReturn(false);
 
         EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
                 () -> workSpaceMemberService.deleteMember(workSpaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
