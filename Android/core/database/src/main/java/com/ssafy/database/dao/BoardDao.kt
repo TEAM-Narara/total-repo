@@ -21,7 +21,7 @@ interface BoardDao {
         FROM board
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalBoards(): List<BoardInList>
+    suspend fun getLocalCreateBoards(): List<BoardInList>
 
     // 서버에 연산할 보드 조회
     @Query("""
@@ -29,7 +29,7 @@ interface BoardDao {
         FROM board
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteBoards(): List<BoardEntity>
+    suspend fun getLocalOperationBoards(): List<BoardEntity>
 
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")

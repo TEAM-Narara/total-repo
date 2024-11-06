@@ -8,8 +8,6 @@ import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.ListMemberAlarmDTO
-import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -49,13 +47,13 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
     override suspend fun getLocalCreateWorkspaceList(): List<WorkspaceInBoardDTO> =
         withContext(ioDispatcher) {
-            workspaceDao.getAllLocalCreateWorkspaces()
+            workspaceDao.getLocalCreateWorkspaces()
                 .map { it.toDTO() }
         }
 
     override suspend fun getLocalOperationWorkspaceList(): List<WorkSpaceDTO> =
         withContext(ioDispatcher) {
-            workspaceDao.getAllLocalOperationWorkspaces()
+            workspaceDao.getLocalOperationWorkspaces()
                 .map { it.toDTO() }
         }
 
