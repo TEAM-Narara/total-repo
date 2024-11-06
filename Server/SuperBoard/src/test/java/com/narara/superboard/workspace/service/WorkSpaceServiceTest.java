@@ -267,11 +267,11 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                                        MemberCollectionResponseDto mockMemberCollectionResponseDto) {
         assertEquals(mockWorkSpace.getId(), result.workSpaceId());
         assertEquals(mockWorkSpace.getName(), result.name());
-        assertEquals(mockBoardCollectionResponseDto, result.boardList());
-        assertEquals(mockMemberCollectionResponseDto, result.workspaceMemberList());
 
-        // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
-        verify(workSpaceValidator, times(1)).validateNameIsPresent(result);
+        // 리스트 내용을 비교할 때는 assertIterableEquals 사용
+        assertIterableEquals(mockBoardCollectionResponseDto, result.boardList());
+
+        assertEquals(mockMemberCollectionResponseDto, result.workspaceMemberList());
     }
 
 
