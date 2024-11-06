@@ -19,6 +19,9 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
+import com.narara.superboard.list.interfaces.dto.info.ArchiveListInfo;
+import com.narara.superboard.list.interfaces.dto.info.CreateListInfo;
+import com.narara.superboard.list.interfaces.dto.info.UpdateListInfo;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 import lombok.RequiredArgsConstructor;
@@ -127,22 +130,4 @@ public class ListServiceImpl implements ListService{
         }
         throw new UnauthorizedException(member.getNickname(), action);
     }
-
-    // 리스트 생성 관련 정보
-    public record CreateListInfo(
-            String listName,
-            Long boardId
-    ) implements AdditionalDetails { }
-
-    // 리스트 업데이트 관련 정보
-    public record UpdateListInfo(
-            String listName
-    ) implements AdditionalDetails { }
-
-    // 리스트 아카이브 상태 변경 관련 정보
-    public record ArchiveListInfo(
-            String listName,
-            boolean isArchived
-    ) implements AdditionalDetails { }
-
 }

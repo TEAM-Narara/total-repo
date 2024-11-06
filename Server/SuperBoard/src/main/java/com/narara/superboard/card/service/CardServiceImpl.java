@@ -2,15 +2,17 @@ package com.narara.superboard.card.service;
 
 import static com.narara.superboard.card.CardAction.*;
 
-import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.card.CardAction;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.card.interfaces.dto.log.ArchiveStatusChangeInfo;
+import com.narara.superboard.card.interfaces.dto.log.CreateCardInfo;
+import com.narara.superboard.card.interfaces.dto.log.DeleteCardInfo;
+import com.narara.superboard.card.interfaces.dto.log.UpdateCardInfo;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.common.application.validator.CoverValidator;
@@ -18,7 +20,6 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
@@ -160,25 +161,4 @@ public class CardServiceImpl implements CardService {
         }
         throw new UnauthorizedException(member.getNickname(), action);
     }
-    // Card 생성 관련 정보
-    public record CreateCardInfo(
-            String cardName
-    ) implements AdditionalDetails { }
-
-    // Card 수정 관련 정보
-    public record UpdateCardInfo(
-            String cardName
-    ) implements AdditionalDetails { }
-
-    // Card 삭제 관련 정보
-    public record DeleteCardInfo(
-            String cardName
-    ) implements AdditionalDetails { }
-
-    // Card 아카이브 상태 변경 관련 정보
-    public record ArchiveStatusChangeInfo(
-            String cardName,
-            boolean isArchived
-    ) implements AdditionalDetails { }
-
 }

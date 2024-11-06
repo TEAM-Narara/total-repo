@@ -7,9 +7,9 @@ import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
+import com.narara.superboard.cardmember.interfaces.dto.log.RepresentativeStatusChangeInfo;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
@@ -135,21 +135,4 @@ public class CardMemberServiceImpl implements CardMemberService {
         cardMemberRepository.save(newCardMember);
         return newCardMember;
     }
-
-    // CardMember 알림 상태 변경 관련 정보
-    public record AlertStatusChangeInfo(
-            Long memberId,
-            Long cardId,
-            boolean isAlert
-    ) implements AdditionalDetails {
-    }
-
-    // CardMember 대표 상태 변경 관련 정보
-    public record RepresentativeStatusChangeInfo(
-            Long memberId,
-            Long cardId,
-            boolean isRepresentative
-    ) implements AdditionalDetails {
-    }
-
 }

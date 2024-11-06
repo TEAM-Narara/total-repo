@@ -7,6 +7,10 @@ import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.infrastructure.BoardSearchRepository;
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.board.interfaces.dto.log.ArchiveStatusChangeInfo;
+import com.narara.superboard.board.interfaces.dto.log.CreateBoardInfo;
+import com.narara.superboard.board.interfaces.dto.log.DeleteBoardInfo;
+import com.narara.superboard.board.interfaces.dto.log.UpdateBoardInfo;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -263,28 +267,7 @@ public class BoardServiceImpl implements BoardService {
         );
     }
 
-    // Board 생성 관련 정보
-    public record CreateBoardInfo(
-            String boardName,
-            String workspaceName
-    ) implements AdditionalDetails { }
 
-    // Board 업데이트 관련 정보
-    public record UpdateBoardInfo(
-            String boardName,
-            String workspaceName
-    ) implements AdditionalDetails { }
 
-    // Board 삭제 관련 정보
-    public record DeleteBoardInfo(
-            String boardName,
-            String workspaceName
-    ) implements AdditionalDetails { }
-
-    // Board 아카이브 상태 변경 관련 정보
-    public record ArchiveStatusChangeInfo(
-            String boardName,
-            boolean isArchived
-    ) implements AdditionalDetails { }
 
 }
