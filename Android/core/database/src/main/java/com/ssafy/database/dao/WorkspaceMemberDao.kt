@@ -1,6 +1,7 @@
 package com.ssafy.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -19,6 +20,10 @@ interface WorkspaceMemberDao {
         WHERE isStatus != 'STAY'
     """)
     suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMemberEntity>
+
+    // 워크스페이스 단일 조회
+    @Query("SELECT * FROM workspace_member WHERE id = :id")
+    fun getWorkspaceMember(id: Long): WorkspaceMemberEntity
 
     // 워크스페이스 멤버 조회
     @Transaction
@@ -55,4 +60,12 @@ interface WorkspaceMemberDao {
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM workspace_member WHERE id NOT IN (:ids)")
     suspend fun deleteWorkspaceMembersNotIn(ids: List<Long>)
+
+    // 상태 업데이트
+    @Query("UPDATE workspace_member SET isStatus = :status AND authority = :authority WHERE id = :id")
+    suspend fun updateWorkspaceMember(id: Long, status: String, authority: String)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Delete
+    suspend fun deleteLocalWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
 }
