@@ -21,12 +21,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.board.updateboard.data.BoardData
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.Primary
+import com.ssafy.model.board.Background
 
 @Composable
 fun UpdateBoardScreen(
     viewModel: UpdateBoardViewModel = hiltViewModel(),
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: () -> Unit
+    moveToSelectBackgroundScreen: (Background?) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
@@ -68,7 +69,7 @@ fun UpdateBoardScreen(
 private fun UpdateBoardScreen(
     modifier: Modifier = Modifier,
     boardData: BoardData,
-    moveToSelectBackgroundScreen: () -> Unit
+    moveToSelectBackgroundScreen: (Background?) -> Unit
 ) {
     with(LocalContext.current as Activity) {
         WindowCompat.getInsetsController(window, window.decorView).apply {
@@ -81,7 +82,7 @@ private fun UpdateBoardScreen(
         modifier = modifier.fillMaxSize(),
         boardTitle = boardData.title,
         workSpaceTitle = boardData.workspaceTitle,
-        background = boardData.background,
+        background = null,
         moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
         updateBoardClick = { /*TODO 보드 생성 로직 생기면 추가*/ }
     )

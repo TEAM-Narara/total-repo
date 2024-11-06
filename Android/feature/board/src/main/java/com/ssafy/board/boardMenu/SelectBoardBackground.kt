@@ -45,15 +45,19 @@ import com.ssafy.designsystem.values.PaddingTwo
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.backgroundColorList
-import com.ssafy.model.background.BackgroundDto
+import com.ssafy.designsystem.values.toColor
+import com.ssafy.model.board.Background
+import com.ssafy.model.board.BackgroundType
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 import java.io.File
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
-    selectedBackground: BackgroundDto,
+    selectedBackground: Background?,
 ) {
 
     val localImages = remember { mutableStateListOf<String>() }
@@ -97,28 +101,27 @@ fun SelectBoardBackgroundScreen(
                         modifier = Modifier
                             .size(60.dp)
                             .padding(PaddingTwo, PaddingTwo)
-                            .background(Color(color), shape = RoundedCornerShape(PaddingSmall))
+                            .background(color = color, shape = RoundedCornerShape(PaddingSmall))
                             .clickable {
                                 // TODO: Viewmodel에 색상 바꿔줘.
                             }
                             .then(
-                                if (selectedBackground.imgPath == null && selectedBackground.color == color) Modifier.border(
-                                    width = 2.dp,
-                                    color = getContrastingTextColor(
-                                        Color(selectedBackground.color)
-                                    ),
-                                    shape = RoundedCornerShape(PaddingSmall)
-                                ) else Modifier
-                            ),
-                    )
-                    {
-                        if (selectedBackground.imgPath == null && selectedBackground.color == color) {
+                                if (isSameColor(selectedBackground, color)) {
+                                    Modifier.border(
+                                        width = 2.dp,
+                                        color = getContrastingTextColor(selectedBackground.value.toColor()),
+                                        shape = RoundedCornerShape(PaddingSmall)
+                                    )
+                                } else {
+                                    Modifier
+                                }
+                            )
+                    ) {
+                        if (isSameColor(selectedBackground, color)) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
-                                tint = getContrastingTextColor(
-                                    Color(selectedBackground.color)
-                                )
+                                tint = getContrastingTextColor(selectedBackground.value.toColor())
                             )
                         }
                     }
@@ -159,17 +162,15 @@ fun SelectBoardBackgroundScreen(
                                 // TODO: Viewmodel에 selectedBackground 이미지 url 바꿔줘.
                             }
                             .then(
-                                if (selectedBackground.imgPath != null && selectedBackground.imgPath == image) Modifier.border(
+                                if (isSameImage(selectedBackground, image)) Modifier.border(
                                     width = 2.dp,
-                                    color = getContrastingTextColor(
-                                        Color.Black
-                                    ),
+                                    color = getContrastingTextColor(Color.Black),
                                     shape = RoundedCornerShape(PaddingSmall)
                                 ) else Modifier
                             ),
                     )
                     {
-                        if (selectedBackground.imgPath != null && selectedBackground.imgPath == image) {
+                        if (isSameImage(selectedBackground, image)) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
@@ -199,10 +200,28 @@ fun DisplayImageFromPath(imagePath: String) {
     )
 }
 
+@OptIn(ExperimentalContracts::class)
+private fun isSameColor(selectedBackground: Background?, color: Color): Boolean {
+    contract {
+        returns(true) implies (selectedBackground != null)
+    }
+
+    return selectedBackground?.type == BackgroundType.COLOR && selectedBackground.value.toColor() == color
+}
+
+@OptIn(ExperimentalContracts::class)
+private fun isSameImage(selectedBackground: Background?, image: String): Boolean {
+    contract {
+        returns(true) implies (selectedBackground != null)
+    }
+
+    return selectedBackground?.type == BackgroundType.IMAGE && selectedBackground.value == image
+}
+
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview2() {
     SelectBoardBackgroundScreen(
-        {}, BackgroundDto(0xFFFCFCFC, null)
+        {}, selectedBackground = null
     )
 }

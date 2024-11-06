@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -117,19 +118,19 @@ private fun LabelScreenPreview() {
         labelList = listOf(
             LabelData(
                 id = 0L,
-                color = 0xFF4BCE97,
+                color = Color(0xFF4BCE97),
                 description = "",
                 isSelected = true
             ),
             LabelData(
                 id = 1L,
-                color = 0xFFF5CD47,
+                color = Color(0xFFF5CD47),
                 description = "",
                 isSelected = false
             ),
             LabelData(
                 id = 0L,
-                color = 0xFFFEA362,
+                color = Color(0xFFFEA362),
                 description = "",
                 isSelected = false
             )

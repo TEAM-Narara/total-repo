@@ -42,7 +42,7 @@ import com.ssafy.designsystem.values.backgroundColorList
 fun ModifyLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<LabelData>,
-    onConfirm: (Long, Long, String) -> Unit,
+    onConfirm: (Long, Color, String) -> Unit,
 ) {
     val (color, setColor) = remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
     val (description, setDescription) = remember(dialogState.isVisible) {
@@ -74,7 +74,7 @@ fun ModifyLabelDialog(
                         modifier = Modifier
                             .size(60.dp)
                             .padding(PaddingTwo, PaddingTwo)
-                            .background(Color(labelColor), shape = RoundedCornerShape(PaddingSmall))
+                            .background(labelColor, shape = RoundedCornerShape(PaddingSmall))
                             .clickable {
                                 setColor(labelColor)
                                 dialogState.parameter =
@@ -83,7 +83,7 @@ fun ModifyLabelDialog(
                             .then(
                                 if (color == labelColor) Modifier.border(
                                     width = 2.dp,
-                                    color = getContrastingTextColor(Color(labelColor)),
+                                    color = getContrastingTextColor(labelColor),
                                     shape = RoundedCornerShape(PaddingSmall)
                                 ) else Modifier
                             ),
@@ -92,7 +92,7 @@ fun ModifyLabelDialog(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
-                                tint = getContrastingTextColor(Color(labelColor))
+                                tint = getContrastingTextColor(labelColor)
                             )
                         }
                     }

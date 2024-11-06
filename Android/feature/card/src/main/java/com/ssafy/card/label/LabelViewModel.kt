@@ -1,5 +1,7 @@
 package com.ssafy.card.label
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.viewModelScope
 import com.ssafy.card.label.data.LabelData
 import com.ssafy.designsystem.values.backgroundColorList
@@ -27,7 +29,7 @@ class LabelViewModel @Inject constructor() : BaseViewModel() {
             emit(
                 backgroundColorList.map {
                     LabelData(
-                        id = it,
+                        id = it.toArgb().toLong(),
                         color = it,
                         description = "",
                         isSelected = true
@@ -41,8 +43,8 @@ class LabelViewModel @Inject constructor() : BaseViewModel() {
         initialValue = null,
     )
 
-    fun createLabel(color: Long, description: String) {}
-    fun updateLabel(id: Long, color: Long, description: String) {}
+    fun createLabel(color: Color, description: String) {}
+    fun updateLabel(id: Long, color: Color, description: String) {}
     fun deleteLabel(id: Long) {}
     fun selectLabel(id: Long, isSelected: Boolean) {}
 }

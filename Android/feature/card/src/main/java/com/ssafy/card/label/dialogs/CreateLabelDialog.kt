@@ -44,7 +44,7 @@ import com.ssafy.designsystem.values.backgroundColorList
 fun CreateLabelDialog(
     modifier: Modifier = Modifier,
     dialogState: DialogState<LabelData>,
-    onConfirm: (Long, String) -> Unit,
+    onConfirm: (Color, String) -> Unit,
 ) {
     var color by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.color) }
     var description by remember(dialogState.isVisible) { mutableStateOf(dialogState.parameter?.description ?: "") }
@@ -54,7 +54,7 @@ fun CreateLabelDialog(
         dialogState = dialogState,
         title = "라벨 생성",
         confirmText = "생성",
-        onConfirm = { onConfirm(color!!, description) },
+        onConfirm = { color?.let { onConfirm(it, description) } },
         validation = { color != null },
     ) {
         Column {
@@ -72,12 +72,12 @@ fun CreateLabelDialog(
                         modifier = Modifier
                             .size(60.dp)
                             .padding(PaddingTwo, PaddingTwo)
-                            .background(Color(labelColor), shape = RoundedCornerShape(PaddingSmall))
+                            .background(labelColor, shape = RoundedCornerShape(PaddingSmall))
                             .clickable { color = labelColor }
                             .then(
                                 if (color == labelColor) Modifier.border(
                                     width = 2.dp,
-                                    color = getContrastingTextColor(Color(labelColor)),
+                                    color = getContrastingTextColor(labelColor),
                                     shape = RoundedCornerShape(PaddingSmall)
                                 ) else Modifier
                             ),
@@ -86,7 +86,7 @@ fun CreateLabelDialog(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
-                                tint = getContrastingTextColor(Color(labelColor))
+                                tint = getContrastingTextColor(labelColor)
                             )
                         }
                     }

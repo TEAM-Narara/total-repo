@@ -11,9 +11,9 @@ import androidx.navigation.compose.NavHost
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
-import com.ssafy.board.boardMenu.Visibility
+import com.ssafy.board.boardMenu.SelectBackGround
 import com.ssafy.board.boardMenu.boardMenuScreen
-import com.ssafy.board.boardMenu.visibilityBackgroundScreen
+import com.ssafy.board.boardMenu.selectBackgroundScreen
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
@@ -40,6 +40,7 @@ import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.auth.AuthManager
+import com.ssafy.model.board.Background
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
@@ -78,14 +79,7 @@ fun SuperBoardNavHost(
                 navController.navigate(Board(it))
             },
             moveToCreateNewBoardScreen = {
-                navController.navigate(
-                    CreateBoard(
-                        workspaceList = listOf(
-                            "workspace1",
-                            "workspace2"
-                        )
-                    )
-                )
+                navController.navigate(CreateBoard())
             },
             moveToLoginScreen = {
                 navController.navigate(LogIn) { popUpAll(navController) }
@@ -122,26 +116,26 @@ fun SuperBoardNavHost(
 
         createBoardScreen(
             popBackToHome = navController::popBackStack,
-            moveToSelectBackgroundScreen = {
-                // TODO : navigate to select background screen
+            moveToSelectBackgroundScreen = { background: Background? ->
+                navController.navigate(SelectBackGround(background))
             }
         )
 
         updateBoardScreen(
             popBackToHome = navController::popBackStack,
-            moveToSelectBackgroundScreen = {
-                // TODO : navigate to select background screen
+            moveToSelectBackgroundScreen = { background: Background? ->
+                navController.navigate(SelectBackGround(background))
             }
         )
 
         boardMenuScreen(
             popBack = { navController.popBackStack() },
-            setBackground = { selectedBackgroundColor: Long, selectBackgroundImg: String? ->
-                navController.navigate(Visibility(selectedBackgroundColor, selectBackgroundImg))
+            selectBackGroundScreen = { background: Background? ->
+                navController.navigate(SelectBackGround(background))
             }
         )
 
-        visibilityBackgroundScreen(popBack = { navController.popBackStack() })
+        selectBackgroundScreen(popBack = { navController.popBackStack() })
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
 
