@@ -2,6 +2,7 @@ package com.narara.superboard.list.entity;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "list")
-public class List extends BaseTimeEntity {
+public class List extends BaseTimeEntity implements Identifiable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

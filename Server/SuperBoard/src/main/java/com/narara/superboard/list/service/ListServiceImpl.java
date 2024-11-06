@@ -1,12 +1,17 @@
 package com.narara.superboard.list.service;
 
+import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.card.CardAction;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
+import com.narara.superboard.common.document.AdditionalDetails;
+import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.list.ListAction;
@@ -30,6 +35,7 @@ public class ListServiceImpl implements ListService{
 
     private final BoardRepository boardRepository;
     private final ListRepository listRepository;
+    private final BoardHistoryRepository boardHistoryRepository;
 
     @Override
     public List createList(Member member, ListCreateRequestDto listCreateRequestDto) {
@@ -40,7 +46,19 @@ public class ListServiceImpl implements ListService{
         boardService.checkBoardMember(board, member, ListAction.ADD_LIST);
 
         List list = List.createList(listCreateRequestDto, board);
-        return listRepository.save(list);
+
+        List savedlist = listRepository.save(list);
+        // 리스트 생성 로그 기록
+        CreateListInfo createListInfo = new CreateListInfo(savedlist.getName(), board.getId());
+        Target target = Target.of(list, createListInfo);
+
+        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.LIST, target);
+
+        boardHistoryRepository.save(boardHistory);
+
+
+        return savedlist;
     }
 
     @Override
@@ -51,6 +69,16 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.EDIT_LIST);
 
         list.updateList(listUpdateRequestDto);
+
+        // 리스트 업데이트 로그 기록
+        UpdateListInfo updateListInfo = new UpdateListInfo(list.getName());
+        Target target = Target.of(list, updateListInfo);
+
+        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+                member, System.currentTimeMillis(), list.getBoard(), EventType.UPDATE, EventData.LIST, target);
+
+        boardHistoryRepository.save(boardHistory);
+
         return list;
     }
 
@@ -66,6 +94,16 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
+
+        // 리스트 아카이브 상태 변경 로그 기록
+        ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getName(), list.getIsArchived());
+        Target target = Target.of(list, archiveListInfo);
+
+        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+                member, System.currentTimeMillis(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, target);
+
+        boardHistoryRepository.save(boardHistory);
+
         return list;
     }
 
@@ -89,4 +127,22 @@ public class ListServiceImpl implements ListService{
         }
         throw new UnauthorizedException(member.getNickname(), action);
     }
+
+    // 리스트 생성 관련 정보
+    public record CreateListInfo(
+            String listName,
+            Long boardId
+    ) implements AdditionalDetails { }
+
+    // 리스트 업데이트 관련 정보
+    public record UpdateListInfo(
+            String listName
+    ) implements AdditionalDetails { }
+
+    // 리스트 아카이브 상태 변경 관련 정보
+    public record ArchiveListInfo(
+            String listName,
+            boolean isArchived
+    ) implements AdditionalDetails { }
+
 }
