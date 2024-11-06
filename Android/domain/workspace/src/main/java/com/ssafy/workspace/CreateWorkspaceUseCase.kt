@@ -9,11 +9,11 @@ class CreateWorkspaceUseCase @Inject constructor(
     private val workspaceRepository: WorkspaceRepository
 ) {
 
-    suspend operator fun invoke(
-        workspaceRequestDTO: WorkspaceRequestDTO,
-        isConnected: Boolean
-    ): Flow<Unit> {
-        return workspaceRepository.createWorkspace(workspaceRequestDTO, isConnected)
-    }
+//    suspend operator fun invoke(
+//        workspaceRequestDTO: WorkspaceRequestDTO,
+//        isConnected: Boolean
+//    ): Flow<Unit> {
+//        return workspaceRepository.createWorkspace(workspaceRequestDTO, isConnected)
+//    }
 
 }

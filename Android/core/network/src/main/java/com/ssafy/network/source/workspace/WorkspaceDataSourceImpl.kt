@@ -15,8 +15,8 @@ class WorkspaceDataSourceImpl @Inject constructor(
     override suspend fun getWorkspaceList(): Flow<List<WorkSpaceDTO>> =
         workspaceAPI.getWorkspaces().toFlow()
 
-    override suspend fun createWorkspace(workspaceRequestDTO: WorkspaceRequestDTO): Flow<Unit> =
-        workspaceAPI.createWorkspace(workspaceRequestDTO).toFlow()
+    override suspend fun createWorkspace(name: String): Flow<Unit> =
+        workspaceAPI.createWorkspace(name).toFlow()
 
     override suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit> =
         workspaceAPI.deleteWorkspace(workspaceId).toFlow()

@@ -21,7 +21,7 @@ fun NavGraphBuilder.homeScreen(
 ) {
     composable<Home> {
         val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>().apply {
-            getHomeInfo()
+//            getHomeInfo()
         }
 
         HomeScreen(
