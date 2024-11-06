@@ -56,11 +56,11 @@ public class ReplyServiceImpl implements ReplyService{
         CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
         Target target = Target.of(savedReply, createReplyInfo);
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-                EventType.CREATE, EventData.COMMENT, target);
-
-        cardHistoryRepository.save(cardHistory);
+//        CardHistory cardHistory = CardHistory.careateCardHistory(
+//                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
+//                EventType.CREATE, EventData.COMMENT, target);
+//
+//        cardHistoryRepository.save(cardHistory);
 
         return savedReply;
     }
