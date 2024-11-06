@@ -65,8 +65,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
-        throw new CustomTestException("Test exception: Reply creation failed.");
-//        return savedReply;
+        return savedReply;
     }
 
     @Override
