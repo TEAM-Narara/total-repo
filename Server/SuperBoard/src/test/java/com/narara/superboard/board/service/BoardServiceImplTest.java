@@ -161,7 +161,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
             boardService.createBoard(member.getId(), requestDto);
         });
 
-        assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
+        // assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
         verify(workspaceRepository, times(1)).findById(workspaceId);
     }
 

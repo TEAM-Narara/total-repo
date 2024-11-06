@@ -35,7 +35,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     private SecretKey secretKey;
     @Value("${token.expire-time.access-token}")
     private long ACCESS_TOKEN_EXPIRE_TIME;
-
     @Value("${token.expire-time.refresh-token}")
     private long REFRESH_TOKEN_EXPIRE_TIME;
 
