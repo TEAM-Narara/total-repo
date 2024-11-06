@@ -195,7 +195,7 @@ public class BoardServiceImpl implements BoardService {
         Target target = Target.of(board, archiveStatusChangeInfo);
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.ARCHIVE, EventData.BOARD, target);
+                member, System.currentTimeMillis(), board, EventType.CLOSE, EventData.BOARD, target);
 
         boardHistoryRepository.save(boardHistory);
     }
