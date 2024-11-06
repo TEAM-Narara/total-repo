@@ -1,6 +1,6 @@
 package com.narara.superboard.card.interfaces.dto;
 
-import com.narara.superboard.board.interfaces.dto.CoverDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.common.interfaces.dto.CoverHolder;
 
 public record CardUpdateRequestDto(
