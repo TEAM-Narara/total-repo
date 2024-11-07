@@ -122,6 +122,9 @@ public class CardServiceImpl implements CardService {
     @Override
     public java.util.List<Card> getArchivedCardList(Member member, Long boardId) {
         java.util.List<List> allListByBoard = listRepository.findAllByBoardId(boardId);
+        if (allListByBoard.isEmpty()) {
+            return new ArrayList<>();
+        }
         java.util.List<Card> cardCollection = new ArrayList<>();
         listService.checkBoardMember(allListByBoard.getFirst(),member, GET_ARCHIVE_CARD);
         for (List list : allListByBoard) {

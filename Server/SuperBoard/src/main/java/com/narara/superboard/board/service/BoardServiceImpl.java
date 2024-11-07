@@ -69,7 +69,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId) {
         List<Board> boardList = boardRepository.findAllByWorkSpaceId(workSpaceId);
-
+        if (boardList.isEmpty()) return new ArrayList<>();
         List<BoardDetailResponseDto> boardDetailResponseDtoList = new ArrayList<>();
 
         for (Board board : boardList) {
@@ -190,11 +190,7 @@ public class BoardServiceImpl implements BoardService {
     // 아카이브된 보드 리스트 조회
     @Override
     public List<Board> getArchivedBoards(Long workspaceId) {
-        List<Board> allByWorkSpaceIdAndIsArchivedTrue = boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(
-                workspaceId);
-
-        System.out.println(allByWorkSpaceIdAndIsArchivedTrue);
-        return allByWorkSpaceIdAndIsArchivedTrue;
+        return boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
     }
 
     // 보드 아카이브 상태 변경
