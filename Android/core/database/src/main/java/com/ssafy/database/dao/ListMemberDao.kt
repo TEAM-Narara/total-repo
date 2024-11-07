@@ -37,7 +37,7 @@ interface ListMemberDao {
     @Query("SELECT * FROM list_member WHERE id = :id")
     fun getListMember(id: Long): ListMemberEntity
 
-    // 서버에 연산할 카드 멤버 알람 조회
+    // 리스트 멤버 알람 조회
     @Query("""
         SELECT * 
         FROM list_member_alarm

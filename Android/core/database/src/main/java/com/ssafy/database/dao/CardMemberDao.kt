@@ -29,7 +29,7 @@ interface CardMemberDao {
     """)
     suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmEntity>
 
-    // 서버에 연산할 카드 멤버 알람 조회
+    // 카드 멤버 알람 조회
     @Query("""
         SELECT * 
         FROM card_member_alarm
