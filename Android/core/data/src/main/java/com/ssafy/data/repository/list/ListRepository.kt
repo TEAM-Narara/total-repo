@@ -4,6 +4,7 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
@@ -44,4 +45,6 @@ interface ListRepository {
     suspend fun getLocalOperationListMember(): List<ListMemberDTO>
 
     suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmDTO>
+
+    suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>>
 }
