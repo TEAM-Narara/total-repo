@@ -21,12 +21,29 @@ val LabelYellow = Color(0xFFFFE770)
 val LabelBlue = Color(0xFF5D9CEC)
 
 val backgroundColorList = listOf(
-    0xFFFCFCFC,
-    0xFFFFE3E8,
-    0xFFFFF7BD,
-    0xFFD9E1F4,
-    0xFFE5EFFF,
-    0xFFEAFFE5,
-    0xFFEEE5FF,
-    0xFFCCCCCC
+    Color(0xFFFCFCFC),
+    Color(0xFFFFE3E8),
+    Color(0xFFFFF7BD),
+    Color(0xFFD9E1F4),
+    Color(0xFFE5EFFF),
+    Color(0xFFEAFFE5),
+    Color(0xFFEEE5FF),
+    Color(0xFFCCCCCC)
 )
+
+fun Color.toColorString(): String {
+    return String.format(
+        "#%02x%02x%02x",
+        (red * 255).toInt(),
+        (green * 255).toInt(),
+        (blue * 255).toInt()
+    )
+}
+
+fun String.toColor(): Color {
+    return try {
+        Color(android.graphics.Color.parseColor(this))
+    } catch (e: IllegalArgumentException) {
+        Color.Black
+    }
+}

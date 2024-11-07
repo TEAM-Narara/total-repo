@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
 import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
+import com.ssafy.board.board.components.card.CardItem
 import com.ssafy.board.board.data.ListData
 import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.board.board.handleLazyListScroll
