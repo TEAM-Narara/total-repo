@@ -15,6 +15,7 @@ import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -37,6 +38,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
             }
 
             getLocalScreenWorkspaceList()
+        }
+
+    override suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?> =
+        withContext(ioDispatcher) {
+            workspaceDao.getWorkspaceForDrawable(workspaceId).map { it?.toDTO() }
         }
 
     override suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>> =
@@ -76,24 +82,26 @@ class WorkspaceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val workspace = workspaceDao.getWorkspace(workspaceId)
 
-            if(workspace != null) {
+            if (workspace != null) {
                 if (isConnected) {
                     workspaceDataSource.deleteWorkspace(workspaceId)
                 } else {
-                    when(workspace.isStatus) {
+                    when (workspace.isStatus) {
                         DataStatus.CREATE ->
-                            workspaceDao.deleteLocalWorkspace(workspace)
+                            flowOf(workspaceDao.deleteLocalWorkspace(workspace))
+
                         else ->
-                            workspaceDao.updateWorkspace(workspace.copy(isStatus = DataStatus.DELETE))
+                            flowOf(workspaceDao.updateWorkspace(workspace.copy(isStatus = DataStatus.DELETE)))
                     }
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun updateWorkspace(
         workspaceId: Long,
@@ -103,16 +111,23 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val workspace = workspaceDao.getWorkspace(workspaceId)
 
-            if(workspace != null) {
+            if (workspace != null) {
                 if (isConnected) {
                     workspaceDataSource.updateWorkspace(workspaceId, name)
                 } else {
-                    when(workspace.isStatus) {
+                    when (workspace.isStatus) {
                         DataStatus.STAY ->
-                            workspaceDao.updateWorkspace(workspace.copy(name = name, isStatus = DataStatus.UPDATE))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            workspaceDao.updateWorkspace(
+                                workspace.copy(
+                                    name = name,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
                             workspaceDao.updateWorkspace(workspace.copy(name = name))
-                        DataStatus.DELETE -> { }
+
+                        DataStatus.DELETE -> {}
                     }
                 }
             }
@@ -135,13 +150,14 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
 
-            if(workspaceMember != null) {
+            if (workspaceMember != null) {
                 if (isConnected) {
                     workspaceDataSource.deleteWorkspaceMember(id)
                 } else {
-                    when(workspaceMember.isStatus) {
+                    when (workspaceMember.isStatus) {
                         DataStatus.CREATE ->
                             workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+
                         else ->
                             workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
                     }
@@ -158,16 +174,23 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
 
-            if(workspaceMember != null) {
+            if (workspaceMember != null) {
                 if (isConnected) {
                     workspaceDataSource.updateWorkspaceMember(id, authority)
                 } else {
-                    when(workspaceMember.isStatus) {
+                    when (workspaceMember.isStatus) {
                         DataStatus.STAY ->
-                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.UPDATE, authority = authority))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            workspaceMemberDao.updateWorkspaceMember(
+                                workspaceMember.copy(
+                                    isStatus = DataStatus.UPDATE,
+                                    authority = authority
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
                             workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
-                        DataStatus.DELETE -> { }
+
+                        DataStatus.DELETE -> {}
                     }
                 }
             }

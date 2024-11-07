@@ -12,7 +12,7 @@ fun NavGraphBuilder.homeScreen(
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: (List<WorkSpaceDTO>) -> Unit,
     moveToLoginScreen: () -> Unit,
-    moveToSettingScreen: () -> Unit,
+    moveToSettingScreen: (Long) -> Unit,
     moveToMyCardScreen: () -> Unit,
     moveToUpdateProfile: () -> Unit,
     moveToSearchScreen: () -> Unit,

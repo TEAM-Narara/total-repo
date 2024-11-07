@@ -34,6 +34,15 @@ open class BaseViewModel : ViewModel() {
         _uiState.update { UiState.Idle }
     }
 
+    suspend fun <T> Flow<T>.safeCollect(block: suspend (T) -> Unit) {
+        runCatching {
+            collect { value -> block(value) }
+        }.onFailure { error ->
+            error.printStackTrace()
+            _uiState.update { UiState.Error(error.message) }
+        }
+    }
+
     fun withMain(block: suspend () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) {
             block()

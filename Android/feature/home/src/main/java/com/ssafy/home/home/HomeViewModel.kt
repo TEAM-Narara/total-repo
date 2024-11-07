@@ -34,11 +34,11 @@ class HomeViewModel @Inject constructor(
 
     fun getHomeInfo() = viewModelScope.launch(Dispatchers.IO) {
         val isConnected = NetworkState.isConnected.value
-        getHomeInfoUseCase(isConnected).withUiState().collect { _homeData.emit(it) }
+        getHomeInfoUseCase(isConnected).safeCollect { _homeData.emit(it) }
     }
 
     fun chaneSelectedWorkSpace(workSpaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        getHomeInfoUseCase(homeData.value, workSpaceId).withUiState().collect { _homeData.emit(it) }
+        getHomeInfoUseCase(homeData.value, workSpaceId).safeCollect { _homeData.emit(it) }
     }
 
     fun createWorkSpace() = viewModelScope.launch(Dispatchers.IO) {

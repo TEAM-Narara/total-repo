@@ -43,7 +43,7 @@ fun EditableLabelItem(
     EditableLabelItem(
         modifier = modifier,
         selected = labelData.isSelected,
-        color = Color(labelData.color),
+        color = labelData.color,
         description = labelData.description,
         onLabelClicked = { onLabelSelect(labelData.id, it) },
         onEditLabel = { onEditLabel(labelData) },
@@ -108,7 +108,7 @@ private fun EditableLabelItemPreviewIsSelected() {
     EditableLabelItem(
         labelData = LabelData(
             id = 0L,
-            color = 0xFF4BCE97,
+            color = Color(0xFF4BCE97),
             description = "success",
             isSelected = true
         ),
@@ -124,7 +124,7 @@ private fun EditableLabelItemPreviewIsNotSelected() {
     EditableLabelItem(
         labelData = LabelData(
             id = 0L,
-            color = 0xFF4BCE97,
+            color = Color(0xFF4BCE97),
             description = "success",
             isSelected = false
         ),
