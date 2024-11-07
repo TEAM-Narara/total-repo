@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 @Service
@@ -65,7 +66,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                                     member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
                             CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                                    member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
+                                    member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                                     EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
                             cardHistoryRepository.save(cardHistory);
@@ -83,7 +84,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                 member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
         CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
         cardHistoryRepository.save(cardHistory);

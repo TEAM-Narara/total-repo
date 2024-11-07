@@ -42,7 +42,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +113,7 @@ public class BoardServiceImpl implements BoardService {
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
         System.out.println(boardHistory.getWhen());
         System.out.println(boardHistory.getWhere());
@@ -143,8 +143,8 @@ public class BoardServiceImpl implements BoardService {
         // Board 삭제 로그 기록
         DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
+        BoardHistory<DeleteBoardInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -181,8 +181,8 @@ public class BoardServiceImpl implements BoardService {
         // Board 업데이트 로그 기록
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                memberRepository.findById(memberId).orElseThrow(), LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        BoardHistory<UpdateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
+                memberRepository.findById(memberId).orElseThrow(), LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -205,8 +205,8 @@ public class BoardServiceImpl implements BoardService {
         // 아카이브 상태 변경 로그 기록
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
+        BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
     }

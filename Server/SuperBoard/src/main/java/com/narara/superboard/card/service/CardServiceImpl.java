@@ -26,6 +26,7 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class CardServiceImpl implements CardService {
         CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(), savedCard.getName());
 
         CardHistory<CreateCardInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), list.getBoard(), savedCard,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), savedCard,
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -90,7 +91,7 @@ public class CardServiceImpl implements CardService {
         DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(), card.getId(), card.getName());
 
         CardHistory<DeleteCardInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -110,7 +111,7 @@ public class CardServiceImpl implements CardService {
         UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(), updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
 
         CardHistory<UpdateCardInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), updatedCard.getList().getBoard(), updatedCard,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), updatedCard.getList().getBoard(), updatedCard,
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -140,7 +141,7 @@ public class CardServiceImpl implements CardService {
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());
 
         CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);

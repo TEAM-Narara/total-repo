@@ -9,6 +9,9 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class BoardMemberServiceImpl implements BoardMemberService{
-    
+public class BoardMemberServiceImpl implements BoardMemberService {
+
     private final BoardMemberRepository boardMemberRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
@@ -139,7 +142,8 @@ public class BoardMemberServiceImpl implements BoardMemberService{
         AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
 
         BoardHistory<AddBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
-                inviteMember, System.currentTimeMillis(), board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
+                inviteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -182,7 +186,8 @@ public class BoardMemberServiceImpl implements BoardMemberService{
         DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
 
         BoardHistory<DeleteBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
-                deleteMember, System.currentTimeMillis(), board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
+                deleteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
 
