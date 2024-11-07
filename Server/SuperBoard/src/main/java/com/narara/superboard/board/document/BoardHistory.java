@@ -24,7 +24,7 @@ public class BoardHistory {
     private String id;
     private Who who; // 누가
     private Long when; // 언제
-    private Where where; // 어디서
+    private BoardWhere where; // 어디서
     private EventType eventType; // 이벤트 유형 (CREATE, UPDATE, DELETE 등) // 무엇을
     private EventData eventData; // 데이터 유형 (CARD, BOARD, LABEL 등) // 어떻게
     private Target target; // 기타 등등...
@@ -33,7 +33,7 @@ public class BoardHistory {
         return BoardHistory.builder()
                 .who(Who.of(member))
                 .when(when)
-                .where(Where.of(board))
+                .where(BoardWhere.of(board))
                 .eventType(eventType)
                 .eventData(eventData)
                 .target(target)
