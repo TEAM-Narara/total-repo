@@ -27,9 +27,10 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextLarge
+import com.ssafy.designsystem.values.Yellow
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -102,6 +103,16 @@ fun CreateBoardBody(
                     AsyncImage(
                         model = background.value,
                         contentDescription = "Image",
+                        modifier = Modifier
+                            .size(BackgroundMini)
+                            .clickable { moveToSelectBackgroundScreen(background) }
+                    )
+                }
+
+                BackgroundType.NONE -> {
+                    Image(
+                        painter = ColorPainter(Yellow),
+                        contentDescription = "Color",
                         modifier = Modifier
                             .size(BackgroundMini)
                             .clickable { moveToSelectBackgroundScreen(background) }

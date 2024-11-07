@@ -46,8 +46,8 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
@@ -57,7 +57,7 @@ import kotlin.contracts.contract
 @Composable
 fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
-    selectedBackground: BackgroundDto?,
+    selectedBackground: Background?,
 ) {
 
     val localImages = remember { mutableStateListOf<String>() }

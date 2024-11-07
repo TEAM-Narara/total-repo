@@ -5,8 +5,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColorString
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.ui.safetype.backgroundType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf

@@ -3,7 +3,7 @@ package com.ssafy.ui.safetype
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
-import com.ssafy.model.board.Background
+import com.ssafy.model.background.Background
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

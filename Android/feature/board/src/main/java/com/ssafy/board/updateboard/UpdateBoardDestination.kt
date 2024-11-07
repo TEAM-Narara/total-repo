@@ -4,7 +4,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ssafy.model.board.Background
+import com.ssafy.model.background.Background
 import kotlinx.serialization.Serializable
 
 @Serializable

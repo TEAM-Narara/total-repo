@@ -24,6 +24,18 @@ class GetHomeInfoUseCase @Inject constructor(
         val user = dataStoreRepository.getUser()
 
         return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
+            val firstWorkspace = workspaceList.firstOrNull()
+            val selectedWorkSpace = firstWorkspace?.let {
+                boardRepository.getBoardsByWorkspace(it.workSpaceId)
+                    .map { boardList ->
+                        SelectedWorkSpace(
+                            workSpaceId = it.workSpaceId,
+                            workSpaceName = it.name,
+                            boards = boardList
+                        )
+                    }
+            } ?: flowOf(SelectedWorkSpace())
+
             val selectedWorkspaceFlow = workspaceList.firstOrNull()?.let { workspace ->
                 boardRepository.getBoardsByWorkspace(workspace.workSpaceId)
                     .map { boardList ->

@@ -21,7 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.board.updateboard.data.BoardData
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.Primary
-import com.ssafy.model.board.Background
+import com.ssafy.model.background.Background
 
 @Composable
 fun UpdateBoardScreen(

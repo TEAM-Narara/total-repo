@@ -1,6 +1,6 @@
 package com.ssafy.model.board
 
-import kotlinx.serialization.Serializable
+import com.ssafy.model.background.Background
 
 data class BoardDTO(
     val id: Long,
@@ -10,17 +10,6 @@ data class BoardDTO(
     val isClosed: Boolean,
     val visibility: Visibility,
 )
-
-@Serializable
-data class Background(
-    val type: BackgroundType,
-    val value: String,
-)
-
-enum class BackgroundType {
-    COLOR,
-    IMAGE;
-}
 
 enum class Visibility {
     WORKSPACE,

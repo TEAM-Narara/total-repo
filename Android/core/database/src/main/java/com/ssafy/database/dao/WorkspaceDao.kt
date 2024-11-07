@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import kotlinx.coroutines.flow.Flow

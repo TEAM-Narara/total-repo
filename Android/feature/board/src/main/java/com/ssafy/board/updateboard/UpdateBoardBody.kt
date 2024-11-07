@@ -32,7 +32,7 @@ import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.visibleList
-import com.ssafy.model.board.Background
+import com.ssafy.model.background.Background
 
 @Composable
 fun UpdateBoardBody(

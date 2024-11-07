@@ -50,8 +50,8 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.model.card.HistoryData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,14 +68,6 @@ fun BoardMenuScreen(
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
     val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-    val (background, onBackgroundChange) = remember {
-        mutableStateOf(
-            BackgroundDto(
-                0xFFFCFCFC,
-                ""
-            )
-        )
-    }
     val (watch, onWatchChange) = remember { mutableStateOf(true) }
     val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
     val activity = LocalContext.current as? Activity
@@ -169,6 +161,15 @@ fun BoardMenuScreen(
                                     modifier = Modifier.size(ImageSmall),
                                     model = background.value,
                                     contentDescription = null
+                                )
+                            }
+
+                            BackgroundType.NONE -> {
+                                Box(
+                                    modifier = Modifier
+                                        .size(ImageSmall)
+                                        .background(color = Color.LightGray)
+                                        .shadow(PaddingOne, spotColor = Color.LightGray)
                                 )
                             }
                         }

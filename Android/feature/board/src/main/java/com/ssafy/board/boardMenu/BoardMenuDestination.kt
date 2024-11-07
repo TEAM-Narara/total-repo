@@ -3,8 +3,8 @@ package com.ssafy.board.boardMenu
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.model.card.HistoryData
 import com.ssafy.ui.safetype.backgroundType
 import kotlinx.serialization.Serializable
