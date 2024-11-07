@@ -18,4 +18,6 @@ interface ListDataSource {
     suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>>
 
     suspend fun deleteListMember(id: Long): Flow<Unit>
+
+    suspend fun toggleListWatchBoard(listId: Long): Flow<Unit>
 }

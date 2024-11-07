@@ -3,23 +3,23 @@ package com.ssafy.board.boardMenu
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ssafy.model.background.Background
-import com.ssafy.ui.safetype.backgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-data class SelectBackGround(val background: Background? = null)
+data class SelectBackGround(val cover: Cover? = null)
 
 fun NavGraphBuilder.selectBackgroundScreen(popBack: () -> Unit) {
     composable<SelectBackGround>(
-        mapOf(typeOf<Background?>() to backgroundType)
+        mapOf(typeOf<Cover?>() to coverType)
     ) { backStackEntry ->
         val selectBackground: SelectBackGround = backStackEntry.toRoute()
 
         SelectBoardBackgroundScreen(
             onBackPressed = popBack,
-            selectedBackground = selectBackground.background
+            selectedCover = selectBackground.cover
         )
     }
 }

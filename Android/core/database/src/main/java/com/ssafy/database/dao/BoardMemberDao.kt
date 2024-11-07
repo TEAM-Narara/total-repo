@@ -5,8 +5,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -28,6 +31,10 @@ interface BoardMemberDao {
         WHERE isStatus != 'STAY'
     """)
     suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmEntity>
+
+    // 보드 멤버 단일 조회
+    @Query("SELECT * FROM board_member WHERE id = :id")
+    fun getBoardMember(id: Long): BoardMemberEntity
 
     // 보드 멤버 조회
     @Transaction
@@ -54,7 +61,19 @@ interface BoardMemberDao {
         FROM board_member_alarm 
         WHERE boardId == :boardId
     """)
-    fun getBoardMemberAlarm(boardId: Long): Flow<BoardMemberAlarmEntity>
+    fun getBoardMemberAlarm(boardId: Long): BoardMemberAlarmEntity
+
+    // 보드 알람 조회
+    @Query("""
+        SELECT *
+        FROM board_member_alarm 
+        WHERE boardId == :boardId
+    """)
+    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity>
+
+    // 알람 상태 업데이트
+    @Update
+    suspend fun updateBoardMemberAlarm(boardMemberAlarm: BoardMemberAlarmEntity)
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

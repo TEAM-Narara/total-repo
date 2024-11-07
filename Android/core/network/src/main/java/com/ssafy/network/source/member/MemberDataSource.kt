@@ -1,6 +1,6 @@
 package com.ssafy.network.source.member
 
-import com.ssafy.model.background.BackgroundDto
+import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.member.SearchMemberResponse
@@ -16,7 +16,7 @@ interface MemberDataSource {
     suspend fun searchMembers(keyword: String, pageDto: PageDto): Flow<SearchMemberResponse>
 
     suspend fun createMemberBackground(
-        background: BackgroundDto,
+        background: CoverDto,
     ): Flow<Long>
 
     suspend fun deleteMemberBackground(id: Long): Flow<Unit>

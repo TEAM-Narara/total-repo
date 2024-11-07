@@ -5,30 +5,30 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColorString
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
-import com.ssafy.ui.safetype.backgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
+import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-data class CreateBoard(val background: Background? = null)
+data class CreateBoard(val cover: Cover? = null)
 
 fun NavGraphBuilder.createBoardScreen(
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: (Background?) -> Unit
+    moveToSelectBackgroundScreen: (Cover?) -> Unit
 ) {
     composable<CreateBoard>(
-        mapOf(typeOf<Background?>() to backgroundType)
+        mapOf(typeOf<Cover?>() to coverType)
     ) { backStackEntry ->
         val createBoard: CreateBoard = backStackEntry.toRoute()
-        val background = createBoard.background ?: Background(
-            BackgroundType.COLOR,
+        val cover = createBoard.cover ?: Cover(
+            CoverType.COLOR,
             backgroundColorList.first().toColorString()
         )
 
         CreateBoardScreen(
-            background = background,
+            cover = cover,
             popBackToHome = popBackToHome,
             moveToSelectBackgroundScreen = moveToSelectBackgroundScreen
         )

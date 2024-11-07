@@ -46,8 +46,8 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
@@ -57,7 +57,7 @@ import kotlin.contracts.contract
 @Composable
 fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
-    selectedBackground: Background?,
+    selectedCover: Cover?,
 ) {
 
     val localImages = remember { mutableStateListOf<String>() }
@@ -106,10 +106,10 @@ fun SelectBoardBackgroundScreen(
                                 // TODO: Viewmodel에 색상 바꿔줘.
                             }
                             .then(
-                                if (isSameColor(selectedBackground, color)) {
+                                if (isSameColor(selectedCover, color)) {
                                     Modifier.border(
                                         width = 2.dp,
-                                        color = getContrastingTextColor(selectedBackground.value.toColor()),
+                                        color = getContrastingTextColor(selectedCover.value.toColor()),
                                         shape = RoundedCornerShape(PaddingSmall)
                                     )
                                 } else {
@@ -117,11 +117,11 @@ fun SelectBoardBackgroundScreen(
                                 }
                             )
                     ) {
-                        if (isSameColor(selectedBackground, color)) {
+                        if (isSameColor(selectedCover, color)) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
-                                tint = getContrastingTextColor(selectedBackground.value.toColor())
+                                tint = getContrastingTextColor(selectedCover.value.toColor())
                             )
                         }
                     }
@@ -162,7 +162,7 @@ fun SelectBoardBackgroundScreen(
                                 // TODO: Viewmodel에 selectedBackground 이미지 url 바꿔줘.
                             }
                             .then(
-                                if (isSameImage(selectedBackground, image)) Modifier.border(
+                                if (isSameImage(selectedCover, image)) Modifier.border(
                                     width = 2.dp,
                                     color = getContrastingTextColor(Color.Black),
                                     shape = RoundedCornerShape(PaddingSmall)
@@ -170,7 +170,7 @@ fun SelectBoardBackgroundScreen(
                             ),
                     )
                     {
-                        if (isSameImage(selectedBackground, image)) {
+                        if (isSameImage(selectedCover, image)) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Selected",
@@ -201,27 +201,27 @@ fun DisplayImageFromPath(imagePath: String) {
 }
 
 @OptIn(ExperimentalContracts::class)
-private fun isSameColor(selectedBackground: Background?, color: Color): Boolean {
+private fun isSameColor(selectedCover: Cover?, color: Color): Boolean {
     contract {
-        returns(true) implies (selectedBackground != null)
+        returns(true) implies (selectedCover != null)
     }
 
-    return selectedBackground?.type == BackgroundType.COLOR && selectedBackground.value.toColor() == color
+    return selectedCover?.type == CoverType.COLOR && selectedCover.value.toColor() == color
 }
 
 @OptIn(ExperimentalContracts::class)
-private fun isSameImage(selectedBackground: Background?, image: String): Boolean {
+private fun isSameImage(selectedCover: Cover?, image: String): Boolean {
     contract {
-        returns(true) implies (selectedBackground != null)
+        returns(true) implies (selectedCover != null)
     }
 
-    return selectedBackground?.type == BackgroundType.IMAGE && selectedBackground.value == image
+    return selectedCover?.type == CoverType.IMAGE && selectedCover.value == image
 }
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview2() {
     SelectBoardBackgroundScreen(
-        {}, selectedBackground = null
+        {}, selectedCover = null
     )
 }

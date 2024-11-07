@@ -1,9 +1,9 @@
 package com.ssafy.model.board
 
-import com.ssafy.model.background.Background
+import com.ssafy.model.background.Cover
 
 data class UpdateBoardRequestDto(
     val name: String,
-    val background: Background,
+    val cover: Cover,
     val visibility: Visibility,
 )

@@ -42,7 +42,7 @@ import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.auth.AuthManager
-import com.ssafy.model.background.Background
+import com.ssafy.model.background.Cover
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
@@ -121,8 +121,8 @@ fun SuperBoardNavHost(
 
         createBoardScreen(
             popBackToHome = navController::popBackStack,
-            moveToSelectBackgroundScreen = { background: Background? ->
-                navController.navigate(SelectBackGround(background))
+            moveToSelectBackgroundScreen = { cover: Cover? ->
+                navController.navigate(SelectBackGround(cover))
             }
         )
 
@@ -132,15 +132,15 @@ fun SuperBoardNavHost(
 
         updateBoardScreen(
             popBackToHome = navController::popBackStack,
-            moveToSelectBackgroundScreen = { background: Background? ->
-                navController.navigate(SelectBackGround(background))
+            moveToSelectBackgroundScreen = { cover: Cover? ->
+                navController.navigate(SelectBackGround(cover))
             }
         )
 
         boardMenuScreen(
             popBack = { navController.popBackStack() },
-            selectBackGroundScreen = { background: Background? ->
-                navController.navigate(SelectBackGround(background))
+            selectBackGroundScreen = { cover: Cover? ->
+                navController.navigate(SelectBackGround(cover))
             }
         )
 

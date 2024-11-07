@@ -73,7 +73,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         if (isConnected) {
             workspaceDataSource.createWorkspace(name)
         } else {
-            flow {
+            flowOf(
                 workspaceDao.insertWorkspace(
                     WorkspaceEntity(
                         name = name,
@@ -81,7 +81,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                         isStatus = DataStatus.CREATE
                     )
                 )
-            }
+            )
         }
     }
 

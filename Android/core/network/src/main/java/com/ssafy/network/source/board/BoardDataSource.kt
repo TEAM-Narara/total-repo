@@ -3,11 +3,13 @@ package com.ssafy.network.source.board
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.UpdateLabelRequestDto
 import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
 
-    suspend fun createBoard(): Flow<Unit>
+    suspend fun createBoard(boardDTO: BoardDTO): Flow<Unit>
 
     suspend fun getBoard(id: Long): Flow<BoardDTO>
 
@@ -27,4 +29,9 @@ interface BoardDataSource {
 
     suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
 
+    suspend fun createLabel(labelDTO: LabelDTO): Flow<Unit>
+
+    suspend fun deleteLabel(id: Long): Flow<Unit>
+
+    suspend fun updateLabel(id: Long, updateLabelRequestDto: UpdateLabelRequestDto): Flow<Unit>
 }
