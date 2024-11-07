@@ -29,6 +29,14 @@ interface CardMemberDao {
     """)
     suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmEntity>
 
+    // 서버에 연산할 카드 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM card_member_alarm
+        WHERE cardId IN (:cardIds) 
+    """)
+    suspend fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
+
     // 카드의 담당자들 조회
     @Transaction
     @Query(

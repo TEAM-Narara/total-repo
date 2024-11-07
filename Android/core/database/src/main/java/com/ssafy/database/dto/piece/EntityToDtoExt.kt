@@ -422,18 +422,22 @@ fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
     )
 }
 
-fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList()): ListInCard {
+fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList(), isWatch: Boolean): ListInCard {
     return ListInCard(
         id = this.id,
         name = this.name,
         myOrder = this.myOrder,
         isArchived = this.isArchived,
-        cards = cards
+        cards = cards,
+        isStatus = this.isStatus,
+        isWatch = isWatch
     )
 }
 
 fun CardEntity.toDTO(
     replyCount: Int = 0,
+    isWatch: Boolean = false,
+    isAttachment: Boolean = false,
     cardMembers: List<MemberResponseDTO> = emptyList(),
     cardLabels: List<CardLabelWithLabelDTO> = emptyList()
 ): CardThumbnail {
@@ -450,6 +454,9 @@ fun CardEntity.toDTO(
         isArchived = this.isArchived,
         replyCount = replyCount,
         cardMembers = cardMembers,
-        cardLabels = cardLabels
+        cardLabels = cardLabels,
+        isStatus = this.isStatus,
+        isAttachment = isAttachment,
+        isWatch = isWatch
     )
 }

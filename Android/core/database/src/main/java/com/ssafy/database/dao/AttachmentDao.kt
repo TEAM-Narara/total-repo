@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.AttachmentEntity
+import com.ssafy.database.dto.piece.CardIsAttachment
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -46,6 +47,14 @@ interface AttachmentDao {
     // 카드의 첨부파일 조회
     @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isStatus != 'DELETE'")
     fun getAllAttachments(cardId: Long): Flow<List<AttachmentEntity>>
+
+    // 카드들의 첨부파일 여부 조회
+    @Query("""
+      SELECT cardId, CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END 
+        FROM attachment 
+        WHERE cardId IN (:cardIds)  AND isStatus != 'DELETE'  
+    """)
+    fun getCardsIsAttachment(cardIds: List<Long>): Flow<List<CardIsAttachment>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttachment(attachment: AttachmentEntity): Long
