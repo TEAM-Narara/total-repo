@@ -43,9 +43,10 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 // Member
 fun MemberEntity.toDTO(): User {
     return User(
+        memberId = this.id,
         nickname = this.nickname,
         email = this.email,
-        profileImage = this.profileImageUrl
+        profileImgUrl = this.profileImageUrl
     )
 }
 
