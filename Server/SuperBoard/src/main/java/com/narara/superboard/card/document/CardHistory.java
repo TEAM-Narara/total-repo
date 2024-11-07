@@ -4,7 +4,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
+
 import com.narara.superboard.common.document.Who;
 import com.narara.superboard.member.entity.Member;
 import lombok.AllArgsConstructor;
