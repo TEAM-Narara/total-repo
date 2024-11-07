@@ -1,8 +1,11 @@
 package com.ssafy.board.board.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.board.board.data.CardData
@@ -17,7 +20,7 @@ fun CardItem(modifier: Modifier = Modifier, cardData: ReorderCardData, onClick: 
             modifier = modifier,
             title = name,
             image = { Image() },
-            labels = { },
+            labels = { /*TODO("Card Label 구현 필요")*/ },
             startTime = startAt,
             endTime = endAt,
             description = description != null,
@@ -28,16 +31,21 @@ fun CardItem(modifier: Modifier = Modifier, cardData: ReorderCardData, onClick: 
     }
 
 @Composable
-fun CardData.Image() = if (coverType != null && coverValue != null) {
-    CardCover(coverType = coverType, coverValue = coverValue)
-} else {
-    null
+fun CardData.Image() = when (coverType) {
+    CoverType.NONE -> null
+    CoverType.COLOR -> coverValue?.let { CardCoverImage(imgPath = it) }
+    CoverType.IMAGE -> coverValue?.let { CardCoverColor(color = Color(0)) } // TODO : coverValue to Color 추가하기
 }
 
 @Composable
-fun CardCover(modifier: Modifier = Modifier, coverType: CoverType, coverValue: String) {
+fun CardCoverColor(modifier: Modifier = Modifier, color: Color) {
+    Box(modifier = modifier.fillMaxSize().background(color))
+}
+
+@Composable
+fun CardCoverImage(modifier: Modifier = Modifier, imgPath: String) {
     AsyncImage(
-        model = coverValue,
+        model = imgPath,
         modifier = modifier.fillMaxSize(),
         contentDescription = null,
         contentScale = ContentScale.FillWidth,
