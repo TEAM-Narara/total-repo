@@ -112,8 +112,8 @@ public class BoardController implements BoardAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<List<ActivityDetailResponseDto>>> getBoardActivity(Long boardId) {
-        boardService.getBoardActivity(boardId);
-        return null;
+        List<ActivityDetailResponseDto> boardActivity = boardService.getBoardActivity(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
     }
 
     @GetMapping

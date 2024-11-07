@@ -117,6 +117,10 @@ public class BoardServiceImpl implements BoardService {
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
                 member, System.currentTimeMillis(), board, EventType.CREATE, EventData.BOARD, target);
 
+        System.out.println(boardHistory.getWhen());
+        System.out.println(boardHistory.getWhere());
+        System.out.println(boardHistory.getEventData());
+        System.out.println(boardHistory.getEventType());
         boardHistoryRepository.save(boardHistory);
 
 
@@ -241,6 +245,11 @@ public class BoardServiceImpl implements BoardService {
     public List<ActivityDetailResponseDto> getBoardActivity(Long boardId) {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
+
+        System.out.println(boardHistoryCollection);
+        System.out.println(boardHistoryCollection.size());
+        System.out.println(boardHistoryCollection.get(0).getWhen());
+        System.out.println(boardHistoryCollection.get(0).getWhere());
 
         List<ActivityDetailResponseDto> activities = new ArrayList<>();
 
