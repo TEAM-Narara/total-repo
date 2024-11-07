@@ -40,7 +40,6 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
         return new ResponseEntity<>(DefaultResponse.res(
                 StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
                 , HttpStatus.OK);
-
     }
 
     @Override
@@ -97,7 +96,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(workspaceId, requestDto.memberId());
 
         return ResponseEntity.ok(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, new WorkspaceMemberDto(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_DELETE_SUCCESS, new WorkspaceMemberDto(
                         workSpaceMember.getMember().getId(),
                         workSpaceMember.getAuthority()
                 ))

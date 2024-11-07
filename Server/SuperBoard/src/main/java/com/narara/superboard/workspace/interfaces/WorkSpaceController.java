@@ -66,7 +66,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
         WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
         WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
 
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_UPDATE_SUCCESS, workspaceCreateData));
     }
 
     @Operation(summary = "나의 워크스페이스 리스트 조회")
