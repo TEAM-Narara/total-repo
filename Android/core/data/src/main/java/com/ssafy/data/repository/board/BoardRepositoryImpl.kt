@@ -7,6 +7,7 @@ import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.network.source.board.BoardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,7 +61,8 @@ class BoardRepositoryImpl @Inject constructor(
 
     override suspend fun getBoardsByWorkspace(id: Long): Flow<List<BoardDTO>> =
         withContext(ioDispatcher) {
-            TODO("워크스페이스에 있는 보드를 가져오는 로직을 추가해주세요.")
+            flowOf(emptyList())
+//            TODO("워크스페이스에 있는 보드를 가져오는 로직을 추가해주세요.")
         }
 
     override suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>> =

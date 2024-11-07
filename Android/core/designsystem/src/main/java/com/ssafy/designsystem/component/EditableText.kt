@@ -21,7 +21,7 @@ fun EditableText(
     maxTitleLength: Int = 15,
     alignStyle: TextAlign = TextAlign.Start
 ) {
-    val (value, onValueChange) = remember { mutableStateOf(text) }
+    val (value, onValueChange) = remember(text) { mutableStateOf(text) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 

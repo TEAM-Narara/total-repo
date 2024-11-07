@@ -2,7 +2,6 @@ package com.ssafy.home.setting
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,11 +34,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.component.FilledButton
 import com.ssafy.designsystem.values.IconLarge
@@ -49,15 +55,53 @@ import com.ssafy.designsystem.values.ReversePrimary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
+import com.ssafy.home.data.MemberData
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeSettingScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeSettingViewModel = hiltViewModel(),
     workspaceId: Long,
     backHome: () -> Unit
 ) {
-    val (name, onValueChange) = remember { mutableStateOf("워크스페이스") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val settingData by viewModel.settingData.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.getSettingInfo(workspaceId)
+    }
+
+    HomeSettingScreen(
+        modifier = modifier,
+        backHome = backHome,
+        workspaceName = settingData.workspaceName,
+        members = settingData.members,
+        deleteWorkspace = { viewModel.deleteWorkspace(workspaceId, backHome) },
+    )
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeSettingScreen(
+    modifier: Modifier = Modifier,
+    workspaceName: String,
+    members: List<MemberData>,
+    backHome: () -> Unit,
+    deleteWorkspace: () -> Unit
+) {
+    val (name, onValueChange) = remember(workspaceName) { mutableStateOf(workspaceName) }
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -65,6 +109,7 @@ fun HomeSettingScreen(
             it.window.statusBarColor = Primary.toArgb()
         }
     }
+
     Scaffold(
         containerColor = White,
         topBar = {
@@ -127,18 +172,15 @@ fun HomeSettingScreen(
                         horizontalArrangement = Arrangement.spacedBy(PaddingXSmall),
                         columns = GridCells.Fixed(6),
                     ) {
-                        // TODO: viewmodel에서 가져와서 붙이삼. 
-                        val images: List<Any>? = null
-                        images?.let {
-                            items(it.size) { index ->
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .aspectRatio(1f)
-                                ) {
-                                    it[index]
-                                }
-                            }
+                        items(members.size) { index ->
+                            AsyncImage(
+                                model = members[index].memberProfileImgUrl,
+                                contentDescription = null,
+                                placeholder = rememberVectorPainter(Icons.Default.AccountCircle),
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .aspectRatio(1f)
+                            )
                         }
                     }
                     FilledButton(text = "Invite", onClick = { /*TODO*/ })
@@ -151,7 +193,7 @@ fun HomeSettingScreen(
             )
             Spacer(modifier = modifier.weight(1f))
             FilledButton(
-                text = "Delete", onClick = { /*TODO*/ }, modifier = Modifier.padding(
+                text = "Delete", onClick = deleteWorkspace, modifier = Modifier.padding(
                     PaddingDefault, PaddingZero, PaddingDefault, PaddingDefault
                 ), color = ReversePrimary
             )
