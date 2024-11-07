@@ -98,7 +98,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private Card getCardById(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
