@@ -81,7 +81,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
         return ResponseEntity.ok(
                 DefaultResponse.res(
                         StatusCode.OK,
-                        ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS,
+                        ResponseMessage.WORKSPACE_MEMBER_CREATE_SUCCESS,
                         new WorkspaceMemberDto(
                             workSpaceMember.getMember().getId(),
                           workSpaceMember.getAuthority()

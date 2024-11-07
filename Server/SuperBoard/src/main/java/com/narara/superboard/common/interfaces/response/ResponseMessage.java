@@ -34,6 +34,7 @@ public class ResponseMessage {
     public static final String WORKSPACE_DELETE_SUCCESS = "워크스페이스 삭제 성공";
 
     // 워크스페이스 멤버 관련 상수
+    public static final String WORKSPACE_MEMBER_CREATE_SUCCESS = "워크스페이스 멤버 생성 성공";
     public static final String WORKSPACE_MEMBER_FETCH_SUCCESS = "워크스페이스 멤버 조회 성공";
     public static final String MEMBER_WORKSPACE_LIST_FETCH_SUCCESS = "멤버의 워크스페이스 리스트 조회 성공";
 
@@ -47,9 +48,12 @@ public class ResponseMessage {
     public static final String BOARD_ARCHIVE_STATUS_CHANGED = "보드 아카이브 상태 변경 성공";
 
     // 보드 멤버 관련 상수
+    public static final String BOARD_MEMBER_CREATE_SUCCESS = "보드 멤버 생성 성공";
+    public static final String BOARD_MEMBER_DELETE_SUCCESS = "보드 멤버 삭제 성공";
     public static final String BOARD_MEMBER_FETCH_SUCCESS = "보드 멤버 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_SUCCESS = "보드 멤버 알림 상태 조회 성공";
     public static final String BOARD_MEMBER_WATCH_STATUS_UPDATE_SUCCESS = "보드 멤버 알림 상태 업데이트 성공";
+    public static final String BOARD_MEMBER_AUTHORITY_UPDATE_SUCCESS = "보드 멤버 권한 수정 성공";
 
     // 리스트 관련 상수
     public static final String LIST_CREATE_SUCCESS = "리스트 생성 성공";
