@@ -36,6 +36,7 @@ public class ResponseMessage {
     // 워크스페이스 멤버 관련 상수
     public static final String WORKSPACE_MEMBER_CREATE_SUCCESS = "워크스페이스 멤버 생성 성공";
     public static final String WORKSPACE_MEMBER_FETCH_SUCCESS = "워크스페이스 멤버 조회 성공";
+    public static final String WORKSPACE_MEMBER_DELETE_SUCCESS = "워크스페이스 멤버 삭제 성공";
     public static final String MEMBER_WORKSPACE_LIST_FETCH_SUCCESS = "멤버의 워크스페이스 리스트 조회 성공";
 
     // 보드 관련 상수
