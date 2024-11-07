@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : ListDataSource {
 
-    override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Long> =
+    override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.createList(createListRequestDto) }.toFlow()
 
     override suspend fun updateList(updateListRequestDto: UpdateListRequestDto): Flow<Unit> =

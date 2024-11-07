@@ -13,7 +13,6 @@ import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCardsDTO
 
-import com.ssafy.model.list.ListRequestDto
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
@@ -39,7 +38,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(createListRequestDto)
+            listDataSource.createList(createListRequestDto).map { -1 }
         } else {
             flow { listDao.insertList(ListEntity(
                 name = createListRequestDto.listName,
@@ -50,27 +49,24 @@ class ListRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateList(
-        listId: Long,
-        listRequestDto: ListRequestDto,
+        updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = flow {
         withContext(ioDispatcher) {
-            val list = listDao.getList(listId)
+            val list = listDao.getList(updateListRequestDto.listId)
 
             if(list != null) {
                 if (isConnected) {
-                    listDataSource.updateList(listId, listRequestDto)
+                    listDataSource.updateList(updateListRequestDto)
                 } else {
                     when(list.isStatus) {
                         DataStatus.STAY ->
                             listDao.updateList(list.copy(
-                                boardId = listRequestDto.boardId,
-                                name = listRequestDto.listName,
+                                name = updateListRequestDto.listName,
                                 isStatus = DataStatus.UPDATE))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
                             listDao.updateList(list.copy(
-                                boardId = listRequestDto.boardId,
-                                name = listRequestDto.listName))
+                                name = updateListRequestDto.listName))
                         DataStatus.DELETE -> { }
                     }
                 }

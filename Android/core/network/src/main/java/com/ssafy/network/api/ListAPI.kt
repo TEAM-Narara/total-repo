@@ -1,5 +1,6 @@
 package com.ssafy.network.api
 
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.source.ApiResponse
