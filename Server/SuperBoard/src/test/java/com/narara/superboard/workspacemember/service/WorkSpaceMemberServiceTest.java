@@ -2,6 +2,7 @@ package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+import com.narara.superboard.common.application.kafka.KafkaConsumerService;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkSpaceMemberServiceTest {
@@ -45,6 +47,9 @@ class WorkSpaceMemberServiceTest {
 
     @Mock
     private WorkSpaceValidator workSpaceValidator;
+
+    @Mock
+    private KafkaConsumerService kafkaConsumerService;
 
     @Mock
     private MemberRepository memberRepository;
@@ -149,6 +154,8 @@ class WorkSpaceMemberServiceTest {
         // given
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any())).thenReturn(true);
 
         // when
         WorkSpaceMember result = workSpaceMemberService.deleteMember(WORKSPACE_ID_1, MEMBER_ID_1);

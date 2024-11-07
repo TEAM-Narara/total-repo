@@ -10,7 +10,9 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -111,5 +113,51 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
 
         // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).findAllByWorkSpaceId(workSpaceId);
+    }
+
+    @Test
+    @DisplayName("워크스페이스 멤버 권한 수정 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
+    void testEditAuthorityEmptyWorkspaceMemberException() {
+        // given
+        Long workSpaceId = 1L;
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
+
+        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
+
+        //when
+        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
+                .thenReturn(Optional.of(mockWorkSpaceMember1));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
+                .thenReturn(false);
+
+        EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
+                () -> workSpaceMemberService.editAuthority(mockMember1.getId(), workSpaceId, Authority.MEMBER));  // 예외가 발생하는지 확인
+
+        // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
+        verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());
+    }
+
+    @Test
+    @DisplayName("워크스페이스 멤버 삭제 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
+    void testEmptyWorkspaceMemberException() {
+        // given
+        Long workSpaceId = 1L;
+        Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
+
+        WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
+
+        //when
+        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
+                .thenReturn(Optional.of(mockWorkSpaceMember1));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
+                .thenReturn(false);
+
+        EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
+                () -> workSpaceMemberService.deleteMember(workSpaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
+
+        // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
+        verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());
     }
 }

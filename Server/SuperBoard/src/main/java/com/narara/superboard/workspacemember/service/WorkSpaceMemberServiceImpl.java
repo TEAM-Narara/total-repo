@@ -2,6 +2,7 @@ package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+import com.narara.superboard.common.application.kafka.KafkaConsumerService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -12,6 +13,7 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkSpaceRepository workSpaceRepository;
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
+    private final KafkaConsumerService kafkaConsumerService;
+
 //    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
@@ -46,6 +50,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                     .memberNickname(workSpaceMember.getMember().getNickname())
                     .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
                     .authority(workSpaceMember.getAuthority().toString())
+                    .isDeleted(workSpaceMember.getIsDeleted())
                     .build();
 
             workspaceDetailResponseDtoList.add(dto);
@@ -80,6 +85,16 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
+
+        if (authority.equals(Authority.MEMBER)) {
+            //권한을 MEBMER로 바꾸는 경우 Workspace Admin이 한 명 이상인지 검증
+            boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(
+                    workSpaceMember.getWorkSpace());
+            if (!workspaceHasOneMember) {
+                throw new EmptyWorkspaceMemberException();
+            }
+        }
+
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
@@ -123,7 +138,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMemberRepository.save(workSpaceMember);
         workSpace.addOffset(); //workspace offset++
 
-//        workspaceOffsetService.saveAddMemberDiff(workspaceMember);
+        // 3. 새로운 멤버를 Kafka Consumer Group에 등록
+        kafkaConsumerService.registerMemberListener(workSpace.getId(), member.getId());
 
         return workSpaceMember;
     }
@@ -132,6 +148,13 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember deleteMember(Long workspaceId, Long memberId) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
+        WorkSpace workSpace = workSpaceMember.getWorkSpace();
+
+        boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(workSpace);
+        if (!workspaceHasOneMember) {
+            throw new EmptyWorkspaceMemberException();
+        }
+
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 

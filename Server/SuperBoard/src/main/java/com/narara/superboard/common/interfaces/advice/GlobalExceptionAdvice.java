@@ -9,6 +9,7 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.AlreadyRegisteredLoginException;
 import com.narara.superboard.member.exception.InvalidRefreshTokenException;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,11 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.FORBIDDEN, ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(EmptyWorkspaceMemberException.class)
+    public ResponseEntity<?> handleEmptyWorkspaceMemberException(EmptyWorkspaceMemberException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     //잘못된 입력

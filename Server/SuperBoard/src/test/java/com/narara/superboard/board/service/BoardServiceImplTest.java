@@ -16,6 +16,7 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
+import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
@@ -77,6 +78,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CoverValidator coverValidator;
+
+    @Mock
+    private NameValidator nameValidator;
 
     @Mock
     private CoverHandler coverHandler;
@@ -496,7 +500,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Board와 WorkSpace 관련 Mock 메서드 설정
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
         when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId))
-                .thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
+                .thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true, false)));
         when(mockBoard.getWorkSpace()).thenReturn(mockWorkSpace);
         when(mockWorkSpace.getName()).thenReturn("Mocked WorkSpace");
         when(mockBoard.updateBoardByAdmin(requestDto)).thenReturn(mockBoard);
@@ -518,6 +522,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(boardHistoryRepository.save(any())).thenReturn(null);
 
         // when
+//        Long memberId = 1L;
+//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(
+//                Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true, false)));
         Board updatedBoard = boardService.updateBoard(memberId, boardId, requestDto);
 
         // then
@@ -703,11 +710,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Pageable 설정 및 Mock repository behavior
         Pageable pageable = PageRequest.of(0, 10);
         Page<Reply> replyPage = new PageImpl<>(Collections.singletonList(reply), pageable, 1);
-
-        // Mock 설정
-        when(boardRepository.existsById(boardId)).thenReturn(true); // 보드 존재 확인 모킹
+//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
         when(replyRepository.findAllByBoardId(boardId, pageable)).thenReturn(replyPage);
-
+        when(boardRepository.existsById(any())).thenReturn(true);
 
         // When
         PageBoardReplyResponseDto responseDto = boardService.getRepliesByBoardId(boardId, pageable);
@@ -732,7 +737,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Given
         Long invalidBoardId = 999L; // 존재하지 않는 보드 ID
 
-        when(boardRepository.existsById(invalidBoardId)).thenReturn(false); // 존재하지 않는 보드로 설정
+//        when(boardRepository.findById(invalidBoardId)).thenReturn(Optional.empty());
 
         // When & Then
         Exception exception = assertThrows(BoardNotFoundException.class, () -> {

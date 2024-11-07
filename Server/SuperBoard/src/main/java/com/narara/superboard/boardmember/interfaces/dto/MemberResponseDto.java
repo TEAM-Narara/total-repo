@@ -8,6 +8,7 @@ public record MemberResponseDto(
         String memberEmail,
         String memberNickname,
         String memberProfileImgUrl,
-        String authority
+        String authority,
+        Boolean isDeleted
 ) {
 }
