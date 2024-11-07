@@ -156,7 +156,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
-//        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
+        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override

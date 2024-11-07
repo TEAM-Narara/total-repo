@@ -40,7 +40,6 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
         return new ResponseEntity<>(DefaultResponse.res(
                 StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_FETCH_SUCCESS, responseDto)
                 , HttpStatus.OK);
-
     }
 
     @Override

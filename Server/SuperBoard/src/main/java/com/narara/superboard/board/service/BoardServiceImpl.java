@@ -26,6 +26,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,7 +46,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
-//    private final WorkspaceOffsetService workspaceOffsetService;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -100,7 +101,7 @@ public class BoardServiceImpl implements BoardService {
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
-//        workspaceOffsetService.saveAddBoardDiff(board);
+        workspaceOffsetService.saveAddBoardDiff(board);
 
         return saveBoard;
     }
@@ -118,7 +119,7 @@ public class BoardServiceImpl implements BoardService {
 
         //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset();
-//        workspaceOffsetService.saveDeleteBoardDiff(board);
+        workspaceOffsetService.saveDeleteBoardDiff(board);
     }
 
     @Override
