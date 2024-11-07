@@ -70,7 +70,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
 
-        // TODO : Kafka 토픽 생성 및 Consumer group Listener 설정
+        // Kafka 토픽 생성 및 Consumer group Listener 설정
 
         String topicName = "workspace-" + newWorkSpace.getId();
 
