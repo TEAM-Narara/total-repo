@@ -48,6 +48,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "cover", columnDefinition = "jsonb")
+    @Setter
     private Map<String, Object> cover;
 
     @Column(name = "my_order", nullable = false, columnDefinition = "bigint default 0")
