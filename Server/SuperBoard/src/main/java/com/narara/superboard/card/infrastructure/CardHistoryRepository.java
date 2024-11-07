@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CardHistoryRepository extends MongoRepository<CardHistory, String> {
     List<CardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId);
+    List<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId);
 }

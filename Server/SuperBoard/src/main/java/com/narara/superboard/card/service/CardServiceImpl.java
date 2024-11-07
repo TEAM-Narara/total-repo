@@ -9,10 +9,7 @@ import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
-import com.narara.superboard.card.interfaces.dto.log.ArchiveStatusChangeInfo;
-import com.narara.superboard.card.interfaces.dto.log.CreateCardInfo;
-import com.narara.superboard.card.interfaces.dto.log.DeleteCardInfo;
-import com.narara.superboard.card.interfaces.dto.log.UpdateCardInfo;
+import com.narara.superboard.card.interfaces.dto.log.*;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.common.application.validator.CoverValidator;
@@ -23,6 +20,7 @@ import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -160,5 +158,13 @@ public class CardServiceImpl implements CardService {
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);
+    }
+
+    @Override
+    public java.util.List<CardActivityDetailResponseDto> getCardActivity(Long cardId) {
+        java.util.List<CardHistory> cardHistoryCollection = cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(cardId);
+        return cardHistoryCollection.stream()
+                .map(CardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
     }
 }
