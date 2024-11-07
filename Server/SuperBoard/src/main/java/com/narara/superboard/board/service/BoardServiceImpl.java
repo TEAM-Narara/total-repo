@@ -41,6 +41,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +113,7 @@ public class BoardServiceImpl implements BoardService {
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
         System.out.println(boardHistory.getWhen());
         System.out.println(boardHistory.getWhere());
@@ -142,7 +144,7 @@ public class BoardServiceImpl implements BoardService {
         DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -178,7 +180,7 @@ public class BoardServiceImpl implements BoardService {
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                memberRepository.findById(memberId).orElseThrow(), System.currentTimeMillis(),
+                memberRepository.findById(memberId).orElseThrow(), LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -202,7 +204,7 @@ public class BoardServiceImpl implements BoardService {
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
     }
@@ -239,10 +241,7 @@ public class BoardServiceImpl implements BoardService {
     public List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId) {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
-        System.out.println(cardHistoryCollectionByBoard.get(0));
-        System.out.println(cardHistoryCollectionByBoard.get(1).getWhere());
-        System.out.println(cardHistoryCollectionByBoard.get(1).getTarget());
-        System.out.println("1121321");
+
         List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
 
         // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
@@ -254,10 +253,6 @@ public class BoardServiceImpl implements BoardService {
                 .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
-        System.out.println(cardDtoList);
-        System.out.println(boardDtoList);
-        System.out.println(boardDtoList.size());
-        System.out.println(cardDtoList.size());
         // 병합 정렬을 수행
         /*
            이유는 boardHistoryCollection과 cardHistoryCollectionByBoard가 이미 when 필드 기준으로 정렬된 상태로 조회되기 때문입니다.
@@ -280,8 +275,9 @@ public class BoardServiceImpl implements BoardService {
             activities.add(cardDtoList.get(j++));
         }
 
-        System.out.println(activities.size());
-        System.out.println(activities);
+        if (activities.isEmpty()) {
+            return new ArrayList<>();
+        }
         return activities;
     }
 

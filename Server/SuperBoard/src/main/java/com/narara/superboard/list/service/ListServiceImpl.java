@@ -25,6 +25,9 @@ import com.narara.superboard.websocket.constant.Action;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Service
 @RequiredArgsConstructor
 public class ListServiceImpl implements ListService{
@@ -53,7 +56,7 @@ public class ListServiceImpl implements ListService{
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 
         BoardHistory<CreateListInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.LIST, createListInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -74,7 +77,7 @@ public class ListServiceImpl implements ListService{
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
 
         BoardHistory<UpdateListInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -98,7 +101,7 @@ public class ListServiceImpl implements ListService{
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
 
         BoardHistory<ArchiveListInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
 

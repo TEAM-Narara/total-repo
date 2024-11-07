@@ -18,6 +18,9 @@ import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -92,7 +95,7 @@ public class ReplyServiceImpl implements ReplyService{
         ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -112,7 +115,7 @@ public class ReplyServiceImpl implements ReplyService{
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 
         cardHistoryRepository.save(cardHistory);

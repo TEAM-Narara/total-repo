@@ -16,6 +16,9 @@ import com.narara.superboard.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Service
 @RequiredArgsConstructor
 public class CardMemberServiceImpl implements CardMemberService {
@@ -62,7 +65,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                                     member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
                             CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                                    member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                                    member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
                                     EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
                             cardHistoryRepository.save(cardHistory);
@@ -80,7 +83,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                 member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
         CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC), card.getList().getBoard(), card,
                 EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
         cardHistoryRepository.save(cardHistory);
