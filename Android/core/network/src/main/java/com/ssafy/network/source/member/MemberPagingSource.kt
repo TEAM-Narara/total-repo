@@ -11,20 +11,27 @@ class MemberPagingSource @Inject constructor(
     private val memberDataSource: MemberDataSource,
     private val keyword: String,
     private val sort: List<String>,
+    private val filterList: List<Long>,
 ) : PagingSource<Int, User>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, User> {
-        val page = params.key ?: 0
+        val page = params.key ?: 1
         val pageDto = PageDto(page, params.loadSize, sort)
 
         return runCatching {
             memberDataSource.searchMembers(keyword, pageDto).firstOrNull()
         }.fold(
             onSuccess = { response ->
-                val repos: List<User> = response ?: emptyList()
-                val nextKey = if (repos.isEmpty()) null else page + (params.loadSize / PAGE_SIZE)
-                val prevKey = if (page == 0) null else page - 1
-                LoadResult.Page(repos, prevKey, nextKey)
+                if (response == null) {
+                    return@fold LoadResult.Error(Exception("response is null"))
+                }
+
+                val userList: List<User> = response.searchMemberResponseDtoList
+                val filteredRepos = userList.filterNot { it.memberId in filterList }
+
+                val prevKey = if (page == 1) null else page - 1
+                val nextKey = if (response.totalPages <= page) null else page + 1
+                LoadResult.Page(filteredRepos, prevKey, nextKey)
             },
             onFailure = { exception ->
                 LoadResult.Error(exception)

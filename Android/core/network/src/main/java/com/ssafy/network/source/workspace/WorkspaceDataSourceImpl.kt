@@ -1,8 +1,8 @@
 package com.ssafy.network.source.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.model.workspace.WorkspaceRequestDTO
 import com.ssafy.network.api.WorkspaceAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
@@ -34,11 +34,22 @@ class WorkspaceDataSourceImpl @Inject constructor(
     override suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>> =
         safeApiCall { workspaceAPI.getWorkspacesByMember(memberId) }.toFlow()
 
-    override suspend fun deleteWorkspaceMember(id: Long): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun addWorkspaceMember(
+        workspaceId: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<SimpleMemberDto> =
+        safeApiCall { workspaceAPI.addWorkspaceMember(workspaceId, simpleMemberDto) }.toFlow()
 
-    override suspend fun updateWorkspaceMember(id: Long, authority: String): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deleteWorkspaceMember(
+        workspaceId: Long,
+        memberId: Long
+    ): Flow<SimpleMemberDto> =
+        safeApiCall { workspaceAPI.deleteWorkspaceMember(workspaceId, memberId) }.toFlow()
+
+    override suspend fun updateWorkspaceMember(
+        id: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<SimpleMemberDto> =
+        safeApiCall { workspaceAPI.updateWorkspaceMember(id, simpleMemberDto) }.toFlow()
+
 }

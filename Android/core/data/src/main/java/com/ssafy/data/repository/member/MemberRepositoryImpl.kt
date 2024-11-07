@@ -7,15 +7,11 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
-import com.ssafy.database.dto.MemberBackgroundEntity
-import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.user.User
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.WorkspaceInBoardDTO
-import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -56,14 +52,16 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun searchMembers(
         keyword: String,
-        sort: List<String>
+        sort: List<String>,
+        filterList: List<Long>,
     ): Flow<PagingData<User>> = Pager(
         config = PagingConfig(pageSize = MemberPagingSource.PAGE_SIZE, enablePlaceholders = false),
         pagingSourceFactory = {
             MemberPagingSource(
                 memberDataSource = memberDataSource,
                 keyword = keyword,
-                sort = sort
+                sort = sort,
+                filterList = filterList
             )
         }
     ).flow.flowOn(ioDispatcher)

@@ -2,7 +2,7 @@ package com.ssafy.home.setting
 
 import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetDetailWorkspaceUseCase
-import com.ssafy.home.data.SettingData
+import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.ui.networkstate.NetworkState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.DeleteWorkspaceUseCase
@@ -21,12 +21,12 @@ class HomeSettingViewModel @Inject constructor(
     private val updateWorkspaceUseCase: UpdateWorkspaceUseCase
 ) : BaseViewModel() {
 
-    private val _settingData = MutableStateFlow(SettingData(-1, "", emptyList()))
-    val settingData = _settingData.asStateFlow()
+    private val _detailWorkspaceData = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
+    val settingData = _detailWorkspaceData.asStateFlow()
 
     fun getSettingInfo(workspaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
         getDetailWorkspaceUseCase(workspaceId).safeCollect { data ->
-            data?.let { _settingData.emit(it) }
+            data?.let { _detailWorkspaceData.emit(it) }
         }
     }
 
