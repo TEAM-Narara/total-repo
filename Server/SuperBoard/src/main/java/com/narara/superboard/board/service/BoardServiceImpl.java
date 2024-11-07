@@ -21,7 +21,6 @@ import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
@@ -55,7 +54,6 @@ public class BoardServiceImpl implements BoardService {
     private final BoardMemberRepository boardMemberRepository;
     private final BoardHistoryRepository boardHistoryRepository;
     private final CardHistoryRepository cardHistoryRepository;
-//    private final WorkspaceOffsetService workspaceOffsetService;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -110,11 +108,10 @@ public class BoardServiceImpl implements BoardService {
 //        workspaceOffsetService.saveAddBoardDiff(board);
 
         // Board 생성 로그 기록
-        CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getName(), workSpace.getName());
-        Target target = Target.of(board, createBoardInfo);
+        CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.BOARD, target);
+                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
         System.out.println(boardHistory.getWhen());
         System.out.println(boardHistory.getWhere());
@@ -142,11 +139,10 @@ public class BoardServiceImpl implements BoardService {
 //        workspaceOffsetService.saveDeleteBoardDiff(board);
 
         // Board 삭제 로그 기록
-        DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getName(), board.getWorkSpace().getName());
-        Target target = Target.of(board, deleteBoardInfo);
+        DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.DELETE, EventData.BOARD, target);
+                member, System.currentTimeMillis(), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -179,12 +175,11 @@ public class BoardServiceImpl implements BoardService {
         }
 
         // Board 업데이트 로그 기록
-        UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
-        Target target = Target.of(updatedBoard, updateBoardInfo);
+        UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
                 memberRepository.findById(memberId).orElseThrow(), System.currentTimeMillis(),
-                updatedBoard, EventType.UPDATE, EventData.BOARD, target);
+                updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -204,11 +199,10 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
 
         // 아카이브 상태 변경 로그 기록
-        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getName(), board.getIsArchived());
-        Target target = Target.of(board, archiveStatusChangeInfo);
+        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CLOSE, EventData.BOARD, target);
+                member, System.currentTimeMillis(), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
     }
@@ -245,19 +239,14 @@ public class BoardServiceImpl implements BoardService {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
 
-        System.out.println(boardHistoryCollection);
-        System.out.println(boardHistoryCollection.size());
-        System.out.println(boardHistoryCollection.get(0).getWhen());
-        System.out.println(boardHistoryCollection.get(0).getWhere());
-
         List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
 
         // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
-        List<BoardActivityDetailResponseDto> boardDtos = boardHistoryCollection.stream()
+        List<BoardActivityDetailResponseDto> boardDtoList = boardHistoryCollection.stream()
                 .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
-        List<BoardActivityDetailResponseDto> cardDtos = cardHistoryCollectionByBoard.stream()
+        List<BoardActivityDetailResponseDto> cardDtoList = cardHistoryCollectionByBoard.stream()
                 .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
@@ -267,20 +256,20 @@ public class BoardServiceImpl implements BoardService {
            이러한 경우, 병합 정렬 (merge sort) 방식이 훨씬 더 효율적입니다.
          */
         int i = 0, j = 0;
-        while (i < boardDtos.size() && j < cardDtos.size()) {
-            if (boardDtos.get(i).when() >= cardDtos.get(j).when()) {
-                activities.add(boardDtos.get(i++));
+        while (i < boardDtoList.size() && j < cardDtoList.size()) {
+            if (boardDtoList.get(i).when() >= cardDtoList.get(j).when()) {
+                activities.add(boardDtoList.get(i++));
             } else {
-                activities.add(cardDtos.get(j++));
+                activities.add(cardDtoList.get(j++));
             }
         }
 
         // 나머지 요소 추가
-        while (i < boardDtos.size()) {
-            activities.add(boardDtos.get(i++));
+        while (i < boardDtoList.size()) {
+            activities.add(boardDtoList.get(i++));
         }
-        while (j < cardDtos.size()) {
-            activities.add(cardDtos.get(j++));
+        while (j < cardDtoList.size()) {
+            activities.add(cardDtoList.get(j++));
         }
 
         return activities;

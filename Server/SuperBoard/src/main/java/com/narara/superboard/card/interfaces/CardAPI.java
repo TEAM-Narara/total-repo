@@ -2,7 +2,6 @@ package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;

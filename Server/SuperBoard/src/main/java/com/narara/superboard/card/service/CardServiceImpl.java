@@ -17,10 +17,8 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -62,12 +60,11 @@ public class CardServiceImpl implements CardService {
         cardMemberRepository.save(cardMember);
 
         // 로그 기록 추가
-        CreateCardInfo createCardInfo = new CreateCardInfo(card.getName());
-        Target target = Target.of(savedCard, createCardInfo);
+        CreateCardInfo createCardInfo = new CreateCardInfo(card.getId(), card.getName());
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
                 member, savedCard.getCreatedAt(), list.getBoard(), savedCard,
-                EventType.CREATE, EventData.CARD, target);
+                EventType.CREATE, EventData.CARD, createCardInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -87,12 +84,11 @@ public class CardServiceImpl implements CardService {
         card.delete();
 
         // 로그 기록 추가
-        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getName());
-        Target target = Target.of(card, deleteCardInfo);
+        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getId(), card.getName());
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                EventType.DELETE, EventData.CARD, target);
+                EventType.DELETE, EventData.CARD, deleteCardInfo);
 
         cardHistoryRepository.save(cardHistory);
     }
@@ -108,12 +104,11 @@ public class CardServiceImpl implements CardService {
         Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
         // 로그 기록 추가
-        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getName());
-        Target target = Target.of(updatedCard, updateCardInfo);
+        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getId(), updatedCard.getName());
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), updatedCard.getList().getBoard(), updatedCard,
-                EventType.UPDATE, EventData.CARD, target);
+                EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -139,12 +134,11 @@ public class CardServiceImpl implements CardService {
         card.changeArchiveStatus();
 
         // 로그 기록 추가
-        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getName(), card.getIsArchived());
-        Target target = Target.of(card, archiveStatusChangeInfo);
+        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());
 
         CardHistory cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                EventType.ARCHIVE, EventData.CARD, target);
+                EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);
     }

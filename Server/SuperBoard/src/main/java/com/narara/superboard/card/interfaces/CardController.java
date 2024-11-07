@@ -5,7 +5,6 @@ import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
