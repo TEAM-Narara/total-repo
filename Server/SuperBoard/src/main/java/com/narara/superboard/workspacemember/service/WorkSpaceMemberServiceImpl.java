@@ -113,10 +113,10 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Transactional
     @Override
     public WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority) {
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+        WorkSpace workSpace = workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         //1. 워크스페이스에 이미 멤버가 추가되어 있으면 무시

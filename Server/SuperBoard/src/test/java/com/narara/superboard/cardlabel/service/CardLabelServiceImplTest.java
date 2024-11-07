@@ -71,11 +71,11 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         Label label = Label.builder().id(labelId).build();
 
         // Card가 존재하지 않는 경우 모킹
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // then
         assertThrows(EntityNotFoundException.class, () -> {
-            Card card = cardRepository.findById(cardId).orElseThrow(EntityNotFoundException::new);
+            Card card = cardRepository.findByIdAndIsDeletedFalse(cardId).orElseThrow(EntityNotFoundException::new);
             cardLabelService.createCardLabel(card, label);
         });
 

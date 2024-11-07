@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         // Refresh Token을 null로 설정
@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void withdrawal(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         if(member.getIsDeleted()) throw new AccountDeletedException();

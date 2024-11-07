@@ -85,8 +85,8 @@ class CardMemberServiceImplTest {
         Member member = new Member(memberId, "dd", "ddd@naver.com");
 
         // 카드와 멤버 유효성 확인
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // 카드가 존재한다고 가정
         when(cardRepository.existsById(cardId)).thenReturn(true);
@@ -101,7 +101,7 @@ class CardMemberServiceImplTest {
         assertTrue(result, "watch 상태가 true일 때 true를 반환해야 합니다.");
 
         // 리포지토리 메서드 호출 확인
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, times(1)).findByCardIdAndMemberId(cardId, memberId);
     }
 
@@ -120,7 +120,7 @@ class CardMemberServiceImplTest {
         }, "Card with ID " + cardId + " does not exist.");
 
         // cardRepository는 존재 확인을 위해 호출되지만 cardMemberRepository는 호출되지 않아야 함
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, never()).findByCardIdAndMemberId(anyLong(), anyLong());
     }
 
@@ -131,8 +131,8 @@ class CardMemberServiceImplTest {
         Long memberId = member.getId();
 
         // 카드와 멤버 유효성 확인
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         when(cardRepository.existsById(cardId)).thenReturn(true);
         when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId))
@@ -142,7 +142,7 @@ class CardMemberServiceImplTest {
 
         assertFalse(result, "카드는 존재하지만 CardMember에 없으면 false를 반환해야 합니다.");
 
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, times(1)).findByCardIdAndMemberId(cardId, memberId);
     }
 
@@ -154,8 +154,8 @@ class CardMemberServiceImplTest {
         CardMember existingCardMember = new CardMember(member, card, true);
 
         // 카드와 멤버 유효성 확인
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         when(cardRepository.existsById(cardId)).thenReturn(true);
         when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId))
@@ -164,7 +164,7 @@ class CardMemberServiceImplTest {
         cardMemberService.setCardMemberIsAlert(memberId, cardId);
 
         assertFalse(existingCardMember.isAlert());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, times(1)).findByCardIdAndMemberId(cardId, memberId);
         verify(cardMemberRepository, times(1)).save(existingCardMember);
     }
@@ -177,10 +177,10 @@ class CardMemberServiceImplTest {
 
         // 카드가 존재한다고 설정
         when(cardRepository.existsById(cardId)).thenReturn(true);
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
 
         // 멤버가 존재한다고 설정
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // CardMember가 존재하지 않는 경우
         when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.empty());
@@ -189,8 +189,8 @@ class CardMemberServiceImplTest {
         cardMemberService.setCardMemberIsAlert(memberId, cardId);
 
         // 메서드 호출 횟수 검증
-        verify(cardRepository, times(1)).findById(cardId);
-        verify(memberRepository, times(1)).findById(memberId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
+        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(memberId);
         verify(cardMemberRepository, times(1)).findByCardIdAndMemberId(cardId, memberId);
         verify(cardMemberRepository, times(1)).save(any(CardMember.class));
     }
@@ -203,7 +203,7 @@ class CardMemberServiceImplTest {
         when(cardRepository.existsById(cardId)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> cardMemberService.setCardMemberIsAlert(memberId, cardId));
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, never()).findByCardIdAndMemberId(anyLong(), anyLong());
         verify(cardMemberRepository, never()).save(any(CardMember.class));
     }
@@ -225,8 +225,8 @@ class CardMemberServiceImplTest {
         CardMember cardMember = new CardMember(member, card, true, isRepresentative);
 
         // 카드와 멤버 유효성 확인
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // 카드 멤버가 없는 경우 새로 추가
         // 3번 조건: 카드 멤버가 없는 경우 새로 추가
@@ -259,14 +259,14 @@ class CardMemberServiceImplTest {
         UpdateCardMemberRequestDto updateCardMemberRequestDto = new UpdateCardMemberRequestDto(cardId, memberId);
 
         // 카드가 존재하지 않는 경우
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // when & then
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
         });
 
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(cardMemberRepository, never()).findByCardIdAndMemberId(anyLong(), anyLong());
         verify(cardMemberRepository, never()).save(any(CardMember.class));
     }
@@ -284,16 +284,16 @@ class CardMemberServiceImplTest {
         Card card = new Card(cardId, null, "dd", "dd", null, null, null, null, null, null, null, null, null);
 
         // 카드가 존재하지만 멤버가 유효하지 않은 경우
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.empty());
 
         // when & then
         Exception exception = assertThrows(NotFoundEntityException.class, () -> {
             cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
         });
 
-        verify(cardRepository, times(1)).findById(cardId);
-        verify(memberRepository, times(1)).findById(memberId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
+        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(memberId);
         verify(cardMemberRepository, never()).save(any(CardMember.class));
     }
 }

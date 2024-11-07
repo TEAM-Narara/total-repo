@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Long userId = Long.valueOf(authentication.getName());
         System.out.println("setAuthenticationContext" + userId);
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundEntityException(userId, "멤버"));
         CustomUserDetails customUserDetails = new CustomUserDetails(member, userId, authentication.getAuthorities());
 

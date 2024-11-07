@@ -112,7 +112,7 @@ public class ListServiceImpl implements ListService{
     @Override
     public java.util.List<List> getArchivedList(Member member, Long boardId) {
 
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
         boardService.checkBoardMember(board, member, ListAction.ARCHIVE_LIST);
 

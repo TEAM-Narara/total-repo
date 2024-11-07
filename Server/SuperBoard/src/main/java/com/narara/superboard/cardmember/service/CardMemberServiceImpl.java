@@ -92,13 +92,13 @@ public class CardMemberServiceImpl implements CardMemberService {
 
     // 카드 존재 확인 및 조회
     private Card validateCardExists(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
     // 멤버 존재 확인 및 조회
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

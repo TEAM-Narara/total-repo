@@ -56,7 +56,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
 
 
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

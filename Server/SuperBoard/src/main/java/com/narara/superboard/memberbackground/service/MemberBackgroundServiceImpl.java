@@ -48,7 +48,7 @@ public class MemberBackgroundServiceImpl implements MemberBackgroundService {
     }
 
     private Member findMemberByIdOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 }

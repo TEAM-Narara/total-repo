@@ -49,7 +49,7 @@ public class ReplyServiceImpl implements ReplyService{
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
-        Card card = cardRepository.findById(replyCreateRequestDto.cardId())
+        Card card = cardRepository.findByIdAndIsDeletedFalse(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
         cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
@@ -129,7 +129,7 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public List<Reply> getRepliesByCardId(Long cardId) {
-        Card card = cardRepository.findById(cardId)
+        Card card = cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
 
         return replyRepository.findAllByCard(card);

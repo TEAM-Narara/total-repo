@@ -51,7 +51,7 @@ class MemberBackgroundServiceImplTest {
                 .build();
 
         // Mock member repository to return the test member
-        when(memberRepository.findById(testMember.getId())).thenReturn(java.util.Optional.of(testMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(testMember.getId())).thenReturn(java.util.Optional.of(testMember));
 
         // Mock the validator to throw NotFoundException if imgUrl is null
         doThrow(new NotFoundException("멤버 배경의 imgUrl(이)가 존재하지 않습니다. imgUrl(을)를 작성해주세요."))
@@ -83,7 +83,7 @@ class MemberBackgroundServiceImplTest {
         Long nonExistentMemberId = 999L;
 
         // Simulate that the member does not exist
-        when(memberRepository.findById(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(MemberNotFoundException.class, () ->
@@ -142,7 +142,7 @@ class MemberBackgroundServiceImplTest {
         Long nonExistentMemberId = 999L;
 
         // Simulate that the member does not exist in memberRepository
-        when(memberRepository.findById(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(MemberNotFoundException.class, () ->
@@ -150,7 +150,7 @@ class MemberBackgroundServiceImplTest {
 
         assertEquals("ID가 999인 회원을 찾을 수 없습니다.(이)가 존재하지 않습니다. ID가 999인 회원을 찾을 수 없습니다.(을)를 작성해주세요.", exception.getMessage());
         verify(memberBackgroundRepository, never()).findAllByMemberId(nonExistentMemberId);
-        verify(memberRepository, times(1)).findById(nonExistentMemberId);
+        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(nonExistentMemberId);
     }
 
     @Test
@@ -175,7 +175,7 @@ class MemberBackgroundServiceImplTest {
         Long nonExistentMemberId = 999L;
         Long backgroundId = 123L;
 
-        when(memberRepository.findById(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(nonExistentMemberId)).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(MemberNotFoundException.class, () ->

@@ -38,7 +38,7 @@ public class ListMemberServiceImpl implements ListMemberService {
 
     // 멤버 존재 확인 및 조회
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

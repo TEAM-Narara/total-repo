@@ -60,7 +60,7 @@ class ListMemberServiceImplTest {
 
         // 리스트와 멤버 유효성 확인
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         when(listRepository.existsById(listId)).thenReturn(true);
         when(listMemberRepository.findByListIdAndMemberId(listId, memberId))
@@ -85,7 +85,7 @@ class ListMemberServiceImplTest {
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
 
         // 멤버가 존재한다고 설정
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // listMember가 존재하지 않는 경우
         when(listMemberRepository.findByListIdAndMemberId(listId, memberId)).thenReturn(Optional.empty());
@@ -95,7 +95,7 @@ class ListMemberServiceImplTest {
 
         // 메서드 호출 횟수 검증
         verify(listRepository, times(1)).findById(listId);
-        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(memberId);
         verify(listMemberRepository, times(1)).findByListIdAndMemberId(listId, memberId);
         verify(listMemberRepository, times(1)).save(any(ListMember.class));
     }

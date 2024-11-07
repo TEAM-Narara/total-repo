@@ -656,14 +656,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L , "시현", "sisi@naver.com");
 
         // Mock: getBoard 호출 시 모킹된 보드 반환
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
 
         // when: 보드 아카이브 상태 변경
         boardService.changeArchiveStatus(member, boardId);
 
         // then: 보드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, board.getIsArchived());
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
     }
 
     /**
@@ -710,7 +710,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Pageable 설정 및 Mock repository behavior
         Pageable pageable = PageRequest.of(0, 10);
         Page<Reply> replyPage = new PageImpl<>(Collections.singletonList(reply), pageable, 1);
-//        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+//        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
         when(replyRepository.findAllByBoardId(boardId, pageable)).thenReturn(replyPage);
         when(boardRepository.existsById(any())).thenReturn(true);
 
@@ -737,7 +737,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Given
         Long invalidBoardId = 999L; // 존재하지 않는 보드 ID
 
-//        when(boardRepository.findById(invalidBoardId)).thenReturn(Optional.empty());
+//        when(boardRepository.findByIdAndIsDeletedFalse(invalidBoardId)).thenReturn(Optional.empty());
 
         // When & Then
         Exception exception = assertThrows(BoardNotFoundException.class, () -> {

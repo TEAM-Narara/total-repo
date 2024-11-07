@@ -93,10 +93,10 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
         boardValidator.validateBackgroundIsValid(boardCreateRequestDto);
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
-        WorkSpace workSpace = workspaceRepository.findById(boardCreateRequestDto.workSpaceId())
+        WorkSpace workSpace = workspaceRepository.findByIdAndIsDeletedFalse(boardCreateRequestDto.workSpaceId())
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
 
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
@@ -182,7 +182,7 @@ public class BoardServiceImpl implements BoardService {
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
         BoardHistory<UpdateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
-                memberRepository.findById(memberId).orElseThrow(() -> new NotFoundEntityException(memberId, "멤버")),
+                memberRepository.findByIdAndIsDeletedFalse(memberId).orElseThrow(() -> new NotFoundEntityException(memberId, "멤버")),
                 LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
