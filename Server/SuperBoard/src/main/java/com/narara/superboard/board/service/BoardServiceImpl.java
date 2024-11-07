@@ -6,6 +6,8 @@ import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.infrastructure.BoardSearchRepository;
+import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
+import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.interfaces.dto.log.ArchiveStatusChangeInfo;
 import com.narara.superboard.board.interfaces.dto.log.CreateBoardInfo;
@@ -14,12 +16,13 @@ import com.narara.superboard.board.interfaces.dto.log.UpdateBoardInfo;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
+import com.narara.superboard.card.document.CardHistory;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
@@ -52,6 +55,7 @@ public class BoardServiceImpl implements BoardService {
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
     private final BoardHistoryRepository boardHistoryRepository;
+    private final CardHistoryRepository cardHistoryRepository;
 //    private final WorkspaceOffsetService workspaceOffsetService;
 
     private final BoardValidator boardValidator;
@@ -232,6 +236,48 @@ public class BoardServiceImpl implements BoardService {
 
         return myBoardCollectionResponse;
     }
+
+    @Override
+    public List<ActivityDetailResponseDto> getBoardActivity(Long boardId) {
+        List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
+        List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
+
+        List<ActivityDetailResponseDto> activities = new ArrayList<>();
+
+        // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
+        List<ActivityDetailResponseDto> boardDtos = boardHistoryCollection.stream()
+                .map(ActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+
+        List<ActivityDetailResponseDto> cardDtos = cardHistoryCollectionByBoard.stream()
+                .map(ActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+
+        // 병합 정렬을 수행
+        /*
+           이유는 boardHistoryCollection과 cardHistoryCollectionByBoard가 이미 when 필드 기준으로 정렬된 상태로 조회되기 때문입니다.
+           이러한 경우, 병합 정렬 (merge sort) 방식이 훨씬 더 효율적입니다.
+         */
+        int i = 0, j = 0;
+        while (i < boardDtos.size() && j < cardDtos.size()) {
+            if (boardDtos.get(i).when() >= cardDtos.get(j).when()) {
+                activities.add(boardDtos.get(i++));
+            } else {
+                activities.add(cardDtos.get(j++));
+            }
+        }
+
+        // 나머지 요소 추가
+        while (i < boardDtos.size()) {
+            activities.add(boardDtos.get(i++));
+        }
+        while (j < cardDtos.size()) {
+            activities.add(cardDtos.get(j++));
+        }
+
+        return activities;
+    }
+
 
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
