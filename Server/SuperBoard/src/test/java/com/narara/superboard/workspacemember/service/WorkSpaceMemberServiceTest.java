@@ -54,9 +54,6 @@ class WorkSpaceMemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private KafkaConsumerService kafkaConsumerService;
-
     private WorkSpace workSpace;
     private Member member;
     private WorkSpaceMember workSpaceMember;
