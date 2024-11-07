@@ -10,6 +10,8 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginResponseDto;
 import com.narara.superboard.member.interfaces.dto.MemberProfile;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.util.JwtTokenProvider;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
+import com.narara.superboard.workspace.service.WorkSpaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @Slf4j
 @Service
@@ -36,6 +37,8 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate = new RestTemplate(); // @Bean으로 주입받도록 수정
+
+    private final WorkSpaceService workSpaceService;
 
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String naverUserInfoUri;
@@ -52,6 +55,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
         MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
         Member member = saveOrUpdateMember(memberProfile, provider);
 
+        System.out.println("member Id " + member.getId());
         MemberDto memberDto = new MemberDto(member.getId(), member.getEmail(), member.getNickname(), member.getProfileImgUrl());
         TokenDto tokenDto = generateTokenDto(member);
 
@@ -104,7 +108,10 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
                 .loginType(LoginType.valueOf(provider.toUpperCase()))
                 .build();
 
-        return memberRepository.save(newMember);
+        Member member = memberRepository.save(newMember);
+        workSpaceService.createWorkSpace(member.getId(), new WorkSpaceCreateRequestDto(member.getNickname() + "의 워크스페이스"));
+
+        return member;
     }
 
     private TokenDto generateTokenDto(Member member) {
