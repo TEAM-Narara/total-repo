@@ -9,5 +9,12 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 data class HomeData(
     val user: User = User("", "", null),
     val workspaceList: List<WorkSpaceDTO> = emptyList(),
-    val boardsBySelectedWorkSpace: List<BoardDTO> = emptyList()
+    val selectedWorkSpace: SelectedWorkSpace = SelectedWorkSpace()
+)
+
+@Immutable
+data class SelectedWorkSpace(
+    val workSpaceId: Long = 0,
+    val workSpaceName: String = "",
+    val boards: List<BoardDTO> = emptyList()
 )

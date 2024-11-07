@@ -4,12 +4,13 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.model.workspace.WorkspaceRequestDTO
 import kotlinx.coroutines.flow.Flow
 
 interface WorkspaceRepository {
 
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
+
+    suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?>
 
     suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Long>
 

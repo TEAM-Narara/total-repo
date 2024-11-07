@@ -1,6 +1,6 @@
 package com.ssafy.board.board.data
 
-import com.ssafy.model.board.Background
+import com.ssafy.model.background.Background
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.ListInCardsDTO

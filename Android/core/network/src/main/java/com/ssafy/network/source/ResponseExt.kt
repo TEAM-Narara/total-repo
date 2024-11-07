@@ -32,7 +32,11 @@ inline fun <reified T> Response<ApiResponse<T>>.toApiResult(): ApiResult<T> {
     errorBody()?.let {
         val errorMessage = it.charStream().readLines().joinToString()
         val json = JSONObject(errorMessage)
-        val message = json.getString("responseMessage")
+        val message = kotlin.runCatching { json.getString("responseMessage") }
+            .fold(
+                onSuccess = { message -> message },
+                onFailure = { ERROR }
+            )
 
         if (message.isNotBlank()) return ApiResult.Error(RuntimeException(message))
         else return ApiResult.Error(RuntimeException(ERROR))

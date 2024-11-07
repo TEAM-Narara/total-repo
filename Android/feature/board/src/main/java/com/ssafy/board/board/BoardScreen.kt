@@ -45,8 +45,8 @@ import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
-import com.ssafy.model.board.Background
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.search.SearchParameters
 import kotlinx.coroutines.launch

@@ -1,5 +1,7 @@
 package com.ssafy.model.board
 
+import com.ssafy.model.background.Background
+
 data class BoardDTO(
     val id: Long,
     val workspaceId: Long,

@@ -34,10 +34,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import coil3.compose.AsyncImage
 import com.ssafy.board.components.BoardMemberItem
 import com.ssafy.board.components.MenuEditTextRow
 import com.ssafy.board.components.MenuHorizontalDivider
-import com.ssafy.model.card.HistoryData
 import com.ssafy.board.getIcon
 import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.values.ImageSmall
@@ -49,7 +49,10 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
-import com.ssafy.model.background.BackgroundDto
+import com.ssafy.designsystem.values.toColor
+import com.ssafy.model.background.Background
+import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.card.HistoryData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,19 +62,12 @@ fun BoardMenuScreen(
     workspaceId: Long,
     backHome: () -> Unit,
     historyContent: List<HistoryData>?,
-    setBackground: (Long, String?) -> Unit
+    background: Background,
+    selectBackGroundScreen: (Background) -> Unit
 ) {
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
     val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-    val (background, onBackgroundChange) = remember {
-        mutableStateOf(
-            BackgroundDto(
-                0xFFFCFCFC,
-                ""
-            )
-        )
-    }
     val (watch, onWatchChange) = remember { mutableStateOf(true) }
     val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
     val activity = LocalContext.current as? Activity
@@ -149,15 +145,35 @@ fun BoardMenuScreen(
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)
-                            .clickable {
-                                setBackground(
-                                    background.color,
-                                    background.imgPath
+                            .clickable { selectBackGroundScreen(background) }) {
+                        when (background.type) {
+                            BackgroundType.COLOR -> {
+                                Box(
+                                    modifier = Modifier
+                                        .size(ImageSmall)
+                                        .background(color = background.value.toColor())
+                                        .shadow(PaddingOne, spotColor = Color.LightGray)
                                 )
                             }
-                            .background(color = Color(background.color))
-                            .shadow(PaddingOne, spotColor = Color.LightGray)
-                    )
+
+                            BackgroundType.IMAGE -> {
+                                AsyncImage(
+                                    modifier = Modifier.size(ImageSmall),
+                                    model = background.value,
+                                    contentDescription = null
+                                )
+                            }
+
+                            BackgroundType.NONE -> {
+                                Box(
+                                    modifier = Modifier
+                                        .size(ImageSmall)
+                                        .background(color = Color.LightGray)
+                                        .shadow(PaddingOne, spotColor = Color.LightGray)
+                                )
+                            }
+                        }
+                    }
                 }
             }
             item {
@@ -229,6 +245,10 @@ fun GreetingPreview() {
         backHome = {},
         workspaceId = 1,
         historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
-        setBackground = { _, _ -> }
+        selectBackGroundScreen = {},
+        background = Background(
+            type = BackgroundType.COLOR,
+            value = "#FFFFFF"
+        )
     )
 }
