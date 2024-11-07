@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 // 보드에 연관된 모든 사용자
 @Entity(tableName = "board_member")
@@ -11,7 +12,7 @@ data class BoardMemberEntity(
     val boardId: Long = 0L,
     val authority: String = "",
 
-    val isStatus: String = "STAY",
+    val isStatus: DataStatus = DataStatus.STAY,
 )
 
 // 내 보드들의 알람
@@ -20,5 +21,5 @@ data class BoardMemberAlarmEntity(
     @PrimaryKey val boardId: Long = 0L,
     val isAlert: Boolean = false,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

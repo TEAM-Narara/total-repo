@@ -21,7 +21,7 @@ interface WorkspaceDao {
         FROM workspace 
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalCreateWorkspaces(): List<WorkspaceInBoard>
+    suspend fun getLocalCreateWorkspaces(): List<WorkspaceInBoard>
 
     // 서버에 연산할 워크스페이스 조회
     @Query("""
@@ -29,7 +29,7 @@ interface WorkspaceDao {
         FROM workspace
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllLocalOperationWorkspaces(): List<WorkspaceEntity>
+    suspend fun getLocalOperationWorkspaces(): List<WorkspaceEntity>
 
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
@@ -51,11 +51,11 @@ interface WorkspaceDao {
     @Query("DELETE FROM workspace WHERE id NOT IN (:ids)")
     suspend fun deleteWorkspacesNotIn(ids: List<Long>)
 
-    // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
-    @Query("UPDATE workspace SET name = :name WHERE id = :workspaceId")
-    suspend fun updateWorkspace(workspaceId: Long, name: String)
+    // 상태 업데이트
+    @Update
+    suspend fun updateWorkspace(workspace: WorkspaceEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
-    suspend fun deleteWorkspace(workspace: WorkspaceEntity)
+    suspend fun deleteLocalWorkspace(workspace: WorkspaceEntity)
 }

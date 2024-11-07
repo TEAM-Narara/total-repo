@@ -11,11 +11,15 @@ import javax.inject.Inject
 
 class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : ListDataSource {
 
-    override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit> =
+    override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Long> =
         safeApiCall { listAPI.createList(createListRequestDto) }.toFlow()
 
     override suspend fun updateList(updateListRequestDto: UpdateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.updateList(updateListRequestDto.listId, updateListRequestDto) }.toFlow()
+
+    override suspend fun deleteList(listId: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun setListArchive(listId: Long): Flow<Unit> =
         safeApiCall { listAPI.setListArchive(listId) }.toFlow()
@@ -23,4 +27,7 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     override suspend fun getArchivedLists(boardId: Long): Flow<List<ListResponseDto>> =
         safeApiCall { listAPI.getArchivedLists(boardId) }.toFlow()
 
+    override suspend fun deleteListMember(id: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 }

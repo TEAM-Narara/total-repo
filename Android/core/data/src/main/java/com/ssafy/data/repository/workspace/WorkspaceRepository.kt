@@ -2,6 +2,7 @@ package com.ssafy.data.repository.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.workspace.WorkspaceRequestDTO
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,7 @@ interface WorkspaceRepository {
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
 
     suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Long>
+
     suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
     suspend fun getLocalCreateWorkspaceList(): List<WorkspaceInBoardDTO>
@@ -29,4 +31,13 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
 
+    suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun updateWorkspaceMember(
+        id: Long,
+        authority: String,
+        isConnected: Boolean
+    ): Flow<Unit>
+
+    suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO>
 }

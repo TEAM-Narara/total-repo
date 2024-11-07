@@ -1,5 +1,7 @@
 package com.ssafy.model.label
 
+import com.ssafy.model.with.DataStatus
+
 data class LabelDTO(
     val id: Long = 0L,
     val boardId: Long = 0L,
@@ -7,5 +9,5 @@ data class LabelDTO(
     val color: Long = 0L,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

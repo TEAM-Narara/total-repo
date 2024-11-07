@@ -7,5 +7,5 @@ data class BoardMemberDTO(
     val authority: String = "",
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

@@ -6,5 +6,5 @@ data class ListMemberDTO(
     val listId: Long = 0L,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

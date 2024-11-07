@@ -1,12 +1,15 @@
 package com.ssafy.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +22,7 @@ interface ListMemberDao {
         FROM list_member
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteListMember(): List<ListMemberEntity>
+    suspend fun getLocalOperationListMember(): List<ListMemberEntity>
 
     // 서버에 연산할 리스트 멤버 알람 조회
     @Query("""
@@ -27,7 +30,11 @@ interface ListMemberDao {
         FROM list_member_alarm
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteListMemberAlarm(): List<ListMemberAlarmEntity>
+    suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmEntity>
+
+    // 워크스페이스 단일 조회
+    @Query("SELECT * FROM list_member WHERE id = :id")
+    fun getListMember(id: Long): ListMemberEntity
 
     // 리스트 멤버들 조회
     @Transaction
@@ -46,6 +53,14 @@ interface ListMemberDao {
         WHERE list_member.listId = :listId AND list_member.isStatus != 'DELETE'
     """)
     fun getListMembers(listId: Long): Flow<List<ListMemberWithMemberInfo>>
+
+    // 상태 업데이트
+    @Update
+    suspend fun updateListMember(listMember: ListMemberEntity)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Delete
+    suspend fun deleteLocalListMember(listMember: ListMemberEntity)
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

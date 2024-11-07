@@ -5,5 +5,5 @@ data class ListMemberAlarmDTO(
     val isAlert: Boolean = false,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

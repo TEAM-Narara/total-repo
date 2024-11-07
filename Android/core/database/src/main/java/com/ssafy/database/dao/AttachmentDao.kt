@@ -20,7 +20,7 @@ interface AttachmentDao {
         FROM attachment
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalAttachments(): List<AttachmentEntity>?
+    suspend fun getLocalCreateAttachments(): List<AttachmentEntity>?
 
     // 서버에 연산할 첨부파일 조회
     @Transaction
@@ -29,7 +29,7 @@ interface AttachmentDao {
         FROM attachment
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteAttachments(): List<AttachmentEntity>?
+    suspend fun getLocalOperationAttachments(): List<AttachmentEntity>?
 
     // 첨부파일 단일 조회
     @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")

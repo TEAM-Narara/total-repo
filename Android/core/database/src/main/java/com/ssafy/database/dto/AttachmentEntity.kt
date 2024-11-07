@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "attachment")
 data class AttachmentEntity(
@@ -11,5 +12,5 @@ data class AttachmentEntity(
     val type: String = "",
     val isCover: Boolean = false,
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )
