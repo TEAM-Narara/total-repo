@@ -6,7 +6,7 @@ import androidx.navigation.toRoute
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColorString
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
+import com.ssafy.model.with.CoverType
 import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf

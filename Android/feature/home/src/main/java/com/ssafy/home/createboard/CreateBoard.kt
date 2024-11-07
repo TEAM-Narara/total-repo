@@ -16,8 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen

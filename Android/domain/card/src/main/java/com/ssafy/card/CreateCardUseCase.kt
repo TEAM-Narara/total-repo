@@ -9,7 +9,7 @@ class CreateCardUseCase @Inject constructor(
     private val cardRepository: CardRepository
 ) {
 
-    suspend operator fun invoke(cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Unit> {
+    suspend operator fun invoke(cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long> {
         return cardRepository.createCard(cardRequestDto, isConnected)
     }
 
