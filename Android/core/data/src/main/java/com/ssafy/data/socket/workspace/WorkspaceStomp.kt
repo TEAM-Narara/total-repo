@@ -1,29 +1,28 @@
 package com.ssafy.data.socket.workspace
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.socket.BaseStomp
+import com.ssafy.data.socket.BaseStompManager
 import com.ssafy.data.socket.workspace.service.WorkspaceService
-import com.ssafy.network.socket.StompClientManager
-import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class WorkspaceStomp @Inject constructor(
-    stompClientManager: StompClientManager,
+    private val stomp: BaseStompManager,
     private val workspaceService: WorkspaceService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : BaseStomp(stompClientManager) {
+) {
     private var _job: Job? = null
 
     fun connect(workspaceId: Long) {
         disconnect()
         _job = CoroutineScope(ioDispatcher).launch {
-            subScribe("WORKSPACE/$workspaceId").stateIn(this).collect {
+            stomp.subscribe("workspace/$workspaceId").stateIn(this).collect {
                 when (it.action) {
                     "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(it.data)
                     "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(it.data)

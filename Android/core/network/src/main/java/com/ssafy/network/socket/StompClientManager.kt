@@ -2,8 +2,8 @@ package com.ssafy.network.socket
 
 import com.google.gson.Gson
 import com.ssafy.network.module.AuthInterceptorOkHttpClient
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -24,13 +24,15 @@ class StompClientManager @Inject constructor(
     private val sessions = mutableMapOf<String, StompSession>()
     private val connectionStates = MutableStateFlow<Map<String, ConnectionState>>(emptyMap())
 
-    suspend fun connect(id: String, url: String) {
+    suspend fun connect(id: String, url: String, onConnect: suspend () -> Unit = {}) {
         if (sessions[id] == null) {
             try {
                 updateConnectionState(id, ConnectionState.Connecting)
                 sessions[id] = client.connect(url)
+                onConnect()
                 updateConnectionState(id, ConnectionState.Connected)
             } catch (e: Exception) {
+                e.printStackTrace()
                 updateConnectionState(id, ConnectionState.Error(e))
             }
         }
@@ -46,7 +48,7 @@ class StompClientManager @Inject constructor(
         }
     }
 
-    suspend fun<T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<T> {
+    suspend fun <T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<T> {
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
             gson.fromJson(it.bodyAsText, clazz)

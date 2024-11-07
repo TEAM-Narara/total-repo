@@ -14,8 +14,8 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.model.with.DataStatus
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class WorkspaceService @Inject constructor(
