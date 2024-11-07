@@ -26,31 +26,34 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     /**
      * 사용자 ID를 기반으로 UserDetails를 반환하는 메서드
+     *
      * @param username
      * @return
      * @throws UsernameNotFoundException
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        long userId;
         try {
-            userId = Long.parseLong(username); // username 대신 userId를 사용
+            long userId = Long.parseLong(username); // username 대신 userId를 사용
+            System.out.println(username);
+            // 사용자 ID로 사용자 정보를 조회
+            Member member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new UsernameNotFoundException("아이디로 회원을 찾을 수 없습니다.: " + userId));
+
+            // 사용자 권한을 가져오는 로직
+            List<GrantedAuthority> authorities = getUserAuthorities(member);
+
+            // CustomUserDetails 객체 생성 후 반환
+            return new CustomUserDetails(member, member.getId(), authorities);
+
         } catch (NumberFormatException e) {
             throw new UsernameNotFoundException("Invalid user ID format: " + username);
         }
-        // 사용자 ID로 사용자 정보를 조회
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
-
-        // 사용자 권한을 가져오는 로직
-        List<GrantedAuthority> authorities = getUserAuthorities(member);
-
-        // CustomUserDetails 객체 생성 후 반환
-        return new CustomUserDetails(member, member.getId(), authorities);
     }
 
     /**
      * 사용자의 권한(워크스페이스, 보드) 정보를 조회하여 GrantedAuthority 리스트를 반환
+     *
      * @param member
      * @return
      */
