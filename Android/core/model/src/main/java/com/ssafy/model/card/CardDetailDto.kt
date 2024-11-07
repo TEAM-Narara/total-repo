@@ -1,5 +1,7 @@
 package com.ssafy.model.card
 
+import com.ssafy.model.with.CoverType
+
 data class CardDetailDto(
     val cardSimpleResponseDto: CardDTO,
     val description: String,
@@ -7,6 +9,6 @@ data class CardDetailDto(
     val endAt: Long,
     val myOrder: Long,
     val isArchived: Boolean,
-    val coverType: String,
+    val coverType: CoverType,
     val coverValue: String,
 )

@@ -1,6 +1,8 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
+
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dto.ListEntity
@@ -8,10 +10,10 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
-
-import com.ssafy.model.list.ListRequestDto
-import com.ssafy.model.with.DataStatus
+import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCardsDTO
+
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.list.ListDataSource
@@ -32,42 +34,39 @@ class ListRepositoryImpl @Inject constructor(
 ) : ListRepository {
 
     override suspend fun createList(
-        listRequestDto: ListRequestDto,
+        createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(listRequestDto)
+            listDataSource.createList(createListRequestDto).map { -1 }
         } else {
             flow { listDao.insertList(ListEntity(
-                name = listRequestDto.listName,
-                boardId = listRequestDto.boardId
+                name = createListRequestDto.listName,
+                boardId = createListRequestDto.boardId
             )) }
 
         }
     }
 
     override suspend fun updateList(
-        listId: Long,
-        listRequestDto: ListRequestDto,
+        updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = flow {
         withContext(ioDispatcher) {
-            val list = listDao.getList(listId)
+            val list = listDao.getList(updateListRequestDto.listId)
 
             if(list != null) {
                 if (isConnected) {
-                    listDataSource.updateList(listId, listRequestDto)
+                    listDataSource.updateList(updateListRequestDto)
                 } else {
                     when(list.isStatus) {
                         DataStatus.STAY ->
                             listDao.updateList(list.copy(
-                                boardId = listRequestDto.boardId,
-                                name = listRequestDto.listName,
+                                name = updateListRequestDto.listName,
                                 isStatus = DataStatus.UPDATE))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
                             listDao.updateList(list.copy(
-                                boardId = listRequestDto.boardId,
-                                name = listRequestDto.listName))
+                                name = updateListRequestDto.listName))
                         DataStatus.DELETE -> { }
                     }
                 }

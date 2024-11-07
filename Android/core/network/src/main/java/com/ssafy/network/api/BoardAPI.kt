@@ -2,6 +2,7 @@ package com.ssafy.network.api
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -26,7 +27,7 @@ interface BoardAPI {
     @PATCH("api/v1/boards/{boardId}")
     suspend fun updateBoard(
         @Path("boardId") id: Long,
-        @Body boardDTO: BoardDTO
+        @Body updateBoardRequestDto: UpdateBoardRequestDto
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/boards/{boardId}/archive")

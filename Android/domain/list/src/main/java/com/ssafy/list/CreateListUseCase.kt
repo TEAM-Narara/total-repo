@@ -1,17 +1,17 @@
 package com.ssafy.list
 
 import com.ssafy.data.repository.list.ListRepository
-import com.ssafy.model.list.ListRequestDto
+import com.ssafy.model.list.CreateListRequestDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class CreateListUseCase @Inject constructor(private val listRepository: ListRepository) {
 
     suspend operator fun invoke(
-        listRequestDto: ListRequestDto,
+        createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> {
-        return listRepository.createList(listRequestDto, isConnected)
+    ): Flow<Long> {
+        return listRepository.createList(createListRequestDto, isConnected)
     }
 
 }

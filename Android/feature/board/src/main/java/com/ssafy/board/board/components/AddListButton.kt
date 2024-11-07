@@ -7,8 +7,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.ListWidth
@@ -17,24 +22,35 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.White
 
 @Composable
-fun AddListButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun AddListButton(modifier: Modifier = Modifier, addList: (String) -> Unit) {
+    var isFocused by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier.width(ListWidth),
         shape = RoundedCornerShape(CornerMedium),
         colors = CardDefaults.cardColors().copy(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = ElevationDefault),
-        onClick = onClick
+        onClick = { isFocused = true }
     ) {
-        Text(
-            text = "+ Add List",
-            modifier = Modifier.padding(PaddingDefault),
-            fontSize = TextMedium,
-        )
+        if (!isFocused) {
+            Text(
+                text = "+ Add List",
+                modifier = Modifier.padding(PaddingDefault),
+                fontSize = TextMedium,
+            )
+        } else {
+            EditableText(
+                onInputFinished = {
+                    isFocused = false
+                    addList(it)
+                }
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun AddListButtonPreview() {
-    AddListButton(onClick = {})
+    AddListButton(addList = {})
 }
