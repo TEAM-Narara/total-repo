@@ -61,7 +61,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);

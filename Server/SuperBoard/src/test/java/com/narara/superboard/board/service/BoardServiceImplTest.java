@@ -159,8 +159,8 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
         Member member = new Member(1L, "시현", "sisi@naver.com");
         // Mocking workspaceRepository to return empty Optional
-        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.empty());
-        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(workspaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(member.getId())).thenReturn(Optional.of(member));
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
@@ -168,7 +168,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         });
 
         // assertEquals("해당하는 워크스페이스(이)가 존재하지 않습니다. 워크스페이스ID: " + workspaceId, exception.getMessage());
-        verify(workspaceRepository, times(1)).findById(workspaceId);
+        verify(workspaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);
     }
 
 
@@ -213,16 +213,16 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
 
         // Mocking: workspaceRepository와 boardRepository의 반환값 설정
-        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.of(workspace));
+        when(workspaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(workspace));
         when(boardRepository.save(any(Board.class))).thenReturn(savedBoard);
-        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(member.getId())).thenReturn(Optional.of(member));
 
         // when
         Board board = boardService.createBoard(member.getId(), requestDto);
 
         // then
         assertEquals(workspaceId, board.getId());
-        verify(workspaceRepository, times(1)).findById(workspaceId);
+        verify(workspaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);
         verify(boardRepository, times(1)).save(any(Board.class));
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
         verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
@@ -245,7 +245,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 .id(workspaceId)
                 .build();
 
-        when(workspaceRepository.findById(workspaceId)).thenReturn(Optional.ofNullable(workSpace));
+        when(workspaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.ofNullable(workSpace));
 
         Board expectedBoard = Board.builder()
                 .cover(background)
@@ -259,7 +259,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // when
         when(boardRepository.save(any(Board.class))).thenReturn(expectedBoard);
-        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(member.getId())).thenReturn(Optional.of(member));
 
         // then
         Board board1 = boardService.createBoard(member.getId(), requestDto);
@@ -277,7 +277,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void testGetBoard_NotFound() {
         // given
         Long boardId = 1L;
-        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
@@ -287,7 +287,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(boardId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
         assertEquals("Board", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
 
-        verify(boardRepository, times(1)).findById(boardId);  // findById가 한 번 호출되었는지 확인
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);  // findById가 한 번 호출되었는지 확인
     }
 
 
@@ -306,7 +306,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     void testGetBoard_Success(Board board) {
         // given
         Long boardId = board.getId();  // Board의 ID
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));  // 정상적으로 Board가 반환되는 상황 설정
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));  // 정상적으로 Board가 반환되는 상황 설정
 
         // when
         Board result = boardService.getBoard(boardId);  // 실제 getBoard 호출
@@ -314,7 +314,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // then
         assertNotNull(result);  // 결과가 null이 아닌지 확인
         assertEquals(board, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
-        verify(boardRepository, times(1)).findById(boardId);  // findById가 한 번 호출되었는지 검증
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);  // findById가 한 번 호출되었는지 검증
     }
 
     @DisplayName("보드 삭제 성공 테스트")
@@ -332,13 +332,13 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // getBoard 메서드가 워크스페이스를 반환하도록 설정
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(mockBoard));
 
         // When
         boardService.deleteBoard(member, boardId);  // deleteBoard 메서드 호출
 
         // Then
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
         Assertions.assertTrue(mockBoard.getIsDeleted());
     }
 
@@ -498,7 +498,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         WorkSpace mockWorkSpace = mock(WorkSpace.class);
 
         // Board와 WorkSpace 관련 Mock 메서드 설정
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(mockBoard));
         when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId))
                 .thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true, false)));
         when(mockBoard.getWorkSpace()).thenReturn(mockWorkSpace);
@@ -518,7 +518,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // Member 및 BoardHistory 관련 데이터 모킹
         Member mockMember = new Member(memberId, "Test User", "user@example.com");
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(mockMember));
         when(boardHistoryRepository.save(any())).thenReturn(null);
 
         // when
@@ -786,7 +786,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId))
                 .thenReturn(Optional.of(boardMember));
         when(boardMember.getAuthority()).thenReturn(Authority.MEMBER);
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
 
         // WorkSpace 객체를 생성하여 Board에 설정
         WorkSpace mockWorkSpace = WorkSpace.builder().name("Test WorkSpace").build();
@@ -795,7 +795,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // memberRepository에서 Member 객체 반환 모킹
         Member mockMember = new Member(memberId, "테스트 사용자", "test@example.com");
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(mockMember));
 
         // boardHistoryRepository의 save 메서드를 BoardHistory 객체를 반환하도록 모킹
         BoardHistory mockBoardHistory = mock(BoardHistory.class);
@@ -837,14 +837,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Board 객체에 WorkSpace 설정
         WorkSpace mockWorkSpace = WorkSpace.builder().name("시현 워크스페이스").build();
         when(board.getWorkSpace()).thenReturn(mockWorkSpace);  // getWorkSpace 호출 시 mockWorkSpace 반환
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
 
         // updateBoardByAdmin 실행 시 board 반환
         when(board.updateBoardByAdmin(dto)).thenReturn(board);
         when(board.getName()).thenReturn("보드 이름"); // 이 부분에서 String 반환
 
         // Mocking: memberRepository와 boardHistoryRepository 설정
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(new Member(memberId, "테스트 사용자", "test@example.com")));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(new Member(memberId, "테스트 사용자", "test@example.com")));
 
         // boardHistoryRepository.save()가 실행될 때 아무 동작도 하지 않도록 설정 (실제 저장 동작 생략)
         doAnswer(invocation -> null).when(boardHistoryRepository).save(any(BoardHistory.class));

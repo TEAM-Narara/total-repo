@@ -130,7 +130,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Long nonExistentReplyId = 1L;
 
         // Mocking: Reply가 존재하지 않도록 설정
-        when(replyRepository.findById(nonExistentReplyId)).thenReturn(Optional.empty());
+        when(replyRepository.findByIdAndIsDeletedFalse(nonExistentReplyId)).thenReturn(Optional.empty());
 
         // then: 예외 발생 확인
         NotFoundEntityException exception = assertThrows(
@@ -139,7 +139,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         );
         assertEquals("해당하는 댓글(이)가 존재하지 않습니다. 댓글ID: " + nonExistentReplyId, exception.getMessage());
 
-        verify(replyRepository, times(1)).findById(nonExistentReplyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(nonExistentReplyId);
     }
 
     @Test
@@ -153,7 +153,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: Reply가 존재하도록 설정
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(reply));
 
         // when
         Reply result = replyService.getReply(replyId);
@@ -163,7 +163,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(replyId, result.getId());
         assertEquals("This is a test reply.", result.getContent());
 
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
     }
 
     @ParameterizedTest
@@ -217,12 +217,12 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // when
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(existingReply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(existingReply));
         Reply updatedReply = replyService.updateReply(member, replyId, requestDto);
 
         // then
         assertEquals(updatedContent, updatedReply.getContent());
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
     }
 
 
@@ -263,14 +263,14 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mock 설정
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(reply));
         when(cardHistoryRepository.save(any(CardHistory.class))).thenReturn(null);
 
         // when
         replyService.deleteReply(member, replyId);
 
         // then
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
         assertTrue(reply.getIsDeleted(), "댓글이 삭제되었는지 확인");
     }
 
