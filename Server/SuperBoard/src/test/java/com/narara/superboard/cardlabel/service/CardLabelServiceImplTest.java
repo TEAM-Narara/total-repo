@@ -227,9 +227,9 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         // Assert
         assertEquals(3, cardLabels.size());  // 보드에 있는 라벨이 총 3개이므로, 3개의 DTO가 반환됩니다.
 
-        assertTrue(cardLabels.get(0).isCardLabel());  // Label1은 카드에 사용됩니다.
-        assertFalse(cardLabels.get(1).isCardLabel()); // Label2는 사용되지 않습니다.
-        assertTrue(cardLabels.get(2).isCardLabel());  // Label3은 카드에 사용됩니다.
+        assertTrue(cardLabels.get(0).IsActivated());  // Label1은 카드에 사용됩니다.
+        assertFalse(cardLabels.get(1).IsActivated()); // Label2는 사용되지 않습니다.
+        assertTrue(cardLabels.get(2).IsActivated());  // Label3은 카드에 사용됩니다.
 
         // DTO에 라벨 정보가 정확히 포함되었는지 추가 검증
         assertEquals("Label1", cardLabels.get(0).name(), "Label1의 이름이 정확히 포함되어야 합니다.");
@@ -297,8 +297,8 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
 
         // Assert
         assertEquals(2, cardLabels.size(), "보드에 있는 라벨의 개수와 일치해야 합니다.");
-        assertFalse(cardLabels.get(0).isCardLabel(), "Label1은 사용되지 않아야 합니다.");
-        assertFalse(cardLabels.get(1).isCardLabel(), "Label2도 사용되지 않아야 합니다.");
+        assertFalse(cardLabels.get(0).IsActivated(), "Label1은 사용되지 않아야 합니다.");
+        assertFalse(cardLabels.get(1).IsActivated(), "Label2도 사용되지 않아야 합니다.");
     }
 
     @Test
