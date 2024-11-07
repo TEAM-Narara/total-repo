@@ -1,5 +1,6 @@
 package com.ssafy.board.board.data
 
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCardsDTO
 
 data class ListData(
@@ -23,7 +24,7 @@ object ListDataMapper {
             isArchived = isArchived,
             cardCollection = CardDataMapper.fromDto(cards),
             isWatching = listMemberAlarm,
-            isSynced = isStatus == "STAY"
+            isSynced = isStatus == DataStatus.STAY
         )
     }
 

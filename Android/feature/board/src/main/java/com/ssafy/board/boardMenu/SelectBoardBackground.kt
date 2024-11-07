@@ -203,6 +203,6 @@ fun DisplayImageFromPath(imagePath: String) {
 @Composable
 fun GreetingPreview2() {
     SelectBoardBackgroundScreen(
-        {}, BackgroundDto(0xFFFCFCFC, null)
+        {}, BackgroundDto(0xFFFCFCFC, "")
     )
 }

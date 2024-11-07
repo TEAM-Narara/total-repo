@@ -23,7 +23,7 @@ fun NavGraphBuilder.visibilityBackgroundScreen(popBack: () -> Unit) {
             onBackPressed = popBack,
             selectedBackground = BackgroundDto(
                 color = selectedBackgroundColor,
-                imgPath = selectedBackgroundImg
+                imgPath = selectedBackgroundImg ?: ""
             )
         )
     }

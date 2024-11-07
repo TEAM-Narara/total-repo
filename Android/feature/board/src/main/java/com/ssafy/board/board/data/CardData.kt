@@ -4,6 +4,7 @@ import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyDTO
 
 data class CardData(
@@ -41,7 +42,7 @@ object CardDataMapper {
             myOrder = myOrder,
             isArchived = isArchived,
             isWatching = cardMemberAlarm,
-            isSynced = isStatus == "STAY",
+            isSynced = isStatus == DataStatus.STAY,
             cardLabels = cardLabels,
             cardMembers = cardMembers,
             cardAttachment = cardAttachment,

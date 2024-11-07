@@ -53,6 +53,7 @@ fun MemberBackgroundEntity.toDTO(): BackgroundDto {
     return BackgroundDto(
         id = this.id,
         imgPath = this.url,
+        color = 0,
         isStatus = this.isStatus
     )
 }

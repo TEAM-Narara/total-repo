@@ -10,7 +10,7 @@ class CreateListUseCase @Inject constructor(private val listRepository: ListRepo
     suspend operator fun invoke(
         createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> {
+    ): Flow<Long> {
         return listRepository.createList(createListRequestDto, isConnected)
     }
 

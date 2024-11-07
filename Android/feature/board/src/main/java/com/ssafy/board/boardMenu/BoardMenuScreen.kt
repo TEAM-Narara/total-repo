@@ -68,7 +68,7 @@ fun BoardMenuScreen(
         mutableStateOf(
             BackgroundDto(
                 0xFFFCFCFC,
-                null
+                ""
             )
         )
     }
