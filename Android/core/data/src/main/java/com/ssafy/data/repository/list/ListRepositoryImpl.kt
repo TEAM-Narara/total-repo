@@ -20,6 +20,7 @@ import com.ssafy.network.source.list.ListDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -160,6 +161,39 @@ class ListRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getListWatchStatus(id: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            listMemberDao.getListMemberAlarmFlow(id).map { it.toDTO().isAlert }
+        }
+
+    override suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val memberAlarm = listMemberDao.getListMemberAlarm(id)
+
+            if(memberAlarm != null) {
+                if (isConnected) {
+                    listDataSource.toggleListWatchBoard(id)
+                } else {
+                    val result = when(memberAlarm.isStatus) {
+                        DataStatus.STAY ->
+                            listMemberDao.updateListMemberAlarm(memberAlarm.copy(
+                                isAlert = !memberAlarm.isAlert,
+                                isStatus = DataStatus.UPDATE
+                            ))
+                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            listMemberDao.updateListMemberAlarm(memberAlarm.copy(
+                                isAlert = !memberAlarm.isAlert,
+                            ))
+                        DataStatus.DELETE -> { }
+                    }
+
+                    flowOf(result)
+                }
+            } else{
+                flowOf(Unit)
+            }
+        }
 
     override suspend fun getLocalOperationListMember(): List<ListMemberDTO> =
         withContext(ioDispatcher) {

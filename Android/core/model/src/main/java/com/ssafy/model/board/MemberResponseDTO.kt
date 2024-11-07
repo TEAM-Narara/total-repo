@@ -5,7 +5,7 @@ import com.ssafy.model.with.DataStatus
 data class MemberResponseDTO(
     val memberId: Long,
     val authority: String,
-    val is_representative: Boolean,
+    val isRepresentative: Boolean,
     val memberEmail: String,
     val memberNickname: String,
     val memberProfileImgUrl: String,

@@ -60,11 +60,19 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun createWorkspace(
         name: String,
         isConnected: Boolean
-    ): Flow<Long> = withContext(ioDispatcher) {
-        if (isConnected) {
-            workspaceDataSource.createWorkspace(name)
-        } else {
-           flow { workspaceDao.insertWorkspace(WorkspaceEntity(name = name, authority = "ADMIN", isStatus = DataStatus.CREATE)) }
+    ): Flow<Long> = flow {
+        withContext(ioDispatcher) {
+            if (isConnected) {
+                workspaceDataSource.createWorkspace(name)
+            } else {
+                workspaceDao.insertWorkspace(
+                    WorkspaceEntity(
+                        name = name,
+                        authority = "ADMIN",
+                        isStatus = DataStatus.CREATE
+                    )
+                )
+            }
         }
     }
 

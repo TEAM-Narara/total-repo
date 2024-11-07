@@ -2,12 +2,19 @@ package com.ssafy.data.repository.board
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.with.BoardInListDTO
+import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.with.BoardMemberAlarmDTO
+import com.ssafy.model.with.BoardMemberDTO
+import com.ssafy.model.with.ListMemberAlarmDTO
+import com.ssafy.model.with.ListMemberDTO
 import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
 
-    suspend fun createBoard(isConnected: Boolean): Flow<Unit>
+    suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun getBoard(id: Long): Flow<BoardDTO>
 
@@ -19,12 +26,19 @@ interface BoardRepository {
 
     suspend fun getBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
+    suspend fun getLocalCreateBoardList(): List<BoardInListDTO>
+
+    suspend fun getLocalOperationBoardList(): List<BoardDTO>
+
     suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
     suspend fun getWatchStatus(id: Long): Flow<Boolean>
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getBoardMembers(id: Long): Flow<List<MemberResponseDTO>>
+    suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
 
+    suspend fun getLocalOperationBoardMember(): List<BoardMemberDTO>
+
+    suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmDTO>
 }

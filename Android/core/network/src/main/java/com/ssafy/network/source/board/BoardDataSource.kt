@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
 
-    suspend fun createBoard(): Flow<Unit>
+    suspend fun createBoard(boardDTO: BoardDTO): Flow<Unit>
 
     suspend fun getBoard(id: Long): Flow<BoardDTO>
 
