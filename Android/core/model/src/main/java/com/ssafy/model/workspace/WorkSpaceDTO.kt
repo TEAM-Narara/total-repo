@@ -8,5 +8,5 @@ data class WorkSpaceDTO(
     val name: String,
 
     @Transient
-    val isStatus: DataStatus = DataStatus.STAY
+    val isStatus: DataStatus? = DataStatus.STAY
 )

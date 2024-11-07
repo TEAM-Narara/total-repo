@@ -19,7 +19,7 @@ fun WorkSpaceDTO.toEntity(): WorkspaceEntity {
         id = this.workSpaceId,
         name = this.name,
         authority = this.authority,
-        isStatus = this.isStatus
+        isStatus = this.isStatus ?: DataStatus.STAY
     )
 }
 fun BoardDTO.toEntity(): BoardEntity {
