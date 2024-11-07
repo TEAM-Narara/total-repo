@@ -1,5 +1,6 @@
 package com.ssafy.model.background
 
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import kotlinx.serialization.Serializable
 
@@ -21,12 +22,6 @@ data class Cover(
     val id: Long = 0,
     val isStatus: DataStatus = DataStatus.STAY
 )
-
-enum class CoverType(name: String) {
-    COLOR("COLOR"),
-    IMAGE("IMAGE"),
-    NONE("NONE"),
-}
 
 fun CoverDto.toCover() = Cover(
     id = id,

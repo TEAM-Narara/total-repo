@@ -51,8 +51,8 @@ import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.card.HistoryData
+import com.ssafy.model.with.CoverType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -4,6 +4,8 @@ import com.ssafy.data.repository.board.BoardRepository
 import com.ssafy.data.repository.board.BoardRepositoryImpl
 import com.ssafy.data.repository.card.CardRepository
 import com.ssafy.data.repository.card.CardRepositoryImpl
+import com.ssafy.data.repository.clear.ClearRoomRepository
+import com.ssafy.data.repository.clear.ClearRoomRepositoryImpl
 import com.ssafy.data.repository.comment.CommentRepository
 import com.ssafy.data.repository.comment.CommentRepositoryImpl
 import com.ssafy.data.repository.github.GitHubRepository
@@ -33,6 +35,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindUserRepository(userRepositoryImpl: UserRepositoryImpl): UserRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindClearRoomRepository(clearRoomRepositoryImpl: ClearRoomRepositoryImpl): ClearRoomRepository
 
     @Singleton
     @Binds

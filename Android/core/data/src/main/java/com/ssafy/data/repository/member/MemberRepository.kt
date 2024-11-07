@@ -15,7 +15,11 @@ interface MemberRepository {
         isConnected: Boolean
     ): Flow<Unit>
 
-    suspend fun searchMembers(keyword: String, sort: List<String>): Flow<PagingData<User>>
+    suspend fun searchMembers(
+        keyword: String,
+        sort: List<String>,
+        filterList: List<Long>
+    ): Flow<PagingData<User>>
 
     suspend fun getLocalCreateMemberBackgrounds(): List<CoverDto>
 

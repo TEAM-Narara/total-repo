@@ -2,6 +2,7 @@ package com.ssafy.network.api
 
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
+import com.ssafy.model.member.SearchMemberResponse
 import com.ssafy.model.user.User
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
@@ -21,6 +22,6 @@ interface MemberAPI {
     suspend fun searchMembers(
         @Query("searchTerm") keyword: String,
         @Query("pageable") pageDto: PageDto
-    ): Response<ApiResponse<List<User>>>
+    ): Response<ApiResponse<SearchMemberResponse>>
 
 }

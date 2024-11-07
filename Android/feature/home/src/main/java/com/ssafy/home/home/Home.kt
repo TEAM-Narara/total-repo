@@ -124,7 +124,7 @@ private fun HomeScreen(
                 icon = {
                     AsyncImage(
                         modifier = Modifier.fillMaxSize(),
-                        model = user.profileImage,
+                        model = user.profileImgUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         error = rememberVectorPainter(Icons.Default.AccountCircle),
@@ -184,7 +184,7 @@ fun GreetingPreview() {
     HomeScreen(
         workSpaceList = emptyList(),
         selectedWorkspace = SelectedWorkSpace(),
-        user = User("", "", null),
+        user = User(0L,"", "", null),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
         moveToLoginScreen = {},

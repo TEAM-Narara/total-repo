@@ -7,17 +7,15 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -71,11 +69,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun createWorkspace(
         name: String,
         isConnected: Boolean
-    ): Flow<Long> = flow {
-        withContext(ioDispatcher) {
-            if (isConnected) {
-                workspaceDataSource.createWorkspace(name)
-            } else {
+    ): Flow<Long> = withContext(ioDispatcher) {
+        if (isConnected) {
+            workspaceDataSource.createWorkspace(name)
+        } else {
+            flowOf(
                 workspaceDao.insertWorkspace(
                     WorkspaceEntity(
                         name = name,
@@ -83,7 +81,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                         isStatus = DataStatus.CREATE
                     )
                 )
-            }
+            )
         }
     }
 
@@ -151,56 +149,84 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
-            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
-
-            if (workspaceMember != null) {
-                if (isConnected) {
-                    workspaceDataSource.deleteWorkspaceMember(id)
-                } else {
-                    when (workspaceMember.isStatus) {
-                        DataStatus.CREATE ->
-                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
-
-                        else ->
-                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
-                    }
-                }
+    override suspend fun addWorkspaceMember(
+        workspaceId: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        workspaceDataSource.addWorkspaceMember(workspaceId, simpleMemberDto)
+            // TODO 원래는 소켓오면 저장해야하는데 지금은 그냥 저장 (테스트용)
+            .map { member ->
+//               workspaceMemberDao.insertWorkspaceMember(member)
+                Unit
             }
-        }
+    }
+
+    override suspend fun deleteWorkspaceMember(
+        workspaceId: Long,
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun updateWorkspaceMember(
         id: Long,
-        authority: String,
+        simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
-            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
-
-            if (workspaceMember != null) {
-                if (isConnected) {
-                    workspaceDataSource.updateWorkspaceMember(id, authority)
-                } else {
-                    when (workspaceMember.isStatus) {
-                        DataStatus.STAY ->
-                            workspaceMemberDao.updateWorkspaceMember(
-                                workspaceMember.copy(
-                                    isStatus = DataStatus.UPDATE,
-                                    authority = authority
-                                )
-                            )
-
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
-
-                        DataStatus.DELETE -> {}
-                    }
-                }
-            }
-        }
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        TODO("Not yet implemented")
     }
+
+//    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+//        withContext(ioDispatcher) {
+//            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+//
+//            if (workspaceMember != null) {
+//                if (isConnected) {
+//                    workspaceDataSource.deleteWorkspaceMember(id)
+//                } else {
+//                    when (workspaceMember.isStatus) {
+//                        DataStatus.CREATE ->
+//                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+//
+//                        else ->
+//                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    override suspend fun updateWorkspaceMember(
+//        id: Long,
+//        authority: String,
+//        isConnected: Boolean
+//    ): Flow<Unit> = flow {
+//        withContext(ioDispatcher) {
+//            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+//
+//            if (workspaceMember != null) {
+//                if (isConnected) {
+//                    workspaceDataSource.updateWorkspaceMember(id, authority)
+//                } else {
+//                    when (workspaceMember.isStatus) {
+//                        DataStatus.STAY ->
+//                            workspaceMemberDao.updateWorkspaceMember(
+//                                workspaceMember.copy(
+//                                    isStatus = DataStatus.UPDATE,
+//                                    authority = authority
+//                                )
+//                            )
+//
+//                        DataStatus.CREATE, DataStatus.UPDATE ->
+//                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
+//
+//                        DataStatus.DELETE -> {}
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     override suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO> =
         withContext(ioDispatcher) {

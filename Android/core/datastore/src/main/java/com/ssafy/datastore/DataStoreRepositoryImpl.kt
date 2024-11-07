@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.ssafy.model.user.User
@@ -19,22 +20,25 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
 
     override suspend fun saveUser(user: User) {
         context.datastore.edit { preferences ->
+            val id = longPreferencesKey(USER_ID)
             val nickname = stringPreferencesKey(USER_NICKNAME)
             val email = stringPreferencesKey(USER_EMAIL)
             val profile = stringPreferencesKey(USER_PROFILE)
 
+            user.memberId.takeIf { it != 0L }?.let { preferences[id] = it }
             user.nickname.ifNotBlank()?.let { preferences[nickname] = it }
             user.email.ifNotBlank()?.let { preferences[email] = it }
-            user.profileImage.ifNotBlank()?.let { preferences[profile] = it }
+            user.profileImgUrl.ifNotBlank()?.let { preferences[profile] = it }
         }
     }
 
     override suspend fun getUser(): User {
         val preferences = context.datastore.data.first()
         return User(
+            memberId = preferences[longPreferencesKey(USER_ID)] ?: 0L,
             nickname = preferences[stringPreferencesKey(USER_NICKNAME)] ?: "",
             email = preferences[stringPreferencesKey(USER_EMAIL)] ?: "",
-            profileImage = preferences[stringPreferencesKey(USER_PROFILE)] ?: ""
+            profileImgUrl = preferences[stringPreferencesKey(USER_PROFILE)] ?: ""
         )
     }
 
@@ -90,6 +94,7 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
 
     companion object {
         const val USER = "user"
+        const val USER_ID = "user_id"
         const val USER_NICKNAME = "user_nickname"
         const val USER_EMAIL = "user_email"
         const val USER_PROFILE = "user_profile"

@@ -10,14 +10,16 @@ import kotlinx.serialization.Serializable
 data class Setting(val workspaceId: Long)
 
 fun NavGraphBuilder.settingScreen(
-    backHomeScreen: () -> Unit
+    backHomeScreen: () -> Unit,
+    moveToInviteWorkspace: (Long) -> Unit
 ) {
     composable<Setting> { backStackEntry: NavBackStackEntry ->
         val setting: Setting = backStackEntry.toRoute()
 
         HomeSettingScreen(
             workspaceId = setting.workspaceId,
-            backHome = backHomeScreen
+            backHome = backHomeScreen,
+            moveToInviteWorkspace = { moveToInviteWorkspace(setting.workspaceId) }
         )
     }
 }
