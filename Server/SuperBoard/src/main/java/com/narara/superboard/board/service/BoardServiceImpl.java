@@ -88,7 +88,7 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateNameIsPresent(boardCreateRequestDto);
         boardValidator.validateVisibilityIsValid(boardCreateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardCreateRequestDto);
-        // TODO: background가 존재하면 background에 대한 검증 추가하기
+        boardValidator.validateBackgroundIsValid(boardCreateRequestDto);
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
@@ -150,6 +150,7 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateNameIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
+        boardValidator.validateBackgroundIsValid(boardUpdateRequestDto);
 
         if (boardUpdateRequestDto.cover() != null) {
             coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
@@ -160,6 +161,7 @@ public class BoardServiceImpl implements BoardService {
         if (boardMember.getAuthority() == null){
             throw  new AccessDeniedException("보드에 대한 권한이 없습니다");
         }
+
         Board board = getBoard(boardId);
         Board updatedBoard;
 
