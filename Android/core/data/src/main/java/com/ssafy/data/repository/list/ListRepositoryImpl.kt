@@ -13,7 +13,6 @@ import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
-import com.ssafy.database.dto.temp.ListInCardThumbnails
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
@@ -270,7 +269,7 @@ class ListRepositoryImpl @Inject constructor(
                         val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
                         val attachmentMap = isAttachment.associateBy { it.cardId }
 
-                        val updatedCards = cards.map { card ->
+                        val cardThumbnails = cards.map { card ->
                             card.toDTO(
                                 replyCount = replyCountMap[card.id]?.count ?: 0,
                                 isWatch = cardWatchMap[card.id]?.isAlert ?: false,
@@ -280,7 +279,7 @@ class ListRepositoryImpl @Inject constructor(
                             )
                         }
 
-                        updatedCards
+                        cardThumbnails
                     }
                 }
             ) { listWatch, updatedCards ->
