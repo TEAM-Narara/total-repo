@@ -1,5 +1,6 @@
 package com.ssafy.logout
 
+import com.ssafy.data.repository.clear.ClearRoomRepository
 import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.datastore.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,12 +12,12 @@ import javax.inject.Inject
 class LogoutUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val userRepository: UserRepository,
+    private val clearRoomRepository: ClearRoomRepository
 ) {
-    // TODO map 뒤에 Room DB 지우는 로직 추가해야함.
+
     suspend operator fun invoke(): Flow<Unit> = flow {
         dataStoreRepository.clearAll()
-        // room db clear
-
+        clearRoomRepository.clearAll()
         emit(Unit)
     }
 
