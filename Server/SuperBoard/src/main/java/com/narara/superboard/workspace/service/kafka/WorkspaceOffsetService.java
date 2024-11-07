@@ -1,15 +1,12 @@
-package com.narara.superboard.workspace.service.mongo;
+package com.narara.superboard.workspace.service.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.enums.BoardAction;
-import com.narara.superboard.board.interfaces.dto.websocket.BoardUpdateData;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.util.ArrayList;
@@ -42,7 +39,6 @@ public class WorkspaceOffsetService {
     public static final String BOARD_ID_COLUMN = "boardId";
     public static final String BOARD_NAME_COLUMN = "boardName";
     private final MongoTemplate mongoTemplate;
-    private final SimpMessagingTemplate messagingTemplate;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
