@@ -50,10 +50,8 @@ public class BoardMemberController implements BoardMemberAPI{
                 HttpStatus.OK);
     }
 
-    @Operation(summary = "보드 멤버 추가", description = "이미 보드의 멤버로 추가되어 있는 경우에는 요청을 무시하고 있는 값을 보내줌")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
-    @PostMapping("/member")
-    public ResponseEntity<DefaultResponse> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+    @Override
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
         BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
 
         return ResponseEntity.ok(
@@ -72,10 +70,8 @@ public class BoardMemberController implements BoardMemberAPI{
         );
     }
 
-    @Operation(summary = "보드 멤버 삭제", description = "삭제한 친구를 보내줌")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
-    @DeleteMapping("/member")
-    public ResponseEntity<DefaultResponse> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+    @Override
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
         BoardMember boardMember = boardMemberService.deleteMember(boardId, dto.memberId());
 
         return ResponseEntity.ok(
@@ -94,9 +90,7 @@ public class BoardMemberController implements BoardMemberAPI{
         );
     }
 
-    @Operation(summary = "보드 멤버 권한 수정", description = "수정한 결과값을 보내줌. ADMIN만 다른 멤버의 권한 수정이 가능함")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
-    @PatchMapping("/member")
+    @Override
     public ResponseEntity<DefaultResponse<MemberResponseDto>> editBoardMemberAuthority(@PathVariable("boardId") Long boardId, @RequestBody EditBoardMemberAuthorityDto dto) {
         BoardMember boardMember = boardMemberService.editBoardMemberAuthority(boardId, dto.memberId(), dto.authority());
 
