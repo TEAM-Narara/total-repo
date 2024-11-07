@@ -75,6 +75,9 @@ interface BoardDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteBoard(board: BoardEntity)
+
+    @Query("DELETE FROM board WHERE id = :id")
+    suspend fun deleteBoardByBoardId(id: Long)
 }
 
 // STAY(원격) -> DELETE, UPDATE

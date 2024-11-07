@@ -69,4 +69,10 @@ interface WorkspaceMemberDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteLocalWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
+
+    @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
+    fun getWorkspaceMemberByWorkspaceIdAndMemberId(workspaceId: Long, memberId: Long): WorkspaceMemberEntity
+
+    @Query("DELETE FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
+    suspend fun deleteByWorkspaceId(workspaceId: Long, memberId: Long)
 }

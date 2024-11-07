@@ -1,10 +1,10 @@
 package com.ssafy.board.board.data
 
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
-import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyDTO
 
@@ -38,8 +38,8 @@ object CardDataMapper {
             description = description,
             startAt = startAt,
             endAt = endAt,
-            coverType = coverType,
-            coverValue = coverValue,
+            coverType = cover?.type ?: CoverType.NONE,
+            coverValue = cover?.value,
             myOrder = myOrder,
             isArchived = isArchived,
             isWatching = cardMemberAlarm,

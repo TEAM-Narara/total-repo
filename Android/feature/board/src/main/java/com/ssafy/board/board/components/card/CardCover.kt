@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.board.board.data.CardData
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.with.CoverType
+import com.ssafy.model.background.CoverType
 
 val CardData.Cover: (@Composable () -> Unit)?
     get() = when (coverType) {
