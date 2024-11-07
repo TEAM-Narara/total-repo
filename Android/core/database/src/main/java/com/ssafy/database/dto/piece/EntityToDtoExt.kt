@@ -434,8 +434,8 @@ fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList()): ListInCard {
 
 fun CardEntity.toDTO(
     replyCount: Int = 0,
-    cardMembers: List<CardMemberDTO> = emptyList(),
-    cardLabels: List<CardLabelDTO> = emptyList()
+    cardMembers: List<MemberResponseDTO> = emptyList(),
+    cardLabels: List<CardLabelWithLabelDTO> = emptyList()
 ): CardThumbnail {
     return CardThumbnail(
         id = this.id,

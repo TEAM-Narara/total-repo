@@ -1,5 +1,7 @@
 package com.ssafy.model.with
 
+import com.ssafy.model.board.MemberResponseDTO
+
 data class ListInCard(
     val id: Long,
     val name: String,
@@ -20,6 +22,6 @@ data class CardThumbnail(
     val myOrder: Long,
     val isArchived: Boolean,
     val replyCount: Int,
-    val cardMembers: List<CardMemberDTO>,
-    val cardLabels: List<CardLabelDTO>
+    val cardMembers: List<MemberResponseDTO>,
+    val cardLabels: List<CardLabelWithLabelDTO>
 )

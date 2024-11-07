@@ -24,6 +24,7 @@ import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.list.ListDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -244,6 +245,7 @@ class ListRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>> {
         return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
             val listIds = lists.map { it.id }
