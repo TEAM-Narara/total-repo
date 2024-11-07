@@ -54,6 +54,7 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.MemberData
+import com.ssafy.home.invite.InviteWorkspace
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -63,7 +64,8 @@ fun HomeSettingScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeSettingViewModel = hiltViewModel(),
     workspaceId: Long,
-    backHome: () -> Unit
+    backHome: () -> Unit,
+    moveToInviteWorkspace: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val settingData by viewModel.settingData.collectAsStateWithLifecycle()
@@ -80,6 +82,7 @@ fun HomeSettingScreen(
         members = settingData.members,
         deleteWorkspace = { viewModel.deleteWorkspace(workspaceId, backHome) },
         updateWorkspaceName = { name -> viewModel.updateWorkspaceName(workspaceId, name) },
+        moveToInviteWorkspace = moveToInviteWorkspace
     )
 
     when (uiState) {
@@ -99,7 +102,8 @@ private fun HomeSettingScreen(
     members: List<MemberData>,
     backHome: () -> Unit,
     deleteWorkspace: () -> Unit,
-    updateWorkspaceName: (String) -> Unit
+    updateWorkspaceName: (String) -> Unit,
+    moveToInviteWorkspace: () -> Unit
 ) {
 
     val activity = LocalContext.current as? Activity
@@ -183,7 +187,7 @@ private fun HomeSettingScreen(
                             )
                         }
                     }
-                    FilledButton(text = "Invite", onClick = { /*TODO*/ })
+                    FilledButton(text = "Invite", onClick = moveToInviteWorkspace)
                 }
             }
             HorizontalDivider(
@@ -205,6 +209,6 @@ private fun HomeSettingScreen(
 @Composable
 fun GreetingPreview() {
     HomeSettingScreen(
-        workspaceId = 1, backHome = {}
+        workspaceId = 1, backHome = {}, moveToInviteWorkspace = {}
     )
 }

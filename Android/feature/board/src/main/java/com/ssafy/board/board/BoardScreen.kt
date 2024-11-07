@@ -46,9 +46,9 @@ import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.search.SearchParameters
+import com.ssafy.model.with.CoverType
 import kotlinx.coroutines.launch
 
 @Composable

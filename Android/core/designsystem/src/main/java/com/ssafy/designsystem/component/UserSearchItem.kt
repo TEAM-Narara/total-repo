@@ -36,16 +36,22 @@ fun UserSearchItem(
     email: String,
     userAuth: String,
     onChangeUserAuth: (String) -> Unit,
-    icon: @Composable () -> Unit,
+    canChangeAuth: Boolean = true,
+    clickAction: (() -> Unit)? = null,
+    icon: @Composable () -> Unit
 ) {
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
-    val authOptions = listOf("Admin", "Member")
+    val authOptions = listOf("ADMIN", "MEMBER")
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(PaddingDefault),
+            .padding(PaddingDefault)
+            .then(
+                if (clickAction != null) Modifier.clickable { clickAction() }
+                else Modifier
+            ),
     ) {
         Box(
             modifier = Modifier
@@ -75,13 +81,15 @@ fun UserSearchItem(
             )
         }
 
-        DropDownMemberAuth(
-            userAuth = userAuth,
-            expanded = expanded,
-            setExpanded = setExpanded,
-            authOptions = authOptions,
-            onChangeUserAuth = onChangeUserAuth
-        )
+        if (canChangeAuth) {
+            DropDownMemberAuth(
+                userAuth = userAuth,
+                expanded = expanded,
+                setExpanded = setExpanded,
+                authOptions = authOptions,
+                onChangeUserAuth = onChangeUserAuth
+            )
+        }
     }
 }
 

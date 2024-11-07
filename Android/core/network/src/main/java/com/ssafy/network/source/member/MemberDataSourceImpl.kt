@@ -3,6 +3,7 @@ package com.ssafy.network.source.member
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
+import com.ssafy.model.member.SearchMemberResponse
 import com.ssafy.model.user.User
 import com.ssafy.network.api.MemberAPI
 import com.ssafy.network.source.safeApiCall
@@ -23,7 +24,8 @@ class MemberDataSourceImpl @Inject constructor(
     override suspend fun searchMembers(
         keyword: String,
         pageDto: PageDto
-    ): Flow<List<User>> = safeApiCall { memberAPI.searchMembers(keyword, pageDto) }.toFlow()
+    ): Flow<SearchMemberResponse> =
+        safeApiCall { memberAPI.searchMembers(keyword, pageDto) }.toFlow()
 
     override suspend fun createMemberBackground(background: CoverDto): Flow<Long> {
         TODO("Not yet implemented")

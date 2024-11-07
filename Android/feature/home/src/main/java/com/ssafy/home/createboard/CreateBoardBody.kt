@@ -30,9 +30,9 @@ import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.Yellow
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.workspace.WorkSpaceDTO
 
 @Composable

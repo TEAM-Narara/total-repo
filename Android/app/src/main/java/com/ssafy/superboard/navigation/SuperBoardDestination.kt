@@ -26,6 +26,8 @@ import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
 import com.ssafy.home.home.homeScreen
+import com.ssafy.home.invite.InviteWorkspace
+import com.ssafy.home.invite.inviteWorkspaceScreen
 import com.ssafy.home.member.workSpaceInviteMemberDestination
 import com.ssafy.home.mycard.MyCard
 import com.ssafy.home.mycard.myCardScreen
@@ -62,7 +64,7 @@ fun SuperBoardNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Home,
+        startDestination = LogIn,
         modifier = modifier
     ) {
         loginScreen(
@@ -104,6 +106,9 @@ fun SuperBoardNavHost(
         settingScreen(
             backHomeScreen = {
                 navController.navigate(Home) { popUpAll(navController) }
+            },
+            moveToInviteWorkspace = { workspaceId: Long ->
+                navController.navigate(InviteWorkspace(workspaceId))
             }
         )
 
@@ -119,6 +124,10 @@ fun SuperBoardNavHost(
             moveToSelectBackgroundScreen = { cover: Cover? ->
                 navController.navigate(SelectBackGround(cover))
             }
+        )
+
+        inviteWorkspaceScreen(
+            popBackToHome = navController::popBackStack
         )
 
         updateBoardScreen(

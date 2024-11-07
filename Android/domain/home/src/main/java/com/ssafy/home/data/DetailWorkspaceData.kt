@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.ssafy.model.board.MemberResponseDTO
 
 @Immutable
-data class SettingData(
+data class DetailWorkspaceData(
     val workspaceId: Long,
     val workspaceName: String,
     val members: List<MemberData>

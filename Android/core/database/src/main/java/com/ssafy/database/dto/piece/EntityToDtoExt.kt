@@ -29,7 +29,6 @@ import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
 import com.ssafy.model.background.Cover
 import com.ssafy.model.background.CoverDto
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.Visibility
@@ -47,6 +46,7 @@ import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardThumbnail
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
@@ -61,9 +61,10 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 // Member
 fun MemberEntity.toDTO(): User {
     return User(
+        memberId = this.id,
         nickname = this.nickname,
         email = this.email,
-        profileImage = this.profileImageUrl
+        profileImgUrl = this.profileImageUrl
     )
 }
 

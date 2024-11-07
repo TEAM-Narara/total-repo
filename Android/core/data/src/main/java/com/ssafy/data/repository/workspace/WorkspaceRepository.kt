@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -32,13 +33,30 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
 
-    suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun addWorkspaceMember(
+        workspaceId: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<Unit>
+
+    suspend fun deleteWorkspaceMember(
+        workspaceId: Long,
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<Unit>
 
     suspend fun updateWorkspaceMember(
         id: Long,
-        authority: String,
+        simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
     ): Flow<Unit>
+
+//    suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit>
+//
+//    suspend fun updateWorkspaceMember(
+//        id: Long,
+//        authority: String,
+//        isConnected: Boolean
+//    ): Flow<Unit>
 
     suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO>
 }
