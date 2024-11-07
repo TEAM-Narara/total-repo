@@ -73,9 +73,39 @@ public class ResponseMessage {
     public static final String ARCHIVED_CARD_LIST_SUCCESS = "아카이브된 카드 목록 조회 성공";
     public static final String CARD_ACTIVITY_FETCH_SUCCESS = "카드 액티비티 목록 조회 성공";
     public static final String CARD_ARCHIVE_STATUS_CHANGE_SUCCESS = "카드 아카이브 상태 변경 성공";
+
     // 댓글 관련 상수
     public static final String REPLY_CREATE_SUCCESS = "댓글 생성 성공";
     public static final String REPLY_UPDATE_SUCCESS = "댓글 수정 성공";
     public static final String REPLY_DELETE_SUCCESS = "댓글 삭제 성공";
 
+    // 카드 라벨 관련 상수
+    public static final String CARD_LABEL_CREATE_SUCCESS = "카드 라벨 생성 성공";
+    public static final String CARD_LABEL_ACTIVATION_STATUS_CHANGED = "카드 라벨 활성화 상태 변경 성공";
+    public static final String CARD_LABEL_COLLECTION_FETCH_SUCCESS = "카드 라벨 목록 조회 성공";
+
+    // 첨부파일 관련 상수
+    public static final String ATTACHMENT_ADD_SUCCESS = "첨부파일 등록 성공";
+    public static final String ATTACHMENT_DELETE_SUCCESS = "첨부파일 삭제 성공";
+    public static final String ATTACHMENT_COVER_STATUS_CHANGE_SUCCESS = "첨부파일 커버 상태 변경 성공";
+
+    // 카드 멤버 관련 상수
+    public static final String CARD_MEMBER_ALERT_STATUS_FETCH_SUCCESS = "카드 멤버 알림 상태 조회 성공";
+    public static final String CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "카드 멤버 알림 상태 업데이트 성공";
+    public static final String CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS = "카드 멤버 대표자 설정 성공";
+
+    // 라벨 관련 상수
+    public static final String LABEL_CREATE_SUCCESS = "라벨 생성 성공";
+    public static final String LABEL_FETCH_SUCCESS = "라벨 조회 성공";
+    public static final String LABEL_UPDATE_SUCCESS = "라벨 수정 성공";
+    public static final String LABEL_DELETE_SUCCESS = "라벨 삭제 성공";
+    public static final String LABEL_ALL_FETCH_SUCCESS = "보드의 모든 라벨 조회 성공";
+
+    // 리스트 멤버 관련 상수
+    public static final String LIST_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "리스트 멤버 알림 상태 업데이트 성공";
+
+    // 회원 배경 관련 상수
+    public static final String MEMBER_BACKGROUND_ADD_SUCCESS = "회원 배경 추가 성공";
+    public static final String MEMBER_BACKGROUND_LIST_FETCH_SUCCESS = "회원 배경 리스트 조회 성공";
+    public static final String MEMBER_BACKGROUND_DELETE_SUCCESS = "회원 배경 삭제 성공";
 }
