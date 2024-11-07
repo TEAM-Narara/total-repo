@@ -1,16 +1,13 @@
 package com.narara.superboard.common.application.validator;
 
-import com.narara.superboard.board.interfaces.dto.CoverDto;
-import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.common.constant.enums.CoverType;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
-import java.util.HashMap;
 import java.util.Map;
 
-import com.narara.superboard.common.interfaces.dto.CoverHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

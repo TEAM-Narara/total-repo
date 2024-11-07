@@ -3,7 +3,7 @@ package com.narara.integration.superboard.reply.service;
 import com.narara.integration.IntegrationTest;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
-import com.narara.superboard.board.interfaces.dto.CoverDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -27,7 +27,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 

@@ -5,6 +5,7 @@ import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "card")
-public class Card extends BaseTimeEntity {
+public class Card extends BaseTimeEntity implements Identifiable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

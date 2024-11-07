@@ -1,4 +1,4 @@
-package com.narara.superboard.board.interfaces.dto;
+package com.narara.superboard.common.interfaces.dto;
 
 public record CoverDto(String type, String value) {
 }

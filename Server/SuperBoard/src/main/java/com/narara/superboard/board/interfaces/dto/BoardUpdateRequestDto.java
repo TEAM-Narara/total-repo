@@ -1,5 +1,6 @@
 package com.narara.superboard.board.interfaces.dto;
 
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.common.interfaces.dto.CoverHolder;
 
 public record BoardUpdateRequestDto(
