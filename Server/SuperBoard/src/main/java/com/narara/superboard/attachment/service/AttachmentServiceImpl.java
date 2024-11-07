@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -104,7 +105,10 @@ public class AttachmentServiceImpl implements AttachmentService{
     }
 
     private void updateCardCover(Card card, Attachment attachment) {
-        card.setCover(Map.of(attachment.getType(), attachment.getUrl()));
+        card.setCover(new HashMap<>(){{
+            put("type", attachment.getType());
+            put("value", attachment.getUrl());
+        }});
         saveCard(card);
     }
 

@@ -2,7 +2,6 @@ package com.narara.superboard.attachment.service;
 
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
-import com.narara.superboard.board.interfaces.dto.CoverDto;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.exception.NotFoundEntityException;
@@ -14,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,7 +39,10 @@ class AttachmentServiceImplTest {
         MockitoAnnotations.openMocks(this);
 
         testCard = Card.builder().id(1L)
-                .cover(Map.of("IMAGE","test.png"))
+                .cover(new HashMap<>(){{
+                    put("type", "IMAGE");
+                    put("value", "ddd.img");
+                }})
                 .build();
         testAttachment = Attachment.builder()
                 .id(1L)
@@ -205,7 +208,11 @@ class AttachmentServiceImplTest {
 
         // Assert
         assertTrue(testAttachment.getIsCover());
-        assertEquals(Map.of(testAttachment.getType(), testAttachment.getUrl()), testCard.getCover());
+        Map<String, String> expectedCover = new HashMap<>();
+        expectedCover.put("type", testAttachment.getType());
+        expectedCover.put("value", testAttachment.getUrl());
+
+        assertEquals(expectedCover, testCard.getCover());
         verify(attachmentRepository, times(1)).save(testAttachment);
         verify(cardRepository, times(1)).save(testCard);
     }
