@@ -22,10 +22,10 @@ data class Background(
     val isStatus: DataStatus = DataStatus.STAY
 )
 
-enum class BackgroundType {
-    COLOR,
-    IMAGE,
-    NONE,
+enum class BackgroundType(name: String) {
+    COLOR("COLOR"),
+    IMAGE("IMAGE"),
+    NONE("NONE"),
 }
 
 fun BackgroundDto.toBackground() = Background(

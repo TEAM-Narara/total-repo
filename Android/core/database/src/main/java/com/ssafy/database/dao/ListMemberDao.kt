@@ -32,7 +32,7 @@ interface ListMemberDao {
     """)
     suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmEntity>
 
-    // 워크스페이스 단일 조회
+    // 리스트 멤버 단일 조회
     @Query("SELECT * FROM list_member WHERE id = :id")
     fun getListMember(id: Long): ListMemberEntity
 
@@ -57,6 +57,18 @@ interface ListMemberDao {
     // 상태 업데이트
     @Update
     suspend fun updateListMember(listMember: ListMemberEntity)
+
+    // 리스트 멤버 단일 조회
+    @Query("SELECT * FROM list_member_alarm WHERE listId = :listId")
+    fun getListMemberAlarm(listId: Long): ListMemberAlarmEntity
+
+    // 리스트 멤버 단일 조회
+    @Query("SELECT * FROM list_member_alarm WHERE listId = :listId")
+    fun getListMemberAlarmFlow(listId: Long): Flow<ListMemberAlarmEntity>
+
+    // 알람 상태 업데이트
+    @Update
+    suspend fun updateListMemberAlarm(listMemberAlarm: ListMemberAlarmEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
