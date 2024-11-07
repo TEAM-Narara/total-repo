@@ -68,12 +68,11 @@ public class WorkspaceOffsetService {
 
         workspaceOffset.getDiffList().add(diffInfo);
 
-        // TODO : 워크 스페이스 이름 수정시, 카프카로 메시지 전송
+        // 워크 스페이스 이름 수정시, 카프카로 메시지 전송
         String topic = "workspace-" + workspace.getId();
         sendMessageToKafka(topic,diffInfo);
 
         // messagingTemplate.convertAndSend("/topic/workspace/" + workspace.getId(), diffInfo);
-
 //        mongoTemplate.save(workspaceOffset);
     }
 

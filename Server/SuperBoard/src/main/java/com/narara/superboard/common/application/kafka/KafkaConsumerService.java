@@ -59,11 +59,11 @@ public class KafkaConsumerService {
         ConcurrentMessageListenerContainer<String, String> container = factory.createContainer(topic);
         container.setupMessageListener((MessageListener<String, String>) record -> {
             String message = record.value();
-            String destination = "topic/workspace/" + workspaceId + "/member/" + memberId;
+            String destination = "/topic/workspace/" + workspaceId + "/member/" + memberId;
 
             // STOMP로 메시지 전송
             messagingTemplate.convertAndSend(destination, message);
-            System.out.println("Message sent to STOMP: " + message + " for member " + memberId);
+            System.out.println("Message sent to STOMP: " + message + " for member " + memberId + ", destination : "+destination);
         });
 
         // Kafka Listener 컨테이너 시작
