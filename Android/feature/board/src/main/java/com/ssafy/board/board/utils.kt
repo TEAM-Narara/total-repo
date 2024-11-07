@@ -16,36 +16,41 @@ suspend fun handleLazyListScroll(
 
     val itemInfo = visibleItemsInfo.firstOrNull()
     val itemSize = itemInfo?.size ?: 0
-    val centerOffset = itemSize / 2
 
     val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
     val lastVisibleItemIndex = firstVisibleItemIndex + visibleItemsInfo.size - 1
 
-    val scrollOffset = when (dropIndex) {
-        0 -> -itemSize
-        firstVisibleItemIndex -> -centerOffset
-        lastVisibleItemIndex -> centerOffset
-        else -> return@coroutineScope
-    }
+    val scrollOffset = itemSize / 2
+    val duration = 200
 
-    val targetIndex = when (dropIndex) {
-        firstVisibleItemIndex -> firstVisibleItemIndex
-        lastVisibleItemIndex -> firstVisibleItemIndex + 1
-        else -> return@coroutineScope
-    }
+    when (dropIndex) {
+        0 -> lazyListState.smoothScrollToItem(
+            index = 0,
+            scrollOffset = -itemSize,
+            duration = duration
+        )
 
-    lazyListState.smoothScrollToItem(
-        index = targetIndex,
-        scrollOffset = scrollOffset,
-        duration = 200
-    )
+        firstVisibleItemIndex -> lazyListState.smoothScrollToItem(
+            index = firstVisibleItemIndex,
+            scrollOffset = -scrollOffset,
+            duration = duration
+        )
+
+        lastVisibleItemIndex -> lazyListState.smoothScrollToItem(
+            index = lastVisibleItemIndex,
+            scrollOffset = scrollOffset,
+            isToLast = true,
+            duration = duration
+        )
+    }
 }
 
 suspend fun handleLazyListScrollToCenter(
     lazyListState: LazyListState,
     dropIndex: Int,
 ): Unit = coroutineScope {
-    val viewportSize = lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
+    val viewportSize =
+        lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
 
     val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull()
     val itemSize = itemInfo?.size ?: 0
@@ -65,13 +70,17 @@ suspend fun LazyListState.smoothScrollToItem(
     index: Int,
     scrollOffset: Int = 0,
     duration: Int = 500,
-    easing: Easing = LinearEasing
+    easing: Easing = LinearEasing,
+    isToLast: Boolean = false
 ) {
     val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
 
     if (itemInfo != null) {
+        val screenHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+        val targetOffset = if (isToLast) -screenHeight + itemInfo.size else 0
+
         animateScrollBy(
-            value = (itemInfo.offset + scrollOffset).toFloat(),
+            value = (itemInfo.offset + targetOffset + scrollOffset).toFloat(),
             animationSpec = tween(
                 durationMillis = duration,
                 easing = easing
@@ -80,7 +89,11 @@ suspend fun LazyListState.smoothScrollToItem(
     } else {
         animateScrollToItem(
             index = index,
-            scrollOffset = scrollOffset
+            scrollOffset = if (isToLast) {
+                -(layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset)
+            } else {
+                scrollOffset
+            }
         )
     }
 }

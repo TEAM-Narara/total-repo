@@ -2,6 +2,7 @@ package com.ssafy.network.source.board
 
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.board.UpdateBoardRequestDto
 import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
@@ -12,7 +13,7 @@ interface BoardDataSource {
 
     suspend fun deleteBoard(id: Long): Flow<Unit>
 
-    suspend fun updateBoard(id: Long, boardDTO: BoardDTO): Flow<Unit>
+    suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto): Flow<Unit>
 
     suspend fun setBoardArchive(boardId: Long): Flow<Unit>
 

@@ -19,7 +19,7 @@ interface BoardMemberDao {
         FROM board_member
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteBoardMember(): List<BoardMemberEntity>
+    suspend fun getLocalOperationBoardMember(): List<BoardMemberEntity>
 
     // 서버에 연산할 내 보드별 알람 조회
     @Query("""
@@ -27,7 +27,7 @@ interface BoardMemberDao {
         FROM board_member_alarm
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteBoardMemberAlarm(): List<BoardMemberAlarmEntity>
+    suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmEntity>
 
     // 보드 멤버 조회
     @Transaction

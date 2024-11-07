@@ -23,7 +23,7 @@ import com.ssafy.designsystem.values.IconMedium
 fun TopAppBar(
     modifier: Modifier = Modifier,
     title: String,
-    onBoardTitleChanged: (String) -> Unit,
+    onBoardNameChanged: (String) -> Unit,
     onBackPressed: () -> Unit,
     onFilterPressed: () -> Unit,
     onNotificationPressed: () -> Unit,
@@ -33,7 +33,7 @@ fun TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         title = {
-            EditableText(text = title, onInputFinished = onBoardTitleChanged)
+            EditableText(text = title, onInputFinished = onBoardNameChanged)
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {

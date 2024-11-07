@@ -68,7 +68,14 @@ fun BoardMenuScreen(
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
     val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-
+    val (background, onBackgroundChange) = remember {
+        mutableStateOf(
+            BackgroundDto(
+                0xFFFCFCFC,
+                ""
+            )
+        )
+    }
     val (watch, onWatchChange) = remember { mutableStateOf(true) }
     val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
     val activity = LocalContext.current as? Activity
@@ -143,7 +150,6 @@ fun BoardMenuScreen(
                 ) {
                     Text(text = "Background", fontSize = TextMedium, color = Primary)
                     Spacer(modifier = Modifier.weight(1f))
-
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)

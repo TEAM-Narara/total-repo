@@ -1,7 +1,7 @@
 package com.ssafy.model.list
 
-data class ListRequestDto(
-    val boardId: Long,
+data class UpdateListRequestDto(
+    val listId: Long,
     val listName: String
 )
 

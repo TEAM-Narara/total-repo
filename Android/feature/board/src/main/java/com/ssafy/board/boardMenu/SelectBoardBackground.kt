@@ -57,7 +57,7 @@ import kotlin.contracts.contract
 @Composable
 fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
-    selectedBackground: Background?,
+    selectedBackground: BackgroundDto?,
 ) {
 
     val localImages = remember { mutableStateListOf<String>() }

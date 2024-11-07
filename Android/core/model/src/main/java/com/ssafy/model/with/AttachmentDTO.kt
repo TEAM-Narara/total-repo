@@ -8,5 +8,5 @@ data class AttachmentDTO(
     val isCover: Boolean = false,
 
     @Transient
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

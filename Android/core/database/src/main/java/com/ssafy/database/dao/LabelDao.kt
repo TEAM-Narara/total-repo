@@ -19,7 +19,7 @@ interface LabelDao {
         FROM label
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalLabels(): List<LabelEntity>
+    suspend fun getLocalCreateLabels(): List<LabelEntity>
 
     // 서버에 연산할 라벨 조회
     @Query("""
@@ -27,7 +27,7 @@ interface LabelDao {
         FROM label
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteLabels(): List<LabelEntity>
+    suspend fun getLocalOperationLabels(): List<LabelEntity>
 
     // 보드 라벨 단일 조회
     @Query("""

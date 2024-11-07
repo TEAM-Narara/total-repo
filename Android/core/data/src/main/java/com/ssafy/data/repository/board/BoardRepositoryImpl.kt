@@ -3,6 +3,7 @@ package com.ssafy.data.repository.board
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.network.source.board.BoardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -40,10 +41,10 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun updateBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Unit> =
+    override suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                boardDataSource.updateBoard(boardDTO.id, boardDTO)
+                boardDataSource.updateBoard(id, updateBoardRequestDto)
             } else {
                 TODO("Room DB 연동이 되면 로컬 데이터를 업데이트하는 로직을 추가해주세요.")
             }

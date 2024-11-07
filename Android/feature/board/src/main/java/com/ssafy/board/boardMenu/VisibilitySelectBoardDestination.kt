@@ -19,6 +19,10 @@ fun NavGraphBuilder.selectBackgroundScreen(popBack: () -> Unit) {
 
         SelectBoardBackgroundScreen(
             onBackPressed = popBack,
+            selectedBackground = BackgroundDto(
+                color = selectedBackgroundColor,
+                imgPath = selectedBackgroundImg ?: ""
+            )
             selectedBackground = selectBackground.background
         )
     }

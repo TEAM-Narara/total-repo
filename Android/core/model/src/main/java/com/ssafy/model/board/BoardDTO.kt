@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 data class BoardDTO(
     val id: Long,
     val workspaceId: Long,
-    val name: String? = null,
-    val background: Background? = null,
-    val isClosed: Boolean? = null,
-    val visibility: Visibility? = null,
+    val name: String,
+    val background: Background,
+    val isClosed: Boolean,
+    val visibility: Visibility,
 )
 
 @Serializable

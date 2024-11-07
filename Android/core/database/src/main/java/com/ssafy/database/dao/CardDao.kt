@@ -22,7 +22,7 @@ interface CardDao {
         FROM card
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalCard(): List<CardAllInfo>
+    suspend fun getLocalCreateCard(): List<CardAllInfo>
 
     // 서버에 연산할 카드 조회
     @Query("""
@@ -30,7 +30,7 @@ interface CardDao {
         FROM card
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteCard(): List<CardEntity>
+    suspend fun getLocalOperationCard(): List<CardEntity>
     
     // 카드 단일 조회
     @Transaction

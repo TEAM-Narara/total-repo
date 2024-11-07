@@ -5,16 +5,26 @@ import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.MemberBackgroundEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.ListInCards
+import com.ssafy.database.dto.with.ListMemberWithMemberInfo
+import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
+import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.user.User
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberDTO
@@ -22,10 +32,33 @@ import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.ListInCardsDTO
+import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.model.with.ReplyDTO
+import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
+
+// Member
+fun MemberEntity.toDTO(): User {
+    return User(
+        nickname = this.nickname,
+        email = this.email,
+        profileImage = this.profileImageUrl
+    )
+}
+
+fun MemberBackgroundEntity.toDTO(): BackgroundDto {
+    return BackgroundDto(
+        id = this.id,
+        imgPath = this.url,
+        color = 0,
+        isStatus = this.isStatus
+    )
+}
+
+// Workspace
 
 fun WorkspaceEntity.toDTO(): WorkSpaceDTO {
     return WorkSpaceDTO(
@@ -130,6 +163,24 @@ fun ListMemberEntity.toDTO(): ListMemberDTO {
     )
 }
 
+fun WorkspaceMemberEntity.toDTO(): WorkspaceMemberDTO {
+    return WorkspaceMemberDTO(
+        id = this.id,
+        memberId = this.memberId,
+        workspaceId = this.workspaceId,
+        authority = this.authority,
+        isStatus = this.isStatus
+    )
+}
+
+fun ListMemberAlarmEntity.toDTO(): ListMemberAlarmDTO {
+    return ListMemberAlarmDTO(
+        isAlert = this.isAlert,
+        listId = this.listId,
+        isStatus = this.isStatus
+    )
+}
+
 fun CardLabelEntity.toDTO(): CardLabelDTO {
     return CardLabelDTO(
         id = this.id,
@@ -179,6 +230,70 @@ fun WorkspaceMemberWithMemberInfo.toDTO(): MemberResponseDTO {
         authority = this.workspaceMember.authority,
         memberEmail = this.member.email,
         memberNickname = this.member.nickname,
-        memberProfileImgUrl = this.member.profileImageUrl
+        memberProfileImgUrl = this.member.profileImageUrl,
+        isStatus = this.workspaceMember.isStatus,
+        is_representative = false,
+        componentId = this.workspaceMember.workspaceId
+    )
+}
+
+fun ListMemberWithMemberInfo.toDTO(): MemberResponseDTO {
+    return MemberResponseDTO(
+        memberId = this.member.id,
+        memberEmail = this.member.email,
+        memberNickname = this.member.nickname,
+        memberProfileImgUrl = this.member.profileImageUrl,
+        isStatus = this.listMember.isStatus,
+        authority = "",
+        is_representative = false,
+        componentId = this.listMember.listId
+    )
+}
+
+// List
+fun ListEntity.toDto(): ListResponseDto {
+    return ListResponseDto(
+        boardId = this.boardId,
+        isStatus = this.isStatus,
+        name = this.name,
+        isArchived = this.isArchived,
+        listId = this.id,
+        myOrder = this.myOrder
+    )
+}
+
+fun ListResponseDto.toEntity(): ListEntity {
+    return ListEntity(
+        boardId = this.boardId,
+        isStatus = this.isStatus,
+        name = this.name,
+        isArchived = this.isArchived,
+        myOrder = this.myOrder,
+        id = this.listId
+    )
+}
+
+// Reply
+fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
+    val replyEntity = ReplyEntity(
+        id = this.id,
+        cardId = this.cardId,
+        memberId = this.memberId,
+        content = this.content,
+        createAt = this.createAt,
+        updateAt = this.updateAt,
+        isStatus = this.isStatus
+    )
+
+    val memberEntity = MemberEntity(
+        id = this.memberId,
+        email = this.memberEmail,
+        nickname = this.memberNickname,
+        profileImageUrl = this.memberProfileImgUrl
+    )
+
+    return ReplyWithMemberInfo(
+        reply = replyEntity,
+        member = memberEntity
     )
 }

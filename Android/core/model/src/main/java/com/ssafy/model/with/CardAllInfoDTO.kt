@@ -7,12 +7,12 @@ data class CardAllInfoDTO(
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
-    val coverType: String? = null,
+    val coverType: CoverType = CoverType.NONE,
     val coverValue: String? = null,
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,
 
-    @Transient val isStatus: String = "STAY",
+    @Transient val isStatus: DataStatus = DataStatus.STAY,
     @Transient val columnUpdate: Long = 0L,
 
     val cardLabels: List<CardLabelDTO>,

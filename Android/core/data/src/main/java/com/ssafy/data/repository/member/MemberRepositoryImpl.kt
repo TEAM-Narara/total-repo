@@ -4,12 +4,23 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.MemberBackgroundDao
+import com.ssafy.database.dao.MemberDao
+import com.ssafy.database.dto.MemberBackgroundEntity
+import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.piece.toDTO
+import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.user.User
+import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -19,23 +30,27 @@ import javax.inject.Singleton
 @Singleton
 class MemberRepositoryImpl @Inject constructor(
     private val memberDataSource: MemberDataSource,
+    private val memberDao: MemberDao,
+    private val memberBackgroundDao: MemberBackgroundDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
-    override suspend fun getMember(): Flow<User> = withContext(ioDispatcher) {
-        TODO("Room DB에서 User 정보를 가져옵니다.")
+    override suspend fun getMember(memberId: Long): Flow<User> = withContext(ioDispatcher) {
+        memberDao.getMember(memberId)
+            .map { it.toDTO() }
     }
 
     override suspend fun updateMember(
         memberUpdateRequestDto: MemberUpdateRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> = withContext(ioDispatcher) {
-        if (isConnected) {
-            memberDataSource.updateMember(memberUpdateRequestDto).map {
-                TODO("Room DB에 User 정보를 업데이트합니다.")
+    ): Flow<Unit> = flow {
+        withContext(ioDispatcher) {
+            if (isConnected) {
+                memberDataSource.updateMember(memberUpdateRequestDto)
             }
-        } else {
-            TODO("Room DB에 User 정보를 업데이트합니다.")
+
+            // TODO 내 PK 또는 이메일
+//            memberDao.updateMember()
         }
     }
 
@@ -52,5 +67,59 @@ class MemberRepositoryImpl @Inject constructor(
             )
         }
     ).flow.flowOn(ioDispatcher)
+
+    override suspend fun getLocalCreateMemberBackgrounds(): List<BackgroundDto> =
+        withContext(ioDispatcher) {
+            memberBackgroundDao.getLocalCreateMemberBackgrounds()
+                .map { it.toDTO() }
+        }
+
+    override suspend fun getLocalOperationMemberBackgrounds(): List<BackgroundDto> =
+        withContext(ioDispatcher) {
+            memberBackgroundDao.getLocalOperationMemberBackgrounds()
+                .map { it.toDTO() }
+        }
+
+    override suspend fun getMemberBackground(id: Long): BackgroundDto =
+        withContext(ioDispatcher) {
+            memberBackgroundDao.getMemberBackground(id)
+                .toDTO()
+        }
+
+    override suspend fun getAllMemberBackgrounds(): Flow<List<BackgroundDto>> =
+        withContext(ioDispatcher) {
+            memberBackgroundDao.getAllMemberBackgrounds()
+                .map { entities -> entities.map { it.toDTO() } }
+        }
+
+    override suspend fun createMemberBackground(
+        background: BackgroundDto,
+        isConnected: Boolean
+    ): Flow<Long> = withContext(ioDispatcher) {
+        if (isConnected) {
+            memberDataSource.createMemberBackground(background)
+        } else {
+            flow { memberBackgroundDao.insertMemberBackground(background.toEntity()) }
+        }
+    }
+
+    override suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+        withContext(ioDispatcher) {
+            val memberBackground = getMemberBackground(id)
+
+            if(memberBackground != null) {
+                if (isConnected) {
+                    memberDataSource.deleteMemberBackground(id)
+                } else {
+                    when(memberBackground.isStatus) {
+                        DataStatus.CREATE ->
+                            memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
+                        else ->
+                            memberBackgroundDao.updateMemberBackground(id, DataStatus.DELETE.name)
+                    }
+                }
+            }
+        }
+    }
 
 }

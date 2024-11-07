@@ -2,6 +2,7 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "workspace_member")
 data class WorkspaceMemberEntity(
@@ -10,5 +11,5 @@ data class WorkspaceMemberEntity(
     val workspaceId: Long = 0L,
     val authority: String = "",
 
-    val isStatus: String = "STAY"
+    val isStatus: DataStatus = DataStatus.STAY
 )

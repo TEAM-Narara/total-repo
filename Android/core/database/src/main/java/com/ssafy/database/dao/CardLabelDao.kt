@@ -19,7 +19,7 @@ interface CardLabelDao {
         FROM card_label
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalCardLabels(): List<CardLabelEntity>
+    suspend fun getLocalCreateCardLabels(): List<CardLabelEntity>
 
     // 서버에 연산할 라벨 조회
     @Query("""
@@ -27,7 +27,7 @@ interface CardLabelDao {
         FROM card_label
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteCardLabels(): List<CardLabelEntity>
+    suspend fun getLocalOperationCardLabels(): List<CardLabelEntity>
 
     // 카드의 라벨을 조회
     @Transaction

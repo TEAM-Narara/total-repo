@@ -19,7 +19,7 @@ interface CardMemberDao {
         FROM card_member
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteCardMember(): List<CardMemberEntity>
+    suspend fun getLocalOperationCardMember(): List<CardMemberEntity>
 
     // 서버에 연산할 카드 멤버 알람 조회
     @Query("""
@@ -27,7 +27,7 @@ interface CardMemberDao {
         FROM card_member_alarm
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteCardMemberAlarm(): List<CardMemberAlarmEntity>
+    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmEntity>
 
     // 카드의 담당자들 조회
     @Transaction
