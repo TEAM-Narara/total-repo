@@ -46,6 +46,9 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.CardThumbnail
+import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
@@ -416,5 +419,37 @@ fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
     return ReplyWithMemberInfo(
         reply = replyEntity,
         member = memberEntity
+    )
+}
+
+fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList()): ListInCard {
+    return ListInCard(
+        id = this.id,
+        name = this.name,
+        myOrder = this.myOrder,
+        isArchived = this.isArchived,
+        cards = cards
+    )
+}
+
+fun CardEntity.toDTO(
+    replyCount: Int = 0,
+    cardMembers: List<MemberResponseDTO> = emptyList(),
+    cardLabels: List<CardLabelWithLabelDTO> = emptyList()
+): CardThumbnail {
+    return CardThumbnail(
+        id = this.id,
+        listId = this.listId,
+        name = this.name,
+        description = this.description,
+        startAt = this.startAt,
+        endAt = this.endAt,
+        coverType = this.coverType,
+        coverValue = this.coverValue,
+        myOrder = this.myOrder,
+        isArchived = this.isArchived,
+        replyCount = replyCount,
+        cardMembers = cardMembers,
+        cardLabels = cardLabels
     )
 }

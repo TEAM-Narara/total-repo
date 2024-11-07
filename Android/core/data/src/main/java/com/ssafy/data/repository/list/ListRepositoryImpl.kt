@@ -1,24 +1,33 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.database.dao.CardDao
+import com.ssafy.database.dao.CardLabelDao
+import com.ssafy.database.dao.CardMemberDao
 
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
+import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
+import com.ssafy.database.dto.temp.ListInCardThumbnails
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCardsDTO
 
 import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.list.ListDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -31,6 +40,10 @@ class ListRepositoryImpl @Inject constructor(
     private val listDataSource: ListDataSource,
     private val listDao: ListDao,
     private val listMemberDao: ListMemberDao,
+    private val cardDao: CardDao,
+    private val replyDao: ReplyDao,
+    private val cardMemberDao: CardMemberDao,
+    private val cardLabelDao: CardLabelDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ListRepository {
 
@@ -231,5 +244,42 @@ class ListRepositoryImpl @Inject constructor(
             listMemberDao.getLocalOperationListMemberAlarm()
                 .map { it.toDTO() }
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>> {
+        return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
+            val listIds = lists.map { it.id }
+            cardDao.getAllCardsInLists(listIds).flatMapLatest { cards ->
+                val cardIds = cards.map { it.id }
+
+                combine(
+                    replyDao.getReplyCounts(cardIds),
+                    cardMemberDao.getCardRepresentativesInCards(cardIds),
+                    cardLabelDao.getAllCardLabelsInCards(cardIds)
+                ) { replyCounts, cardMembers, cardLabels ->
+                    val replyCountMap = replyCounts.associateBy { it.cardId }
+                    val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                    val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+
+                    val updatedCards = cards.map { card ->
+                        card.toDTO(
+                            replyCount = replyCountMap[card.id]?.count ?: 0,
+                            cardMembers = cardMemberMap[card.id]?.map { it.toDTO() } ?: emptyList(),
+                            cardLabels = cardLabelMap[card.id]?.map { it.toDto() } ?: emptyList()
+                        )
+                    }
+
+                    lists.map { list ->
+                        list.toDto(
+                            cards = updatedCards.filter { it.listId == list.id }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 }
