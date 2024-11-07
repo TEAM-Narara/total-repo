@@ -37,6 +37,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
+                // TODO
                 boardDataSource.createBoard(boardDTO).map { 5 }
             } else {
                 flowOf(boardDao.insertBoard(
@@ -211,6 +212,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
+                // TODO
                 boardDataSource.createLabel(labelDTO).map { 5 }
             } else {
                 flowOf(labelDao.insertLabel(
