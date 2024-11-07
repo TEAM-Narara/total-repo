@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "워크스페이스 회원", description = "워크스페이스 멤버 관련 API")
 public interface WorkSpaceMemberAPI {
 
-    @Operation(summary = "워크스페이스 멤버 조회", description = "워크스페이스 ID를 통해 멤버 리스트를 조회합니다.")
+    @Operation(summary = "워크스페이스 멤버 조회", description = "워크스페이스 ID를 통해 멤버 리스트를 조회합니다.", hidden = true)
     @GetMapping("/workspaces/{workspaceId}/members")
     ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getWorkspaceMemberCollectionResponseDto(
             @Parameter(description = "조회할 워크스페이스의 ID", required = true) @PathVariable Long workspaceId
     );
 
-    @Operation(summary = "멤버의 워크스페이스 리스트 조회", description = "멤버 ID를 통해 멤버가 속한 워크스페이스 리스트를 조회합니다.")
+    @Operation(summary = "멤버의 워크스페이스 리스트 조회", description = "멤버 ID를 통해 멤버가 속한 워크스페이스 리스트를 조회합니다.", hidden = true)
     @GetMapping("/member/workspaces")
     ResponseEntity<DefaultResponse<WorkSpaceListResponseDto>> getMemberWorkspaceList(
             @AuthenticationPrincipal @Parameter(hidden = true) Member member
