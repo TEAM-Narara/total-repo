@@ -41,10 +41,15 @@ class ListRepositoryImpl @Inject constructor(
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { -1 }
         } else {
-            flow { listDao.insertList(ListEntity(
-                name = createListRequestDto.listName,
-                boardId = createListRequestDto.boardId
-            )) }
+            flow {
+                listDao.insertList(
+                    ListEntity(
+                        name = createListRequestDto.listName,
+                        boardId = createListRequestDto.boardId,
+                        isStatus = DataStatus.CREATE
+                    )
+                )
+            }
 
         }
     }
@@ -52,66 +57,79 @@ class ListRepositoryImpl @Inject constructor(
     override suspend fun updateList(
         updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
-            val list = listDao.getList(updateListRequestDto.listId)
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val list = listDao.getList(updateListRequestDto.listId)
 
-            if(list != null) {
-                if (isConnected) {
-                    listDataSource.updateList(updateListRequestDto)
-                } else {
-                    when(list.isStatus) {
-                        DataStatus.STAY ->
-                            listDao.updateList(list.copy(
+        if (list != null) {
+            if (isConnected) {
+                listDataSource.updateList(updateListRequestDto)
+            } else {
+                val result = when (list.isStatus) {
+                    DataStatus.STAY ->
+                        listDao.updateList(
+                            list.copy(
                                 name = updateListRequestDto.listName,
-                                isStatus = DataStatus.UPDATE))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            listDao.updateList(list.copy(
-                                name = updateListRequestDto.listName))
-                        DataStatus.DELETE -> { }
-                    }
+                                isStatus = DataStatus.UPDATE
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        listDao.updateList(
+                            list.copy(
+                                name = updateListRequestDto.listName
+                            )
+                        )
+
+                    DataStatus.DELETE -> {}
                 }
+                flowOf(result)
             }
+        } else {
+            flowOf(Unit)
         }
     }
 
-    override suspend fun deleteList(listId: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteList(listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val list = listDao.getList(listId)
 
-            if(list != null) {
+            if (list != null) {
                 if (isConnected) {
                     listDataSource.deleteList(listId)
                 } else {
-                    when(list.isStatus) {
-                        DataStatus.CREATE ->
-                            listDao.deleteList(list)
-                        else ->
-                            listDao.updateList(list.copy(isStatus = DataStatus.DELETE))
+                    val result = when (list.isStatus) {
+                        DataStatus.CREATE -> listDao.deleteList(list)
+                        else -> listDao.updateList(list.copy(isStatus = DataStatus.DELETE))
                     }
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
-    override suspend fun setListArchive(listId: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun setListArchive(listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val list = listDao.getList(listId)
 
-            if(list != null) {
+            if (list != null) {
                 if (isConnected) {
                     listDataSource.setListArchive(listId)
                 } else {
-                    when(list.isStatus) {
+                    val result = when (list.isStatus) {
                         DataStatus.CREATE ->
                             listDao.deleteList(list)
+
                         else ->
                             listDao.updateList(list.copy(isArchived = !list.isArchived))
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun getLists(boardId: Long): Flow<List<ListResponseDto>> =
         withContext(ioDispatcher) {
@@ -147,13 +165,14 @@ class ListRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val member = listMemberDao.getListMember(id)
 
-            if(member != null) {
+            if (member != null) {
                 if (isConnected) {
                     listDataSource.deleteListMember(id)
                 } else {
-                    when(member.isStatus) {
+                    when (member.isStatus) {
                         DataStatus.CREATE ->
                             listMemberDao.deleteLocalListMember(member)
+
                         else ->
                             listMemberDao.updateListMember(member.copy(isStatus = DataStatus.DELETE))
                     }
@@ -171,26 +190,32 @@ class ListRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val memberAlarm = listMemberDao.getListMemberAlarm(id)
 
-            if(memberAlarm != null) {
+            if (memberAlarm != null) {
                 if (isConnected) {
                     listDataSource.toggleListWatchBoard(id)
                 } else {
-                    val result = when(memberAlarm.isStatus) {
+                    val result = when (memberAlarm.isStatus) {
                         DataStatus.STAY ->
-                            listMemberDao.updateListMemberAlarm(memberAlarm.copy(
-                                isAlert = !memberAlarm.isAlert,
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            listMemberDao.updateListMemberAlarm(memberAlarm.copy(
-                                isAlert = !memberAlarm.isAlert,
-                            ))
-                        DataStatus.DELETE -> { }
+                            listMemberDao.updateListMemberAlarm(
+                                memberAlarm.copy(
+                                    isAlert = !memberAlarm.isAlert,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            listMemberDao.updateListMemberAlarm(
+                                memberAlarm.copy(
+                                    isAlert = !memberAlarm.isAlert,
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }

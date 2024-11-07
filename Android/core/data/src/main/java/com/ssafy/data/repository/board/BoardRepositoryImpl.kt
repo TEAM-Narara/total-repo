@@ -85,16 +85,16 @@ class BoardRepositoryImpl @Inject constructor(
                         DataStatus.STAY ->
                             boardDao.updateBoard(board.copy(
                                 name = updateBoardRequestDto.name,
-                                backgroundType = updateBoardRequestDto.background.type.name,
-                                backgroundValue = updateBoardRequestDto.background.value,
+                                coverType = updateBoardRequestDto.cover.type.name,
+                                coverValue = updateBoardRequestDto.cover.value,
                                 visibility = updateBoardRequestDto.visibility.name,
                                 isStatus = DataStatus.UPDATE
                             ))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
                             boardDao.updateBoard(board.copy(
                                 name = updateBoardRequestDto.name,
-                                backgroundType = updateBoardRequestDto.background.type.name,
-                                backgroundValue = updateBoardRequestDto.background.value,
+                                coverType = updateBoardRequestDto.cover.type.name,
+                                coverValue = updateBoardRequestDto.cover.value,
                                 visibility = updateBoardRequestDto.visibility.name,
                             ))
                         DataStatus.DELETE -> { }
@@ -256,7 +256,7 @@ class BoardRepositoryImpl @Inject constructor(
 
     override suspend fun updateLabel(
         id: Long,
-        updatelabelRequestDto: UpdateLabelRequestDto,
+        updateLabelRequestDto: UpdateLabelRequestDto,
         isConnected: Boolean
     ): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -264,19 +264,19 @@ class BoardRepositoryImpl @Inject constructor(
 
             if(label != null) {
                 if (isConnected) {
-                    boardDataSource.updateLabel(id, updatelabelRequestDto)
+                    boardDataSource.updateLabel(id, updateLabelRequestDto)
                 } else {
                     val result = when(label.isStatus) {
                         DataStatus.STAY ->
                             labelDao.updateLabel(label.copy(
-                                name = updatelabelRequestDto.name,
-                                color = updatelabelRequestDto.color,
+                                name = updateLabelRequestDto.name,
+                                color = updateLabelRequestDto.color,
                                 isStatus = DataStatus.UPDATE
                             ))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
                             labelDao.updateLabel(label.copy(
-                                name = updatelabelRequestDto.name,
-                                color = updatelabelRequestDto.color
+                                name = updateLabelRequestDto.name,
+                                color = updateLabelRequestDto.color
                             ))
                         DataStatus.DELETE -> { }
                     }

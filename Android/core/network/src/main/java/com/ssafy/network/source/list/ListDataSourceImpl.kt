@@ -30,4 +30,8 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     override suspend fun deleteListMember(id: Long): Flow<Unit> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun toggleListWatchBoard(listId: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 }

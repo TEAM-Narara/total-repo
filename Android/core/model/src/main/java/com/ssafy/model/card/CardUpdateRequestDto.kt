@@ -1,9 +1,12 @@
 package com.ssafy.model.card
 
+import com.ssafy.model.background.Cover
+
 data class CardUpdateRequestDto(
+    val cardId: Long,
     val name: String,
     val description: String,
     val startAt: Long,
     val endAt: Long,
-    val cover: Any,
+    val cover: Cover,
 )

@@ -52,7 +52,7 @@ interface BoardRepository {
 
     suspend fun deleteLabel(id: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun updateLabel(id: Long, updateBoardRequestDto: UpdateLabelRequestDto, isConnected: Boolean): Flow<Unit>
+    suspend fun updateLabel(id: Long, updateLabelRequestDto: UpdateLabelRequestDto, isConnected: Boolean): Flow<Unit>
 
     suspend fun getLocalCreateLabels(): List<LabelDTO>
 

@@ -1,8 +1,13 @@
 package com.ssafy.network.source.card
 
+import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.UpdateLabelRequestDto
+import com.ssafy.model.with.AttachmentDTO
+import com.ssafy.model.with.CardLabelDTO
 import kotlinx.coroutines.flow.Flow
 
 interface CardDataSource {
@@ -12,7 +17,6 @@ interface CardDataSource {
     suspend fun deleteCard(cardId: Long): Flow<Unit>
 
     suspend fun updateCard(
-        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
     ): Flow<Unit>
 
@@ -20,4 +24,13 @@ interface CardDataSource {
 
     suspend fun getArchivedCards(boardId: Long): Flow<List<CardResponseDto>>
 
+    suspend fun createCardLabel(cardLabel: CardLabelDTO): Flow<Unit>
+
+    suspend fun deleteCardLabel(id: Long): Flow<Unit>
+
+    suspend fun updateCardLabel(id: Long, cardLabelUpdateDto: CardLabelUpdateDto): Flow<Unit>
+
+    suspend fun createAttachment(attachment: AttachmentDTO): Flow<Unit>
+
+    suspend fun deleteAttachment(id: Long): Flow<Unit>
 }

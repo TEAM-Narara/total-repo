@@ -60,7 +60,7 @@ class BoardViewModel @Inject constructor(
                 id = _boardId.value ?: return@launch,
                 updateBoardRequestDto = UpdateBoardRequestDto(
                     name = boardName,
-                    background = it.background,
+                    cover = it.cover,
                     visibility = it.visibility,
                 ),
                 isConnected = isConnected.value

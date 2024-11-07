@@ -3,10 +3,10 @@ package com.ssafy.board.boardMenu
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.card.HistoryData
-import com.ssafy.ui.safetype.backgroundType
+import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
@@ -14,20 +14,20 @@ import kotlin.reflect.typeOf
 data class BoardMenu(
     val boardId: Long,
     val workspaceId: Long,
-    val background: Background? = null
+    val cover: Cover? = null
 )
 
 fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
-    selectBackGroundScreen: (Background) -> Unit
+    selectBackGroundScreen: (Cover) -> Unit
 ) {
     composable<BoardMenu>(
-        mapOf(typeOf<Background?>() to backgroundType)
+        mapOf(typeOf<Cover?>() to coverType)
     ) { backStackEntry ->
         val boardSearch: BoardMenu = backStackEntry.toRoute()
         val boardId = boardSearch.boardId
         val workspaceId = boardSearch.workspaceId
-        val background = boardSearch.background
+        val background = boardSearch.cover
 
         BoardMenuScreen(
             boardId = boardId,
@@ -40,8 +40,8 @@ fun NavGraphBuilder.boardMenuScreen(
                     300
                 )
             },
-            background = background ?: Background(
-                type = BackgroundType.COLOR,
+            cover = background ?: Cover(
+                type = CoverType.COLOR,
                 value = "#FFFFFF"
             ),
             selectBackGroundScreen = selectBackGroundScreen,

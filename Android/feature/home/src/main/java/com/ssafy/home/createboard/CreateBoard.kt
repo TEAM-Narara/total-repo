@@ -15,8 +15,8 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.values.Primary
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.uistate.ErrorScreen
@@ -26,16 +26,16 @@ import com.ssafy.ui.uistate.UiState
 @Composable
 fun CreateBoardScreen(
     viewModel: CreateBoardViewModel = hiltViewModel(),
-    background: Background,
+    cover: Cover,
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: (Background?) -> Unit,
+    moveToSelectBackgroundScreen: (Cover?) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     CreateBoardScreen(
-        background = background,
+        cover = cover,
         workspaceList = emptyList(),
         popBackToHome = popBackToHome,
         moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
@@ -52,10 +52,10 @@ fun CreateBoardScreen(
 
 @Composable
 private fun CreateBoardScreen(
-    background: Background,
+    cover: Cover,
     workspaceList: List<WorkSpaceDTO>,
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: (Background?) -> Unit,
+    moveToSelectBackgroundScreen: (Cover?) -> Unit,
     createBoard: (BoardDTO) -> Unit,
 ) {
     with(LocalContext.current as Activity) {
@@ -75,7 +75,7 @@ private fun CreateBoardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            background = background,
+            cover = cover,
             workSpaceList = workspaceList,
             moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
             createBoardClick = createBoard,
@@ -87,8 +87,8 @@ private fun CreateBoardScreen(
 @Preview
 private fun CreateBoardPreview() {
     CreateBoardScreen(
-        background = Background(
-            type = BackgroundType.COLOR,
+        cover = Cover(
+            type = CoverType.COLOR,
             value = "#FFFFFF"
         ),
         popBackToHome = {},

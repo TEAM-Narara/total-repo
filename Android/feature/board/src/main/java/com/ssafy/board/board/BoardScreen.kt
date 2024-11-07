@@ -45,8 +45,8 @@ import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.search.SearchParameters
 import kotlinx.coroutines.launch
@@ -218,7 +218,7 @@ private fun BoardScreenPreview() {
             id = 1,
             name = "title",
             workspaceId = 0,
-            background = Background(BackgroundType.COLOR, ""),
+            cover = Cover(CoverType.COLOR, ""),
             isClosed = false,
             visibility = Visibility.PRIVATE,
             listCollection = (1..1).map { listData ->

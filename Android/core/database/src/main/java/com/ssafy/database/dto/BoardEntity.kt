@@ -9,8 +9,8 @@ data class BoardEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val workspaceId: Long = 0L,
     val name: String = "",
-    val backgroundType: String? = "COLOR",
-    val backgroundValue: String? = "0xff000000",
+    val coverType: String? = "COLOR",
+    val coverValue: String? = "0xff000000",
     val visibility: String = "",
     val isClosed: Boolean = false,
 
