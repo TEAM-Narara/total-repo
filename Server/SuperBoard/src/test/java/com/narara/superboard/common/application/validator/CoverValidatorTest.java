@@ -224,7 +224,6 @@ class CoverValidatorTest {
                 new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
-        System.out.println(requestDto.cover().value());
         // when & then
         assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }

@@ -97,7 +97,6 @@ class ReplyServiceImplTest extends IntegrationTest {
         List list = List.createList(listRequest, board);
         listRepository.save(list);
 
-        System.out.println(list.getId());
         // Card 생성 및 저장
         CardCreateRequestDto cardRequest = new CardCreateRequestDto(list.getId(), "카드 이름");
         Card card = Card.createCard(cardRequest, list);

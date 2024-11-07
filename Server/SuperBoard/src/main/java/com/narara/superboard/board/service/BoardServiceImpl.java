@@ -115,10 +115,6 @@ public class BoardServiceImpl implements BoardService {
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
-        System.out.println(boardHistory.getWhen());
-        System.out.println(boardHistory.getWhere());
-        System.out.println(boardHistory.getEventData());
-        System.out.println(boardHistory.getEventType());
         boardHistoryRepository.save(boardHistory);
 
 
@@ -194,7 +190,11 @@ public class BoardServiceImpl implements BoardService {
     // 아카이브된 보드 리스트 조회
     @Override
     public List<Board> getArchivedBoards(Long workspaceId) {
-        return boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
+        List<Board> allByWorkSpaceIdAndIsArchivedTrue = boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(
+                workspaceId);
+
+        System.out.println(allByWorkSpaceIdAndIsArchivedTrue);
+        return allByWorkSpaceIdAndIsArchivedTrue;
     }
 
     // 보드 아카이브 상태 변경
