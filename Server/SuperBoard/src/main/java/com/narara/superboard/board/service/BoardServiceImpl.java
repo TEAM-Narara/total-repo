@@ -182,7 +182,8 @@ public class BoardServiceImpl implements BoardService {
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
         BoardHistory<UpdateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
-                memberRepository.findById(memberId).orElseThrow(), LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
+                memberRepository.findById(memberId).orElseThrow(() -> new NotFoundEntityException(memberId, "멤버")),
+                LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -321,8 +322,6 @@ public class BoardServiceImpl implements BoardService {
                 reply.getCard().getList().getName()
         );
     }
-
-
 
 
 }
