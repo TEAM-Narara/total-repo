@@ -40,11 +40,12 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
-    public ResponseEntity<DefaultResponse<Long>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
         Long memberId = getMemberId();
         Board board = boardService.createBoard(memberId, boardCreateRequestDto);
+        BoardDetailResponseDto boardDetailResponseDto = BoardDetailResponseDto.of(board);
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, board.getId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardDetailResponseDto), HttpStatus.CREATED);
     }
 
     private Long getMemberId() {

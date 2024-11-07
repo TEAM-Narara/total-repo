@@ -105,7 +105,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
         if (!(boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
             this.name = boardUpdateRequestDto.name();
         }
-        if (!(boardUpdateRequestDto.visibility().isEmpty() || boardUpdateRequestDto.visibility().isBlank())) {
+        if (!(boardUpdateRequestDto.visibility() == null || boardUpdateRequestDto.visibility().isEmpty() || boardUpdateRequestDto.visibility().isBlank())) {
             this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
         }
         return this;
@@ -118,7 +118,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
             this.cover.put("value", boardUpdateRequestDto.cover().value());
         }
 
-        if (!(boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
             this.name = boardUpdateRequestDto.name();
         }
         return this;
