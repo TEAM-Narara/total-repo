@@ -6,6 +6,7 @@ import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 
@@ -14,7 +15,7 @@ fun WorkSpaceDTO.toEntity(): WorkspaceEntity {
         id = this.workSpaceId,
         name = this.name,
         authority = this.authority,
-        isStatus = this.isStatus
+        isStatus = this.isStatus ?: DataStatus.STAY
     )
 }
 

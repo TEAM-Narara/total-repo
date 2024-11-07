@@ -13,7 +13,11 @@ import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -32,7 +36,8 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.getWorkspaceList().map { dtoList ->
+                val dtoList = workspaceDataSource.getWorkspaceList().firstOrNull()
+                dtoList?.let {
                     workspaceDao.insertWorkspaces(dtoList.map { it.toEntity() })
                 }
             }
