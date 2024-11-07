@@ -1,9 +1,12 @@
 package com.ssafy.board.board.data
 
+import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
+import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.CardThumbnail
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyDTO
@@ -23,14 +26,14 @@ data class CardData(
     val isWatching: Boolean,
     val isSynced: Boolean,
 
-    val cardLabels: List<CardLabelDTO>,
-    val cardMembers: List<CardMemberDTO>,
-    val cardAttachment: List<AttachmentDTO>,
-    val cardReplies: List<ReplyDTO>,
+    val cardLabels: List<CardLabelWithLabelDTO>,
+    val cardMembers: List<MemberResponseDTO>,
+    val attachment: Boolean,
+    val replyCount: Int,
 )
 
 object CardDataMapper {
-    fun fromDto(card: CardAllInfoDTO) = with(card) {
+    fun fromDto(card: CardThumbnail) = with(card) {
         CardData(
             id = id,
             listId = listId,
@@ -38,20 +41,20 @@ object CardDataMapper {
             description = description,
             startAt = startAt,
             endAt = endAt,
-            coverType = cover?.type ?: CoverType.NONE,
-            coverValue = cover?.value,
+            coverType = CoverType.NONE, // TODO : Card CoverType 파싱하기
+            coverValue = coverValue,
             myOrder = myOrder,
             isArchived = isArchived,
-            isWatching = cardMemberAlarm,
-            isSynced = isStatus == DataStatus.STAY,
+            isWatching = false, // TODO : Card watching 상태 바꾸기
+            isSynced = true, // TODO : Card sync 상태 바꾸기
             cardLabels = cardLabels,
             cardMembers = cardMembers,
-            cardAttachment = cardAttachment,
-            cardReplies = cardReplies,
+            attachment = false, // TODO : Card attachment 상태 바꾸기
+            replyCount = replyCount,
         )
     }
 
-    fun fromDto(cards: List<CardAllInfoDTO>): List<CardData> = cards.map(::fromDto)
+    fun fromDto(cards: List<CardThumbnail>): List<CardData> = cards.map(::fromDto)
 }
 
 data class ReorderCardData(

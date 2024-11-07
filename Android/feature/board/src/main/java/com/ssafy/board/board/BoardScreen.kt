@@ -225,7 +225,6 @@ private fun BoardScreenPreview() {
                 ListData(
                     id = listData.toLong(),
                     name = listData.toString(),
-                    boardId = 0,
                     myOrder = 1,
                     isArchived = false,
                     cardCollection = (1..3).map { cardData ->
@@ -237,8 +236,8 @@ private fun BoardScreenPreview() {
                             isSynced = true,
                             cardLabels = emptyList(),
                             cardMembers = emptyList(),
-                            cardAttachment = emptyList(),
-                            cardReplies = emptyList(),
+                            attachment = false,
+                            replyCount = 3,
                         )
                     },
                     isWatching = true,

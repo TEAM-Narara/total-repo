@@ -6,7 +6,7 @@ import com.ssafy.board.UpdateBoardUseCase
 import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.BoardDataMapper
 import com.ssafy.list.CreateListUseCase
-import com.ssafy.list.GetListsUseCase
+import com.ssafy.list.GetListsInCardsUseCase
 import com.ssafy.list.SetListArchiveUseCase
 import com.ssafy.list.UpdateListUseCase
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class BoardViewModel @Inject constructor(
     private val getBoardUseCase: GetBoardUseCase,
     private val updateBoardUseCase: UpdateBoardUseCase,
-    private val getListsUseCase: GetListsUseCase,
+    private val getListsUseCase: GetListsInCardsUseCase,
     private val createListUseCase: CreateListUseCase,
     private val updatedListUseCase: UpdateListUseCase,
     private val setListArchiveUseCase: SetListArchiveUseCase,

@@ -3,7 +3,7 @@ package com.ssafy.board.board.data
 import com.ssafy.model.background.Cover
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
-import com.ssafy.model.with.ListInCardsDTO
+import com.ssafy.model.with.ListInCard
 
 data class BoardData(
     val id: Long,
@@ -16,7 +16,7 @@ data class BoardData(
 )
 
 object BoardDataMapper {
-    fun fromDto(board: BoardDTO, lists: List<ListInCardsDTO>): BoardData {
+    fun fromDto(board: BoardDTO, lists: List<ListInCard>): BoardData {
         return BoardData(
             id = board.id,
             workspaceId = board.workspaceId,
