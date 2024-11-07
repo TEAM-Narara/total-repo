@@ -108,4 +108,9 @@ public class ResponseMessage {
     public static final String MEMBER_BACKGROUND_ADD_SUCCESS = "회원 배경 추가 성공";
     public static final String MEMBER_BACKGROUND_LIST_FETCH_SUCCESS = "회원 배경 리스트 조회 성공";
     public static final String MEMBER_BACKGROUND_DELETE_SUCCESS = "회원 배경 삭제 성공";
+
+    // FCM 토큰 관련 상수
+    public static final String FCM_TOKEN_CREATE_SUCCESS = "FCM 토큰 생성 성공";
+    public static final String FCM_TOKEN_UPDATE_SUCCESS = "FCM 토큰 수정 성공";
+    public static final String FCM_TOKEN_DELETE_SUCCESS = "FCM 토큰 삭제 성공";
 }
