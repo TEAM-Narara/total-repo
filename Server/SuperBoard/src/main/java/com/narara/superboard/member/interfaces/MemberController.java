@@ -42,6 +42,6 @@ public class MemberController implements MemberAPI {
         SearchMemberListResponseDto searchMemberListResponseDto
                 = memberService.searchMember(searchTerm,pageable);
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.SEARCH_USERS,searchMemberListResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.SEARCH_USERS,searchMemberListResponseDto.searchMemberResponseDtoList()), HttpStatus.OK);
     }
 }
