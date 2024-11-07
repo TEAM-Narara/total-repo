@@ -10,12 +10,15 @@ import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDt
 import com.narara.superboard.cardmember.interfaces.dto.log.RepresentativeStatusChangeInfo;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -60,12 +63,11 @@ public class CardMemberServiceImpl implements CardMemberService {
 
                             // 로그 기록 추가
                             RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
-                                    member.getId(), card.getId(), cardMember.isRepresentative());
-                            Target target = Target.of(card, repStatusChangeInfo);
+                                    member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
-                            CardHistory cardHistory = CardHistory.careateCardHistory(
-                                    member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                                    EventType.UPDATE, EventData.CARD_MANAGER, target);
+                            CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
+                                    member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                                    EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
                             cardHistoryRepository.save(cardHistory);
                         },
@@ -79,12 +81,11 @@ public class CardMemberServiceImpl implements CardMemberService {
 
         // 로그 기록 추가
         RepresentativeStatusChangeInfo newRepCardMemberInfo = new RepresentativeStatusChangeInfo(
-                member.getId(), card.getId(), newCardMember.isRepresentative());
-        Target target = Target.of(card, newRepCardMemberInfo);
+                member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                EventType.ADD, EventData.CARD_MANAGER, target);
+        CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
         cardHistoryRepository.save(cardHistory);
     }
@@ -107,7 +108,7 @@ public class CardMemberServiceImpl implements CardMemberService {
         cardMemberRepository.save(cardMember);
     }
 
-    // CardMember 객체의 isRepresentative 상태를 반대로 변경하고, isAlert도 동일한 값으로 설정 후 저장
+    // CardMember 객체의 isRepresentative 상태를 반대로 변경하고, isAlert 도 동일한 값으로 설정 후 저장
     private void toggleRepresentativeAndSave(CardMember cardMember) {
         cardMember.changeIsRepresentative();
         cardMember.setAlert(cardMember.isRepresentative());

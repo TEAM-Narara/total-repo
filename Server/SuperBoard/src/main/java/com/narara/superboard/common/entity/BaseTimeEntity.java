@@ -5,7 +5,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import java.time.ZoneOffset;
+
+import java.time.ZoneId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,13 +31,14 @@ public class BaseTimeEntity {
     // 엔티티가 저장되기 전 호출
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        this.createdAt = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond();
         this.updatedAt = this.createdAt; // 생성 시점과 동일하게 초기화
     }
 
     // 엔티티가 업데이트되기 전 호출
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        this.updatedAt = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond();
+
     }
 }

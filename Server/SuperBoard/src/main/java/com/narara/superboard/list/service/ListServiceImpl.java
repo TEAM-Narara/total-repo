@@ -10,8 +10,6 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.list.ListAction;
@@ -26,6 +24,10 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +54,10 @@ public class ListServiceImpl implements ListService{
 
         List savedlist = listRepository.save(list);
         // 리스트 생성 로그 기록
-        CreateListInfo createListInfo = new CreateListInfo(savedlist.getName(), board.getId());
-        Target target = Target.of(list, createListInfo);
+        CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.LIST, target);
+        BoardHistory<CreateListInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -74,11 +75,10 @@ public class ListServiceImpl implements ListService{
         list.updateList(listUpdateRequestDto);
 
         // 리스트 업데이트 로그 기록
-        UpdateListInfo updateListInfo = new UpdateListInfo(list.getName());
-        Target target = Target.of(list, updateListInfo);
+        UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), list.getBoard(), EventType.UPDATE, EventData.LIST, target);
+        BoardHistory<UpdateListInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -99,11 +99,10 @@ public class ListServiceImpl implements ListService{
         list.changeListIsArchived();
 
         // 리스트 아카이브 상태 변경 로그 기록
-        ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getName(), list.getIsArchived());
-        Target target = Target.of(list, archiveListInfo);
+        ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, target);
+        BoardHistory<ArchiveListInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
 

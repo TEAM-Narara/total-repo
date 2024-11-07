@@ -1,7 +1,7 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
-import com.narara.superboard.common.entity.CustomUserDetails;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,4 +59,10 @@ public interface BoardAPI {
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 아카이브 상태 변경")
     ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
+
+    @GetMapping("/{boardId}/activity")
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
+    @Operation(summary = "보드 액티비티(로그) 조회")
+    ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(@PathVariable Long boardId);
+
 }

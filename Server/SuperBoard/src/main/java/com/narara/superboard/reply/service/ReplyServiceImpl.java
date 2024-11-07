@@ -8,7 +8,6 @@ import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
@@ -19,6 +18,10 @@ import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -56,12 +59,11 @@ public class ReplyServiceImpl implements ReplyService{
         Reply savedReply = replyRepository.save(reply);
 
 
-        ReplyInfo createReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(savedReply, createReplyInfo);
+        ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
                 member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-                EventType.CREATE, EventData.COMMENT, target);
+                EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -91,12 +93,11 @@ public class ReplyServiceImpl implements ReplyService{
         reply.updateReply(replyUpdateRequestDto);
 
         // 업데이트 로그 기록
-        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(reply, updateReplyInfo);
+        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
-                EventType.UPDATE, EventData.COMMENT, target);
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -112,12 +113,11 @@ public class ReplyServiceImpl implements ReplyService{
         }
 
         // 삭제 로그 기록
-        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(reply, deleteReplyInfo);
+        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
-                EventType.DELETE, EventData.COMMENT, target);
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 

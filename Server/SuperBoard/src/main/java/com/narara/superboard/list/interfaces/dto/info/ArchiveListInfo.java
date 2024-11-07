@@ -1,8 +1,9 @@
 package com.narara.superboard.list.interfaces.dto.info;
 
-import com.narara.superboard.common.document.AdditionalDetails;
+
 
 public record ArchiveListInfo(
+        Long listId,
         String listName,
         boolean isArchived
-) implements AdditionalDetails { }
+) { }

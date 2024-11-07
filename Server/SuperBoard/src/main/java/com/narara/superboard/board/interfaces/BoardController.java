@@ -4,6 +4,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
@@ -107,6 +108,13 @@ public class BoardController implements BoardAPI {
     public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId) {
         boardService.changeArchiveStatus(member, boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVE_STATUS_CHANGED), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "보드의 액티비티 목록 조회", description = "보드의 액티비티 목록 조회")
+    public ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(Long boardId) {
+        List<BoardActivityDetailResponseDto> boardActivity = boardService.getBoardActivity(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
     }
 
     @GetMapping

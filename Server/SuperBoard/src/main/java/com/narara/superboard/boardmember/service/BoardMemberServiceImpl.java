@@ -1,19 +1,28 @@
 package com.narara.superboard.boardmember.service;
 
+import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
+import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.narara.superboard.boardmember.interfaces.dto.log.AddBoardMemberInfo;
+import com.narara.superboard.boardmember.interfaces.dto.log.DeleteBoardMemberInfo;
 import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -28,12 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class BoardMemberServiceImpl implements BoardMemberService{
-    
+public class BoardMemberServiceImpl implements BoardMemberService {
+
     private final BoardMemberRepository boardMemberRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
+    private final BoardHistoryRepository boardHistoryRepository;
 
     @Override
     public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
@@ -128,6 +138,16 @@ public class BoardMemberServiceImpl implements BoardMemberService{
         BoardMember newBoardMember = BoardMember.createBoardMemberByAdmin(board, inviteMember);
         boardMemberRepository.save(newBoardMember);
 
+        // 멤버 추가 로그 기록
+        AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
+
+        BoardHistory<AddBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
+                inviteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
+
+        boardHistoryRepository.save(boardHistory);
+
+
         return newBoardMember;
     }
 
@@ -162,6 +182,17 @@ public class BoardMemberServiceImpl implements BoardMemberService{
 
         boardMember.deleted();
 
+        // 멤버 삭제 로그 기록
+        DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
+
+        BoardHistory<DeleteBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
+                deleteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
+
+        boardHistoryRepository.save(boardHistory);
+
+
         return boardMember;
     }
+
 }

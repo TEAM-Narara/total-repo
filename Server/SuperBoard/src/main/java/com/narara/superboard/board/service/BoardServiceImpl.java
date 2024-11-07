@@ -14,15 +14,16 @@ import com.narara.superboard.board.interfaces.dto.log.UpdateBoardInfo;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
+import com.narara.superboard.card.document.CardHistory;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.AdditionalDetails;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -40,6 +41,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +55,7 @@ public class BoardServiceImpl implements BoardService {
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
     private final BoardHistoryRepository boardHistoryRepository;
-//    private final WorkspaceOffsetService workspaceOffsetService;
+    private final CardHistoryRepository cardHistoryRepository;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -107,12 +110,15 @@ public class BoardServiceImpl implements BoardService {
 //        workspaceOffsetService.saveAddBoardDiff(board);
 
         // Board 생성 로그 기록
-        CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getName(), workSpace.getName());
-        Target target = Target.of(board, createBoardInfo);
+        CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
         BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CREATE, EventData.BOARD, target);
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
+        System.out.println(boardHistory.getWhen());
+        System.out.println(boardHistory.getWhere());
+        System.out.println(boardHistory.getEventData());
+        System.out.println(boardHistory.getEventType());
         boardHistoryRepository.save(boardHistory);
 
 
@@ -135,11 +141,10 @@ public class BoardServiceImpl implements BoardService {
 //        workspaceOffsetService.saveDeleteBoardDiff(board);
 
         // Board 삭제 로그 기록
-        DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getName(), board.getWorkSpace().getName());
-        Target target = Target.of(board, deleteBoardInfo);
+        DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.DELETE, EventData.BOARD, target);
+        BoardHistory<DeleteBoardInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -174,12 +179,12 @@ public class BoardServiceImpl implements BoardService {
         }
 
         // Board 업데이트 로그 기록
-        UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
-        Target target = Target.of(updatedBoard, updateBoardInfo);
+        UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                memberRepository.findById(memberId).orElseThrow(), System.currentTimeMillis(),
-                updatedBoard, EventType.UPDATE, EventData.BOARD, target);
+        BoardHistory<UpdateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
+                memberRepository.findById(memberId).orElseThrow(() -> new NotFoundEntityException(memberId, "멤버")),
+                LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
+                updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
 
@@ -199,11 +204,10 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
 
         // 아카이브 상태 변경 로그 기록
-        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getName(), board.getIsArchived());
-        Target target = Target.of(board, archiveStatusChangeInfo);
+        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
-                member, System.currentTimeMillis(), board, EventType.CLOSE, EventData.BOARD, target);
+        BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
     }
@@ -236,6 +240,52 @@ public class BoardServiceImpl implements BoardService {
 
         return myBoardCollectionResponse;
     }
+//    1730955028912
+
+    @Override
+    public List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId) {
+        List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
+        List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
+
+        List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
+
+        // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
+        List<BoardActivityDetailResponseDto> boardDtoList = boardHistoryCollection.stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+
+        List<BoardActivityDetailResponseDto> cardDtoList = cardHistoryCollectionByBoard.stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+
+        // 병합 정렬을 수행
+        /*
+           이유는 boardHistoryCollection과 cardHistoryCollectionByBoard가 이미 when 필드 기준으로 정렬된 상태로 조회되기 때문입니다.
+           이러한 경우, 병합 정렬 (merge sort) 방식이 훨씬 더 효율적입니다.
+         */
+        int i = 0, j = 0;
+        while (i < boardDtoList.size() && j < cardDtoList.size()) {
+            if (boardDtoList.get(i).when() >= cardDtoList.get(j).when()) {
+                activities.add(boardDtoList.get(i++));
+            } else {
+                activities.add(cardDtoList.get(j++));
+            }
+        }
+
+        // 나머지 요소 추가
+        while (i < boardDtoList.size()) {
+            activities.add(boardDtoList.get(i++));
+        }
+        while (j < cardDtoList.size()) {
+            activities.add(cardDtoList.get(j++));
+        }
+
+        if (activities.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return activities;
+    }
+
 
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
@@ -272,8 +322,6 @@ public class BoardServiceImpl implements BoardService {
                 reply.getCard().getList().getName()
         );
     }
-
-
 
 
 }
