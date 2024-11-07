@@ -49,6 +49,9 @@ class WorkSpaceMemberServiceTest {
     private WorkSpaceValidator workSpaceValidator;
 
     @Mock
+    private KafkaConsumerService kafkaConsumerService;
+
+    @Mock
     private MemberRepository memberRepository;
 
     @Mock
