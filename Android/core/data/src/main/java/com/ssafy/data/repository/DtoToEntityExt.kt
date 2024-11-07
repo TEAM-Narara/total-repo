@@ -1,12 +1,14 @@
 package com.ssafy.data.repository
 
 import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.MemberBackgroundEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.model.background.BackgroundDto
 import com.ssafy.model.board.BoardDTO
+import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyWithMemberDTO
@@ -20,18 +22,27 @@ fun WorkSpaceDTO.toEntity(): WorkspaceEntity {
         isStatus = this.isStatus
     )
 }
-
 fun BoardDTO.toEntity(): BoardEntity {
     return BoardEntity(
         id = this.id,
         workspaceId = this.workspaceId,
-        name = this.name ?: "",
-        backgroundType = this.backgroundType?.name,
-        backgroundValue = this.backgroundValue,
-        visibility = this.visibility ?: "",
-        isClosed = this.isClosed ?: false,
+        name = this.name,
+        backgroundType = background.type.name,
+        backgroundValue = background.value,
+        visibility = visibility.name,
+        isClosed = this.isClosed,
         isStatus = DataStatus.STAY,
         columnUpdate = 0L
+    )
+}
+
+fun LabelDTO.toEntity(): LabelEntity {
+    return LabelEntity(
+        id = this.id,
+        boardId = this.boardId ,
+        name = this.name,
+        color = this.color,
+        isStatus = this.isStatus
     )
 }
 

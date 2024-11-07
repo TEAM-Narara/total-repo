@@ -23,10 +23,12 @@ import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
+import com.ssafy.model.background.Background
 import com.ssafy.model.background.BackgroundDto
-import com.ssafy.model.board.BackgroundType
+import com.ssafy.model.background.BackgroundType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.board.Visibility
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.user.User
@@ -283,10 +285,12 @@ fun BoardEntity.toDto(): BoardDTO {
         id = this.id,
         workspaceId = this.workspaceId,
         name = this.name,
-        backgroundType = this.backgroundType?.let { BackgroundType.valueOf(it) },
-        backgroundValue = this.backgroundValue,
+        background = Background(
+            type = BackgroundType.valueOf(backgroundType ?: "COLOR"),
+            value = backgroundValue ?: "0xff000000"
+        ),
         isClosed = this.isClosed,
-        visibility = this.visibility
+        visibility = Visibility.valueOf(visibility)
     )
 }
 

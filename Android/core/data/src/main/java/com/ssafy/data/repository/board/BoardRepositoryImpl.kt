@@ -4,22 +4,21 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
-import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.ListMemberAlarmDTO
-import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.board.BoardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -31,6 +30,7 @@ class BoardRepositoryImpl @Inject constructor(
     private val boardDataSource: BoardDataSource,
     private val boardDao: BoardDao,
     private val boardMemberDao: BoardMemberDao,
+    private val labelDao: LabelDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
@@ -205,6 +205,96 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmDTO> =
         withContext(ioDispatcher) {
             boardMemberDao.getLocalOperationBoardMemberAlarm()
+                .map { it.toDTO() }
+        }
+
+    override suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long> =
+        withContext(ioDispatcher) {
+            if (isConnected) {
+                boardDataSource.createLabel(labelDTO).map { 5 }
+            } else {
+                flowOf(labelDao.insertLabel(
+                    labelDTO.copy(isStatus = DataStatus.CREATE).toEntity()
+                ))
+            }
+        }
+
+    override suspend fun getLabel(id: Long): Flow<LabelDTO> =
+        withContext(ioDispatcher) {
+            labelDao.getLabelFlow(id).map { it.toDTO() }
+        }
+
+    override suspend fun getLabels(boardId: Long): Flow<List<LabelDTO>> =
+        withContext(ioDispatcher) {
+            labelDao.getAllLabels(boardId)
+                .map { list -> list.map { it.toDTO() } }
+        }
+
+    override suspend fun deleteLabel(id: Long, isConnected: Boolean): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val label = labelDao.getLabel(id)
+
+            if(label != null) {
+                if (isConnected) {
+                    boardDataSource.deleteLabel(id)
+                } else {
+                    val result = when(label.isStatus) {
+                        DataStatus.CREATE ->
+                            labelDao.deleteLabel(label)
+                        else ->
+                            labelDao.updateLabel(label.copy(isStatus = DataStatus.DELETE))
+                    }
+
+                    flowOf(result)
+                }
+            } else{
+                flowOf(Unit)
+            }
+        }
+
+    override suspend fun updateLabel(
+        id: Long,
+        updatelabelRequestDto: UpdateLabelRequestDto,
+        isConnected: Boolean
+    ): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val label = labelDao.getLabel(id)
+
+            if(label != null) {
+                if (isConnected) {
+                    boardDataSource.updateLabel(id, updatelabelRequestDto)
+                } else {
+                    val result = when(label.isStatus) {
+                        DataStatus.STAY ->
+                            labelDao.updateLabel(label.copy(
+                                name = updatelabelRequestDto.name,
+                                color = updatelabelRequestDto.color,
+                                isStatus = DataStatus.UPDATE
+                            ))
+                        DataStatus.CREATE, DataStatus.UPDATE  ->
+                            labelDao.updateLabel(label.copy(
+                                name = updatelabelRequestDto.name,
+                                color = updatelabelRequestDto.color
+                            ))
+                        DataStatus.DELETE -> { }
+                    }
+
+                    flowOf(result)
+                }
+            } else{
+                flowOf(Unit)
+            }
+        }
+
+    override suspend fun getLocalCreateLabels(): List<LabelDTO> =
+        withContext(ioDispatcher) {
+            labelDao.getLocalCreateLabels()
+                .map { it.toDTO() }
+        }
+
+    override suspend fun getLocalOperationLabels(): List<LabelDTO> =
+        withContext(ioDispatcher) {
+            labelDao.getLocalOperationLabels()
                 .map { it.toDTO() }
         }
 }

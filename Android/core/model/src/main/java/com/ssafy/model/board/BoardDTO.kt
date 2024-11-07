@@ -1,5 +1,6 @@
 package com.ssafy.model.board
 
+import com.ssafy.model.background.Background
 import com.ssafy.model.with.DataStatus
 
 data class BoardDTO(
@@ -14,7 +15,7 @@ data class BoardDTO(
     val isStatus: DataStatus? = DataStatus.STAY
 )
 
-enum class Visibility {
-    WORKSPACE,
-    PRIVATE;
+enum class Visibility(name: String) {
+    WORKSPACE("WORKSPACE"),
+    PRIVATE("PRIVATE")
 }

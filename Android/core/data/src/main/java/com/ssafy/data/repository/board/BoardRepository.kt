@@ -6,6 +6,8 @@ import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
@@ -41,4 +43,18 @@ interface BoardRepository {
     suspend fun getLocalOperationBoardMember(): List<BoardMemberDTO>
 
     suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmDTO>
+
+    suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long>
+
+    suspend fun getLabel(id: Long): Flow<LabelDTO>
+
+    suspend fun getLabels(boardId: Long): Flow<List<LabelDTO>>
+
+    suspend fun deleteLabel(id: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun updateLabel(id: Long, updateBoardRequestDto: UpdateLabelRequestDto, isConnected: Boolean): Flow<Unit>
+
+    suspend fun getLocalCreateLabels(): List<LabelDTO>
+
+    suspend fun getLocalOperationLabels(): List<LabelDTO>
 }
