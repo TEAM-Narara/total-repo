@@ -62,7 +62,7 @@ fun SuperBoardNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = LogIn,
+        startDestination = Home,
         modifier = modifier
     ) {
         loginScreen(
@@ -84,8 +84,8 @@ fun SuperBoardNavHost(
             moveToLoginScreen = {
                 navController.navigate(LogIn) { popUpAll(navController) }
             },
-            moveToSettingScreen = {
-                navController.navigate(Setting)
+            moveToSettingScreen = { workspaceId: Long ->
+                navController.navigate(Setting(workspaceId))
             },
             moveToMyCardScreen = {
                 navController.navigate(MyCard)

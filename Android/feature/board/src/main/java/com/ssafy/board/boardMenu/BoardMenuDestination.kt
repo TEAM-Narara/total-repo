@@ -6,7 +6,9 @@ import androidx.navigation.toRoute
 import com.ssafy.model.board.Background
 import com.ssafy.model.board.BackgroundType
 import com.ssafy.model.card.HistoryData
+import com.ssafy.ui.safetype.backgroundType
 import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
 
 @Serializable
 data class BoardMenu(
@@ -19,7 +21,9 @@ fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
     selectBackGroundScreen: (Background) -> Unit
 ) {
-    composable<BoardMenu> { backStackEntry ->
+    composable<BoardMenu>(
+        mapOf(typeOf<Background?>() to backgroundType)
+    ) { backStackEntry ->
         val boardSearch: BoardMenu = backStackEntry.toRoute()
         val boardId = boardSearch.boardId
         val workspaceId = boardSearch.workspaceId
