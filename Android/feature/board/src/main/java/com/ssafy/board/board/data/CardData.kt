@@ -4,6 +4,7 @@ import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ReplyDTO
 
@@ -14,7 +15,7 @@ data class CardData(
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
-    val coverType: String? = null,
+    val coverType: CoverType = CoverType.NONE,
     val coverValue: String? = null,
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,

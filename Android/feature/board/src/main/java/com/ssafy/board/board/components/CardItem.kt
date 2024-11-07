@@ -8,6 +8,7 @@ import coil3.compose.AsyncImage
 import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.designsystem.component.CardItem
+import com.ssafy.model.with.CoverType
 
 @Composable
 fun CardItem(modifier: Modifier = Modifier, cardData: ReorderCardData, onClick: () -> Unit = {}) =
@@ -34,7 +35,7 @@ fun CardData.Image() = if (coverType != null && coverValue != null) {
 }
 
 @Composable
-fun CardCover(modifier: Modifier = Modifier, coverType: String, coverValue: String) {
+fun CardCover(modifier: Modifier = Modifier, coverType: CoverType, coverValue: String) {
     AsyncImage(
         model = coverValue,
         modifier = modifier.fillMaxSize(),
