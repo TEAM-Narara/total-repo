@@ -51,6 +51,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
 
     @Override
     public MemberLoginResponseDto getUserInfo(String accessToken, String provider) {
+        System.out.println("OAuth2UserServiceImpl.getUserInfo");
         Map<String, Object> attributes = fetchUserInfo(accessToken, provider);
         MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
         Member member = saveOrUpdateMember(memberProfile, provider);
@@ -69,6 +70,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
 
         try {
             ResponseEntity<Map> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
+            System.out.println("fetchUserInfo : " + response.getBody());
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Failed to fetch user info from provider");
@@ -86,6 +88,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     }
 
     private Member saveOrUpdateMember(MemberProfile memberProfile, String provider) {
+        System.out.println("saveOrUpdateMember");
         return memberRepository.findByEmail(memberProfile.email())
                 .map(existingMember -> validateExistingMember(existingMember, provider, memberProfile))
                 .orElseGet(() -> createNewMember(memberProfile, provider));
@@ -115,7 +118,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
     }
 
     private TokenDto generateTokenDto(Member member) {
-
+        System.out.println("generateTokenDto");
         Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId().toString(), null, new ArrayList<>());
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(authentication);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(authentication);

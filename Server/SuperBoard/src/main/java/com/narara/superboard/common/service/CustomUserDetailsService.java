@@ -34,6 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
+            System.out.println("customUserDetailsService loadUserByUsername : " + username);
             long userId = Long.parseLong(username); // username 대신 userId를 사용
             System.out.println(username);
             // 사용자 ID로 사용자 정보를 조회
