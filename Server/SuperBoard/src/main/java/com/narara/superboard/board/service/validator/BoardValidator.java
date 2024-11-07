@@ -5,6 +5,8 @@ import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatExcepti
 import com.narara.superboard.board.exception.BoardVisibilityNotFoundException;
 import com.narara.superboard.board.interfaces.dto.BoardCoreHolder;
 import com.narara.superboard.board.exception.BoardNameNotFoundException;
+import com.narara.superboard.common.constant.enums.CoverType;
+import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatException;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
 import org.springframework.stereotype.Component;
 
@@ -35,13 +37,11 @@ public class BoardValidator {
     }
 
     public void validateBackgroundIsValid(BoardCoreHolder boardCoreHolder) {
-        try {
-            CoverDto background = boardCoreHolder.background();
-            if (!List.of("IMAGE", "COLOR", "NONE").contains(background.type())) {
-                throw new IllegalArgumentException("타입이 올바른 형식이 아닙니다");
+        CoverDto background = boardCoreHolder.background();
+        for (CoverType type : CoverType.values()) {
+            if (type.toString().equals(background.type())) {
+                throw new InvalidCoverTypeFormatException();
             }
-        } catch (IllegalArgumentException e) {
-            throw new BoardInvalidVisibilityFormatException();
         }
     }
 }

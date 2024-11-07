@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CoverType {
+    NONE,
     IMAGE,
     COLOR;
 
