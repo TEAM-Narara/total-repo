@@ -111,6 +111,7 @@ public class BoardController implements BoardAPI {
     }
 
     @Override
+    @Operation(summary = "보드의 액티비티 목록 조회", description = "보드의 액티비티 목록 조회")
     public ResponseEntity<DefaultResponse<List<ActivityDetailResponseDto>>> getBoardActivity(Long boardId) {
         List<ActivityDetailResponseDto> boardActivity = boardService.getBoardActivity(boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
