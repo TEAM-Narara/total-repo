@@ -71,12 +71,22 @@ public class Board extends BaseTimeEntity implements Identifiable {
     private Long offset = 0L;
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
+        Map<String, Object> coverMap;
+
+        if (boardCreateRequestDto.background() == null) {
+            coverMap = Map.of(
+                    "type", "NONE",
+                    "value", "NONE"
+            );
+        } else {
+            coverMap = Map.of(
+                    "type", boardCreateRequestDto.background().type(),
+                    "value", boardCreateRequestDto.background().value()
+            );
+        }
+
         return Board.builder()
-                .cover(boardCreateRequestDto.background() != null
-                        ? Map.of(
-                        "type", boardCreateRequestDto.background().type(),
-                        "value", boardCreateRequestDto.background().value())
-                        : null)
+                .cover(coverMap)
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
@@ -107,6 +117,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
             this.cover.put("type", boardUpdateRequestDto.cover().type());
             this.cover.put("value", boardUpdateRequestDto.cover().value());
         }
+
         if (!(boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
             this.name = boardUpdateRequestDto.name();
         }
