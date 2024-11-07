@@ -77,7 +77,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Card getCard(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 

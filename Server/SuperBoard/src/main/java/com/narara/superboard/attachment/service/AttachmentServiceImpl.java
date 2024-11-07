@@ -103,7 +103,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private Attachment getAttachmentById(Long attachmentId) {
-        return attachmentRepository.findById(attachmentId)
+        return attachmentRepository.findByIdAndIsDeletedFalse(attachmentId)
                 .orElseThrow(() -> new NotFoundEntityException(attachmentId, "첨부파일"));
     }
 

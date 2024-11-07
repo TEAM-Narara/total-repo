@@ -72,7 +72,7 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Reply getReply(Long replyId) {
-        return replyRepository.findById(replyId)
+        return replyRepository.findByIdAndIsDeletedFalse(replyId)
                 .orElseThrow(() -> new NotFoundEntityException(replyId, "댓글"));
     }
 

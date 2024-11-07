@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface CardRepository extends JpaRepository<Card, Long> {
     java.util.List<Card> findAllByListAndIsArchivedTrue(List list);
 
@@ -15,4 +17,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     Board findBoardByCardId(@Param("cardId") Long cardId);
 
     java.util.List<Card> findAllByList(List list);
+
+    Optional<Card> findByIdAndIsDeletedFalse(Long cardId);
 }

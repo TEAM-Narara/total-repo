@@ -53,7 +53,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private Member findMemberByIdOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 

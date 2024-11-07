@@ -127,7 +127,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board getBoard(Long boardId) {
-        return boardRepository.findById(boardId)
+        return boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "Board"));
     }
 

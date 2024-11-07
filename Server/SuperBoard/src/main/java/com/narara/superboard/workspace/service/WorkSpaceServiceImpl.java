@@ -164,7 +164,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public WorkSpace getWorkSpace(Long workSpaceId) {
-        return workSpaceRepository.findById(workSpaceId)
+        return workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)
                 .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));
     }
 
