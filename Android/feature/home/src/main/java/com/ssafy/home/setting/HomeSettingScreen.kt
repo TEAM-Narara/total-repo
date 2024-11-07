@@ -27,8 +27,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,6 +79,7 @@ fun HomeSettingScreen(
         workspaceName = settingData.workspaceName,
         members = settingData.members,
         deleteWorkspace = { viewModel.deleteWorkspace(workspaceId, backHome) },
+        updateWorkspaceName = { name -> viewModel.updateWorkspaceName(workspaceId, name) },
     )
 
     when (uiState) {
@@ -99,9 +98,10 @@ private fun HomeSettingScreen(
     workspaceName: String,
     members: List<MemberData>,
     backHome: () -> Unit,
-    deleteWorkspace: () -> Unit
+    deleteWorkspace: () -> Unit,
+    updateWorkspaceName: (String) -> Unit
 ) {
-    val (name, onValueChange) = remember(workspaceName) { mutableStateOf(workspaceName) }
+
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -145,8 +145,8 @@ private fun HomeSettingScreen(
             ) {
                 Text(text = "Name", fontSize = TextMedium, color = Primary)
                 EditableText(
-                    text = name,
-                    onInputFinished = { newName: String -> onValueChange(newName) },
+                    text = workspaceName,
+                    onInputFinished = updateWorkspaceName,
                     modifier = Modifier.weight(1f),
                     alignStyle = TextAlign.End
                 )

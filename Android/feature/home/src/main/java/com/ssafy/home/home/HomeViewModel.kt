@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
         getHomeInfoUseCase(isConnected).safeCollect { _homeData.emit(it) }
     }
 
-    fun chaneSelectedWorkSpace(workSpaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
+    fun changeSelectedWorkSpace(workSpaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
         getHomeInfoUseCase(homeData.value, workSpaceId).safeCollect { _homeData.emit(it) }
     }
 

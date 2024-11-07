@@ -34,7 +34,7 @@ open class BaseViewModel : ViewModel() {
         _uiState.update { UiState.Idle }
     }
 
-    suspend fun <T> Flow<T>.safeCollect(block: suspend (T) -> Unit) {
+    suspend fun <T> Flow<T>.safeCollect(block: suspend (T) -> Unit = {}) {
         runCatching {
             collect { value -> block(value) }
         }.onFailure { error ->

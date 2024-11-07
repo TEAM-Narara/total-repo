@@ -3,6 +3,7 @@ package com.ssafy.home.home
 import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -27,8 +28,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.White
+import com.ssafy.home.data.SelectedWorkSpace
 import com.ssafy.home.drawer.DrawerSheet
-import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.user.User
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.uistate.ErrorScreen
@@ -66,7 +67,7 @@ fun HomeScreen(
     HomeScreen(
         workSpaceList = homeData.workspaceList,
         user = homeData.user,
-        boardsBySelectedWorkSpace = homeData.selectedWorkSpace.boards,
+        selectedWorkspace = homeData.selectedWorkSpace,
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(homeData.workspaceList) },
         moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
@@ -77,7 +78,7 @@ fun HomeScreen(
         moveToAlarmScreen = moveToAlarmScreen,
         moveToJoinedBoard = { /*TODO 가입한 보드 화면으로 이동 */ },
         addNewWorkSpace = viewModel::createWorkSpace,
-        chaneSelectedWorkSpace = viewModel::chaneSelectedWorkSpace
+        chaneSelectedWorkSpace = viewModel::changeSelectedWorkSpace
     )
 
     when (uiState) {
@@ -90,9 +91,9 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
-    workSpaceList: List<WorkSpaceDTO>,
-    boardsBySelectedWorkSpace: List<BoardDTO>,
     user: User,
+    workSpaceList: List<WorkSpaceDTO>,
+    selectedWorkspace: SelectedWorkSpace,
     moveToBoardScreen: (Long) -> Unit,
     moveToCreateNewBoardScreen: () -> Unit,
     moveToLoginScreen: () -> Unit,
@@ -122,10 +123,11 @@ private fun HomeScreen(
             DrawerSheet(
                 icon = {
                     AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
                         model = user.profileImage,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        placeholder = rememberVectorPainter(Icons.Default.AccountCircle),
+                        error = rememberVectorPainter(Icons.Default.AccountCircle),
                     )
                 },
                 nickname = user.nickname,
@@ -136,7 +138,7 @@ private fun HomeScreen(
                 onMyCardClick = moveToMyCardScreen,
                 onSettingClick = moveToUpdateProfile,
                 onLogoutClick = moveToLoginScreen,
-                onWorkSpaceClick = chaneSelectedWorkSpace
+                onWorkSpaceClick = { chaneSelectedWorkSpace(it).also { scope.launch { drawerState.close() } } }
             )
         }
     ) {
@@ -144,7 +146,7 @@ private fun HomeScreen(
             containerColor = White,
             topBar = {
                 MainTopBar(
-                    title = "${user.nickname}의 워크 스페이스",
+                    title = selectedWorkspace.workSpaceName,
                     onDrawerClick = { scope.launch { drawerState.open() } },
                     onSearchClick = moveToSearchScreen,
                     onAlarmClick = moveToAlarmScreen,
@@ -162,7 +164,7 @@ private fun HomeScreen(
             if (workSpaceList.isNotEmpty()) {
                 HomeBodyScreen(
                     modifier = Modifier.padding(innerPadding),
-                    boards = boardsBySelectedWorkSpace,
+                    boards = selectedWorkspace.boards,
                     spanCount = spanCount,
                     moveToBoardScreen = moveToBoardScreen
                 )
@@ -181,7 +183,7 @@ private fun HomeScreen(
 fun GreetingPreview() {
     HomeScreen(
         workSpaceList = emptyList(),
-        boardsBySelectedWorkSpace = emptyList(),
+        selectedWorkspace = SelectedWorkSpace(),
         user = User("", "", null),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
