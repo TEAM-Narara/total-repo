@@ -61,7 +61,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                             RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
                                     member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
-                            CardHistory cardHistory = CardHistory.careateCardHistory(
+                            CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
                                     member, System.currentTimeMillis(), card.getList().getBoard(), card,
                                     EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
@@ -79,7 +79,7 @@ public class CardMemberServiceImpl implements CardMemberService {
         RepresentativeStatusChangeInfo newRepCardMemberInfo = new RepresentativeStatusChangeInfo(
                 member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), card.getList().getBoard(), card,
                 EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 

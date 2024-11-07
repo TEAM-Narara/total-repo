@@ -60,9 +60,9 @@ public class CardServiceImpl implements CardService {
         cardMemberRepository.save(cardMember);
 
         // 로그 기록 추가
-        CreateCardInfo createCardInfo = new CreateCardInfo(card.getId(), card.getName());
+        CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(), savedCard.getName());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<CreateCardInfo> cardHistory = CardHistory.careateCardHistory(
                 member, savedCard.getCreatedAt(), list.getBoard(), savedCard,
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
@@ -84,9 +84,9 @@ public class CardServiceImpl implements CardService {
         card.delete();
 
         // 로그 기록 추가
-        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getId(), card.getName());
+        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(), card.getId(), card.getName());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<DeleteCardInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), card.getList().getBoard(), card,
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
@@ -104,9 +104,9 @@ public class CardServiceImpl implements CardService {
         Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
         // 로그 기록 추가
-        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getId(), updatedCard.getName());
+        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(), updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<UpdateCardInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), updatedCard.getList().getBoard(), updatedCard,
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
@@ -136,7 +136,7 @@ public class CardServiceImpl implements CardService {
         // 로그 기록 추가
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), card.getList().getBoard(), card,
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 

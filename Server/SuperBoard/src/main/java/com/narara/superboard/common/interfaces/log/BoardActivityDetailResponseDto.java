@@ -4,22 +4,21 @@ import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.document.Who;
 
-public record BoardActivityDetailResponseDto(
+public record BoardActivityDetailResponseDto<T>(
         Who who,
         Long when,
         BoardWhereDto where,
         EventType eventType,
         EventData eventData,
-        Target target
+        T target
 ) {
 
-    public static BoardActivityDetailResponseDto createActivityDetailResponseDto(
-            BoardHistory boardHistory
+    public static <T> BoardActivityDetailResponseDto<T> createActivityDetailResponseDto(
+            BoardHistory<T> boardHistory
     ) {
-        return new BoardActivityDetailResponseDto(
+        return new BoardActivityDetailResponseDto<>(
                 boardHistory.getWho(),
                 boardHistory.getWhen(),
                 new BoardWhereDto(boardHistory.getWhere().boardId(), boardHistory.getWhere().boardName()),
@@ -29,10 +28,11 @@ public record BoardActivityDetailResponseDto(
         );
     }
 
-    public static BoardActivityDetailResponseDto createActivityDetailResponseDto(
-            CardHistory cardHistory
+
+    public static<T> BoardActivityDetailResponseDto<T> createActivityDetailResponseDto(
+            CardHistory<T> cardHistory
     ) {
-        return new BoardActivityDetailResponseDto(
+        return new BoardActivityDetailResponseDto<>(
                 cardHistory.getWho(),
                 cardHistory.getWhen(),
                 new BoardWhereDto(cardHistory.getWhere().boardId(), cardHistory.getWhere().boardName()),

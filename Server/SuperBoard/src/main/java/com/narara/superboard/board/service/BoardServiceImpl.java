@@ -233,12 +233,16 @@ public class BoardServiceImpl implements BoardService {
 
         return myBoardCollectionResponse;
     }
+//    1730955028912
 
     @Override
     public List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId) {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
-
+        System.out.println(cardHistoryCollectionByBoard.get(0));
+        System.out.println(cardHistoryCollectionByBoard.get(1).getWhere());
+        System.out.println(cardHistoryCollectionByBoard.get(1).getTarget());
+        System.out.println("1121321");
         List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
 
         // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
@@ -250,6 +254,10 @@ public class BoardServiceImpl implements BoardService {
                 .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
+        System.out.println(cardDtoList);
+        System.out.println(boardDtoList);
+        System.out.println(boardDtoList.size());
+        System.out.println(cardDtoList.size());
         // 병합 정렬을 수행
         /*
            이유는 boardHistoryCollection과 cardHistoryCollectionByBoard가 이미 when 필드 기준으로 정렬된 상태로 조회되기 때문입니다.
@@ -272,6 +280,8 @@ public class BoardServiceImpl implements BoardService {
             activities.add(cardDtoList.get(j++));
         }
 
+        System.out.println(activities.size());
+        System.out.println(activities);
         return activities;
     }
 

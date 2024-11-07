@@ -55,9 +55,9 @@ public class ReplyServiceImpl implements ReplyService{
         Reply savedReply = replyRepository.save(reply);
 
 
-        ReplyInfo createReplyInfo = new ReplyInfo(reply.getId(), reply.getContent());
+        ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
                 member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
@@ -89,9 +89,9 @@ public class ReplyServiceImpl implements ReplyService{
         reply.updateReply(replyUpdateRequestDto);
 
         // 업데이트 로그 기록
-        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getId(), reply.getContent());
+        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
@@ -109,9 +109,9 @@ public class ReplyServiceImpl implements ReplyService{
         }
 
         // 삭제 로그 기록
-        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getId(), reply.getContent());
+        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
                 member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 

@@ -52,7 +52,7 @@ public class ListServiceImpl implements ListService{
         // 리스트 생성 로그 기록
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+        BoardHistory<CreateListInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, System.currentTimeMillis(), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -73,7 +73,7 @@ public class ListServiceImpl implements ListService{
         // 리스트 업데이트 로그 기록
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+        BoardHistory<UpdateListInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, System.currentTimeMillis(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -97,7 +97,7 @@ public class ListServiceImpl implements ListService{
         // 리스트 아카이브 상태 변경 로그 기록
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+        BoardHistory<ArchiveListInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, System.currentTimeMillis(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
