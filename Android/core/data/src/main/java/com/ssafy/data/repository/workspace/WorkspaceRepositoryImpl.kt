@@ -13,6 +13,7 @@ import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,6 +36,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
             }
 
             getLocalScreenWorkspaceList()
+        }
+
+    override suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?> =
+        withContext(ioDispatcher) {
+            workspaceDao.getWorkspaceForDrawable(workspaceId).map { it?.toDTO() }
         }
 
     override suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>> =
@@ -62,18 +68,25 @@ class WorkspaceRepositoryImpl @Inject constructor(
         if (isConnected) {
             workspaceDataSource.createWorkspace(name)
         } else {
-           flow { workspaceDao.insertWorkspace(WorkspaceEntity(name = name, authority = "ADMIN", isStatus = "CREATE")) }
+            flow {
+                workspaceDao.insertWorkspace(
+                    WorkspaceEntity(
+                        name = name,
+                        authority = "ADMIN",
+                        isStatus = "CREATE"
+                    )
+                )
+            }
         }
     }
 
-    override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
+    override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> {
+        return withContext(ioDispatcher) {
             if (isConnected) {
                 workspaceDataSource.deleteWorkspace(workspaceId)
             } else {
                 val workspace = workspaceDao.getWorkspace(workspaceId)
-
-                workspaceDao.deleteWorkspace(workspace)
+                flowOf(workspaceDao.deleteWorkspace(workspace))
             }
         }
     }

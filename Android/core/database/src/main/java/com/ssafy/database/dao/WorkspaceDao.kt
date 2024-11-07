@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +33,10 @@ interface WorkspaceDao {
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
     fun getWorkspace(workspaceId: Long): WorkspaceEntity
+
+    // 워크스페이스 조회 + Drawable에서 볼 것
+    @Query("SELECT * FROM workspace WHERE id = :workspaceId")
+    fun getWorkspaceForDrawable(workspaceId: Long): Flow<WorkspaceEntity?>
 
     // Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")
