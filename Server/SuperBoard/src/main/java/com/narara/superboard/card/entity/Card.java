@@ -73,6 +73,10 @@ public class Card extends BaseTimeEntity implements Identifiable {
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
+                .cover(new HashMap<>(){{
+                    put("type", "NONE");
+                    put("value", "NONE");
+                }}) //default cover 지정
                 .myOrder(list.getLastCardOrder() + 1)
                 .myOrder(0L)
                 .isDeleted(false)
