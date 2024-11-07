@@ -148,19 +148,15 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
-        boardValidator.validateNameIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
         boardValidator.validateBackgroundIsValid(boardUpdateRequestDto);
-
-        if (boardUpdateRequestDto.cover() != null) {
-            coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
-        }
-
+        coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
                 .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
-        if (boardMember.getAuthority() == null){
-            throw  new AccessDeniedException("보드에 대한 권한이 없습니다");
+
+        if (boardMember.getAuthority() == null) {
+            throw new AccessDeniedException("보드에 대한 권한이 없습니다");
         }
 
         Board board = getBoard(boardId);
