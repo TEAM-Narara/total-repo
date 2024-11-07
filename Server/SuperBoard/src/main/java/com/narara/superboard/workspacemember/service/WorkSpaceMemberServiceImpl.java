@@ -3,6 +3,7 @@ package com.narara.superboard.workspacemember.service;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -127,7 +128,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpace.addOffset(); //workspace offset++
 
         // 3. 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(workSpace.getId(), member.getId());
+        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
 
         return workSpaceMember;
     }

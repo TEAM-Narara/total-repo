@@ -4,6 +4,7 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -70,14 +71,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
 
-        // TODO : Kafka 토픽 생성 및 Consumer group Listener 설정
-
+        // Kafka 토픽 생성 및 Consumer group Listener 설정
         String topicName = "workspace-" + newWorkSpace.getId();
 
         // Kafka: 워크스페이스용 토픽 생성
         // 토픽 이름 : workspace-1 ,파티션 수 :10개, 복제 개수 : 1개 (단일 브로커)
-        // kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
-
         try {
             kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
             // 토픽 생성 확인 후 메시지 전송토픽 생성 확인 후 메시지 전송
@@ -101,7 +99,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         }
 
         // 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
+        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
         return newWorkSpace;
     }
