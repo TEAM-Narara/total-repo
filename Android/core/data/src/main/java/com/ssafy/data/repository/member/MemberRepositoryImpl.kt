@@ -7,15 +7,11 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
-import com.ssafy.database.dto.MemberBackgroundEntity
-import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
-import com.ssafy.model.background.BackgroundDto
+import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.user.User
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.WorkspaceInBoardDTO
-import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -68,32 +64,32 @@ class MemberRepositoryImpl @Inject constructor(
         }
     ).flow.flowOn(ioDispatcher)
 
-    override suspend fun getLocalCreateMemberBackgrounds(): List<BackgroundDto> =
+    override suspend fun getLocalCreateMemberBackgrounds(): List<CoverDto> =
         withContext(ioDispatcher) {
             memberBackgroundDao.getLocalCreateMemberBackgrounds()
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationMemberBackgrounds(): List<BackgroundDto> =
+    override suspend fun getLocalOperationMemberBackgrounds(): List<CoverDto> =
         withContext(ioDispatcher) {
             memberBackgroundDao.getLocalOperationMemberBackgrounds()
                 .map { it.toDTO() }
         }
 
-    override suspend fun getMemberBackground(id: Long): BackgroundDto =
+    override suspend fun getMemberBackground(id: Long): CoverDto =
         withContext(ioDispatcher) {
             memberBackgroundDao.getMemberBackground(id)
                 .toDTO()
         }
 
-    override suspend fun getAllMemberBackgrounds(): Flow<List<BackgroundDto>> =
+    override suspend fun getAllMemberBackgrounds(): Flow<List<CoverDto>> =
         withContext(ioDispatcher) {
             memberBackgroundDao.getAllMemberBackgrounds()
                 .map { entities -> entities.map { it.toDTO() } }
         }
 
     override suspend fun createMemberBackground(
-        background: BackgroundDto,
+        background: CoverDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {

@@ -13,8 +13,8 @@ data class CardEntity(
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
-    val coverType: CoverType = CoverType.NONE,
-    val coverValue: String? = null,
+    val coverType: String? = "COLOR",
+    val coverValue: String? = "0xff000000",
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,
 

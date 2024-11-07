@@ -4,7 +4,9 @@ import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardLabelEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.ListEntity
@@ -18,17 +20,20 @@ import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import com.ssafy.database.dto.with.CardAllInfo
+import com.ssafy.database.dto.with.CardLabelWithLabelInfo
+import com.ssafy.database.dto.with.CardMemberWithMemberInfo
 import com.ssafy.database.dto.with.ListInCards
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundDto
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverDto
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.Visibility
+import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.user.User
@@ -38,6 +43,8 @@ import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
+import com.ssafy.model.with.CardLabelWithLabelDTO
+import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
@@ -57,8 +64,8 @@ fun MemberEntity.toDTO(): User {
     )
 }
 
-fun MemberBackgroundEntity.toDTO(): BackgroundDto {
-    return BackgroundDto(
+fun MemberBackgroundEntity.toDTO(): CoverDto {
+    return CoverDto(
         id = this.id,
         imgPath = this.url,
         color = 0,
@@ -92,8 +99,8 @@ fun BoardInList.toDTO(): BoardInListDTO {
         id = this.board.id,
         workspaceId = this.board.workspaceId,
         name = this.board.name,
-        backgroundType = this.board.backgroundType,
-        backgroundValue = this.board.backgroundValue,
+        coverType = this.board.coverType,
+        coverValue = this.board.coverValue,
         visibility = this.board.visibility,
         isClosed = this.board.isClosed,
         isStatus = this.board.isStatus,
@@ -128,8 +135,10 @@ fun CardAllInfo.toDTO(): CardAllInfoDTO {
         description = this.card.description,
         startAt = this.card.startAt,
         endAt = this.card.endAt,
-        coverType = this.card.coverType,
-        coverValue = this.card.coverValue,
+        cover = Cover(
+            type = CoverType.valueOf(card.coverType ?: "COLOR"),
+            value = card.coverValue ?: "0xff000000"
+        ),
         myOrder = this.card.myOrder,
         isArchived = this.card.isArchived,
         isStatus = this.card.isStatus,
@@ -193,6 +202,14 @@ fun BoardMemberAlarmEntity.toDTO(): BoardMemberAlarmDTO {
     return BoardMemberAlarmDTO(
         isAlert = this.isAlert,
         boardId = this.boardId,
+        isStatus = this.isStatus
+    )
+}
+
+fun CardMemberAlarmEntity.toDTO(): CardMemberAlarmDTO {
+    return CardMemberAlarmDTO(
+        isAlert = this.isAlert,
+        cardId = this.cardId,
         isStatus = this.isStatus
     )
 }
@@ -279,15 +296,28 @@ fun BoardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
     )
 }
 
+fun CardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
+    return MemberResponseDTO(
+        memberId = this.member.id,
+        memberEmail = this.member.email,
+        memberNickname = this.member.nickname,
+        memberProfileImgUrl = this.member.profileImageUrl,
+        componentId = this.cardMember.cardId,
+        authority = "",
+        isRepresentative = this.cardMember.isRepresentative,
+        isStatus = this.cardMember.isStatus
+    )
+}
+
 // Board
 fun BoardEntity.toDto(): BoardDTO {
     return BoardDTO(
         id = this.id,
         workspaceId = this.workspaceId,
         name = this.name,
-        background = Background(
-            type = BackgroundType.valueOf(backgroundType ?: "COLOR"),
-            value = backgroundValue ?: "0xff000000"
+        cover = Cover(
+            type = CoverType.valueOf(coverType ?: "COLOR"),
+            value = coverValue ?: "0xff000000"
         ),
         isClosed = this.isClosed,
         visibility = Visibility.valueOf(visibility)
@@ -314,6 +344,53 @@ fun ListResponseDto.toEntity(): ListEntity {
         isArchived = this.isArchived,
         myOrder = this.myOrder,
         id = this.listId
+    )
+}
+
+// Card
+
+fun CardEntity.toDto(): CardResponseDto {
+    return CardResponseDto(
+        id = this.id,
+        listId = this.listId,
+        name = this.name,
+        description = this.description,
+        startAt = this.startAt,
+        endAt = this.endAt,
+        cover = Cover(
+            type = CoverType.valueOf(coverType ?: "COLOR"),
+            value = coverValue ?: "0xff000000"
+        ),
+        myOrder = this.myOrder,
+        isArchived = this.isArchived,
+        isStatus = this.isStatus,
+        columnUpdate = this.columnUpdate
+    )
+}
+
+fun CardLabelWithLabelInfo.toDto(): CardLabelWithLabelDTO {
+    return CardLabelWithLabelDTO(
+        cardLabelId = this.cardLabel.id,
+        labelId = this.cardLabel.labelId,
+        cardId = this.cardLabel.cardId,
+        isActivated = this.cardLabel.isActivated,
+        cardLabelStatus = this.cardLabel.isStatus,
+
+        labelBoardId = this.label.boardId,
+        labelName = this.label.name,
+        labelColor = this.label.color,
+        labelStatus = this.label.isStatus
+    )
+}
+
+fun AttachmentEntity.toDto(): AttachmentDTO {
+    return AttachmentDTO(
+        id = this.id,
+        cardId = this.cardId,
+        url = this.url,
+        type = this.type,
+        isCover = this.isCover,
+        isStatus = this.isStatus
     )
 }
 

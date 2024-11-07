@@ -1,6 +1,6 @@
 package com.ssafy.board.board.data
 
-import com.ssafy.model.background.Background
+import com.ssafy.model.background.Cover
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.ListInCardsDTO
@@ -9,7 +9,7 @@ data class BoardData(
     val id: Long,
     val workspaceId: Long,
     val name: String,
-    val background: Background,
+    val cover: Cover,
     val isClosed: Boolean,
     val visibility: Visibility,
     var listCollection: List<ListData>,
@@ -21,7 +21,7 @@ object BoardDataMapper {
             id = board.id,
             workspaceId = board.workspaceId,
             name = board.name,
-            background = board.background,
+            cover = board.cover,
             isClosed = board.isClosed,
             visibility = board.visibility,
             listCollection = ListDataMapper.fromDto(lists)

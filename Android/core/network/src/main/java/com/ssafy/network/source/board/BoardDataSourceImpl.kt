@@ -3,6 +3,8 @@ package com.ssafy.network.source.board
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
@@ -11,7 +13,7 @@ import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : BoardDataSource {
 
-    override suspend fun createBoard(): Flow<Unit> = safeApiCall { boardAPI.createBoard() }.toFlow()
+    override suspend fun createBoard(boardDTO: BoardDTO): Flow<Unit> = safeApiCall { boardAPI.createBoard() }.toFlow()
 
     override suspend fun getBoard(id: Long): Flow<BoardDTO> =
         safeApiCall { boardAPI.getBoard(id) }.toFlow() // TODO : Socket으로 바꾸기
@@ -39,5 +41,20 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
 
     override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
         safeApiCall { boardAPI.getBoardMembers(boardId) }.toFlow()
+
+    override suspend fun createLabel(labelDTO: LabelDTO): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteLabel(id: Long): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateLabel(
+        id: Long,
+        updateLabelRequestDto: UpdateLabelRequestDto
+    ): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
 
 }

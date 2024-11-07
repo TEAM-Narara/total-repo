@@ -50,8 +50,8 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.card.HistoryData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +62,8 @@ fun BoardMenuScreen(
     workspaceId: Long,
     backHome: () -> Unit,
     historyContent: List<HistoryData>?,
-    background: Background,
-    selectBackGroundScreen: (Background) -> Unit
+    cover: Cover,
+    selectBackGroundScreen: (Cover) -> Unit
 ) {
 
     val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
@@ -145,26 +145,26 @@ fun BoardMenuScreen(
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)
-                            .clickable { selectBackGroundScreen(background) }) {
-                        when (background.type) {
-                            BackgroundType.COLOR -> {
+                            .clickable { selectBackGroundScreen(cover) }) {
+                        when (cover.type) {
+                            CoverType.COLOR -> {
                                 Box(
                                     modifier = Modifier
                                         .size(ImageSmall)
-                                        .background(color = background.value.toColor())
+                                        .background(color = cover.value.toColor())
                                         .shadow(PaddingOne, spotColor = Color.LightGray)
                                 )
                             }
 
-                            BackgroundType.IMAGE -> {
+                            CoverType.IMAGE -> {
                                 AsyncImage(
                                     modifier = Modifier.size(ImageSmall),
-                                    model = background.value,
+                                    model = cover.value,
                                     contentDescription = null
                                 )
                             }
 
-                            BackgroundType.NONE -> {
+                            CoverType.NONE -> {
                                 Box(
                                     modifier = Modifier
                                         .size(ImageSmall)
@@ -246,8 +246,8 @@ fun GreetingPreview() {
         workspaceId = 1,
         historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
         selectBackGroundScreen = {},
-        background = Background(
-            type = BackgroundType.COLOR,
+        cover = Cover(
+            type = CoverType.COLOR,
             value = "#FFFFFF"
         )
     )

@@ -32,15 +32,15 @@ import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.visibleList
-import com.ssafy.model.background.Background
+import com.ssafy.model.background.Cover
 
 @Composable
 fun UpdateBoardBody(
     modifier: Modifier = Modifier,
     boardTitle: String,
     workSpaceTitle: String,
-    background: Background?,
-    moveToSelectBackgroundScreen: (Background?) -> Unit,
+    cover: Cover?,
+    moveToSelectBackgroundScreen: (Cover?) -> Unit,
     updateBoardClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -104,7 +104,7 @@ fun UpdateBoardBody(
                 painter = ColorPainter(Pink), contentDescription = null,
                 modifier = Modifier
                     .size(BackgroundMini)
-                    .clickable { moveToSelectBackgroundScreen(background) }
+                    .clickable { moveToSelectBackgroundScreen(cover) }
             )
         }
 

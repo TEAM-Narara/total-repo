@@ -1,6 +1,6 @@
 package com.ssafy.network.source.member
 
-import com.ssafy.model.background.BackgroundDto
+import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.user.User
@@ -25,7 +25,7 @@ class MemberDataSourceImpl @Inject constructor(
         pageDto: PageDto
     ): Flow<List<User>> = safeApiCall { memberAPI.searchMembers(keyword, pageDto) }.toFlow()
 
-    override suspend fun createMemberBackground(background: BackgroundDto): Flow<Long> {
+    override suspend fun createMemberBackground(background: CoverDto): Flow<Long> {
         TODO("Not yet implemented")
     }
 

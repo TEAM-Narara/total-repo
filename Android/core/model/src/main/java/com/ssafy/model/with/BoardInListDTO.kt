@@ -6,8 +6,8 @@ data class BoardInListDTO(
     val id: Long,
     val workspaceId: Long = 0L,
     val name: String,
-    val backgroundType: String?,
-    val backgroundValue: String?,
+    val coverType: String?,
+    val coverValue: String?,
     val visibility: String,
     val isClosed: Boolean,
 

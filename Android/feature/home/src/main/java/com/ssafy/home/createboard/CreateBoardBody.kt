@@ -29,8 +29,8 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.Yellow
 import com.ssafy.designsystem.values.toColor
-import com.ssafy.model.background.Background
-import com.ssafy.model.background.BackgroundType
+import com.ssafy.model.background.Cover
+import com.ssafy.model.background.CoverType
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -39,8 +39,8 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 fun CreateBoardBody(
     modifier: Modifier = Modifier,
     workSpaceList: List<WorkSpaceDTO>,
-    background: Background,
-    moveToSelectBackgroundScreen: (Background?) -> Unit,
+    cover: Cover,
+    moveToSelectBackgroundScreen: (Cover?) -> Unit,
     createBoardClick: (boardDTO: BoardDTO) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -88,34 +88,34 @@ fun CreateBoardBody(
                 color = Primary
             )
 
-            when (background.type) {
-                BackgroundType.COLOR -> {
+            when (cover.type) {
+                CoverType.COLOR -> {
                     Image(
-                        painter = ColorPainter(background.value.toColor()),
+                        painter = ColorPainter(cover.value.toColor()),
                         contentDescription = "Color",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(background) }
+                            .clickable { moveToSelectBackgroundScreen(cover) }
                     )
                 }
 
-                BackgroundType.IMAGE -> {
+                CoverType.IMAGE -> {
                     AsyncImage(
-                        model = background.value,
+                        model = cover.value,
                         contentDescription = "Image",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(background) }
+                            .clickable { moveToSelectBackgroundScreen(cover) }
                     )
                 }
 
-                BackgroundType.NONE -> {
+                CoverType.NONE -> {
                     Image(
                         painter = ColorPainter(Yellow),
                         contentDescription = "Color",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(background) }
+                            .clickable { moveToSelectBackgroundScreen(cover) }
                     )
                 }
             }
@@ -129,7 +129,7 @@ fun CreateBoardBody(
                     id = 0,
                     workspaceId = workSpace.workSpaceId,
                     name = boardName,
-                    background = background,
+                    cover = cover,
                     isClosed = false,
                     visibility = visibleScope
                 )

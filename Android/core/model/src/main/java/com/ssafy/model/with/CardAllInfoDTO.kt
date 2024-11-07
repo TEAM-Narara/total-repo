@@ -1,5 +1,7 @@
 package com.ssafy.model.with
 
+import com.ssafy.model.background.Cover
+
 data class CardAllInfoDTO(
     val id: Long = 0L,
     val listId: Long = 0L,
@@ -7,8 +9,7 @@ data class CardAllInfoDTO(
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
-    val coverType: CoverType = CoverType.NONE,
-    val coverValue: String? = null,
+    val cover: Cover? = null,
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,
 
