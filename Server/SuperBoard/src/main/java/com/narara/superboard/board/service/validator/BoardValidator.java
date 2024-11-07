@@ -40,8 +40,10 @@ public class BoardValidator {
         CoverDto background = boardCoreHolder.background();
         for (CoverType type : CoverType.values()) {
             if (type.toString().equals(background.type())) {
-                throw new InvalidCoverTypeFormatException();
+                return;
             }
         }
+
+        throw new InvalidCoverTypeFormatException();
     }
 }
