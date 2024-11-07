@@ -2,6 +2,7 @@ package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -189,10 +190,30 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         ReplyUpdateRequestDto requestDto = new ReplyUpdateRequestDto(updatedContent);
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
+        // Board, List, Card 객체를 생성하고 연결
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .build();
+
+        List list = List.builder()
+                .id(1L)
+                .name("Test List")
+                .board(board)  // List에 Board 설정
+                .build();
+
+        Card card = Card.builder()
+                .id(1L)
+                .name("Test Card")
+                .list(list)  // Card에 List 설정
+                .build();
+
+        // Reply 객체 생성 및 Card 설정
         Reply existingReply = Reply.builder()
                 .id(replyId)
                 .content("Original Content")
                 .member(member)
+                .card(card)  // Reply에 Card 설정
                 .build();
 
         // when
@@ -204,6 +225,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         verify(replyRepository, times(1)).findById(replyId);
     }
 
+
     @Test
     @DisplayName("댓글 삭제 성공 테스트")
     void shouldDeleteReplySuccessfully() {
@@ -211,23 +233,47 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Long replyId = 1L;
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
+        // Board 객체 생성
+        Board board = Board.builder()
+                .id(1L)
+                .name("Test Board")
+                .build();
+
+        // List 객체 생성 및 Board 설정
+        List list = List.builder()
+                .id(1L)
+                .name("Test List")
+                .board(board)  // List에 Board 설정
+                .build();
+
+        // Card 객체 생성 및 List 설정
+        Card card = Card.builder()
+                .id(1L)
+                .name("Test Card")
+                .list(list)  // Card에 List 설정
+                .build();
+
+        // Reply 객체 생성 및 Card 설정
         Reply reply = Reply.builder()
                 .id(replyId)
                 .content("This is a test reply")
                 .isDeleted(false)  // 초기값 설정
                 .member(member)
+                .card(card)  // Reply에 Card 설정
                 .build();
 
+        // Mock 설정
         when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(cardHistoryRepository.save(any(CardHistory.class))).thenReturn(null);
 
         // when
         replyService.deleteReply(member, replyId);
 
         // then
-        // delete 메서드가 올바르게 호출되었는지 확인
-        verify(replyRepository, times(1)).findById(replyId);  // findById가 1번 호출되었는지 확인
-        assertTrue(reply.getIsDeleted());
+        verify(replyRepository, times(1)).findById(replyId);
+        assertTrue(reply.getIsDeleted(), "댓글이 삭제되었는지 확인");
     }
+
 
     @Test
     @DisplayName("카드 ID로 카드가 존재하지 않을 때 NotFoundEntityException 발생")

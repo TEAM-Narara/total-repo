@@ -95,7 +95,7 @@ public class KafkaConsumerConfig {
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "43.203.221.42:29092");  // 상수 사용
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);  // 상수 사용
         return new KafkaAdmin(configs);
     }
 

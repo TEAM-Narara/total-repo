@@ -61,8 +61,8 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 삭제", description = "보드 ID를 사용하여 특정 보드를 삭제합니다.")
-    public ResponseEntity<DefaultResponse<Void>> deleteBoard(@PathVariable Long boardId) {
-        boardService.deleteBoard(boardId);
+    public ResponseEntity<DefaultResponse<Void>> deleteBoard(@AuthenticationPrincipal Member member, @PathVariable Long boardId) {
+        boardService.deleteBoard(member, boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_DELETE_SUCCESS), HttpStatus.OK);
     }
 
@@ -104,8 +104,8 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 아카이브 상태 변경", description = "보드 ID를 사용하여 특정 보드의 아카이브 상태를 변경합니다.")
-    public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@PathVariable Long boardId) {
-        boardService.changeArchiveStatus(boardId);
+    public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId) {
+        boardService.changeArchiveStatus(member, boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVE_STATUS_CHANGED), HttpStatus.OK);
     }
 

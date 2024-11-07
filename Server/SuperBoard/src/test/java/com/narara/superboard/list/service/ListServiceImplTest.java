@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.entity.BoardMember;
@@ -46,6 +47,9 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private BoardHistoryRepository boardHistoryRepository;
 
     @Mock
     private BoardService boardService;

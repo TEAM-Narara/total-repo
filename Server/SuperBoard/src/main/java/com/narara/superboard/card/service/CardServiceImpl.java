@@ -3,16 +3,24 @@ package com.narara.superboard.card.service;
 import static com.narara.superboard.card.CardAction.*;
 
 import com.narara.superboard.boardmember.entity.BoardMember;
-import com.narara.superboard.card.CardAction;
+import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
+import com.narara.superboard.card.interfaces.dto.log.ArchiveStatusChangeInfo;
+import com.narara.superboard.card.interfaces.dto.log.CreateCardInfo;
+import com.narara.superboard.card.interfaces.dto.log.DeleteCardInfo;
+import com.narara.superboard.card.interfaces.dto.log.UpdateCardInfo;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
+import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.list.entity.List;
@@ -33,6 +41,7 @@ public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final ListRepository listRepository;
     private final CardMemberRepository cardMemberRepository;
+    private final CardHistoryRepository cardHistoryRepository;
 
     private final NameValidator nameValidator;
     private final CoverValidator coverValidator;
@@ -54,6 +63,16 @@ public class CardServiceImpl implements CardService {
         CardMember cardMember = CardMember.createCardMember(savedCard, member);
         cardMemberRepository.save(cardMember);
 
+        // 로그 기록 추가
+        CreateCardInfo createCardInfo = new CreateCardInfo(card.getName());
+        Target target = Target.of(savedCard, createCardInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, savedCard.getCreatedAt(), list.getBoard(), savedCard,
+                EventType.CREATE, EventData.CARD, target);
+
+        cardHistoryRepository.save(cardHistory);
+
         return savedCard;
     }
 
@@ -68,6 +87,16 @@ public class CardServiceImpl implements CardService {
         Card card = getCard(cardId);
         checkBoardMember(card, member, DELETE_CARD);
         card.delete();
+
+        // 로그 기록 추가
+        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getName());
+        Target target = Target.of(card, deleteCardInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                EventType.DELETE, EventData.CARD, target);
+
+        cardHistoryRepository.save(cardHistory);
     }
 
     @Override
@@ -78,8 +107,19 @@ public class CardServiceImpl implements CardService {
         if (cardUpdateRequestDto.cover() != null) {
             coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
         }
+        Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
-        return card.updateCard(cardUpdateRequestDto);
+        // 로그 기록 추가
+        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getName());
+        Target target = Target.of(updatedCard, updateCardInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, System.currentTimeMillis(), updatedCard.getList().getBoard(), updatedCard,
+                EventType.UPDATE, EventData.CARD, target);
+
+        cardHistoryRepository.save(cardHistory);
+
+        return updatedCard;
     }
 
     @Override
@@ -99,6 +139,16 @@ public class CardServiceImpl implements CardService {
         Card card = getCard(cardId);
         checkBoardMember(card, member, ARCHIVE_CARD);
         card.changeArchiveStatus();
+
+        // 로그 기록 추가
+        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getName(), card.getIsArchived());
+        Target target = Target.of(card, archiveStatusChangeInfo);
+
+        CardHistory cardHistory = CardHistory.careateCardHistory(
+                member, System.currentTimeMillis(), card.getList().getBoard(), card,
+                EventType.ARCHIVE, EventData.CARD, target);
+
+        cardHistoryRepository.save(cardHistory);
     }
 
     @Override

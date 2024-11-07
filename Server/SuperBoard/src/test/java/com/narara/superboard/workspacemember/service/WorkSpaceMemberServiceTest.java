@@ -2,6 +2,7 @@ package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
+import com.narara.superboard.common.application.kafka.KafkaConsumerService;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -49,6 +50,9 @@ class WorkSpaceMemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private KafkaConsumerService kafkaConsumerService;
 
     private WorkSpace workSpace;
     private Member member;
