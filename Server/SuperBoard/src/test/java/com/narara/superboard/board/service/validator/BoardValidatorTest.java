@@ -40,8 +40,8 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
 
     static Stream<Arguments> provideInvalidBoardDataByNoName() {
         return Stream.of(
-                Arguments.of(1L, null, "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
-                Arguments.of(2L, "", "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
+                Arguments.of(1L, " ", "PRIVATE", Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of(2L, null, "WORKSPACE", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
 
@@ -56,7 +56,7 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
 
     static Stream<Arguments> provideInvalidBoardDataByNoVisibility() {
         return Stream.of(
-                Arguments.of(1L, BOARD_NAME1, null, Map.of("type", "color", "value", "#ffffff")),
+                Arguments.of(1L, BOARD_NAME1, "   ", Map.of("type", "color", "value", "#ffffff")),
                 Arguments.of(2L, BOARD_NAME2, " ", Map.of("type", "image", "value", "https://example.com/image.jpg"))
         );
     }
