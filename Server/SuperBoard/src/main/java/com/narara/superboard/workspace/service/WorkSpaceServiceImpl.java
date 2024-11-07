@@ -58,7 +58,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     @Transactional
-    public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
+    public WorkSpaceMember createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
         Member member = memberRepository.findById(memberId)
@@ -103,8 +103,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         // 새로운 멤버를 Kafka Consumer Group에 등록
         kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
 
-        return newWorkSpace;
-
+        return workspaceMemberByAdmin;
     }
 
     private boolean waitForTopicCreation(String topicName) {

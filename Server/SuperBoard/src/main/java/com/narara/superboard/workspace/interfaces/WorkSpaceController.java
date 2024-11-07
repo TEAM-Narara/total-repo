@@ -37,16 +37,17 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 생성")
     @PostMapping
-    public ResponseEntity<DefaultResponse<WorkspaceCreateData>> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<WorkSpaceResponseDto>> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
 
-        WorkSpace workSpace = workSpaceService.createWorkSpace(
+        WorkSpaceMember workSpaceMember = workSpaceService.createWorkSpace(
                 memberId,
                 workspaceCreateRequestDto
         );
 
-        WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
+        WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.from(workSpaceMember);
+
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workSpaceResponseDto));
     }
 
     @Operation(summary = "워크스페이스 삭제")
