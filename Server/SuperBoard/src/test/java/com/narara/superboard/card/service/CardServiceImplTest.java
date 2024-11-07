@@ -64,7 +64,6 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private CardHistoryRepository cardHistoryRepository; // 추가: listService를 Mock으로 설정
 
-
     @InjectMocks
     private CardServiceImpl cardService; // 실제 인스턴스 생성 후 Mock 주입
 
@@ -116,11 +115,11 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         // then
         assertEquals(cardId, result.getId());
         assertEquals(cardName, result.getName());
+        assertEquals("NONE", result.getCover().get("type")); //cover default NONE 으로 지정
         verify(nameValidator, times(1)).validateCardNameIsEmpty(cardCreateRequestDto);
         verify(cardRepository, times(1)).save(any(Card.class));
         verify(cardMemberRepository, times(1)).save(any(CardMember.class));
     }
-
 
     @ParameterizedTest
     @DisplayName("리스트가 존재하지 않을 때 실패")
