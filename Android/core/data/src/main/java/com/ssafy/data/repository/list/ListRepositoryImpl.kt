@@ -55,7 +55,7 @@ class ListRepositoryImpl @Inject constructor(
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { -1 }
         } else {
-            flow {
+            flowOf (
                 listDao.insertList(
                     ListEntity(
                         name = createListRequestDto.listName,
@@ -63,8 +63,7 @@ class ListRepositoryImpl @Inject constructor(
                         isStatus = DataStatus.CREATE
                     )
                 )
-            }
-
+            )
         }
     }
 
@@ -175,7 +174,7 @@ class ListRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val member = listMemberDao.getListMember(id)
 
@@ -183,17 +182,20 @@ class ListRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     listDataSource.deleteListMember(id)
                 } else {
-                    when (member.isStatus) {
+                    val result = when (member.isStatus) {
                         DataStatus.CREATE ->
                             listMemberDao.deleteLocalListMember(member)
 
                         else ->
                             listMemberDao.updateListMember(member.copy(isStatus = DataStatus.DELETE))
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun getListWatchStatus(id: Long): Flow<Boolean> =
         withContext(ioDispatcher) {

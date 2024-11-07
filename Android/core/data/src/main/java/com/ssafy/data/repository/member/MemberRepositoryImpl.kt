@@ -17,6 +17,7 @@ import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -39,16 +40,14 @@ class MemberRepositoryImpl @Inject constructor(
     override suspend fun updateMember(
         memberUpdateRequestDto: MemberUpdateRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 memberDataSource.updateMember(memberUpdateRequestDto)
             }
-
+            flowOf()
             // TODO 내 PK 또는 이메일
-//            memberDao.updateMember()
         }
-    }
 
     override suspend fun searchMembers(
         keyword: String,
@@ -95,11 +94,11 @@ class MemberRepositoryImpl @Inject constructor(
         if (isConnected) {
             memberDataSource.createMemberBackground(background)
         } else {
-            flow { memberBackgroundDao.insertMemberBackground(background.toEntity()) }
+            flowOf(memberBackgroundDao.insertMemberBackground(background.toEntity()))
         }
     }
 
-    override suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val memberBackground = getMemberBackground(id)
 
@@ -107,15 +106,18 @@ class MemberRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     memberDataSource.deleteMemberBackground(id)
                 } else {
-                    when(memberBackground.isStatus) {
+                    val result = when(memberBackground.isStatus) {
                         DataStatus.CREATE ->
                             memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
                         else ->
                             memberBackgroundDao.updateMemberBackground(id, DataStatus.DELETE.name)
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
 }
