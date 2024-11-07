@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
@@ -19,7 +20,7 @@ interface WorkspaceMemberDao {
         FROM workspace_member
         WHERE isStatus != 'STAY'
     """)
-    suspend fun getAllRemoteWorkspaceMember(): List<WorkspaceMemberEntity>
+    suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberEntity>
 
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace_member WHERE id = :id")
@@ -62,8 +63,8 @@ interface WorkspaceMemberDao {
     suspend fun deleteWorkspaceMembersNotIn(ids: List<Long>)
 
     // 상태 업데이트
-    @Query("UPDATE workspace_member SET isStatus = :status AND authority = :authority WHERE id = :id")
-    suspend fun updateWorkspaceMember(id: Long, status: String, authority: String)
+    @Update
+    suspend fun updateWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete

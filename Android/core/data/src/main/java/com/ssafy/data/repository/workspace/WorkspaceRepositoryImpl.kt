@@ -9,6 +9,7 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
+import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,13 +47,13 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
     override suspend fun getLocalCreateWorkspaceList(): List<WorkspaceInBoardDTO> =
         withContext(ioDispatcher) {
-            workspaceDao.getAllLocalCreateWorkspaces()
+            workspaceDao.getLocalCreateWorkspaces()
                 .map { it.toDTO() }
         }
 
     override suspend fun getLocalOperationWorkspaceList(): List<WorkSpaceDTO> =
         withContext(ioDispatcher) {
-            workspaceDao.getAllLocalOperationWorkspaces()
+            workspaceDao.getLocalOperationWorkspaces()
                 .map { it.toDTO() }
         }
 
@@ -79,7 +80,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                         DataStatus.CREATE ->
                             workspaceDao.deleteLocalWorkspace(workspace)
                         else ->
-                            workspaceDao.updateWorkspace(workspace.id, workspace.name, DataStatus.DELETE.name)
+                            workspaceDao.updateWorkspace(workspace.copy(isStatus = DataStatus.DELETE))
                     }
                 }
             }
@@ -100,9 +101,9 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 } else {
                     when(workspace.isStatus) {
                         DataStatus.STAY ->
-                            workspaceDao.updateWorkspace(workspaceId, name, DataStatus.UPDATE.name)
+                            workspaceDao.updateWorkspace(workspace.copy(name = name, isStatus = DataStatus.UPDATE))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
-                            workspaceDao.updateWorkspace(workspaceId, name, workspace.isStatus.name)
+                            workspaceDao.updateWorkspace(workspace.copy(name = name))
                         DataStatus.DELETE -> { }
                     }
                 }
@@ -120,8 +121,6 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspacesByMember(memberId)
                 .map { list -> list.map { it.toDTO() } }
-
-
         }
 
     override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
@@ -136,10 +135,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                         DataStatus.CREATE ->
                             workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
                         else ->
-                            workspaceMemberDao.updateWorkspaceMember(
-                                workspaceMember.id,
-                                DataStatus.DELETE.name,
-                                workspaceMember.authority)
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
                     }
                 }
             }
@@ -160,13 +156,19 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 } else {
                     when(workspaceMember.isStatus) {
                         DataStatus.STAY ->
-                            workspaceMemberDao.updateWorkspaceMember(id = id, status = DataStatus.UPDATE.name, authority = authority)
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.UPDATE, authority = authority))
                         DataStatus.CREATE, DataStatus.UPDATE  ->
-                            workspaceMemberDao.updateWorkspaceMember(id = id, status =  workspaceMember.isStatus.name, authority =  authority)
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
                         DataStatus.DELETE -> { }
                     }
                 }
             }
         }
     }
+
+    override suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO> =
+        withContext(ioDispatcher) {
+            workspaceMemberDao.getLocalOperationWorkspaceMember()
+                .map { it.toDTO() }
+        }
 }

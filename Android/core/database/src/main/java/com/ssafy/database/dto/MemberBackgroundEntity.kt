@@ -7,7 +7,7 @@ import com.ssafy.model.with.DataStatus
 @Entity(tableName = "member_background")
 data class MemberBackgroundEntity(
     @PrimaryKey val id: Long = 0L,
-    val url: String? = null,
+    val url: String,
 
     val isStatus: DataStatus = DataStatus.STAY
 )

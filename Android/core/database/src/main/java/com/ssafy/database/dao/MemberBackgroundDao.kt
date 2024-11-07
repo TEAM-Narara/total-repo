@@ -18,7 +18,7 @@ interface MemberBackgroundDao {
         FROM member_background
         WHERE isStatus == 'CREATE'
     """)
-    suspend fun getAllLocalMemberBackgrounds(): List<MemberBackgroundEntity>
+    suspend fun getLocalCreateMemberBackgrounds(): List<MemberBackgroundEntity>
 
     // 서버에 연산할 멤버 배경 조회
     @Query("""
@@ -26,7 +26,7 @@ interface MemberBackgroundDao {
         FROM member_background
         WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
     """)
-    suspend fun getAllRemoteMemberBackgrounds(): List<MemberBackgroundEntity>
+    suspend fun getLocalOperationMemberBackgrounds(): List<MemberBackgroundEntity>
 
     // 멤버 배경 단일 조회
     @Query("""
@@ -34,7 +34,7 @@ interface MemberBackgroundDao {
             FROM member_background
             WHERE id == :id And isStatus != 'DELETE'
         """)
-    fun getMemberBackground(id: Long): Flow<MemberBackgroundEntity>
+    fun getMemberBackground(id: Long): MemberBackgroundEntity
     
     // 멤버 배경 모두 조회
     @Query("""
@@ -57,8 +57,8 @@ interface MemberBackgroundDao {
     suspend fun deleteMemberBackgroundsNotIn(ids: List<Long>)
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
-    @Update
-    suspend fun updateMemberBackground(memberBackground: MemberBackgroundEntity)
+    @Query("UPDATE member_background SET isStatus = :status WHERE id = :id")
+    suspend fun updateMemberBackground(id: Long, status: String)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
