@@ -1,7 +1,7 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,6 +63,6 @@ public interface BoardAPI {
     @GetMapping("/{boardId}/activity")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 액티비티(로그) 조회")
-    ResponseEntity<DefaultResponse<List<ActivityDetailResponseDto>>> getBoardActivity(@PathVariable Long boardId);
+    ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(@PathVariable Long boardId);
 
 }

@@ -1,7 +1,7 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.*;
 
 import com.narara.superboard.member.entity.Member;
@@ -33,5 +33,5 @@ public interface BoardService {
 
     MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword);
 
-    List<ActivityDetailResponseDto> getBoardActivity(Long boardId);
+    List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId);
 }

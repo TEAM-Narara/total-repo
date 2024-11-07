@@ -6,8 +6,6 @@ import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.infrastructure.BoardSearchRepository;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
-import com.narara.superboard.common.interfaces.log.ActivityDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.interfaces.dto.log.ArchiveStatusChangeInfo;
 import com.narara.superboard.board.interfaces.dto.log.CreateBoardInfo;
@@ -26,6 +24,7 @@ import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -242,7 +241,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<ActivityDetailResponseDto> getBoardActivity(Long boardId) {
+    public List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId) {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
 
@@ -251,15 +250,15 @@ public class BoardServiceImpl implements BoardService {
         System.out.println(boardHistoryCollection.get(0).getWhen());
         System.out.println(boardHistoryCollection.get(0).getWhere());
 
-        List<ActivityDetailResponseDto> activities = new ArrayList<>();
+        List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
 
         // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
-        List<ActivityDetailResponseDto> boardDtos = boardHistoryCollection.stream()
-                .map(ActivityDetailResponseDto::createActivityDetailResponseDto)
+        List<BoardActivityDetailResponseDto> boardDtos = boardHistoryCollection.stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
-        List<ActivityDetailResponseDto> cardDtos = cardHistoryCollectionByBoard.stream()
-                .map(ActivityDetailResponseDto::createActivityDetailResponseDto)
+        List<BoardActivityDetailResponseDto> cardDtos = cardHistoryCollectionByBoard.stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
                 .toList();
 
         // 병합 정렬을 수행
