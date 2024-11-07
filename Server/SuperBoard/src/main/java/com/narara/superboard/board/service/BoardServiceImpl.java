@@ -150,9 +150,10 @@ public class BoardServiceImpl implements BoardService {
         boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
         boardValidator.validateBackgroundIsValid(boardUpdateRequestDto);
-
+        coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
                 .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
+
         if (boardMember.getAuthority() == null) {
             throw new AccessDeniedException("보드에 대한 권한이 없습니다");
         }
