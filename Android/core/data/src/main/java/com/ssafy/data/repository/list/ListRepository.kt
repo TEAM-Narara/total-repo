@@ -36,7 +36,7 @@ interface ListRepository {
 
     suspend fun getListMembers(listId: Long): Flow<List<MemberResponseDTO>>
 
-    suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getListWatchStatus(id: Long): Flow<Boolean>
 
