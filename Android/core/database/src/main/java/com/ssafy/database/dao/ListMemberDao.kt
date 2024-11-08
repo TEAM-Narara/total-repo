@@ -73,7 +73,7 @@ interface ListMemberDao {
 
     // 리스트 멤버 단일 조회
     @Query("SELECT * FROM list_member_alarm WHERE listId = :listId")
-    fun getListMemberAlarmFlow(listId: Long): Flow<ListMemberAlarmEntity>?
+    fun getListMemberAlarmFlow(listId: Long): Flow<ListMemberAlarmEntity?>
 
     // 알람 상태 업데이트
     @Update

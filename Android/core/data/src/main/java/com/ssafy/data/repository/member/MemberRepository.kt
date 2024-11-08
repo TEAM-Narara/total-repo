@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MemberRepository {
 
-    suspend fun getMember(memberId: Long): Flow<User>?
+    suspend fun getMember(memberId: Long): Flow<User?>
 
     suspend fun updateMember(
         memberId: Long,

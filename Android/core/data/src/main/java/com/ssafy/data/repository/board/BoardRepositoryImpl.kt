@@ -46,9 +46,9 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoard(id: Long): Flow<BoardDTO>? =
+    override suspend fun getBoard(id: Long): Flow<BoardDTO?> =
         withContext(ioDispatcher) {
-            boardDao.getBoardFlow(id)?.map { it.toDto() }
+            boardDao.getBoardFlow(id).map { it?.toDto() }
         }
 
     override suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit> =
@@ -159,9 +159,9 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { entities -> entities.map { it.toDto() } }
         }
 
-    override suspend fun getWatchStatus(id: Long): Flow<Boolean>? =
+    override suspend fun getWatchStatus(id: Long): Flow<Boolean?> =
         withContext(ioDispatcher) {
-            boardMemberDao.getBoardMemberAlarmFlow(id)?.map { it.toDTO().isAlert }
+            boardMemberDao.getBoardMemberAlarmFlow(id).map { it?.toDTO()?.isAlert }
         }
 
     override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
@@ -191,10 +191,10 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO>? =
+    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?> =
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMemberFlow(boardId, memberId)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
     override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
@@ -284,9 +284,9 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getLabel(id: Long): Flow<LabelDTO>? =
+    override suspend fun getLabel(id: Long): Flow<LabelDTO?> =
         withContext(ioDispatcher) {
-            labelDao.getLabelFlow(id)?.map { it.toDTO() }
+            labelDao.getLabelFlow(id).map { it?.toDTO() }
         }
 
     override suspend fun getLabels(boardId: Long): Flow<List<LabelDTO>> =

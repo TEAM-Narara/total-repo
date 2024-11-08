@@ -9,7 +9,7 @@ class GetBoardUseCase @Inject constructor(
     private val boardRepository: BoardRepository
 ) {
 
-    suspend operator fun invoke(id: Long): Flow<BoardDTO>? {
+    suspend operator fun invoke(id: Long): Flow<BoardDTO?> {
         return  boardRepository.getBoard(id)
     }
 
