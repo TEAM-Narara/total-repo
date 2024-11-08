@@ -34,8 +34,8 @@ interface ListMemberDao {
     suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmEntity>
 
     // 리스트 멤버 단일 조회
-    @Query("SELECT * FROM list_member WHERE id = :id")
-    fun getListMember(id: Long): ListMemberEntity
+    @Query("SELECT * FROM list_member WHERE memberId = :memberId AND listId = :listId")
+    fun getListMember(memberId: Long, listId: Long): ListMemberEntity
 
     // 리스트 멤버 알람 조회
     @Query("""
