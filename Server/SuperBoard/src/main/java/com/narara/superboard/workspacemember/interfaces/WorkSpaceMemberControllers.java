@@ -63,6 +63,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
                         StatusCode.OK,
                         ResponseMessage.WORKSPACE_UPDATE_SUCCESS,
                         new WorkspaceMemberDto(
+                            workSpaceMember.getId(),
                             workSpaceMember.getMember().getId(),
                             workSpaceMember.getAuthority()
                     )
@@ -82,8 +83,9 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
                         StatusCode.OK,
                         ResponseMessage.WORKSPACE_MEMBER_CREATE_SUCCESS,
                         new WorkspaceMemberDto(
+                            workSpaceMember.getId(),
                             workSpaceMember.getMember().getId(),
-                          workSpaceMember.getAuthority()
+                            workSpaceMember.getAuthority()
                         )
                 )
         );
@@ -97,6 +99,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_DELETE_SUCCESS, new WorkspaceMemberDto(
+                        workSpaceMember.getId(),
                         workSpaceMember.getMember().getId(),
                         workSpaceMember.getAuthority()
                 ))
