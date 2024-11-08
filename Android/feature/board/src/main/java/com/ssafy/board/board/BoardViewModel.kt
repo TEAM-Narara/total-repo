@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,11 +43,18 @@ class BoardViewModel @Inject constructor(
     private var isConnected = MutableStateFlow(true)
 
     val boardData: StateFlow<BoardData?> = _boardId.filterNotNull().flatMapLatest { boardId ->
-        combine(
-            getBoardUseCase(boardId).withUiState(),
-            getListsUseCase(boardId).withUiState()
-        ) { board, lists ->
-            BoardDataMapper.fromDto(board, lists)
+        val boardFlow = getBoardUseCase(boardId)
+        val listsFlow = getListsUseCase(boardId)
+
+        if (boardFlow != null) {
+            combine(
+                boardFlow.withUiState(),
+                listsFlow.withUiState()
+            ) { board, lists ->
+                BoardDataMapper.fromDto(board, lists)
+            }
+        } else {
+            flowOf(null)
         }
     }.stateIn(
         scope = viewModelScope,

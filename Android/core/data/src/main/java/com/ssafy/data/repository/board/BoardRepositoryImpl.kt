@@ -38,8 +38,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                // TODO
-                boardDataSource.createBoard(boardDTO).map { 5 }
+                boardDataSource.createBoard(boardDTO).map { it.id }
             } else {
                 flowOf(boardDao.insertBoard(
                     boardDTO.copy(isStatus = DataStatus.CREATE).toEntity()

@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : BoardDataSource {
 
-    override suspend fun createBoard(boardDTO: BoardDTO): Flow<Unit> = safeApiCall { boardAPI.createBoard() }.toFlow()
+    override suspend fun createBoard(boardDTO: BoardDTO): Flow<BoardDTO> =
+        safeApiCall { boardAPI.createBoard(boardDTO) }.toFlow()
 
     override suspend fun getBoard(id: Long): Flow<BoardDTO> =
         safeApiCall { boardAPI.getBoard(id) }.toFlow() // TODO : Socket으로 바꾸기
@@ -22,7 +23,10 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
     override suspend fun deleteBoard(id: Long): Flow<Unit> =
         safeApiCall { boardAPI.deleteBoard(id) }.toFlow()
 
-    override suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto): Flow<Unit> =
+    override suspend fun updateBoard(
+        id: Long,
+        updateBoardRequestDto: UpdateBoardRequestDto
+    ): Flow<Unit> =
         safeApiCall { boardAPI.updateBoard(id, updateBoardRequestDto) }.toFlow()
 
     override suspend fun setBoardArchive(boardId: Long): Flow<Unit> =

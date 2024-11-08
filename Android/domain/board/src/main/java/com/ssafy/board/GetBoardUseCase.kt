@@ -9,8 +9,8 @@ class GetBoardUseCase @Inject constructor(
     private val boardRepository: BoardRepository
 ) {
 
-    suspend operator fun invoke(id: Long): Flow<BoardDTO> {
-        return boardRepository.getBoard(id) ?: throw Exception("존재하지 않는 board 입니다.")
+    suspend operator fun invoke(id: Long): Flow<BoardDTO>? {
+        return  boardRepository.getBoard(id)
     }
 
 }

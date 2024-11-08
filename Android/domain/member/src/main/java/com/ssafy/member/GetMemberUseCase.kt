@@ -9,8 +9,8 @@ class GetMemberUseCase @Inject constructor(
     private val memberRepository: MemberRepository
 ) {
 
-    suspend operator fun invoke(memberId: Long): Flow<User> {
-        return memberRepository.getMember(memberId) ?: throw Exception("존재하지 않는 member 입니다.")
+    suspend operator fun invoke(memberId: Long): Flow<User>? {
+        return memberRepository.getMember(memberId)
     }
 
 }
