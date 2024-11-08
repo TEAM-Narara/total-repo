@@ -48,7 +48,8 @@ public class SecurityConfiguration {
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
                 .requestMatchers(
-                        "/ws/**", "/index.html" //웹소켓 엔드포인트
+                        "/ws/**", "/index.html", //웹소켓 엔드포인트
+                        "/theme-outline.css" // swagger ui
                 );
     }
 
