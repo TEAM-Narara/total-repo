@@ -37,6 +37,9 @@ interface BoardMemberDao {
     fun getBoardMember(id: Long): BoardMemberEntity?
 
     @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
+    fun getBoardMemberFlow(boardId: Long, memberId: Long): Flow<BoardMemberEntity>?
+
+    @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
     fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity?
 
     // 보드 멤버 조회

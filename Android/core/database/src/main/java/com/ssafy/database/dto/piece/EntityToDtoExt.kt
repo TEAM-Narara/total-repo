@@ -35,6 +35,7 @@ import com.ssafy.model.board.Visibility
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.member.Authority
 import com.ssafy.model.user.User
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInListDTO
@@ -82,7 +83,7 @@ fun MemberBackgroundEntity.toDTO(): CoverDto {
 fun WorkspaceEntity.toDTO(): WorkSpaceDTO {
     return WorkSpaceDTO(
         workSpaceId = this.id,
-        authority = this.authority,
+        authority = Authority.valueOf(this.authority.name),
         name = this.name,
         isStatus = this.isStatus
     )
@@ -281,7 +282,7 @@ fun ListMemberWithMemberInfo.toDTO(): MemberResponseDTO {
         memberNickname = this.member.nickname,
         memberProfileImgUrl = this.member.profileImageUrl,
         isStatus = this.listMember.isStatus,
-        authority = "",
+        authority = Authority.MEMBER,
         isRepresentative = false,
         componentId = this.listMember.listId
     )
@@ -307,7 +308,7 @@ fun CardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
         memberNickname = this.member.nickname,
         memberProfileImgUrl = this.member.profileImageUrl,
         componentId = this.cardMember.cardId,
-        authority = "",
+        authority = Authority.MEMBER,
         isRepresentative = this.cardMember.isRepresentative,
         isStatus = this.cardMember.isStatus
     )
