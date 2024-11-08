@@ -47,7 +47,7 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
+import com.ssafy.model.with.CoverType
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
 import java.io.File
 import kotlin.contracts.ExperimentalContracts

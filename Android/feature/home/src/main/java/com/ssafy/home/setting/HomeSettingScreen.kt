@@ -27,8 +27,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +54,7 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.MemberData
+import com.ssafy.home.invite.InviteWorkspace
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -65,7 +64,8 @@ fun HomeSettingScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeSettingViewModel = hiltViewModel(),
     workspaceId: Long,
-    backHome: () -> Unit
+    backHome: () -> Unit,
+    moveToInviteWorkspace: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val settingData by viewModel.settingData.collectAsStateWithLifecycle()
@@ -81,6 +81,8 @@ fun HomeSettingScreen(
         workspaceName = settingData.workspaceName,
         members = settingData.members,
         deleteWorkspace = { viewModel.deleteWorkspace(workspaceId, backHome) },
+        updateWorkspaceName = { name -> viewModel.updateWorkspaceName(workspaceId, name) },
+        moveToInviteWorkspace = moveToInviteWorkspace
     )
 
     when (uiState) {
@@ -99,9 +101,11 @@ private fun HomeSettingScreen(
     workspaceName: String,
     members: List<MemberData>,
     backHome: () -> Unit,
-    deleteWorkspace: () -> Unit
+    deleteWorkspace: () -> Unit,
+    updateWorkspaceName: (String) -> Unit,
+    moveToInviteWorkspace: () -> Unit
 ) {
-    val (name, onValueChange) = remember(workspaceName) { mutableStateOf(workspaceName) }
+
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -145,8 +149,8 @@ private fun HomeSettingScreen(
             ) {
                 Text(text = "Name", fontSize = TextMedium, color = Primary)
                 EditableText(
-                    text = name,
-                    onInputFinished = { newName: String -> onValueChange(newName) },
+                    text = workspaceName,
+                    onInputFinished = updateWorkspaceName,
                     modifier = Modifier.weight(1f),
                     alignStyle = TextAlign.End
                 )
@@ -183,7 +187,7 @@ private fun HomeSettingScreen(
                             )
                         }
                     }
-                    FilledButton(text = "Invite", onClick = { /*TODO*/ })
+                    FilledButton(text = "Invite", onClick = moveToInviteWorkspace)
                 }
             }
             HorizontalDivider(
@@ -205,6 +209,6 @@ private fun HomeSettingScreen(
 @Composable
 fun GreetingPreview() {
     HomeSettingScreen(
-        workspaceId = 1, backHome = {}
+        workspaceId = 1, backHome = {}, moveToInviteWorkspace = {}
     )
 }

@@ -51,14 +51,16 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun searchMembers(
         keyword: String,
-        sort: List<String>
+        sort: List<String>,
+        filterList: List<Long>,
     ): Flow<PagingData<User>> = Pager(
         config = PagingConfig(pageSize = MemberPagingSource.PAGE_SIZE, enablePlaceholders = false),
         pagingSourceFactory = {
             MemberPagingSource(
                 memberDataSource = memberDataSource,
                 keyword = keyword,
-                sort = sort
+                sort = sort,
+                filterList = filterList
             )
         }
     ).flow.flowOn(ioDispatcher)

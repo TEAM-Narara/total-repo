@@ -7,6 +7,7 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
@@ -14,6 +15,7 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -32,7 +34,8 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.getWorkspaceList().map { dtoList ->
+                val dtoList = workspaceDataSource.getWorkspaceList().firstOrNull()
+                dtoList?.let {
                     workspaceDao.insertWorkspaces(dtoList.map { it.toEntity() })
                 }
             }
@@ -80,7 +83,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                         )
                     )
                 )
-            }
+            )
         }
 
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
@@ -175,7 +178,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
     override suspend fun updateWorkspaceMember(
         id: Long,
-        authority: String,
+        simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
     ): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -206,6 +209,57 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 flowOf(Unit)
             }
         }
+
+//    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+//        withContext(ioDispatcher) {
+//            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+//
+//            if (workspaceMember != null) {
+//                if (isConnected) {
+//                    workspaceDataSource.deleteWorkspaceMember(id)
+//                } else {
+//                    when (workspaceMember.isStatus) {
+//                        DataStatus.CREATE ->
+//                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+//
+//                        else ->
+//                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    override suspend fun updateWorkspaceMember(
+//        id: Long,
+//        authority: String,
+//        isConnected: Boolean
+//    ): Flow<Unit> = flow {
+//        withContext(ioDispatcher) {
+//            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+//
+//            if (workspaceMember != null) {
+//                if (isConnected) {
+//                    workspaceDataSource.updateWorkspaceMember(id, authority)
+//                } else {
+//                    when (workspaceMember.isStatus) {
+//                        DataStatus.STAY ->
+//                            workspaceMemberDao.updateWorkspaceMember(
+//                                workspaceMember.copy(
+//                                    isStatus = DataStatus.UPDATE,
+//                                    authority = authority
+//                                )
+//                            )
+//
+//                        DataStatus.CREATE, DataStatus.UPDATE ->
+//                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
+//
+//                        DataStatus.DELETE -> {}
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     override suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO> =
         withContext(ioDispatcher) {

@@ -7,6 +7,7 @@ import com.ssafy.home.data.HomeData
 import com.ssafy.home.data.SelectedWorkSpace
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -24,18 +25,6 @@ class GetHomeInfoUseCase @Inject constructor(
         val user = dataStoreRepository.getUser()
 
         return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
-            val firstWorkspace = workspaceList.firstOrNull()
-            val selectedWorkSpace = firstWorkspace?.let {
-                boardRepository.getBoardsByWorkspace(it.workSpaceId)
-                    .map { boardList ->
-                        SelectedWorkSpace(
-                            workSpaceId = it.workSpaceId,
-                            workSpaceName = it.name,
-                            boards = boardList
-                        )
-                    }
-            } ?: flowOf(SelectedWorkSpace())
-
             val selectedWorkspaceFlow = workspaceList.firstOrNull()?.let { workspace ->
                 boardRepository.getBoardsByWorkspace(workspace.workSpaceId)
                     .map { boardList ->
@@ -58,10 +47,17 @@ class GetHomeInfoUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData> {
-        return boardRepository.getBoardsByWorkspace(workspaceId).map { boardList ->
-            val selectedWorkSpace = homeData.selectedWorkSpace.copy(boards = boardList)
-            homeData.copy(selectedWorkSpace = selectedWorkSpace)
+        return combine(
+            workspaceRepository.getWorkspace(workspaceId),
+            boardRepository.getBoardsByWorkspace(workspaceId)
+        ) { workspace, boardList ->
+            homeData.copy(
+                selectedWorkSpace = SelectedWorkSpace(
+                    workSpaceId = workspace?.workSpaceId ?: -1,
+                    workSpaceName = workspace?.name ?: "",
+                    boards = boardList
+                )
+            )
         }
-
     }
 }

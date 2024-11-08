@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ssafy.model.background.Cover
-import com.ssafy.model.background.CoverType
 import com.ssafy.model.card.HistoryData
+import com.ssafy.model.with.CoverType
 import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
