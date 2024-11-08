@@ -16,7 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "첨부파일")
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class AttachmentController implements AttachmentAPI {
 

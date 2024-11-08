@@ -5,11 +5,13 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.interfaces.dto.VerifyEmailCodeRequestDto;
 import com.narara.superboard.member.service.EmailService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "이메일")
 @RestController
 @RequiredArgsConstructor
 public class EmailController implements EmailAPI{

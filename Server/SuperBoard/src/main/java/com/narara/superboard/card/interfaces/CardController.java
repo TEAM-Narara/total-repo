@@ -25,7 +25,7 @@ import java.util.List;
 
 @Tag(name = "카드")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CardController implements CardAPI {
 

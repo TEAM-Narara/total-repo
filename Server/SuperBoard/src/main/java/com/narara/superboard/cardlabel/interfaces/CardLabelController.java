@@ -23,7 +23,7 @@ import java.util.List;
 
 @Tag(name = "카드 라벨")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CardLabelController implements CardLabelAPI {
 
