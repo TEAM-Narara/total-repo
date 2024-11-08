@@ -37,7 +37,7 @@ interface WorkspaceDao {
 
     // 워크스페이스 조회 + Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
-    fun getWorkspaceForDrawable(workspaceId: Long): Flow<WorkspaceEntity>?
+    fun getWorkspaceForDrawable(workspaceId: Long): Flow<WorkspaceEntity?>
 
     // Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")
