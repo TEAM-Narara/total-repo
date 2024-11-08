@@ -1,6 +1,7 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.DetailMemberDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.ApiResponse
@@ -37,19 +38,19 @@ interface WorkspaceAPI {
     suspend fun addWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
         @Body simpleMemberDto: SimpleMemberDto
-    ): Response<ApiResponse<SimpleMemberDto>>
+    ): Response<ApiResponse<DetailMemberDto>>
 
     @DELETE("api/v1/{workspaceId}/members")
     suspend fun deleteWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
         @Body memberId: Long
-    ): Response<ApiResponse<SimpleMemberDto>>
+    ): Response<ApiResponse<DetailMemberDto>>
 
     @PATCH("api/v1/{workspaceId}/members")
     suspend fun updateWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
         @Body detailMemberDto: SimpleMemberDto
-    ): Response<ApiResponse<SimpleMemberDto>>
+    ): Response<ApiResponse<DetailMemberDto>>
 
     @GET("api/v1/members/{memberId}/workspaces")
     suspend fun getWorkspacesByMember(@Path("memberId") memberId: Long): Response<ApiResponse<List<WorkSpaceDTO>>>

@@ -1,6 +1,7 @@
 package com.ssafy.network.source.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.DetailMemberDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.api.WorkspaceAPI
@@ -38,19 +39,19 @@ class WorkspaceDataSourceImpl @Inject constructor(
     override suspend fun addWorkspaceMember(
         workspaceId: Long,
         simpleMemberDto: SimpleMemberDto
-    ): Flow<SimpleMemberDto> =
+    ): Flow<DetailMemberDto> =
         safeApiCall { workspaceAPI.addWorkspaceMember(workspaceId, simpleMemberDto) }.toFlow()
 
     override suspend fun deleteWorkspaceMember(
         workspaceId: Long,
         memberId: Long
-    ): Flow<SimpleMemberDto> =
+    ): Flow<DetailMemberDto> =
         safeApiCall { workspaceAPI.deleteWorkspaceMember(workspaceId, memberId) }.toFlow()
 
     override suspend fun updateWorkspaceMember(
         workspaceId: Long,
         detailMemberDto: SimpleMemberDto
-    ): Flow<SimpleMemberDto> =
+    ): Flow<DetailMemberDto> =
         safeApiCall { workspaceAPI.updateWorkspaceMember(workspaceId, detailMemberDto) }.toFlow()
 
 }
