@@ -7,15 +7,14 @@ import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
 import com.narara.superboard.cardlabel.interfaces.dto.CardLabelDto;
 import com.narara.superboard.cardlabel.service.validator.CardLabelValidator;
-import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -61,19 +60,34 @@ public class CardLabelServiceImpl implements CardLabelService {
 
         List<Label> boardLabels = labelRepository.findAllByBoard(board);
 
-        Set<Long> cardLabelIds = cardLabelRepository.findLabelIdsByCardId(cardId);
+        List<CardLabel> cardLabelList = cardLabelRepository.findByCardId(cardId);
 
-        return createCardLabelDtoList(boardLabels, cardLabelIds);
+        return createCardLabelDtoList(boardLabels, cardLabelList);
     }
 
-    private List<CardLabelDto> createCardLabelDtoList(List<Label> boardLabels, Set<Long> cardLabelIds) {
+    private List<CardLabelDto> createCardLabelDtoList(List<Label> boardLabels, List<CardLabel> cardLabelList) {
+        // O(1) 검색
+        Map<Long, CardLabel> cardLabelMap = cardLabelList.stream()
+                .collect(Collectors.toMap(
+                        cardLabel -> cardLabel.getLabel().getId(),
+                        cardLabel -> cardLabel
+                ));
+
+        // boardLabels를 조회하면서, cardLabel인 경우 isActivated를 true로 설정, cardLabelId를 null이 아닌 값으로 설정
         return boardLabels.stream()
-                .map(label -> new CardLabelDto(
-                        label.getId(),
-                        label.getName(),
-                        label.getColor(),
-                        cardLabelIds.contains(label.getId())
-                ))
-                .toList();
+                .map(boardLabel -> {
+                    CardLabel cardLabel = cardLabelMap.get(boardLabel.getId());
+                    if (cardLabel != null) {
+                        return CardLabelDto.of(cardLabel);
+                    }
+                    return CardLabelDto.builder()
+                            .cardLabelId(null)
+                            .labelId(boardLabel.getId())
+                            .name(boardLabel.getName())
+                            .color(boardLabel.getColor())
+                            .IsActivated(false)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
