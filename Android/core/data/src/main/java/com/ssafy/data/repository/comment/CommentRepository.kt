@@ -16,7 +16,7 @@ interface CommentRepository {
     suspend fun createComment(
         commentRequestDto: CommentRequestDto,
         isConnected: Boolean
-    ): Flow<Unit>
+    ): Flow<Long>
 
     suspend fun deleteComment(commentId: Long, isConnected: Boolean): Flow<Unit>
 

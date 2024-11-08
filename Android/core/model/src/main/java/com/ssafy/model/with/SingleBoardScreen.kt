@@ -7,7 +7,9 @@ data class ListInCard(
     val name: String,
     val myOrder: Long,
     val isArchived: Boolean,
-    val cards: List<CardThumbnail>
+    val isWatch: Boolean,
+    val cards: List<CardThumbnail>,
+    val isStatus: DataStatus
 )
 
 data class CardThumbnail(
@@ -22,6 +24,9 @@ data class CardThumbnail(
     val myOrder: Long,
     val isArchived: Boolean,
     val replyCount: Int,
+    val isWatch: Boolean,
+    val isAttachment: Boolean,
     val cardMembers: List<MemberResponseDTO>,
-    val cardLabels: List<CardLabelWithLabelDTO>
+    val cardLabels: List<CardLabelWithLabelDTO>,
+    val isStatus: DataStatus
 )
