@@ -39,129 +39,68 @@ public class KafkaConsumerService {
     private final Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners
             = new ConcurrentHashMap<>();
 
-    /**
-     * 새로운 엔터티를 Kafka Consumer Group에 등록하고, 메시지를 STOMP로 전송하는 Kafka Listener 생성
-     *
-     * @param primaryId   주 ID (workspaceId 또는 boardId)
-     * @param memberId    멤버 ID
-     * @param entityType  엔터티 타입 ("workspace" 또는 "board")
-     */
-    public void registerListener(KafkaRegisterType entityType, Long primaryId, Long memberId) {
-        String entityName = entityType.toString();
-        String topic = entityName + "-" + primaryId;
-        String groupId = "member-" + memberId;
-        String listenerKey = topic+"-"+groupId;
 
-        // 동일한 여러개의 리스너를 방지하기 위해 중복 체크
-        if (activeListeners.containsKey(listenerKey)) {
-            System.out.println("Listener already registered for " + entityName + "Id " + primaryId + " and memberId " + memberId);
-            throw new DuplicateListenerRegistrationException("entityType="+entityName+", primaryId="+primaryId+
-                    ", memberId="+memberId +" 의 리스너가 이미 있습니다.");
-        }
-
-        // Kafka Listener 컨테이너 팩토리 설정
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(createConsumerFactory(groupId));
-
-        // Kafka 메시지를 수신하여 STOMP로 전송하는 메시지 리스너 설정
-        ConcurrentMessageListenerContainer<String, String> container = factory.createContainer(topic);
-        container.setupMessageListener((MessageListener<String, String>) record -> {
-            String message = record.value();
-            String destination = "/topic/" + entityName + "/" + primaryId + "/member/" + memberId;
-
-            // STOMP로 메시지 전송
-            messagingTemplate.convertAndSend(destination, message);
-            System.out.println("Message sent to STOMP: " + message + " for " + entityName + " " + primaryId + " and member " + memberId + ", destination: " + destination);
-        });
-
-        // Kafka Listener 컨테이너 시작
-        container.start();
-        activeListeners.put(listenerKey, container);
-    }
-
-    /**TOMP 구독 이벤트 리스너: 구독 시 Kafka에서 밀린 메시지 가져와 STOMP로 전송
-     */
     @EventListener
-    public void handleSubscription(SessionSubscribeEvent event) {
+    public void registerListener(SessionSubscribeEvent event) {
         String destination = (String) event.getMessage().getHeaders().get("simpDestination");
 
-        // 토픽 이름 추출
+        System.out.println(destination);
+
         String[] destinationParts = destination.split("/");
-        if (destinationParts.length < 4) return;
+        if (destinationParts.length < 6) return;
 
         String entityType = destinationParts[2];
         Long primaryId = Long.parseLong(destinationParts[3]);
         Long memberId = Long.parseLong(destinationParts[5]);
 
-        // Kafka에서 밀린 메시지 가져오기
-//        List<String> missedMessages = getMissedMessagesForMember(entityType + "-" + primaryId,memberId);
-//        for (String message : missedMessages) {
-//            messagingTemplate.convertAndSend(destination, message);
-//        }
+        String topic = entityType + "-" + primaryId;
+        String groupId = "member-" + memberId;
+        String listenerKey = topic + "-" + groupId;
+
+        ConcurrentMessageListenerContainer<String, String> container;
+
+        // 중복 리스너 확인
+        if (activeListeners.containsKey(listenerKey)) {
+            log.info("Listener already registered for " + entityType + "Id " + primaryId + " and memberId " + memberId);
+            // 이미 존재하는 리스너 사용
+            container = activeListeners.get(listenerKey);
+        } else {
+            // Kafka Listener 컨테이너 팩토리 설정
+            ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+            factory.setConsumerFactory(createConsumerFactory(groupId));
+
+            // 새로운 리스너 생성 및 설정
+            container = factory.createContainer(topic);
+            container.setupMessageListener((MessageListener<String, String>) record -> {
+                String message = record.value();
+                String stompDestination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
+                messagingTemplate.convertAndSend(stompDestination, message);
+                log.info("Message sent to STOMP: " + message + " for " + entityType + " " + primaryId + " and member " + memberId);
+            });
+
+            // 리스너 시작 및 activeListeners에 등록
+            container.start();
+            activeListeners.put(listenerKey, container);
+        }
+
+        // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
+        fetchMissedMessages(container, topic, memberId, "/topic/" + entityType + "/" + primaryId + "/member/" + memberId);
     }
 
     /**
-     * Kafka의 밀린 메시지를 특정 파티션과 Offset에서부터 가져오는 메서드
+     * 구독 시점에 필요한 Offset부터 밀린 메시지를 가져와 STOMP로 전송
      */
-//    private List<String> getMissedMessagesForMember(String topic, Long memberId) {
-//        List<String> messages = new ArrayList<>();
-//        Properties props = new Properties();
-//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-//        props.put(ConsumerConfig.GROUP_ID_CONFIG, "member-" + memberId); // memberId 기반 그룹 ID 설정
-//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-//
-//        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
-//            TopicPartition partition = new TopicPartition(topic, 0);
-//            consumer.assign(Collections.singletonList(partition));
-//
-//            // 해당 memberId의 마지막 커밋된 Offset 위치부터 읽기 시작
-//            consumer.seek(partition, consumer.position(partition));
-//
-//            // 메시지 읽기
-//            while (true) {
-//                var records = consumer.poll(Duration.ofMillis(100));
-//                if (records.isEmpty()) break;
-//
-//                for (ConsumerRecord<String, String> record : records) {
-//                    messages.add(record.value());
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return messages;
-//    }
+    private void fetchMissedMessages(ConcurrentMessageListenerContainer<String, String> container, String topic, Long memberId, String destination) {
+        container.stop(); // 일시적으로 Kafka 리스너 중지
 
-    /**
-     * Kafka의 밀린 메시지를 특정 파티션과 Offset에서부터 가져오는 메서드
-     */
-//    private List<String> getMissedMessages(String topic) {
-//        List<String> messages = new ArrayList<>();
-//        Properties props = new Properties();
-//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-//        props.put(ConsumerConfig.GROUP_ID_CONFIG, "missed-messages-group");
-//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-//
-//        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
-//            TopicPartition partition = new TopicPartition(topic, 0);
-//            consumer.assign(Collections.singletonList(partition));
-//            consumer.seek(partition, 0); // 처음부터 읽어오기
-//
-//            while (true) {
-//                var records = consumer.poll(Duration.ofMillis(100));
-//                if (records.isEmpty()) break;
-//
-//                for (ConsumerRecord<String, String> record : records) {
-//                    messages.add(record.value());
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return messages;
-//    }
+        // Offset 조정 후, 메시지를 STOMP로 전송
+        container.getContainerProperties().setMessageListener((MessageListener<String, String>) record -> {
+            messagingTemplate.convertAndSend(destination, record.value());
+            log.info("Sent missed message to STOMP: {} for member {}", record.value(), memberId);
+        });
+
+        container.start(); // 리스너 재시작하여 실시간 메시지 수신 재개
+    }
 
     // 엔터티별 Consumer Group을 위한 Kafka ConsumerFactory 생성
     private ConsumerFactory<String, String> createConsumerFactory(String groupId) {

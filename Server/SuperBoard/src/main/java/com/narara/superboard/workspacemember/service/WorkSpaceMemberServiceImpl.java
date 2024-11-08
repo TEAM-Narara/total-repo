@@ -140,7 +140,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpace.addOffset(); //workspace offset++
 
         // 3. 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
+        // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
         // 4. 카프카에 전송
         workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
