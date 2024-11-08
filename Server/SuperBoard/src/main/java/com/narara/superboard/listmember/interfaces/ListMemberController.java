@@ -12,8 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "리스트 멤버")
-@Controller
+@Tag(name = "리스트 회원")
+@RestController
 @RequiredArgsConstructor
 public class ListMemberController implements ListMemberAPI {
 

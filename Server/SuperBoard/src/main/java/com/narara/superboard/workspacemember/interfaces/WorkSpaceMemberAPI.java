@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping("/api/v1")
-@Tag(name = "워크스페이스 회원", description = "워크스페이스 멤버 관련 API")
 public interface WorkSpaceMemberAPI {
 
     @Operation(summary = "워크스페이스 멤버 조회", description = "워크스페이스 ID를 통해 멤버 리스트를 조회합니다.", hidden = true)

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "FCM 토큰")
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class FcmTokenController implements FcmTokenAPI {
 

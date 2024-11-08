@@ -5,6 +5,7 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.memberbackground.entity.MemberBackground;
 import com.narara.superboard.memberbackground.interfaces.dto.MemberBackgroundResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
