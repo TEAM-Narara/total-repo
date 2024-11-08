@@ -62,4 +62,7 @@ interface WorkspaceDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteLocalWorkspace(workspace: WorkspaceEntity)
+
+    @Query("DELETE FROM workspace WHERE id = :id")
+    suspend fun deleteByWorkspaceId(id: Long)
 }

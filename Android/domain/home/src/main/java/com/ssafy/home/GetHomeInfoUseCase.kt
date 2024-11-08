@@ -2,6 +2,7 @@ package com.ssafy.home
 
 import com.ssafy.data.repository.board.BoardRepository
 import com.ssafy.data.repository.workspace.WorkspaceRepository
+import com.ssafy.data.socket.workspace.WorkspaceStomp
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.home.data.HomeData
 import com.ssafy.home.data.SelectedWorkSpace
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class GetHomeInfoUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val workspaceRepository: WorkspaceRepository,
-    private val boardRepository: BoardRepository
+    private val boardRepository: BoardRepository,
+    private val workspaceStomp: WorkspaceStomp,
 ) {
 
 
@@ -47,6 +49,7 @@ class GetHomeInfoUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData> {
+        workspaceStomp.connect(workspaceId)
         return combine(
             workspaceRepository.getWorkspace(workspaceId),
             boardRepository.getBoardsByWorkspace(workspaceId)

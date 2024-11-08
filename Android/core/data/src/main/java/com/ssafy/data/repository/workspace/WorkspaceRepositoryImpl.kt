@@ -171,7 +171,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
             if (workspaceMember != null) {
                 if (isConnected) {
-                    workspaceDataSource.deleteWorkspaceMember(id).map { Unit }
+                    workspaceDataSource.deleteWorkspaceMember(workspaceMember.workspaceId, workspaceMember.memberId).map { Unit }
                 } else {
                     val result = when (workspaceMember.isStatus) {
                         DataStatus.CREATE -> workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)

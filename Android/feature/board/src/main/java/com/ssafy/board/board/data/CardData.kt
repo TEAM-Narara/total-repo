@@ -39,7 +39,7 @@ object CardDataMapper {
             startAt = startAt,
             endAt = endAt,
             coverType = cover?.type ?: CoverType.NONE,
-            coverValue = cover?.value ?: "",
+            coverValue = cover?.value,
             myOrder = myOrder,
             isArchived = isArchived,
             isWatching = cardMemberAlarm,
