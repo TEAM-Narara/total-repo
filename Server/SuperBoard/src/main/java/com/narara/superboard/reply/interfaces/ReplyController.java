@@ -39,7 +39,7 @@ public class ReplyController implements ReplyAPI {
 
     @Override
     @Operation(summary = "댓글 수정", description = "")
-    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(@AuthenticationPrincipal Member member, ReplyUpdateRequestDto updateRequestDto,
                                                                Long replyId) {
         Reply reply = replyService.updateReply(member, replyId, updateRequestDto);
 
@@ -50,7 +50,7 @@ public class ReplyController implements ReplyAPI {
 
     @Override
     @Operation(summary = "댓글 삭제", description = "")
-    public ResponseEntity<DefaultResponse<Void>> deleteReply(Member member, Long replyId) {
+    public ResponseEntity<DefaultResponse<Void>> deleteReply(@AuthenticationPrincipal Member member, Long replyId) {
         replyService.deleteReply(member, replyId);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS),HttpStatus.OK);
