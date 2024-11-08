@@ -5,6 +5,7 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
@@ -54,6 +55,17 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
         id: Long,
         updateLabelRequestDto: UpdateLabelRequestDto
     ): Flow<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteBoardMember(boardId: Long, memberId: Long): Flow<SimpleMemberDto> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateBoardMember(
+        boardId: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<SimpleMemberDto> {
         TODO("Not yet implemented")
     }
 

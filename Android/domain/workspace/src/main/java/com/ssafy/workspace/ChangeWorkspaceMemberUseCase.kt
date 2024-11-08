@@ -1,8 +1,8 @@
 package com.ssafy.workspace
 
 import com.ssafy.data.repository.workspace.WorkspaceRepository
+import com.ssafy.model.member.SimpleMemberDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class ChangeWorkspaceMemberUseCase @Inject constructor(
@@ -12,11 +12,11 @@ class ChangeWorkspaceMemberUseCase @Inject constructor(
     suspend operator fun invoke(
         workspaceId: Long,
         memberId: Long,
-        authority: String
+        authority: String,
+        isConnected: Boolean
     ): Flow<Unit> {
-//        workspaceRepository.updateWorkspaceMember(id, memberId, authority)
-//        return workspaceRepository.changeWorkspaceMember(workspaceId, simpleMemberDto)
-        return flowOf(Unit)
+        val simpleMemberDto = SimpleMemberDto(memberId, authority)
+        return workspaceRepository.updateWorkspaceMember(workspaceId, simpleMemberDto, isConnected)
     }
 
 }

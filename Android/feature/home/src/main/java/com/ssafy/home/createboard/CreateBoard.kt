@@ -28,7 +28,7 @@ fun CreateBoardScreen(
     viewModel: CreateBoardViewModel = hiltViewModel(),
     cover: Cover,
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: (Cover?) -> Unit,
+    moveToSelectBackgroundScreen: (Cover) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -55,7 +55,7 @@ private fun CreateBoardScreen(
     cover: Cover,
     workspaceList: List<WorkSpaceDTO>,
     popBackToHome: () -> Unit,
-    moveToSelectBackgroundScreen: (Cover?) -> Unit,
+    moveToSelectBackgroundScreen: (Cover) -> Unit,
     createBoard: (BoardDTO) -> Unit,
 ) {
     with(LocalContext.current as Activity) {

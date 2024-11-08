@@ -40,7 +40,7 @@ fun CreateBoardBody(
     modifier: Modifier = Modifier,
     workSpaceList: List<WorkSpaceDTO>,
     cover: Cover,
-    moveToSelectBackgroundScreen: (Cover?) -> Unit,
+    moveToSelectBackgroundScreen: (Cover) -> Unit,
     createBoardClick: (boardDTO: BoardDTO) -> Unit
 ) {
     val scrollState = rememberScrollState()

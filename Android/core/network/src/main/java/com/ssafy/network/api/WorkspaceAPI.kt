@@ -49,7 +49,7 @@ interface WorkspaceAPI {
     @PATCH("api/v1/{workspaceId}/members")
     suspend fun updateWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
-        @Body detailMemberDto: SimpleMemberDto
+        @Body simpleMemberDto: SimpleMemberDto
     ): Response<ApiResponse<DetailMemberDto>>
 
     @GET("api/v1/members/{memberId}/workspaces")
