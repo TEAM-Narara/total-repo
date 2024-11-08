@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import okhttp3.OkHttpClient
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
+import org.hildan.krossbow.stomp.frame.StompFrame
 import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.stomp.subscribe
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
@@ -50,11 +51,17 @@ class StompClientManager @Inject constructor(
         }
     }
 
-    suspend fun <T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<T> {
+    suspend fun <T> subscribe(
+        id: String,
+        topic: String,
+        clazz: Class<T>,
+        ack: suspend (StompFrame.Message) -> Unit = {}
+    ): Flow<T> {
         Log.d("TAG", "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
             Log.d("TAG", "data: ${it.bodyAsText}")
+            ack(it)
             gson.fromJson(it.bodyAsText, clazz)
         }.catch { exception ->
             exception.printStackTrace()
