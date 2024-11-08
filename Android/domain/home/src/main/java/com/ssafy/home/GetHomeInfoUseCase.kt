@@ -31,10 +31,11 @@ class GetHomeInfoUseCase @Inject constructor(
                 boardRepository.getBoardsByWorkspace(workspace.workSpaceId)
                     .map { boardList ->
                         SelectedWorkSpace(
-                            workSpaceId = workspace.workSpaceId,
-                            workSpaceName = workspace.name,
+                            workspaceId = workspace.workSpaceId,
+                            workspaceName = workspace.name,
                             boards = boardList
                         )
+
                     }
             } ?: flowOf(SelectedWorkSpace())
 
@@ -60,8 +61,8 @@ class GetHomeInfoUseCase @Inject constructor(
         ) { workspace, boardList ->
             homeData.copy(
                 selectedWorkSpace = SelectedWorkSpace(
-                    workSpaceId = workspace.workSpaceId,
-                    workSpaceName = workspace.name,
+                    workspaceId = workspace.workSpaceId,
+                    workspaceName = workspace.name,
                     boards = boardList
                 )
             )

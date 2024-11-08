@@ -71,7 +71,7 @@ fun HomeScreen(
         moveToBoardScreen = moveToBoardScreen,
         moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(homeData.workspaceList) },
         moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
-        moveToSettingScreen = { moveToSettingScreen(homeData.selectedWorkSpace.workSpaceId) },
+        moveToSettingScreen = { moveToSettingScreen(homeData.selectedWorkSpace.workspaceId) },
         moveToMyCardScreen = moveToMyCardScreen,
         moveToUpdateProfile = moveToUpdateProfile,
         moveToSearchScreen = moveToSearchScreen,
@@ -146,7 +146,7 @@ private fun HomeScreen(
             containerColor = White,
             topBar = {
                 MainTopBar(
-                    title = selectedWorkspace.workSpaceName,
+                    title = selectedWorkspace.workspaceName,
                     onDrawerClick = { scope.launch { drawerState.open() } },
                     onSearchClick = moveToSearchScreen,
                     onAlarmClick = moveToAlarmScreen,
