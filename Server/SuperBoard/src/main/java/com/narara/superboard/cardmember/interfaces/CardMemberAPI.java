@@ -25,7 +25,7 @@ public interface CardMemberAPI {
             @PathVariable Long cardId);
 
     @PatchMapping("/representative")
-    @Operation(summary = "카드 멤버 대표자 설정", description = "특정 카드 멤버를 대표자로 설정합니다.")
+    @Operation(summary = "카드 멤버 대표자 설정", description = "특정 카드 멤버를 담당자로 설정합니다.")
     ResponseEntity<DefaultResponse<Void>> setCardMemberIsRepresentative(
             @RequestBody UpdateCardMemberRequestDto updateCardMemberRequestDto);
 }
