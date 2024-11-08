@@ -3,6 +3,7 @@ package com.narara.superboard.memberbackground.interfaces;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.memberbackground.entity.MemberBackground;
 import com.narara.superboard.memberbackground.interfaces.dto.MemberBackgroundResponseDto;
 import com.narara.superboard.memberbackground.service.MemberBackgroundService;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +40,9 @@ public class MemberBackgroundController implements MemberBackgroundAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<List<MemberBackgroundResponseDto>>> getAllMemberBackground(
-            @PathVariable Long memberId) {
+            @AuthenticationPrincipal Member member) {
 
-        List<MemberBackground> backgrounds = memberBackgroundService.getAllMemberBackground(memberId);
+        List<MemberBackground> backgrounds = memberBackgroundService.getAllMemberBackground(member);
         List<MemberBackgroundResponseDto> memberBackgroundResponseDtoList= new ArrayList<>();
         for (MemberBackground background : backgrounds) {
             memberBackgroundResponseDtoList.add(MemberBackgroundResponseDto.of(background));
@@ -54,10 +56,10 @@ public class MemberBackgroundController implements MemberBackgroundAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<Void>> deleteMemberBackground(
-            @PathVariable Long memberId,
+            @AuthenticationPrincipal Member member,
             @PathVariable Long backgroundId) {
 
-        memberBackgroundService.deleteMemberBackground(memberId, backgroundId);
+        memberBackgroundService.deleteMemberBackground(member, backgroundId);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.MEMBER_BACKGROUND_DELETE_SUCCESS),
                 HttpStatus.OK

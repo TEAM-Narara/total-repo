@@ -45,10 +45,8 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     }
 
     @Override
-    public void deleteFcmToken(Long memberId) {
-        validateMemberExists(memberId);
-
-        FcmToken fcmToken = fcmTokenRepository.findByMemberId(memberId)
+    public void deleteFcmToken(Member member) {
+        FcmToken fcmToken = fcmTokenRepository.findByMember(member)
                 .orElseThrow(() -> new NotFoundException("FcmToken", "토큰"));
 
         fcmTokenRepository.delete(fcmToken);

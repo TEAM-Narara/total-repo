@@ -5,10 +5,12 @@ import com.narara.superboard.cardmember.service.CardMemberService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +23,10 @@ public class CardMemberController implements CardMemberAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<Boolean>> getCardMemberIsAlert(
-            @PathVariable Long memberId,
+            @AuthenticationPrincipal Member member,
             @PathVariable Long cardId) {
 
-        boolean isAlert = cardMemberService.getCardMemberIsAlert(memberId, cardId);
+        boolean isAlert = cardMemberService.getCardMemberIsAlert(member, cardId);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_ALERT_STATUS_FETCH_SUCCESS, isAlert),
                 HttpStatus.OK
@@ -33,10 +35,10 @@ public class CardMemberController implements CardMemberAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<Void>> setCardMemberIsAlert(
-            @PathVariable Long memberId,
+            @AuthenticationPrincipal Member member,
             @PathVariable Long cardId) {
 
-        cardMemberService.setCardMemberIsAlert(memberId, cardId);
+        cardMemberService.setCardMemberIsAlert(member, cardId);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS),
                 HttpStatus.OK

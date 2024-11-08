@@ -19,11 +19,10 @@ public class ListMemberServiceImpl implements ListMemberService {
     private final ListMemberRepository listMemberRepository;
 
     @Override
-    public void setListMemberIsAlert(Long memberId, Long listId) {
+    public void setListMemberIsAlert(Member member, Long listId) {
         List list = validateListExists(listId);
-        Member member = validateMemberExists(memberId);
 
-        listMemberRepository.findByListIdAndMemberId(listId, memberId)
+        listMemberRepository.findByListIdAndMember(listId, member)
                 .ifPresentOrElse(
                         this::toggleAlertAndSave,
                         () -> addNewListMember(member, list)

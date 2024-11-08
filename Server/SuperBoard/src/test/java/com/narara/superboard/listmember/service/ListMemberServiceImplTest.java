@@ -63,14 +63,14 @@ class ListMemberServiceImplTest {
         when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         when(listRepository.existsById(listId)).thenReturn(true);
-        when(listMemberRepository.findByListIdAndMemberId(listId, memberId))
+        when(listMemberRepository.findByListIdAndMember(listId, member))
                 .thenReturn(Optional.of(existingListMember));
 
-        listMemberService.setListMemberIsAlert(memberId, listId);
+        listMemberService.setListMemberIsAlert(member, listId);
 
         assertFalse(existingListMember.isAlert());
         verify(listRepository, times(1)).findById(listId);
-        verify(listMemberRepository, times(1)).findByListIdAndMemberId(listId, memberId);
+        verify(listMemberRepository, times(1)).findByListIdAndMember(listId, member);
         verify(listMemberRepository, times(1)).save(existingListMember);
     }
 
@@ -88,28 +88,29 @@ class ListMemberServiceImplTest {
         when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // listMember가 존재하지 않는 경우
-        when(listMemberRepository.findByListIdAndMemberId(listId, memberId)).thenReturn(Optional.empty());
+        when(listMemberRepository.findByListIdAndMember(listId, member)).thenReturn(Optional.empty());
 
         // 메서드 호출
-        listMemberService.setListMemberIsAlert(memberId, listId);
+        listMemberService.setListMemberIsAlert(member, listId);
 
         // 메서드 호출 횟수 검증
         verify(listRepository, times(1)).findById(listId);
-        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(memberId);
-        verify(listMemberRepository, times(1)).findByListIdAndMemberId(listId, memberId);
+//        verify(memberRepository, times(1)).findByIdAndIsDeletedFalse(memberId);
+        verify(listMemberRepository, times(1)).findByListIdAndMember(listId, member);
         verify(listMemberRepository, times(1)).save(any(ListMember.class));
     }
+
     @Test
     @DisplayName("리스트가 존재하지 않을 때 예외 발생")
     void testSetlistMemberWatch_listDoesNotExist() {
         Long listId = list.getId();
-        Long memberId = member.getId();
 
         when(listRepository.existsById(listId)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> listMemberService.setListMemberIsAlert(memberId, listId));
+        assertThrows(IllegalArgumentException.class, () -> listMemberService.setListMemberIsAlert(member, listId));
         verify(listRepository, times(1)).findById(listId);
-        verify(listMemberRepository, never()).findByListIdAndMemberId(anyLong(), anyLong());
+        verify(listMemberRepository, never()).findByListIdAndMember(anyLong(), eq(member)); // 수정된 부분
         verify(listMemberRepository, never()).save(any(ListMember.class));
     }
+
 }

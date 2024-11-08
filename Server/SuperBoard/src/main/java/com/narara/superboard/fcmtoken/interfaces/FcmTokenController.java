@@ -6,10 +6,12 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.fcmtoken.interfaces.dto.FcmTokenResponseDto;
 import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,9 +49,10 @@ public class FcmTokenController implements FcmTokenAPI {
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<Void>> deleteFcmToken(@PathVariable Long memberId) {
+    public ResponseEntity<DefaultResponse<Void>> deleteFcmToken(
+            @AuthenticationPrincipal Member member) {
 
-        fcmTokenService.deleteFcmToken(memberId);
+        fcmTokenService.deleteFcmToken(member);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.FCM_TOKEN_DELETE_SUCCESS),
                 HttpStatus.OK

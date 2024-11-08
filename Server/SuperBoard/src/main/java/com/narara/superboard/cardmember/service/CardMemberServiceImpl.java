@@ -29,21 +29,19 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final CardHistoryRepository cardHistoryRepository;
 
     @Override
-    public boolean getCardMemberIsAlert(Long memberId, Long cardId) {
+    public boolean getCardMemberIsAlert(Member member, Long cardId) {
         validateCardExists(cardId);
-        validateMemberExists(memberId);
 
-        return cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
+        return cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .map(CardMember::isAlert)
                 .orElse(false);
     }
 
     @Override
-    public void setCardMemberIsAlert(Long memberId, Long cardId) {
+    public void setCardMemberIsAlert(Member member, Long cardId) {
         Card card = validateCardExists(cardId);
-        Member member = validateMemberExists(memberId);
 
-        cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
+        cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .ifPresentOrElse(
                         this::toggleAlertAndSave,
                         () -> addNewCardMember(member, card)

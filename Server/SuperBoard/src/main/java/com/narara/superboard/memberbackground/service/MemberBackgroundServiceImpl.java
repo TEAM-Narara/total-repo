@@ -32,17 +32,14 @@ public class MemberBackgroundServiceImpl implements MemberBackgroundService {
     }
 
     @Override
-    public List<MemberBackground> getAllMemberBackground(Long memberId) {
-        findMemberByIdOrThrow(memberId);
+    public List<MemberBackground> getAllMemberBackground(Member member) {
 
-        return memberBackgroundRepository.findAllByMemberId(memberId);
+        return memberBackgroundRepository.findAllByMember(member);
     }
 
     @Override
-    public void deleteMemberBackground(Long memberId, Long backgroundId) {
-        findMemberByIdOrThrow(memberId);
-
-        MemberBackground background = memberBackgroundRepository.findByIdAndMemberId(backgroundId, memberId)
+    public void deleteMemberBackground(Member member, Long backgroundId) {
+        MemberBackground background = memberBackgroundRepository.findByIdAndMember(backgroundId, member)
                 .orElseThrow(() -> new NotFoundEntityException(backgroundId, "멤버 배경"));
         memberBackgroundRepository.delete(background);
     }
