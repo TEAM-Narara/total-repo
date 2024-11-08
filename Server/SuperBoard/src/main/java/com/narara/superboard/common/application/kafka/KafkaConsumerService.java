@@ -1,5 +1,8 @@
 package com.narara.superboard.common.application.kafka;
 
+import com.narara.superboard.common.entity.TopicMemberOffset;
+import com.narara.superboard.common.infrastructure.kafka.TopicMemberOffsetRepository;
+import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.common.interfaces.dto.AckMessage;
 import com.narara.superboard.common.interfaces.dto.LastOffsetKey;
 import com.narara.superboard.common.interfaces.dto.OffsetKey;
@@ -23,6 +26,9 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -37,13 +43,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KafkaConsumerService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisService redisService;
+    private final TopicMemberOffsetRepository topicMemberOffsetRepository;
     private final ConsumerFactory<String, String> consumerFactory;
     // 컨슈머 리스너 중복 관리를 위한 맵
     private final Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners = new ConcurrentHashMap<>();
-    // ack 비동기 처리에 대한 관리를 위한 맵, 여러개의 토픽을 처리하기위한 복합키 사용
     private final Map<OffsetKey, Acknowledgment> pendingAcks = new ConcurrentHashMap<>();
-    // (topic, groupId)별로 독립적인 오프셋을 관리하기 위한 맵
-    private final Map<LastOffsetKey, Long> lastAcknowledgedOffsets = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private static final long WAIT_PERIOD = 3000;
 
     /**
      * stomp 구독 시에 자동으로 함수 호출됨
@@ -78,33 +85,18 @@ public class KafkaConsumerService {
 
             container = factory.createContainer(topic);
             container.setupMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
-                handleRecord(record, acknowledgment, entityType, primaryId, memberId);
+                processRecord(record, acknowledgment, entityType, primaryId, memberId);
             });
 
             container.start();
             activeListeners.put(listenerKey, container);
+
+            // TODO : 컨슈머 그룹 생성할떄, topicMemberOffset 생성하기
+            topicMemberOffsetRepository.save(new TopicMemberOffset(topic,memberId));
         }
 
         // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
         fetchMissedMessages(container, topic, memberId, "/topic/" + entityType + "/" + primaryId + "/member/" + memberId);
-    }
-
-    /**
-     * 메시지를 STOMP로 전송하고, acknowledgment를 대기 목록에 추가
-     */
-    private void handleRecord(ConsumerRecord<String, String> record, Acknowledgment acknowledgment, String entityType, Long primaryId, Long memberId) {
-        String message = record.value();
-        String destination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
-        OffsetKey offsetKey = new OffsetKey(record.topic(), record.partition(), record.offset(), "member-" + memberId);
-
-        // 메시지 전송 시 헤더에 offset, partition, topic, groupId 정보 추가
-        Map<String, Object> headers = new HashMap<>();
-        headers.put("offset", record.offset());
-
-        messagingTemplate.convertAndSend(destination, message, headers);  // 헤더 포함하여 메시지 전송
-
-        pendingAcks.put(offsetKey, acknowledgment);
-        log.info("Message sent to STOMP: {} for {} {} and member {}", message, entityType, primaryId, memberId);
     }
 
     /**
@@ -113,9 +105,125 @@ public class KafkaConsumerService {
     private void fetchMissedMessages(ConcurrentMessageListenerContainer<String, String> container, String topic, Long memberId, String destination) {
         container.stop();
         container.getContainerProperties().setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
-            handleRecord(record, acknowledgment, topic.split("-")[0], Long.parseLong(topic.split("-")[1]), memberId);
+            processRecord(record, acknowledgment, topic.split("-")[0], Long.parseLong(topic.split("-")[1]), memberId);
         });
         container.start();
+    }
+
+    /**
+     * 메시지를 STOMP로 전송하고, acknowledgment를 대기 목록에 추가
+     */
+    private void processRecord(ConsumerRecord<String, String> record, Acknowledgment acknowledgment, String entityType, Long primaryId, Long memberId){
+        long offset = record.offset();
+        String destination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
+
+        // header에 offset을 포함해 STOMP로 메시지 전송
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("offset", offset);
+        messagingTemplate.convertAndSend(destination, record.value(), headers);
+
+        // ACK 대기 큐에 추가
+        redisService.addAckToQueue(entityType+"-"+primaryId, "member-"+memberId, offset, record.value());
+
+        // 오프셋 및 ACK 처리
+        processAcknowledgment(new OffsetKey(record.topic(), record.partition(), offset, "member-"+memberId));
+    }
+
+    /**
+     * 순서에 맞는 ACK가 처리되었는지 확인하고, 순서가 맞지 않으면 Redis 대기 큐에 저장하여 순서를 맞춥니다.
+     */
+    public void processAcknowledgment(OffsetKey offsetKey) {
+        String topic = offsetKey.topic();
+        String groupId = offsetKey.groupId();
+        long offset = offsetKey.offset();
+        Long memberId = Long.parseLong(groupId.replace("member-", ""));
+
+        // Redis에서 마지막으로 ACK된 오프셋 조회
+        long lastOffset = topicMemberOffsetRepository.findByTopicAndMemberId(topic,memberId)
+                .map(TopicMemberOffset::getLastOffset)
+                .orElse(-1L);
+
+        Acknowledgment acknowledgment = pendingAcks.remove(offsetKey);
+
+        if (offset == lastOffset + 1) {
+            if (acknowledgment != null) {
+                // Kafka에 오프셋 커밋
+                acknowledgment.acknowledge();
+            }
+
+            // Redis 및 DB에 최신 오프셋 갱신
+            // redisService.setLastAcknowledgedOffset(topic, groupId, offset);
+            updateLastOffsetInDB(topic,memberId, offset);
+
+            log.info("Acknowledged and updated last acknowledged offset for topic: {}, groupId: {}: {}", topic, groupId, offset);
+
+            // 다음 오프셋을 대기 큐에서 처리
+            processPendingAcks(topic, groupId, offset + 1);
+        } else {
+            // 순서가 맞지 않으면 Redis 대기 큐에 저장
+            redisService.addAckToQueue(topic, groupId, offset, "ack_pending");
+            log.warn("ACK is out of order. Expected: {}, but got: {}. Added to queue.", lastOffset + 1, offset);
+            // 일정시간 기다림
+            startSingleWaitTimer(offsetKey);
+        }
+    }
+
+    /**
+     * 대기 큐에서 순차적으로 ACK를 처리
+     */
+    private void processPendingAcks(String topic, String groupId, long startOffset) {
+        Long nextOffset = startOffset;
+
+        while (true) {
+            // 다음 ack가 왔는지 확인
+            String pendingAck = (String) redisService.getAckFromQueue(topic, groupId, nextOffset);
+
+            if (pendingAck != null) {
+                Acknowledgment acknowledgment = pendingAcks.remove(new OffsetKey(topic, 0, nextOffset, groupId));
+                if (acknowledgment != null) {
+                    acknowledgment.acknowledge(); // ACK 처리
+                    // 최신 오프셋 갱신
+                    updateLastOffsetInDB(topic,Long.parseLong(groupId.replace("member-", "")),nextOffset);
+                    // redisService.setLastAcknowledgedOffset(topic, groupId, nextOffset); // 최신 오프셋 갱신
+                    redisService.removeAckFromQueue(topic, groupId, nextOffset); // 대기 큐에서 제거
+                    nextOffset++;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Initiates a single wait timer for an out-of-order ACK.
+     * If the ACK is not received within the WAIT_PERIOD, it logs an error and stops tracking that ACK.
+     *
+     * @param offsetKey the OffsetKey for which we are waiting for the ACK
+     */
+    private void startSingleWaitTimer(OffsetKey offsetKey) {
+        scheduler.schedule(() -> {
+            String pendingAck = (String) redisService.getAckFromQueue(offsetKey.topic(), offsetKey.groupId(), offsetKey.offset());
+            if (pendingAck != null) {
+                log.error("No ACK received for offset {} within {} ms. Stopping tracking for groupId {}.",
+                        offsetKey.offset(), WAIT_PERIOD, offsetKey.groupId());
+                pendingAcks.remove(offsetKey);
+                redisService.removeAckFromQueue(offsetKey.topic(), offsetKey.groupId(), offsetKey.offset());
+            }
+        }, WAIT_PERIOD, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * offset 갱신하는 로직
+     * @param topic
+     * @param memberId
+     * @param newOffset
+     */
+    private void updateLastOffsetInDB(String topic, Long memberId, Long newOffset) {
+        TopicMemberOffset offsetRecord = topicMemberOffsetRepository.findByTopicAndMemberId(topic, memberId)
+                .orElse(new TopicMemberOffset(topic, memberId));
+
+        offsetRecord.updateLastOffset(newOffset);
+        topicMemberOffsetRepository.save(offsetRecord);
     }
 
     /**
@@ -127,31 +235,20 @@ public class KafkaConsumerService {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    // 문제 : lastAcknowledgedOffset이 (토픽,groupId) 마다 다 달라야하는데 같아서 문제남
-    /**
-     * 클라이언트에서 ack를 수신하여 해당 메시지의 오프셋을 커밋
-     */
-    public void processAcknowledgment(OffsetKey offsetKey) {
-        Acknowledgment acknowledgment = pendingAcks.remove(offsetKey);
-        if (acknowledgment != null) {
-            long lastOffsetForKey = lastAcknowledgedOffsets
-                    .getOrDefault(new LastOffsetKey(offsetKey.topic(),offsetKey.groupId()), -1L);
-
-            if (offsetKey.offset() == lastOffsetForKey + 1) {
-                acknowledgment.acknowledge(); // 카프카에 오프셋 커밋
-                LastOffsetKey lastOffsetKey = new LastOffsetKey(offsetKey.topic(),offsetKey.groupId());
-                lastAcknowledgedOffsets.put(lastOffsetKey, offsetKey.offset()); // (topic, groupId)별로 오프셋 갱신
-
-                // TODO: db에 각 topic, groupId별로 오프셋 저장하기
-                log.info("Acknowledged and updated last acknowledged offset for {}: {}", lastOffsetKey, offsetKey.offset());
-            } else {
-                log.warn("Received ack for non-contiguous offset. Last acknowledged offset for {}: {}", offsetKey, lastOffsetForKey);
-            }
-        } else {
-            log.warn("Acknowledgment not found for topic: {}, partition: {}, offset: {}, groupId: {}",
-                    offsetKey.topic(), offsetKey.partition(), offsetKey.offset(), offsetKey.groupId());
-        }
-    }
+    //    private void handleRecord(ConsumerRecord<String, String> record, Acknowledgment acknowledgment, String entityType, Long primaryId, Long memberId) {
+//        String message = record.value();
+//        String destination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
+//        OffsetKey offsetKey = new OffsetKey(record.topic(), record.partition(), record.offset(), "member-" + memberId);
+//
+//        // 메시지 전송 시 헤더에 offset, partition, topic, groupId 정보 추가
+//        Map<String, Object> headers = new HashMap<>();
+//        headers.put("offset", record.offset());
+//
+//        messagingTemplate.convertAndSend(destination, message, headers);  // 헤더 포함하여 메시지 전송
+//
+//        pendingAcks.put(offsetKey, acknowledgment);
+//        log.info("Message sent to STOMP: {} for {} {} and member {}", message, entityType, primaryId, memberId);
+//    }
 
 //    @MessageMapping("/ack")
 //    public void receiveAck(@Payload AckMessage ackMessage) {

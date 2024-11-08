@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    // private final RedisTemplate<String, Object> redisAckTemplate;
 
     @Override
     public String getData(String key) {
@@ -91,5 +93,36 @@ public class RedisServiceImpl implements RedisService {
         } catch (Exception e) {
             throw new RedisDataDeleteException(key);
         }
+    }
+
+    @Override
+    public void addAckToQueue(String topic, String groupId, long offset, String ackMessage) {
+        String key = "ackQueue:" + topic + ":" + groupId;
+        redisTemplate.opsForZSet().add(key, ackMessage, offset);
+    }
+
+    @Override
+    public Object getAckFromQueue(String topic, String groupId, long offset) {
+        String key = "ackQueue:" + topic + ":" + groupId;
+        Set<String> resultSet = redisTemplate.opsForZSet().rangeByScore(key, offset, offset);
+        return resultSet != null && !resultSet.isEmpty() ? resultSet.iterator().next() : null;
+    }
+
+    @Override
+    public Set<String> getPendingAcks(String topic, String groupId, long startOffset, long endOffset) {
+        String key = "ackQueue:" + topic + ":" + groupId;
+        return redisTemplate.opsForZSet().rangeByScore(key, startOffset, endOffset);
+    }
+
+    @Override
+    public void removeAckFromQueue(String topic, String groupId, long offset) {
+        String key = "ackQueue:" + topic + ":" + groupId;
+        redisTemplate.opsForZSet().removeRangeByScore(key, offset, offset);
+    }
+
+    @Override
+    public void removeFirstAck(String topic, String groupId) {
+        String key = "ackQueue:" + topic + ":" + groupId;
+        redisTemplate.opsForZSet().removeRange(key, 0, 0);
     }
 }
