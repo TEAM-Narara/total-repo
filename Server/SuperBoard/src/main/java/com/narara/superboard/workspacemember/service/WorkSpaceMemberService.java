@@ -8,7 +8,7 @@ import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.util.List;
 
 public interface WorkSpaceMemberService {
-    MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId);
+    MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId);
     WorkSpaceListResponseDto getMemberWorkspaceList(Member member);
 
     WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority);

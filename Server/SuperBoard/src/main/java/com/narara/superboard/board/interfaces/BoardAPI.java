@@ -21,7 +21,7 @@ public interface BoardAPI {
     ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(@PathVariable Long workspaceId);
 
     @PostMapping("")
-    @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
+    @PreAuthorize("hasPermission(#boardCreateRequestDto.workspaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
     ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(
             @RequestBody BoardCreateRequestDto boardCreateRequestDto);

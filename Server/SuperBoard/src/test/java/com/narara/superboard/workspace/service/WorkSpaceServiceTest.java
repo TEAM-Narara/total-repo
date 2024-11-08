@@ -148,18 +148,18 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     @Test
     void testGetWorkSpace_NotFound() {
         // given
-        Long workSpaceId = 1L;
-        when(workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
+        Long workspaceId = 1L;
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
-                () -> workSpaceService.getWorkSpace(workSpaceId));  // 예외가 발생하는지 확인
+                () -> workSpaceService.getWorkSpace(workspaceId));  // 예외가 발생하는지 확인
 
         // 추가 검증: 예외 객체에 담긴 ID와 엔티티 타입이 정확한지 확인
-        assertEquals(workSpaceId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
+        assertEquals(workspaceId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
         assertEquals("WorkSpace", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
 
-        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workSpaceId);  // findById가 한 번 호출되었는지 확인
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);  // findById가 한 번 호출되었는지 확인
     }
 
 
@@ -183,16 +183,16 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     @MethodSource("provideWorkSpaces")
     void testGetWorkSpace_Success(WorkSpace workSpace) {
         // given
-        Long workSpaceId = workSpace.getId();  // WorkSpace의 ID
-        when(workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
+        Long workspaceId = workSpace.getId();  // WorkSpace의 ID
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
 
         // when
-        WorkSpace result = workSpaceService.getWorkSpace(workSpaceId);  // 실제 getWorkSpace 호출
+        WorkSpace result = workSpaceService.getWorkSpace(workspaceId);  // 실제 getWorkSpace 호출
 
         // then
         assertNotNull(result);  // 결과가 null이 아닌지 확인
         assertEquals(workSpace, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
-        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workSpaceId);  // findById가 한 번 호출되었는지 검증
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);  // findById가 한 번 호출되었는지 검증
     }
 
 
@@ -270,7 +270,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     private void assertWorkspaceDetail(WorkSpaceDetailResponseDto result, WorkSpace mockWorkSpace,
                                        List<BoardDetailResponseDto> mockBoardCollectionResponseDto,
                                        MemberCollectionResponseDto mockMemberCollectionResponseDto) {
-        assertEquals(mockWorkSpace.getId(), result.workSpaceId());
+        assertEquals(mockWorkSpace.getId(), result.workspaceId());
         assertEquals(mockWorkSpace.getName(), result.name());
 
         // 리스트 내용을 비교할 때는 assertIterableEquals 사용

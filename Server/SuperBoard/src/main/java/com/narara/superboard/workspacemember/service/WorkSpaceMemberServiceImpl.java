@@ -39,8 +39,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
-    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
-        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId);
+    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId) {
+        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workspaceId);
 
         List<MemberResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
 
@@ -69,7 +69,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         for (WorkSpaceMember workSpaceMember : workSpaceMemberList) {
             WorkSpace workSpace = workSpaceMember.getWorkSpace();
             WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
-                    .workSpaceId(workSpace.getId())
+                    .workspaceId(workSpace.getId())
                     .name(workSpace.getName())
                     .build();
 

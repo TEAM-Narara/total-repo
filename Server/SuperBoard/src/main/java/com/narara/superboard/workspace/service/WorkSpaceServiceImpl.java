@@ -150,31 +150,31 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     @Transactional
-    public void deleteWorkSpace(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public void deleteWorkSpace(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
         workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override
-    public WorkSpace getWorkSpace(Long workSpaceId) {
-        return workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)
-                .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));
+    public WorkSpace getWorkSpace(Long workspaceId) {
+        return workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
+                .orElseThrow(() -> new NotFoundEntityException(workspaceId, "WorkSpace"));
     }
 
     @Override
-    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
 
         List<BoardDetailResponseDto> boardCollectionResponseDto =
-                boardService.getBoardCollectionResponseDto(workSpaceId);
+                boardService.getBoardCollectionResponseDto(workspaceId);
 
         MemberCollectionResponseDto workspaceMemberCollectionResponseDto =
-                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId);
 
         WorkSpaceDetailResponseDto workspaceDetailResponseDto = WorkSpaceDetailResponseDto.builder()
-                .workSpaceId(workSpace.getId())
+                .workspaceId(workSpace.getId())
                 .name(workSpace.getName())
                 .boardList(boardCollectionResponseDto)
                 .workspaceMemberList(workspaceMemberCollectionResponseDto)
