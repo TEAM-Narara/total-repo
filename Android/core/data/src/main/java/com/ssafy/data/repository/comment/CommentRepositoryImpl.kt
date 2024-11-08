@@ -16,6 +16,7 @@ import com.ssafy.network.source.comment.CommentDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -31,24 +32,23 @@ class CommentRepositoryImpl @Inject constructor(
     override suspend fun createComment(
         commentRequestDto: CommentRequestDto,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
-            if (isConnected) {
-                commentDataSource.createComment(commentRequestDto)
-            } else {
-                replyDao.insertReply(ReplyEntity(
-                    content = commentRequestDto.content,
-                    cardId = commentRequestDto.cardId,
-                    isStatus = DataStatus.CREATE,
-                    createAt = System.currentTimeMillis(),
-                    // TODO 내 아이디 가져오기
-                    memberId = 0L
-                ))
-            }
+    ): Flow<Long> = withContext(ioDispatcher) {
+        if (isConnected) {
+            commentDataSource.createComment(commentRequestDto).map { 5 }
+        } else {
+            flowOf(replyDao.insertReply(ReplyEntity(
+                content = commentRequestDto.content,
+                cardId = commentRequestDto.cardId,
+                isStatus = DataStatus.CREATE,
+                createAt = System.currentTimeMillis(),
+                // TODO 내 아이디 가져오기
+                memberId = 0L
+            )))
+
         }
     }
 
-    override suspend fun deleteComment(commentId: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteComment(commentId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val reply = replyDao.getReply(commentId)
 
@@ -56,38 +56,43 @@ class CommentRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     commentDataSource.deleteComment(commentId)
                 } else {
-                    when(reply.isStatus) {
+                    val result = when(reply.isStatus) {
                         DataStatus.CREATE ->
                             replyDao.deleteReply(reply)
                         else ->
                             replyDao.updateReply(reply.copy(isStatus = DataStatus.DELETE))
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun updateComment(
         commentId: Long,
         content: String,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
-        withContext(ioDispatcher) {
-            val reply = replyDao.getReply(commentId)
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val reply = replyDao.getReply(commentId)
 
-            if(reply != null) {
-                if (isConnected) {
-                    commentDataSource.updateComment(commentId, UpdateCommentDto(content))
-                } else {
-                    when(reply.isStatus) {
-                        DataStatus.STAY ->
-                            replyDao.updateReply(reply.copy(isStatus = DataStatus.UPDATE, content = content))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            replyDao.updateReply(reply.copy(content = content))
-                        DataStatus.DELETE -> { }
-                    }
+        if(reply != null) {
+            if (isConnected) {
+                commentDataSource.updateComment(commentId, UpdateCommentDto(content))
+            } else {
+                val result = when(reply.isStatus) {
+                    DataStatus.STAY ->
+                        replyDao.updateReply(reply.copy(isStatus = DataStatus.UPDATE, content = content))
+                    DataStatus.CREATE, DataStatus.UPDATE  ->
+                        replyDao.updateReply(reply.copy(content = content))
+                    DataStatus.DELETE -> { }
                 }
+
+                flowOf(result)
             }
+        } else {
+            flowOf(Unit)
         }
     }
 

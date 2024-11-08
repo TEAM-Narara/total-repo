@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
@@ -12,7 +13,6 @@ import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
-import com.ssafy.database.dto.temp.ListInCardThumbnails
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
@@ -42,6 +42,7 @@ class ListRepositoryImpl @Inject constructor(
     private val listMemberDao: ListMemberDao,
     private val cardDao: CardDao,
     private val replyDao: ReplyDao,
+    private val attachmentDao: AttachmentDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -54,7 +55,7 @@ class ListRepositoryImpl @Inject constructor(
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { -1 }
         } else {
-            flow {
+            flowOf (
                 listDao.insertList(
                     ListEntity(
                         name = createListRequestDto.listName,
@@ -62,8 +63,7 @@ class ListRepositoryImpl @Inject constructor(
                         isStatus = DataStatus.CREATE
                     )
                 )
-            }
-
+            )
         }
     }
 
@@ -174,7 +174,7 @@ class ListRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
+    override suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val member = listMemberDao.getListMember(id)
 
@@ -182,17 +182,20 @@ class ListRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     listDataSource.deleteListMember(id)
                 } else {
-                    when (member.isStatus) {
+                    val result = when (member.isStatus) {
                         DataStatus.CREATE ->
                             listMemberDao.deleteLocalListMember(member)
 
                         else ->
                             listMemberDao.updateListMember(member.copy(isStatus = DataStatus.DELETE))
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun getListWatchStatus(id: Long): Flow<Boolean> =
         withContext(ioDispatcher) {
@@ -249,37 +252,48 @@ class ListRepositoryImpl @Inject constructor(
     override suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>> {
         return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
             val listIds = lists.map { it.id }
-            cardDao.getAllCardsInLists(listIds).flatMapLatest { cards ->
-                val cardIds = cards.map { it.id }
 
-                combine(
-                    replyDao.getReplyCounts(cardIds),
-                    cardMemberDao.getCardRepresentativesInCards(cardIds),
-                    cardLabelDao.getAllCardLabelsInCards(cardIds)
-                ) { replyCounts, cardMembers, cardLabels ->
-                    val replyCountMap = replyCounts.associateBy { it.cardId }
-                    val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
-                    val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+            combine(
+                listMemberDao.getListsMemberAlarms(listIds),
+                cardDao.getAllCardsInLists(listIds).flatMapLatest { cards ->
+                    val cardIds = cards.map { it.id }
 
-                    val updatedCards = cards.map { card ->
-                        card.toDTO(
-                            replyCount = replyCountMap[card.id]?.count ?: 0,
-                            cardMembers = cardMemberMap[card.id]?.map { it.toDTO() } ?: emptyList(),
-                            cardLabels = cardLabelMap[card.id]?.map { it.toDto() } ?: emptyList()
-                        )
+                    combine(
+                        replyDao.getReplyCounts(cardIds),
+                        cardMemberDao.getCardRepresentativesInCards(cardIds),
+                        cardMemberDao.getCardsMemberAlarms(cardIds),
+                        cardLabelDao.getAllCardLabelsInCards(cardIds),
+                        attachmentDao.getCardsIsAttachment(cardIds)
+                    ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
+                        val replyCountMap = replyCounts.associateBy { it.cardId }
+                        val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                        val cardWatchMap = cardWatch.associateBy { it.cardId }
+                        val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+                        val attachmentMap = isAttachment.associateBy { it.cardId }
+
+                        val cardThumbnails = cards.map { card ->
+                            card.toDTO(
+                                replyCount = replyCountMap[card.id]?.count ?: 0,
+                                isWatch = cardWatchMap[card.id]?.isAlert ?: false,
+                                isAttachment = attachmentMap[card.id]?.isAttachment ?: false,
+                                cardMembers = cardMemberMap[card.id]?.map { it.toDTO() } ?: emptyList(),
+                                cardLabels = cardLabelMap[card.id]?.map { it.toDto() } ?: emptyList()
+                            )
+                        }
+
+                        cardThumbnails
                     }
+                }
+            ) { listWatch, updatedCards ->
+                val listWatchMap = listWatch.associateBy { it.listId }
 
-                    lists.map { list ->
-                        list.toDto(
-                            cards = updatedCards.filter { it.listId == list.id }
-                        )
-                    }
+                lists.map { list ->
+                    list.toDto(
+                        cards = updatedCards.filter { it.listId == list.id },
+                        isWatch = listWatchMap[list.id]?.isAlert ?: false
+                    )
                 }
             }
         }
     }
-
-
-
-
 }

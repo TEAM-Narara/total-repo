@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
@@ -35,6 +36,14 @@ interface ListMemberDao {
     // 리스트 멤버 단일 조회
     @Query("SELECT * FROM list_member WHERE id = :id")
     fun getListMember(id: Long): ListMemberEntity
+
+    // 리스트 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM list_member_alarm
+        WHERE listId IN (:listIds) 
+    """)
+    fun getListsMemberAlarms(listIds: List<Long>): Flow<List<ListMemberAlarmEntity>>
 
     // 리스트 멤버들 조회
     @Transaction
