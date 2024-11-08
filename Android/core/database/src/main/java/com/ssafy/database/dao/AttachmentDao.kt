@@ -50,9 +50,10 @@ interface AttachmentDao {
 
     // 카드들의 첨부파일 여부 조회
     @Query("""
-      SELECT cardId, CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END 
+      SELECT cardId, CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS isAttachmentInt
         FROM attachment 
-        WHERE cardId IN (:cardIds)  AND isStatus != 'DELETE'  
+        WHERE cardId IN (:cardIds)  AND isStatus != 'DELETE'
+        GROUP BY cardId
     """)
     fun getCardsIsAttachment(cardIds: List<Long>): Flow<List<CardIsAttachment>>
 
