@@ -174,17 +174,17 @@ class ListRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun deleteListMember(id: Long, isConnected: Boolean): Flow<Unit> =
+    override suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
-            val member = listMemberDao.getListMember(id)
+            val member = listMemberDao.getListMember(memberId, listId)
 
             if (member != null) {
                 if (isConnected) {
-                    listDataSource.deleteListMember(id)
+                    listDataSource.deleteListMember(memberId, listId)
                 } else {
                     val result = when (member.isStatus) {
                         DataStatus.CREATE ->
-                            listMemberDao.deleteLocalListMember(member)
+                            listMemberDao.deleteLocalListMember(memberId, listId)
 
                         else ->
                             listMemberDao.updateListMember(member.copy(isStatus = DataStatus.DELETE))
