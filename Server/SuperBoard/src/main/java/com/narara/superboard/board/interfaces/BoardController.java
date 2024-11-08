@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Tag(name = "보드", description = "보드 관련 API를 제공하는 인터페이스")
+@Tag(name = "5. 보드")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/boards")

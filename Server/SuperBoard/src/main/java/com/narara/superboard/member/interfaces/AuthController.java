@@ -11,6 +11,7 @@ import com.narara.superboard.member.interfaces.dto.MemberLoginResponseDto;
 import com.narara.superboard.member.interfaces.dto.TokenDto;
 import com.narara.superboard.member.service.AuthService;
 import com.narara.superboard.member.service.OAuth2UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "1. 인증")
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthAPI{

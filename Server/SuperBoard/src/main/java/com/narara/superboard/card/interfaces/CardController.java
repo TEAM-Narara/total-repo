@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "카드")
+@Tag(name = "7. 카드")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CardController implements CardAPI {
 

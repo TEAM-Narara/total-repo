@@ -35,6 +35,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private NameValidator nameValidator;
 
+    
     @Mock
     private CoverHandler coverHandler;
 
@@ -90,6 +92,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardHistoryRepository boardHistoryRepository;
+
+    @Mock
+    private WorkspaceOffsetService workspaceOffsetService;
 
     /**
      * 가상의 객체 주로 단위 테스트에서 의존성을 격리하고 특정 메서드의 동작을 시뮬레이션하는 데 사용됩니다. 실제 로직 실행을 방지, 메서드 호출 검증, 메서드 동작을 제어

@@ -3,6 +3,7 @@ package com.narara.superboard.workspacemember.service;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -11,6 +12,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
@@ -34,8 +36,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
     private final KafkaConsumerService kafkaConsumerService;
-
-//    private final WorkspaceOffsetService workspaceOffsetService;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
     public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
@@ -98,7 +99,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-//        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
+        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
 
         workSpaceMember.getWorkSpace().addOffset();
 
@@ -139,7 +140,9 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpace.addOffset(); //workspace offset++
 
         // 3. 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(workSpace.getId(), member.getId());
+        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
+        // 4. 카프카에 전송
+        workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
         return workSpaceMember;
     }
@@ -158,7 +161,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-//        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
+        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
 
         return workSpaceMember;
     }

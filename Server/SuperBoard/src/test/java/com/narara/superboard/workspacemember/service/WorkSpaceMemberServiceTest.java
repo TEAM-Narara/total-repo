@@ -10,6 +10,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -50,6 +51,9 @@ class WorkSpaceMemberServiceTest {
 
     @Mock
     private KafkaConsumerService kafkaConsumerService;
+
+    @Mock
+    private WorkspaceOffsetService workspaceOffsetService;
 
     @Mock
     private MemberRepository memberRepository;

@@ -34,6 +34,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -54,6 +55,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
+    private final WorkspaceOffsetService workspaceOffsetService;
     private final BoardHistoryRepository boardHistoryRepository;
     private final CardHistoryRepository cardHistoryRepository;
 
@@ -107,7 +109,7 @@ public class BoardServiceImpl implements BoardService {
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
-//        workspaceOffsetService.saveAddBoardDiff(board);
+        workspaceOffsetService.saveAddBoardDiff(board);
 
         // Board 생성 로그 기록
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
@@ -134,7 +136,7 @@ public class BoardServiceImpl implements BoardService {
 
         //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset();
-//        workspaceOffsetService.saveDeleteBoardDiff(board);
+        workspaceOffsetService.saveDeleteBoardDiff(board);
 
         // Board 삭제 로그 기록
         DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());

@@ -4,6 +4,7 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -14,7 +15,7 @@ import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
-import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -71,13 +72,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
 
         // Kafka 토픽 생성 및 Consumer group Listener 설정
-
         String topicName = "workspace-" + newWorkSpace.getId();
 
         // Kafka: 워크스페이스용 토픽 생성
         // 토픽 이름 : workspace-1 ,파티션 수 :10개, 복제 개수 : 1개 (단일 브로커)
-        // kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
-
         try {
             kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
             // 토픽 생성 확인 후 메시지 전송토픽 생성 확인 후 메시지 전송
@@ -101,7 +99,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         }
 
         // 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
+        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
         return workspaceMemberByAdmin;
     }
@@ -158,7 +156,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = getWorkSpace(workSpaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
-//        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
+        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override

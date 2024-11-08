@@ -13,13 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "멤버 배경")
-@Controller
+@Tag(name = "g. 회원 배경")
+@RestController
 @RequiredArgsConstructor
 public class MemberBackgroundController implements MemberBackgroundAPI {
 

@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "카드 라벨")
+@Tag(name = "f. 카드 라벨")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CardLabelController implements CardLabelAPI {
 

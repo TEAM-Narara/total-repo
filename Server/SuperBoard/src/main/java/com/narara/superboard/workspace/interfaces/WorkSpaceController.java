@@ -16,6 +16,7 @@ import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateD
 
 import java.util.List;
 
+@Tag(name = "4. 워크스페이스")
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceController implements WorkSpaceAPI {
