@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record WorkSpaceResponseDto(
-        Long workSpaceId,
+        Long workspaceId,
         String name,
         Authority authority
 ) implements WorkSpaceNameHolder {

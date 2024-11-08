@@ -70,8 +70,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardSearchRepository boardSearchRepository;
 
     @Override
-    public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId) {
-        List<Board> boardList = boardRepository.findAllByWorkSpaceId(workSpaceId);
+    public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workspaceId) {
+        List<Board> boardList = boardRepository.findAllByWorkSpaceId(workspaceId);
         if (boardList.isEmpty()) return new ArrayList<>();
         List<BoardDetailResponseDto> boardDetailResponseDtoList = new ArrayList<>();
 
@@ -98,8 +98,8 @@ public class BoardServiceImpl implements BoardService {
         Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
-        WorkSpace workSpace = workspaceRepository.findByIdAndIsDeletedFalse(boardCreateRequestDto.workSpaceId())
-                .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workSpaceId(), "워크스페이스"));
+        WorkSpace workSpace = workspaceRepository.findByIdAndIsDeletedFalse(boardCreateRequestDto.workspaceId())
+                .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workspaceId(), "워크스페이스"));
 
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
 
