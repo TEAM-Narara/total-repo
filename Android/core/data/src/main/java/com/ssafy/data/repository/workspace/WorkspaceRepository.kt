@@ -29,7 +29,7 @@ interface WorkspaceRepository {
         isConnected: Boolean
     ): Flow<Unit>
 
-    suspend fun getWorkspaceMemberMyInfo(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberDTO>?
+    suspend fun getWorkspaceMemberMyInfo(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberDTO?>
 
     suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>>
 

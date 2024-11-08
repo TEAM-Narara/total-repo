@@ -33,10 +33,10 @@ class MemberRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
-    override suspend fun getMember(memberId: Long): Flow<User>? =
+    override suspend fun getMember(memberId: Long): Flow<User?> =
         withContext(ioDispatcher) {
         memberDao.getMemberFlow(memberId)
-            ?.map { it.toDTO() }
+            .map { it?.toDTO() }
     }
 
     override suspend fun updateMember(

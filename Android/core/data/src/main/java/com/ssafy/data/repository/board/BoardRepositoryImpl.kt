@@ -191,10 +191,10 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO>? =
+    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?> =
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMemberFlow(boardId, memberId)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
     override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
@@ -284,9 +284,9 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getLabel(id: Long): Flow<LabelDTO>? =
+    override suspend fun getLabel(id: Long): Flow<LabelDTO?> =
         withContext(ioDispatcher) {
-            labelDao.getLabelFlow(id)?.map { it.toDTO() }
+            labelDao.getLabelFlow(id).map { it?.toDTO() }
         }
 
     override suspend fun getLabels(boardId: Long): Flow<List<LabelDTO>> =

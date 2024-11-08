@@ -143,10 +143,10 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun getWorkspaceMemberMyInfo(
         workspaceId: Long,
         memberId: Long
-    ): Flow<WorkspaceMemberDTO>?  =
+    ): Flow<WorkspaceMemberDTO?>  =
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspaceMemberFlow(workspaceId, memberId)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
 

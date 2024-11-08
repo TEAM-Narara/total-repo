@@ -32,7 +32,7 @@ interface WorkspaceMemberDao {
     fun getWorkspaceMember(workspaceId: Long, memberId: Long): WorkspaceMemberEntity?
 
     @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId AND memberId = :memberId")
-    fun getWorkspaceMemberFlow(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberEntity>?
+    fun getWorkspaceMemberFlow(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberEntity?>
 
     // 워크스페이스 멤버 조회
     @Transaction
