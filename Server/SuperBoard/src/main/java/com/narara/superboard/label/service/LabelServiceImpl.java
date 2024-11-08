@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class LabelServiceImpl implements LabelService {
@@ -22,6 +24,7 @@ public class LabelServiceImpl implements LabelService {
 
     private final ColorValidator colorValidator;
 
+    @Transactional
     @Override
     public Label createLabel(Long boardId, LabelCreateRequestDto createLabelRequestDto) {
         colorValidator.validateLabelColor(createLabelRequestDto);
@@ -40,7 +43,7 @@ public class LabelServiceImpl implements LabelService {
                 .orElseThrow(() -> new NotFoundEntityException(labelId, "라벨"));
     }
 
-
+    @Transactional
     @Override
     public Label updateLabel(Long labelId, LabelUpdateRequestDto updateLabelRequestDto) {
         colorValidator.validateLabelColor(updateLabelRequestDto);
@@ -50,6 +53,7 @@ public class LabelServiceImpl implements LabelService {
         return label.updateLabel(updateLabelRequestDto);
     }
 
+    @Transactional
     @Override
     public void deleteLabel(Long labelId) {
         Label label = getLabel(labelId);
@@ -63,5 +67,4 @@ public class LabelServiceImpl implements LabelService {
 
         return labelRepository.findAllByBoard(board);
     }
-
 }
