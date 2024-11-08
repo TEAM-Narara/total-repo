@@ -35,7 +35,7 @@ interface CardMemberDao {
         FROM card_member_alarm
         WHERE cardId IN (:cardIds) 
     """)
-    suspend fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
+    fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
 
     // 카드의 담당자들 조회
     @Transaction
