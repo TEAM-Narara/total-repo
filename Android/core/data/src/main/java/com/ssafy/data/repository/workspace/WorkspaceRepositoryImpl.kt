@@ -69,21 +69,22 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun createWorkspace(
         name: String,
         isConnected: Boolean
-    ): Flow<Long> = withContext(ioDispatcher) {
-        if (isConnected) {
-            workspaceDataSource.createWorkspace(name)
-        } else {
-            flowOf(
-                workspaceDao.insertWorkspace(
-                    WorkspaceEntity(
-                        name = name,
-                        authority = "ADMIN",
-                        isStatus = DataStatus.CREATE
+    ): Flow<Long> =
+        withContext(ioDispatcher) {
+            if (isConnected) {
+                workspaceDataSource.createWorkspace(name)
+            } else {
+                flowOf(
+                    workspaceDao.insertWorkspace(
+                        WorkspaceEntity(
+                            name = name,
+                            authority = "ADMIN",
+                            isStatus = DataStatus.CREATE
+                        )
                     )
                 )
             )
         }
-    }
 
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -110,7 +111,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         workspaceId: Long,
         name: String,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             val workspace = workspaceDao.getWorkspace(workspaceId)
 
@@ -118,7 +119,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     workspaceDataSource.updateWorkspace(workspaceId, name)
                 } else {
-                    when (workspace.isStatus) {
+                    val result = when (workspace.isStatus) {
                         DataStatus.STAY ->
                             workspaceDao.updateWorkspace(
                                 workspace.copy(
@@ -132,10 +133,13 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
                         DataStatus.DELETE -> {}
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
-    }
 
     override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
@@ -149,33 +153,62 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun addWorkspaceMember(
-        workspaceId: Long,
-        simpleMemberDto: SimpleMemberDto
-    ): Flow<Unit> = withContext(ioDispatcher) {
-        workspaceDataSource.addWorkspaceMember(workspaceId, simpleMemberDto)
-            // TODO 원래는 소켓오면 저장해야하는데 지금은 그냥 저장 (테스트용)
-            .map { member ->
-//               workspaceMemberDao.insertWorkspaceMember(member)
-                Unit
-            }
-    }
+    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
 
-    override suspend fun deleteWorkspaceMember(
-        workspaceId: Long,
-        memberId: Long,
-        isConnected: Boolean
-    ): Flow<Unit> = withContext(ioDispatcher) {
-        TODO("Not yet implemented")
-    }
+            if (workspaceMember != null) {
+                if (isConnected) {
+                    workspaceDataSource.deleteWorkspaceMember(id)
+                } else {
+                    val result = when (workspaceMember.isStatus) {
+                        DataStatus.CREATE ->
+                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+
+                        else ->
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
+                    }
+
+                    flowOf(result)
+                }
+            } else {
+                flowOf(Unit)
+            }
+        }
 
     override suspend fun updateWorkspaceMember(
         id: Long,
         simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
-    ): Flow<Unit> = withContext(ioDispatcher) {
-        TODO("Not yet implemented")
-    }
+    ): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
+
+            if (workspaceMember != null) {
+                if (isConnected) {
+                    workspaceDataSource.updateWorkspaceMember(id, authority)
+                } else {
+                    val result = when (workspaceMember.isStatus) {
+                        DataStatus.STAY ->
+                            workspaceMemberDao.updateWorkspaceMember(
+                                workspaceMember.copy(
+                                    isStatus = DataStatus.UPDATE,
+                                    authority = authority
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
+
+                        DataStatus.DELETE -> {}
+                    }
+
+                    flowOf(result)
+                }
+            } else {
+                flowOf(Unit)
+            }
+        }
 
 //    override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> = flow {
 //        withContext(ioDispatcher) {
