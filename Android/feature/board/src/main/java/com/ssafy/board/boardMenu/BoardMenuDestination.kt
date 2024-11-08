@@ -36,7 +36,7 @@ fun NavGraphBuilder.boardMenuScreen(
 
         BoardMenuScreen(
             viewModel = viewModel,
-            backHome = popBack,
+            popBack = popBack,
             cover = background ?: Cover(
                 type = CoverType.COLOR,
                 value = "#FFFFFF"
