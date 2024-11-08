@@ -96,6 +96,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //            }
         }
 
+        //워크스페이스 처음 만든 사람을 Member 추가로 넣기
+        workspaceOffsetService.saveAddMemberDiff(workspaceMemberByAdmin);
+
         // 새로운 멤버를 Kafka Consumer Group에 등록
         // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
