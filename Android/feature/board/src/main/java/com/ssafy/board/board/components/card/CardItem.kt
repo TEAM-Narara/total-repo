@@ -16,7 +16,9 @@ fun CardItem(modifier: Modifier = Modifier, cardData: ReorderCardData, onClick: 
             startTime = startAt,
             endTime = endAt,
             description = description != null,
-            commentCount = cardReplies.size,
+            attachment = attachment,
+            isSynced = isSynced,
+            commentCount = replyCount,
             manager = Manager,
             onClick = onClick
         )

@@ -1,11 +1,10 @@
 package com.ssafy.board.board.data
 
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.ListInCardsDTO
+import com.ssafy.model.with.ListInCard
 
 data class ListData(
     val id: Long,
-    val boardId: Long,
     val name: String,
     val myOrder: Long,
     val isArchived: Boolean,
@@ -15,18 +14,17 @@ data class ListData(
 )
 
 object ListDataMapper {
-    fun fromDto(list: ListInCardsDTO): ListData = with(list) {
+    fun fromDto(list: ListInCard): ListData = with(list) {
         ListData(
             id = id,
-            boardId = boardId,
             name = name,
             myOrder = myOrder,
             isArchived = isArchived,
             cardCollection = CardDataMapper.fromDto(cards),
-            isWatching = listMemberAlarm,
-            isSynced = isStatus == DataStatus.STAY
+            isWatching = isWatch,
+            isSynced = isStatus == DataStatus.STAY,
         )
     }
 
-    fun fromDto(lists: List<ListInCardsDTO>): List<ListData> = lists.map(::fromDto)
+    fun fromDto(lists: List<ListInCard>): List<ListData> = lists.map(::fromDto)
 }
