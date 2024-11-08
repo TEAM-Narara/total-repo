@@ -53,7 +53,7 @@ public class WorkspaceOffsetService {
         data.put(WORKSPACE_NAME_COLUMN, workspace.getName());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_WORKSPACE.name(),
@@ -73,7 +73,7 @@ public class WorkspaceOffsetService {
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_WORKSPACE.name(),
@@ -98,7 +98,7 @@ public class WorkspaceOffsetService {
         data.put(AUTHORITY_COLUMN, workspace.getName());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.ADD_MEMBER.name(),
@@ -121,7 +121,7 @@ public class WorkspaceOffsetService {
         data.put(MEMBER_ID_COLUMN, workspace.getId());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_MEMBER.name(),
@@ -145,7 +145,7 @@ public class WorkspaceOffsetService {
         data.put(AUTHORITY_COLUMN, workspace.getName());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_MEMBER.name(),
@@ -172,7 +172,7 @@ public class WorkspaceOffsetService {
         data.put("isClosed", board.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.ADD_BOARD.name(),
@@ -196,7 +196,7 @@ public class WorkspaceOffsetService {
         data.put("isClosed", board.getIsArchived()); //true로 나와야해
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_BOARD.name(),
@@ -208,20 +208,20 @@ public class WorkspaceOffsetService {
     }
 
     //특정 offset 이후 변경사항 불러오는 로직
-    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
-
-        if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
-            log.debug("No diff list found for workspace: {}", workspaceId);
-            return Collections.emptyList();
-        }
-
-        return workspaceOffset.getDiffList().stream()
-                .filter(diffInfo -> diffInfo.getOffset() >= fromOffset)
-                .sorted(Comparator.comparing(DiffInfo::getOffset))
-                .map(WorkspaceDiffDto::from)
-                .collect(Collectors.toList());
-    }
+//    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
+//        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
+//
+//        if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
+//            log.debug("No diff list found for workspace: {}", workspaceId);
+//            return Collections.emptyList();
+//        }
+//
+//        return workspaceOffset.getDiffList().stream()
+//                .filter(diffInfo -> diffInfo.getOffset() >= fromOffset)
+//                .sorted(Comparator.comparing(DiffInfo::getOffset))
+//                .map(WorkspaceDiffDto::from)
+//                .collect(Collectors.toList());
+//    }
 
     private <T> void sendMessageToKafka(Long workspaceId, T object) {
         String topic = "workspace-" + workspaceId;
