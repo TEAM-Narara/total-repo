@@ -74,6 +74,6 @@ public class CardLabelServiceImpl implements CardLabelService {
                         label.getColor(),
                         cardLabelIds.contains(label.getId())
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

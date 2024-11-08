@@ -97,7 +97,7 @@ class JwtTokenProviderTest {
                 .compact(); // JWT를 직렬화하여 문자열로 변환
 
         // Repository Mock 설정
-        when(memberRepository.findById(1L).get().getRefreshToken()).thenReturn(storedRefreshToken);
+        when(memberRepository.findByIdAndIsDeletedFalse(1L).get().getRefreshToken()).thenReturn(storedRefreshToken);
     }
 
     @DisplayName("token 생성 테스트")
@@ -270,7 +270,7 @@ class JwtTokenProviderTest {
     @DisplayName("refreshAccessToken - 리프레시 토큰이 DB에 없을 때 예외 발생 테스트")
     @Test
     void testRefreshAccessToken_TokenNotFound() {
-        when(memberRepository.findById(userID).get().getRefreshToken()).thenReturn(null);
+        when(memberRepository.findByIdAndIsDeletedFalse(userID).get().getRefreshToken()).thenReturn(null);
 
         JwtException exception = assertThrows(JwtException.class, () -> {
             jwtTokenProvider.refreshAccessToken(validRefreshToken);
@@ -283,7 +283,7 @@ class JwtTokenProviderTest {
     void testRefreshAccessToken_TokenMismatch() {
         // DB에서 유저를 조회할 때, 다른 리프레시 토큰이 있는 경우
         Member mockMember = mock(Member.class);
-        when(memberRepository.findById(userID)).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(userID)).thenReturn(Optional.of(mockMember));
         when(mockMember.getRefreshToken()).thenReturn("invalidToken");
 
         // 클라이언트가 제공한 리프레시 토큰과 DB에 저장된 토큰이 일치하지 않음

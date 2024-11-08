@@ -63,7 +63,7 @@ class BoardMemberServiceImplTest implements MockSuperBoardUnitTests {
         when(boardMemberRepository.findAllMembersByBoardId(boardId)).thenReturn(mockBoardMemberList);
 
         long workspaceId = 1L;
-        when(boardRepository.findById(boardId))
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId))
                 .thenReturn(
                         Optional.of(
                                 Board.builder()

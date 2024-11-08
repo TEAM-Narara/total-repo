@@ -37,7 +37,7 @@ class CoverValidatorTest {
     void testCoverTypeIsNull() {
         // null 값이 전달될 때 예외 발생 테스트
         assertThrows(NotFoundCoverTypeException.class, () -> {
-            coverValidator.validateCoverTypeIsValid((CoverDto) null);
+            coverValidator.validateCoverTypeIsValid(new CoverDto(null , "https://"));
         });
     }
 
@@ -184,7 +184,6 @@ class CoverValidatorTest {
                 Arguments.of(Map.of("value", "linear-gradient(#e66465, #9198e5)"))
         );
     }
-
     // 실패 테스트: type이 없는 경우
     @ParameterizedTest
     @MethodSource("provideMissingTypeCases")
@@ -200,7 +199,7 @@ class CoverValidatorTest {
         );
 
         // when & then
-        assertThrows(InvalidCoverTypeFormatException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
+        assertThrows(NotFoundCoverTypeException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }
 
     // Test data for missing value cases
@@ -224,7 +223,6 @@ class CoverValidatorTest {
                 new CoverDto((String)cover.get("type"), (String)cover.get("value"))
         );
 
-        System.out.println(requestDto.cover().value());
         // when & then
         assertThrows(NotFoundCoverValueException.class, () -> coverValidator.validateCoverTypeIsValid(requestDto.cover()));
     }

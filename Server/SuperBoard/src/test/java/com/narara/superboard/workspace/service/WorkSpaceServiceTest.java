@@ -75,7 +75,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         // given
 //        WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
 //        Member member = new Member(1L, "시현", "sisi@naver.com");
-//        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+//        when(memberRepository.findByIdAndIsDeletedFalse(member.getId())).thenReturn(Optional.of(member));
 //
 //        // when
 //        workSpaceService.createWorkSpace(member.getId(), workspaceCreateDto);
@@ -108,7 +108,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 //
 //
 ////        즉, 기존의 워크스페이스가 존재한다는 시나리오를 시뮬레이션합니다.
-//        when(workSpaceRepository.findById(workspaceId))
+//        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId))
 //                .thenReturn(Optional.of(existingWorkspace));
 //
 //        // When
@@ -119,7 +119,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 //                () -> assertNotNull(result),
 //                () -> assertEquals(newName, result.getName()),
 ////                () -> assertEquals(newDescription, result.getDescription()),
-//                () -> verify(workSpaceRepository).findById(workspaceId)
+//                () -> verify(workSpaceRepository).findByIdAndIsDeletedFalse(workspaceId)
 //        );
     }
 
@@ -137,13 +137,13 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                 .build();
 
         // getWorkSpace 메서드가 워크스페이스를 반환하도록 설정
-        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
 
         // When
         workSpaceService.deleteWorkSpace(workspaceId);  // deleteWorkSpace 메서드 호출
 
         // Then
-        verify(workSpaceRepository, times(1)).findById(workspaceId);
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);
 //        verify(workSpaceRepository, times(1)).delete(mockWorkSpace);
     }
 
@@ -152,7 +152,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     void testGetWorkSpace_NotFound() {
         // given
         Long workSpaceId = 1L;
-        when(workSpaceRepository.findById(workSpaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
@@ -162,7 +162,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         assertEquals(workSpaceId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
         assertEquals("WorkSpace", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
 
-        verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 확인
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workSpaceId);  // findById가 한 번 호출되었는지 확인
     }
 
 
@@ -187,7 +187,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     void testGetWorkSpace_Success(WorkSpace workSpace) {
         // given
         Long workSpaceId = workSpace.getId();  // WorkSpace의 ID
-        when(workSpaceRepository.findById(workSpaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
 
         // when
         WorkSpace result = workSpaceService.getWorkSpace(workSpaceId);  // 실제 getWorkSpace 호출
@@ -195,7 +195,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         // then
         assertNotNull(result);  // 결과가 null이 아닌지 확인
         assertEquals(workSpace, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
-        verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 검증
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workSpaceId);  // findById가 한 번 호출되었는지 검증
     }
 
 
@@ -264,7 +264,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     private void mockDependencies(Long workspaceId, WorkSpace mockWorkSpace,
                                   List<BoardDetailResponseDto> mockBoardCollectionResponseDto,
                                   MemberCollectionResponseDto mockMemberCollectionResponseDto) {
-        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
         when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(
                 mockBoardCollectionResponseDto.stream().toList());
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);

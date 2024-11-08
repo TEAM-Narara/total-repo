@@ -41,11 +41,12 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
-    public ResponseEntity<DefaultResponse<Long>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
         Long memberId = getMemberId();
         Board board = boardService.createBoard(memberId, boardCreateRequestDto);
+        BoardDetailResponseDto boardDetailResponseDto = BoardDetailResponseDto.of(board);
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, board.getId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardDetailResponseDto), HttpStatus.CREATED);
     }
 
     private Long getMemberId() {
@@ -80,16 +81,6 @@ public class BoardController implements BoardAPI {
         BoardDetailResponseDto boardDetailResponseDto = BoardDetailResponseDto.of(updatedBoard, coverHandler);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ADMIN_UPDATE_SUCCESS, boardDetailResponseDto), HttpStatus.OK);
     }
-
-//    @Override //프론트 팀원의 요구사항을 반영, 어드민 보드 수정 하나로 퉁침. 백엔드 팀원 모두 확인 후, 나중에 삭제 TODO
-//    @Operation(summary = "사용자 보드 설정 수정", description = "보드 ID와 사용자 수정 정보를 사용하여 사용자가 자신의 보드 설정을 업데이트합니다.")
-//    public ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
-//            @PathVariable Long boardId,
-//            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
-//        Board updatedBoard = boardService.updateBoardByMember(boardId, boardUpdateByMemberRequestDto);
-//        BoardSimpleResponseDto boardSimpleResponseDto = BoardSimpleResponseDto.of(updatedBoard, coverHandler);
-//        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_MEMBER_UPDATE_SUCCESS, boardSimpleResponseDto), HttpStatus.OK);
-//    }
 
     @Override
     @Operation(summary = "아카이브된 보드 조회", description = "워크스페이스 ID를 사용하여 아카이브된 보드 목록을 조회합니다.")

@@ -147,7 +147,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     void testGetCardFailure() {
         // given
         Long cardId = 999L; // 존재하지 않는 카드 ID 설정
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
@@ -155,7 +155,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         });
 
         assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
 
@@ -170,7 +170,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: 카드가 존재하는 경우
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
 
         // when
         Card result = cardService.getCard(cardId);
@@ -179,7 +179,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertNotNull(result);
         assertEquals(cardId, result.getId());
         assertEquals("Test Card", result.getName());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
     @ParameterizedTest
@@ -333,14 +333,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: getCard 호출 시 모킹된 카드 반환
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
 
         // when: 카드 아카이브 상태 변경
         cardService.changeArchiveStatusByCard(member, cardId);
 
         // then: 카드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, card.getIsArchived());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
 

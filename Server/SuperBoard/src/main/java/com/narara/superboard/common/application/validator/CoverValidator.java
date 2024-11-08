@@ -18,13 +18,13 @@ public class CoverValidator {
     public void validateCoverTypeIsValid(CoverDto cover) {
         // 1. coverTypeValue가 null인 경우 예외 발생
         if (cover == null) {
-            throw new NotFoundCoverTypeException();
+            return;
         }
         String coverTypeValue = cover.type();
 
         // 2. 주어진 값이 유효한 CoverType의 value와 일치하는지 확인
         if (cover.type() == null || cover.type().trim().isEmpty()){
-            throw new InvalidCoverTypeFormatException();
+            throw new NotFoundCoverTypeException();
         }
 
         boolean isValid = false;

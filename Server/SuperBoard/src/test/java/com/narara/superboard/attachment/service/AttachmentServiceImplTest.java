@@ -81,7 +81,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Arrange
-        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
+        when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
         when(attachmentRepository.existsByCardIdAndIsDeletedFalse(testCard.getId())).thenReturn(false);
         when(attachmentRepository.save(any(Attachment.class))).thenReturn(testAttachment);
 
@@ -100,7 +100,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("첨부파일 추가시, 이미 첨부파일이 있는 경우 isCover = false로 등록")
     void testAddAttachment_Success2() {
         // Arrange
-        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
+        when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
         when(attachmentRepository.existsByCardIdAndIsDeletedFalse(testCard.getId())).thenReturn(true);
         when(attachmentRepository.save(any(Attachment.class))).thenReturn(testAttachment);
         Member member = new Member(1L, "시현", "sisi@naver.com");
@@ -120,7 +120,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("첨부파일 추가 시 카드가 존재하지 않으면 예외 발생")
     void testAddAttachment_Failure_CardNotFound() {
         // Arrange
-        when(cardRepository.findById(anyLong())).thenReturn(Optional.empty());
+//        when(cardRepository.findByIdAndIsDeletedFalse(anyLong())).thenReturn(Optional.empty());
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Act & Assert
@@ -135,7 +135,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("첨부파일 추가 시 URL이 null이면 예외 발생")
     void testAddAttachment_Failure_NullUrl() {
         // Arrange
-//        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
+//        when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Act & Assert
@@ -148,10 +148,10 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
 
     /**
      * 이 UnnecessaryStubbingException 오류는 불필요한 목 설정이 포함되어 있음을 나타냅니다.
-     * testAddAttachment_Failure_EmptyUrl 테스트 메서드에서 cardRepository.findById(testCard.getId())를 스텁(stub)했지만, 이 테스트에서는 실제로 그 호출이 사용되지 않아 Mockito가 불필요한 스텁으로 인식하고 오류를 발생시킵니다.
+     * testAddAttachment_Failure_EmptyUrl 테스트 메서드에서 cardRepository.findByIdAndIsDeletedFalse(testCard.getId())를 스텁(stub)했지만, 이 테스트에서는 실제로 그 호출이 사용되지 않아 Mockito가 불필요한 스텁으로 인식하고 오류를 발생시킵니다.
      *
      * 원인 분석
-     * testAddAttachment_Failure_EmptyUrl 테스트의 목적은 첨부파일 URL이 빈 문자열일 때 예외가 발생하는지 확인하는 것입니다. 따라서, attachmentService.addAttachment 메서드 호출 시 URL의 유효성 검사를 통과하지 못하고 예외가 발생하여, cardRepository.findById(testCard.getId())는 실제로 호출되지 않습니다.
+     * testAddAttachment_Failure_EmptyUrl 테스트의 목적은 첨부파일 URL이 빈 문자열일 때 예외가 발생하는지 확인하는 것입니다. 따라서, attachmentService.addAttachment 메서드 호출 시 URL의 유효성 검사를 통과하지 못하고 예외가 발생하여, cardRepository.findByIdAndIsDeletedFalse(testCard.getId())는 실제로 호출되지 않습니다.
      *
      * 해결 방법
      * 불필요한 스텁을 제거하거나,
@@ -184,7 +184,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         testAttachment.setIsCover(true);
         // 커버가 이미 카드에 있는 경우
 
-        when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+        when(attachmentRepository.findByIdAndIsDeletedFalse(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
 
         // Act
         attachmentService.deleteAttachment(member, testAttachment.getId());
@@ -203,7 +203,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Arrange
-        when(attachmentRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(attachmentRepository.findByIdAndIsDeletedFalse(anyLong())).thenReturn(Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(NotFoundEntityException.class, () ->
@@ -221,7 +221,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         // Arrange
         testAttachment.setIsCover(true); // Mark the attachment as cover
 
-        when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+        when(attachmentRepository.findByIdAndIsDeletedFalse(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
         doThrow(new RuntimeException("카드 커버 업데이트 실패")).when(cardRepository).save(testCard);
 
         // Act & Assert
@@ -242,8 +242,8 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         testAttachment.setIsCover(false); // Initially not set as cover
         testCard.setCover(null);
 
-        when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
-//        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
+        when(attachmentRepository.findByIdAndIsDeletedFalse(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+//        when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
 
         // Act
         attachmentService.updateAttachmentIsCover(testAttachment.getId());
@@ -266,8 +266,8 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         testAttachment.setIsCover(true); // Initially set as cover
         testCard.setCover(Map.of(testAttachment.getType(), testAttachment.getUrl())); // Set cover
 
-        when(attachmentRepository.findById(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
-//        when(cardRepository.findById(testCard.getId())).thenReturn(Optional.of(testCard));
+        when(attachmentRepository.findByIdAndIsDeletedFalse(testAttachment.getId())).thenReturn(Optional.of(testAttachment));
+//        when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
 
         // Act
         attachmentService.updateAttachmentIsCover(testAttachment.getId());
@@ -283,7 +283,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("커버 여부 업데이트 시 첨부파일이 존재하지 않으면 예외 발생")
     void testUpdateAttachmentIsCover_Failure_NotFound() {
         // Arrange
-        when(attachmentRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(attachmentRepository.findByIdAndIsDeletedFalse(anyLong())).thenReturn(Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(NotFoundEntityException.class, () ->

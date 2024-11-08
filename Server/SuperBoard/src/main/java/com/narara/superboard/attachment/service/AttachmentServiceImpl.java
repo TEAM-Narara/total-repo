@@ -43,7 +43,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         // 첨부 파일 추가 로그 기록
         AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), url, isCover);
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<AddAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
 
@@ -70,9 +70,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         DeleteAttachmentInfo deleteAttachmentInfo = new DeleteAttachmentInfo(
                 card.getId(), card.getName(), attachmentId, attachment.getIsCover());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
+
+        cardHistoryRepository.save(cardHistory);
+
     }
 
     @Override
@@ -98,12 +101,12 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private Card getCardById(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
     private Attachment getAttachmentById(Long attachmentId) {
-        return attachmentRepository.findById(attachmentId)
+        return attachmentRepository.findByIdAndIsDeletedFalse(attachmentId)
                 .orElseThrow(() -> new NotFoundEntityException(attachmentId, "첨부파일"));
     }
 

@@ -22,6 +22,7 @@ import com.narara.superboard.list.interfaces.dto.info.CreateListInfo;
 import com.narara.superboard.list.interfaces.dto.info.UpdateListInfo;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -112,11 +113,15 @@ public class ListServiceImpl implements ListService{
     @Override
     public java.util.List<List> getArchivedList(Member member, Long boardId) {
 
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
         boardService.checkBoardMember(board, member, ListAction.ARCHIVE_LIST);
 
-        return listRepository.findByBoardAndIsArchived(board, true);
+        java.util.List<List> archivedList = listRepository.findByBoardAndIsArchived(board, true);
+        if (archivedList.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return archivedList;
     }
 
     @Override

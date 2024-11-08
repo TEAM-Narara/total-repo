@@ -47,7 +47,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
 
     @Override
     public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "board"));
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -152,12 +152,12 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     }
 
     private Board getBoard(Long boardId) {
-        return boardRepository.findById(boardId)
+        return boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "Borad"));
     }
 
     private Member getMember(Long inviteMemberId) {
-        return memberRepository.findById(inviteMemberId)
+        return memberRepository.findByIdAndIsDeletedFalse(inviteMemberId)
                 .orElseThrow(() -> new NotFoundEntityException(inviteMemberId, "Member"));
     }
 

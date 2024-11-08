@@ -29,21 +29,19 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final CardHistoryRepository cardHistoryRepository;
 
     @Override
-    public boolean getCardMemberIsAlert(Long memberId, Long cardId) {
+    public boolean getCardMemberIsAlert(Member member, Long cardId) {
         validateCardExists(cardId);
-        validateMemberExists(memberId);
 
-        return cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
+        return cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .map(CardMember::isAlert)
                 .orElse(false);
     }
 
     @Override
-    public void setCardMemberIsAlert(Long memberId, Long cardId) {
+    public void setCardMemberIsAlert(Member member, Long cardId) {
         Card card = validateCardExists(cardId);
-        Member member = validateMemberExists(memberId);
 
-        cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
+        cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .ifPresentOrElse(
                         this::toggleAlertAndSave,
                         () -> addNewCardMember(member, card)
@@ -92,13 +90,13 @@ public class CardMemberServiceImpl implements CardMemberService {
 
     // 카드 존재 확인 및 조회
     private Card validateCardExists(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
     // 멤버 존재 확인 및 조회
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

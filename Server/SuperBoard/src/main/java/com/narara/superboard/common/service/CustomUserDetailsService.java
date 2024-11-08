@@ -38,7 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             long userId = Long.parseLong(username); // username 대신 userId를 사용
             System.out.println(username);
             // 사용자 ID로 사용자 정보를 조회
-            Member member = memberRepository.findById(userId)
+            Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("아이디로 회원을 찾을 수 없습니다.: " + userId));
 
             // 사용자 권한을 가져오는 로직

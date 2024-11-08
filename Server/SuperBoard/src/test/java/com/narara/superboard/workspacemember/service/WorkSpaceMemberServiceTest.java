@@ -132,8 +132,8 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("워크스페이스 멤버 추가 성공")
     void addMember_Success() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.empty());
         given(workSpaceMemberRepository.save(any(WorkSpaceMember.class)))
@@ -181,8 +181,8 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("이미 존재하는 워크스페이스 멤버 추가시 기존 멤버 반환")
     void addMember_AlreadyExists() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
 

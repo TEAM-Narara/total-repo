@@ -284,7 +284,7 @@ class AuthServiceImplTest {
         member = new Member(1L, "testNickname", "ddddd","1111","");
         member.setRefreshToken("refresh-token"); // 기존 토큰 설정
 
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // When: 로그아웃 호출
         authService.logout(memberId);
@@ -301,7 +301,7 @@ class AuthServiceImplTest {
         Long memberId = 99L;
 
         // When & Then: 회원을 찾을 수 없는 경우 예외 발생
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.empty());
 
         assertThrows(MemberNotFoundException.class, () -> authService.logout(memberId));
     }
@@ -320,7 +320,7 @@ class AuthServiceImplTest {
         member.setRefreshToken("refresh-token"); // 기존 토큰 설정
 
         // Mocking: 회원 조회 시 성공적으로 회원 객체 반환
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // When: 회원 탈퇴 호출
         authService.withdrawal(memberId);
@@ -339,7 +339,7 @@ class AuthServiceImplTest {
         Long memberId = 99L;
 
         // When & Then: 회원을 찾을 수 없는 경우 예외 발생
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.empty());
 
         assertThrows(MemberNotFoundException.class, () -> authService.withdrawal(memberId));
     }
@@ -354,7 +354,7 @@ class AuthServiceImplTest {
         deletedMember.setIsDeleted(true); // 탈퇴 상태 설정
 
         // Mocking: 회원 조회 시 탈퇴된 회원 객체 반환
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(deletedMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(deletedMember));
 
         // When & Then: 이미 탈퇴된 계정인 경우 예외 발생
         assertThrows(AccountDeletedException.class, () -> authService.withdrawal(memberId));

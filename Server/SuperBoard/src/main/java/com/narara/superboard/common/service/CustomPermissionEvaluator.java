@@ -119,17 +119,17 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
     private Member findMemberById(Long userId) {
-        return memberRepository.findById(userId)
+        return memberRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + userId));
     }
 
     private WorkSpace findWorkSpaceById(Long workspaceId) {
-        return workSpaceRepository.findById(workspaceId)
+        return workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("WorkSpace not found with ID: " + workspaceId));
     }
 
     private Board findBoardById(Long boardId) {
-        return boardRepository.findById(boardId)
+        return boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found with ID: " + boardId));
     }
 
