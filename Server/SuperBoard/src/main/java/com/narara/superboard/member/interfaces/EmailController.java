@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "이메일")
+@Tag(name = "2. 이메일")
 @RestController
 @RequiredArgsConstructor
 public class EmailController implements EmailAPI{

@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "회원", description = "멤버 관련 API")
+@Tag(name = "3. 회원")
 @RestController
 @RequiredArgsConstructor
 public class MemberController implements MemberAPI {

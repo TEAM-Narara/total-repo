@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "댓글")
+@Tag(name = "8. 댓글")
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor

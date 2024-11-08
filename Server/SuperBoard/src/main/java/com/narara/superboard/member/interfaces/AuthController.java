@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "인증")
+@Tag(name = "1. 인증")
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthAPI{

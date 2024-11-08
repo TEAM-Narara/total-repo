@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "라벨")
+@Tag(name = "e. 라벨")
 @RestController
 @RequiredArgsConstructor
 public class LabelController implements LabelAPI {
