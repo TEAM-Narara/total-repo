@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":domain:workspace"))
     implementation(project(":domain:home"))
     implementation(project(":domain:member"))
+    implementation(project(":domain:board"))
 
     // Paging
     implementation(libs.androidx.paging.runtime)
