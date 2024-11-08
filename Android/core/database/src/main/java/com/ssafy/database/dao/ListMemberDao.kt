@@ -43,7 +43,7 @@ interface ListMemberDao {
         FROM list_member_alarm
         WHERE listId IN (:listIds) 
     """)
-    suspend fun getListsMemberAlarms(listIds: List<Long>): Flow<List<ListMemberAlarmEntity>>
+    fun getListsMemberAlarms(listIds: List<Long>): Flow<List<ListMemberAlarmEntity>>
 
     // 리스트 멤버들 조회
     @Transaction
