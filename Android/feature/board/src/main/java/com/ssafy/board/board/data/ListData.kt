@@ -2,7 +2,6 @@ package com.ssafy.board.board.data
 
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
-import com.ssafy.model.with.ListInCardsDTO
 
 data class ListData(
     val id: Long,
@@ -22,8 +21,8 @@ object ListDataMapper {
             myOrder = myOrder,
             isArchived = isArchived,
             cardCollection = CardDataMapper.fromDto(cards),
-            isWatching = false, // TODO : List watching 상태 바꾸기
-            isSynced = true, // TODO : LIst Sync 상태 바꾸기
+            isWatching = isWatch,
+            isSynced = isStatus == DataStatus.STAY,
         )
     }
 

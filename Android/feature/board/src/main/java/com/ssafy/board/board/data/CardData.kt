@@ -1,15 +1,10 @@
 package com.ssafy.board.board.data
 
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.with.AttachmentDTO
-import com.ssafy.model.with.CardAllInfoDTO
-import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
-import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardThumbnail
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.ReplyDTO
 
 data class CardData(
     val id: Long,
@@ -41,15 +36,15 @@ object CardDataMapper {
             description = description,
             startAt = startAt,
             endAt = endAt,
-            coverType = CoverType.NONE, // TODO : Card CoverType 파싱하기
+            coverType = coverType?.let { CoverType.valueOf(it) } ?: CoverType.NONE,
             coverValue = coverValue,
             myOrder = myOrder,
             isArchived = isArchived,
-            isWatching = false, // TODO : Card watching 상태 바꾸기
-            isSynced = true, // TODO : Card sync 상태 바꾸기
+            isWatching = isWatch,
+            isSynced = isStatus == DataStatus.STAY,
             cardLabels = cardLabels,
             cardMembers = cardMembers,
-            attachment = false, // TODO : Card attachment 상태 바꾸기
+            attachment = isAttachment,
             replyCount = replyCount,
         )
     }
