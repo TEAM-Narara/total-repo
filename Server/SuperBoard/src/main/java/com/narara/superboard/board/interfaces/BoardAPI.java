@@ -20,7 +20,7 @@ public interface BoardAPI {
     @Operation(summary = "워크스페이스의 모든 보드 조회")
     ResponseEntity<DefaultResponse<List<BoardDetailResponseDto>>> getBoardCollection(@PathVariable Long workspaceId);
 
-    @PostMapping("/")
+    @PostMapping("")
     @PreAuthorize("hasPermission(#boardCreateRequestDto.workSpaceId(), 'WORKSPACE', 'MEMBER')")
     @Operation(summary = "보드 생성")
     ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(
