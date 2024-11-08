@@ -46,9 +46,9 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoard(id: Long): Flow<BoardDTO>? =
+    override suspend fun getBoard(boardId: Long): Flow<BoardDTO?> =
         withContext(ioDispatcher) {
-            boardDao.getBoardFlow(id)?.map { it.toDto() }
+            boardDao.getBoardFlow(boardId).map { it?.toDto() }
         }
 
     override suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit> =
@@ -159,9 +159,9 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { entities -> entities.map { it.toDto() } }
         }
 
-    override suspend fun getWatchStatus(id: Long): Flow<Boolean>? =
+    override suspend fun getWatchStatus(id: Long): Flow<Boolean?> =
         withContext(ioDispatcher) {
-            boardMemberDao.getBoardMemberAlarmFlow(id)?.map { it.toDTO().isAlert }
+            boardMemberDao.getBoardMemberAlarmFlow(id).map { it?.toDTO()?.isAlert }
         }
 
     override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
