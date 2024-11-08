@@ -19,14 +19,30 @@ public class ListMemberServiceImpl implements ListMemberService {
     private final ListMemberRepository listMemberRepository;
 
     @Override
-    public void setListMemberIsAlert(Member member, Long listId) {
+    public Boolean setListMemberIsAlert(Member member, Long listId) {
         List list = validateListExists(listId);
 
-        listMemberRepository.findByListIdAndMember(listId, member)
-                .ifPresentOrElse(
-                        this::toggleAlertAndSave,
-                        () -> addNewListMember(member, list)
-                );
+        ListMember listMember = listMemberRepository.findByListIdAndMember(listId, member)
+                .map(this::toggleAlertAndSave) //Optional이 존재할 경우 값 반환
+                .orElseGet(() -> addNewListMember(member, list)); //아닐 경우 새로 생성
+
+        return listMember.isAlert();
+    }
+
+    @Override
+    public Boolean getListMemberIsAlert(Member member, Long listId) {
+        ListMember listMember = listMemberRepository.findByListIdAndMember(listId, member)
+                .orElse(null);
+
+        List list = listRepository.findById(listId)
+                .orElseThrow(() -> new NotFoundEntityException(listId, "list"));
+
+        //없으면 새로 추가
+        if (listMember == null) {
+            addNewListMember(member, list);
+        }
+
+        return listMember.isAlert();
     }
 
     // 리스트 존재 확인 및 조회
@@ -42,19 +58,18 @@ public class ListMemberServiceImpl implements ListMemberService {
     }
 
     //  ListMember 객체의 isAlert 상태를 반대로 변경하고 저장
-    private void toggleAlertAndSave(ListMember listMember) {
+    private ListMember toggleAlertAndSave(ListMember listMember) {
         listMember.changeIsAlert();
-        listMemberRepository.save(listMember);
+        return listMemberRepository.save(listMember);
     }
 
     // 새로운 ListMember 추가 및 저장
-    private void addNewListMember(Member member, List list) {
+    private ListMember addNewListMember(Member member, List list) {
         ListMember newListMember = ListMember.builder()
                 .member(member)
                 .list(list)
                 .isAlert(true)
                 .build();
-        listMemberRepository.save(newListMember);
+        return listMemberRepository.save(newListMember);
     }
-    
 }
