@@ -11,6 +11,7 @@ interface MemberRepository {
     suspend fun getMember(memberId: Long): Flow<User>?
 
     suspend fun updateMember(
+        memberId: Long,
         memberUpdateRequestDto: MemberUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit>

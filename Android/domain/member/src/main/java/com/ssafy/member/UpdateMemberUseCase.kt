@@ -1,11 +1,13 @@
 package com.ssafy.member
 
 import com.ssafy.data.repository.member.MemberRepository
+import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.member.MemberUpdateRequestDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UpdateMemberUseCase @Inject constructor(
+    private val dataStoreRepository: DataStoreRepository,
     private val memberRepository: MemberRepository
 ) {
 
@@ -13,7 +15,8 @@ class UpdateMemberUseCase @Inject constructor(
         memberUpdateRequestDto: MemberUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> {
-        return memberRepository.updateMember(memberUpdateRequestDto, isConnected)
+        val memberId = dataStoreRepository.getUser().memberId
+        return memberRepository.updateMember(memberId, memberUpdateRequestDto, isConnected)
     }
 
 }

@@ -3,6 +3,7 @@ package com.ssafy.database.dto
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "member",
         indices = [Index(value = ["email"], unique = true)])
