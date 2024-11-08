@@ -37,7 +37,7 @@ interface BoardDao {
 
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
-    fun getBoardFlow(boardId: Long): Flow<BoardEntity>?
+    fun getBoardFlow(boardId: Long): Flow<BoardEntity?>
 
     // 워크스페이스에서 볼 것
     @Query("""

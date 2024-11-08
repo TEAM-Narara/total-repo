@@ -48,7 +48,7 @@ interface CardDao {
         FROM card 
         WHERE id = :cardId
     """)
-    fun getCardFlow(cardId: Long): Flow<CardEntity>?
+    fun getCardFlow(cardId: Long): Flow<CardEntity?>
     
     // 카드 상위의 List, Board 이름 조회
     @Transaction
@@ -63,7 +63,7 @@ interface CardDao {
         INNER JOIN board ON board.id = list.boardId
         WHERE card.id = :cardId
     """)
-    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>?
+    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
 
     // 리스트 내에 카드들 조회
     @Query("""

@@ -43,9 +43,9 @@ class WorkspaceRepositoryImpl @Inject constructor(
             getLocalScreenWorkspaceList()
         }
 
-    override suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO>? =
+    override suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?> =
         withContext(ioDispatcher) {
-            workspaceDao.getWorkspaceForDrawable(workspaceId)?.map { it.toDTO() }
+            workspaceDao.getWorkspaceForDrawable(workspaceId).map { it?.toDTO() }
         }
 
     override suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>> =
@@ -143,10 +143,10 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun getWorkspaceMemberMyInfo(
         workspaceId: Long,
         memberId: Long
-    ): Flow<WorkspaceMemberDTO>?  =
+    ): Flow<WorkspaceMemberDTO?>  =
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspaceMemberFlow(workspaceId, memberId)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
 

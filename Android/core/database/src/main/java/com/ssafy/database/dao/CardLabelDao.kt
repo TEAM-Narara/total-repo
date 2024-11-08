@@ -44,7 +44,7 @@ interface CardLabelDao {
         FROM card_label 
         WHERE id = :id
     """)
-    fun getLabelFlow(id: Long): Flow<CardLabelEntity>?
+    fun getLabelFlow(id: Long): Flow<CardLabelEntity?>
 
     // 카드의 라벨을 조회
     @Transaction

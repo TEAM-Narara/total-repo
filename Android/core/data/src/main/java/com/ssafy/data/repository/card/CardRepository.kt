@@ -34,9 +34,9 @@ interface CardRepository {
 
     suspend fun getLocalOperationCard(): List<CardResponseDto>
 
-    suspend fun getCard(id: Long): Flow<CardResponseDto>?
+    suspend fun getCard(id: Long): Flow<CardResponseDto?>
 
-    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>?
+    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
 
     suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>>
 
@@ -44,7 +44,7 @@ interface CardRepository {
 
     suspend fun getLocalOperationCardMember(): List<CardMemberDTO>
 
-    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmDTO>?
+    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmDTO>
 
     suspend fun getCardRepresentativesInCard(cardId: Long): Flow<List<MemberResponseDTO>>
 
@@ -56,7 +56,7 @@ interface CardRepository {
 
     suspend fun getLocalOperationCardLabels(): List<CardLabelDTO>
 
-    suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO>?
+    suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO?>
 
     suspend fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelDTO>>
 
@@ -72,9 +72,9 @@ interface CardRepository {
 
     suspend fun getLocalOperationAttachment(): List<AttachmentDTO>
 
-    suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO>?
+    suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO?>
 
-    suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO>?
+    suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO?>
 
     suspend fun getAllAttachments(cardId: Long): Flow<List<AttachmentDTO>>
 
