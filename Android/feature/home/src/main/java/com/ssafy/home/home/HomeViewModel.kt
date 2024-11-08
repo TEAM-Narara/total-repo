@@ -38,9 +38,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun changeSelectedWorkSpace(workSpaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        getHomeInfoUseCase(homeData.value, workSpaceId).safeCollect {
-            println(it.selectedWorkSpace)
-            _homeData.emit(it)
+        getHomeInfoUseCase(homeData.value, workSpaceId).safeCollect { homeData ->
+            homeData?.let { _homeData.emit(it) }
         }
     }
 

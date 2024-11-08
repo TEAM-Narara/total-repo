@@ -30,9 +30,12 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextSmall
+import com.ssafy.model.board.Visibility
+import com.ssafy.model.board.Visibility.WORKSPACE
+import com.ssafy.model.board.Visibility.PRIVATE
 
 @Composable
-fun VisibilityDialog(onDismiss: () -> Unit, visibility: String, setVisibility: (String) -> Unit) {
+fun VisibilityDialog(onDismiss: () -> Unit, visibility: Visibility, setVisibility: (Visibility) -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(PaddingXSmall),
@@ -51,10 +54,10 @@ fun VisibilityDialog(onDismiss: () -> Unit, visibility: String, setVisibility: (
                 Card(
                     modifier = Modifier
                         .clickable {
-                            setVisibility("PRIVATE")
+                            setVisibility(PRIVATE)
                             onDismiss()
                         }
-                        .border(BorderFat, if (visibility == "PRIVATE") Primary else LightGray),
+                        .border(BorderFat, if (visibility == PRIVATE) Primary else LightGray),
                 ) {
                     Column(
                         modifier = Modifier
@@ -86,10 +89,10 @@ fun VisibilityDialog(onDismiss: () -> Unit, visibility: String, setVisibility: (
                 Card(
                     modifier = Modifier
                         .clickable {
-                            setVisibility("WORKSPACE")
+                            setVisibility(WORKSPACE)
                             onDismiss()
                         }
-                        .border(BorderFat, if (visibility == "WORKSPACE") Primary else LightGray),
+                        .border(BorderFat, if (visibility == WORKSPACE) Primary else LightGray),
                     shape = RoundedCornerShape(PaddingXSmall),
                 ) {
                     Column(
@@ -127,5 +130,5 @@ fun VisibilityDialog(onDismiss: () -> Unit, visibility: String, setVisibility: (
 @Preview
 @Composable
 fun MinimalDialogPreview() {
-    VisibilityDialog(onDismiss = {}, visibility = "WORKSPACE", {})
+    VisibilityDialog(onDismiss = {}, visibility = WORKSPACE, {})
 }

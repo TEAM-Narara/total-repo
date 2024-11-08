@@ -48,7 +48,7 @@ fun HomeBodyScreen(
             val board = boards[it]
             BoardItem(
                 title = board.name,
-                onBoardClick = { moveToBoardScreen(it.toLong()) },
+                onBoardClick = { moveToBoardScreen(board.id) },
                 containerColor = board.cover.value.toLongOrNull()?.let(::Color) ?: Yellow,
             )
         }

@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,12 +36,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.ssafy.board.components.BoardMemberItem
+import com.ssafy.board.board.components.BoardMemberItem
+import com.ssafy.board.boardMenu.data.BoardMenuData
 import com.ssafy.board.components.MenuEditTextRow
 import com.ssafy.board.components.MenuHorizontalDivider
-import com.ssafy.board.getIcon
-import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.values.ImageSmall
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingOne
@@ -51,25 +54,62 @@ import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
-import com.ssafy.model.card.HistoryData
+import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.CoverType
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardMenuScreen(
     modifier: Modifier = Modifier,
-    boardId: Long,
-    workspaceId: Long,
+    viewModel: BoardMenuViewModel = hiltViewModel(),
     backHome: () -> Unit,
-    historyContent: List<HistoryData>?,
     cover: Cover,
-    selectBackGroundScreen: (Cover) -> Unit
+    moveToSelectBackGroundScreen: (Cover) -> Unit,
+    moveToInviteMemberScreen: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val boardState by viewModel.boardState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
 
-    val (boardName, onBoardNameChange) = remember { mutableStateOf("board 이름") }
-    val (workspaceName, onWorkspaceNameChange) = remember { mutableStateOf("손오공's 워크스페이스") }
-    val (watch, onWatchChange) = remember { mutableStateOf(true) }
-    val (visibility, onVisibilityChange) = remember { mutableStateOf("WORKSPACE") }
+    boardState?.let { boardMenuData ->
+        BoardMenuScreen(
+            modifier = modifier,
+            boardMenuData = boardMenuData,
+            backHome = backHome,
+            moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
+            moveToInviteMemberScreen = moveToInviteMemberScreen,
+            cover = cover,
+            changeBoardName = viewModel::changeBoardName,
+            changeWorkspaceName = viewModel::changeWorkspaceName,
+            changeWatch = viewModel::changeWatch,
+            changeVisibility = viewModel::changeVisibility
+        )
+    }
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BoardMenuScreen(
+    modifier: Modifier = Modifier,
+    boardMenuData: BoardMenuData,
+    backHome: () -> Unit,
+    moveToSelectBackGroundScreen: (Cover) -> Unit,
+    moveToInviteMemberScreen: () -> Unit,
+    cover: Cover,
+    changeBoardName: (String) -> Unit,
+    changeWorkspaceName: (String) -> Unit,
+    changeWatch: (Boolean) -> Unit,
+    changeVisibility: (Visibility) -> Unit
+) {
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -81,8 +121,8 @@ fun BoardMenuScreen(
     if (showDialog) {
         VisibilityDialog(
             onDismiss = { setShowDialog(false) },
-            visibility = visibility,
-            onVisibilityChange
+            visibility = boardMenuData.boardDto.visibility,
+            setVisibility = changeVisibility
         )
     }
     Scaffold(
@@ -113,23 +153,26 @@ fun BoardMenuScreen(
         ) {
             item {
                 BoardMemberItem(
-                    modifier
+                    modifier = modifier
                         .padding(PaddingDefault)
-                        .padding(bottom = PaddingZero)
+                        .padding(bottom = PaddingZero),
+                    boardMember = boardMenuData.members,
+                    moveToBoardInviteMemberScreen = moveToInviteMemberScreen
                 )
-                // TODO: Memeber도 넘기기
             }
             item {
                 MenuHorizontalDivider()
             }
             item {
-                MenuEditTextRow(modifier, "Name", boardName, onBoardNameChange)
+                val name = boardMenuData.boardDto.name
+                MenuEditTextRow(modifier, "Name", name, changeBoardName)
             }
             item {
                 MenuHorizontalDivider()
             }
             item {
-                MenuEditTextRow(modifier, "WorkSpace", workspaceName, onWorkspaceNameChange)
+                val workspaceName = boardMenuData.workSpaceDTO.name
+                MenuEditTextRow(modifier, "WorkSpace", workspaceName, changeWorkspaceName)
             }
             item {
                 MenuHorizontalDivider()
@@ -145,7 +188,7 @@ fun BoardMenuScreen(
                     Box(
                         modifier = Modifier
                             .size(ImageSmall)
-                            .clickable { selectBackGroundScreen(cover) }) {
+                            .clickable { moveToSelectBackGroundScreen(cover) }) {
                         when (cover.type) {
                             CoverType.COLOR -> {
                                 Box(
@@ -187,8 +230,8 @@ fun BoardMenuScreen(
                     Text(text = "Watch", fontSize = TextMedium, color = Primary)
                     Spacer(modifier = Modifier.weight(1f))
                     Switch(
-                        checked = watch,
-                        onCheckedChange = onWatchChange,
+                        checked = boardMenuData.watchStatus,
+                        onCheckedChange = changeWatch,
                         colors = SwitchDefaults.colors(checkedTrackColor = Primary)
                     )
                 }
@@ -206,9 +249,10 @@ fun BoardMenuScreen(
                     Spacer(
                         modifier = Modifier.weight(1f)
                     )
-                    Text(text = visibility, modifier = Modifier.clickable(onClick = {
-                        setShowDialog(true)
-                    }))
+                    Text(
+                        text = boardMenuData.boardDto.visibility.name,
+                        modifier = Modifier.clickable(onClick = { setShowDialog(true) })
+                    )
                 }
             }
             item {
@@ -224,28 +268,20 @@ fun BoardMenuScreen(
                         .padding(PaddingDefault, PaddingZero)
                 )
             }
-            items(historyContent?.size ?: 0) { index ->
-                historyContent?.let {
-                    ActivityLog(
-                        icon = getIcon(historyContent[index].type),
-                        content = historyContent[index].content,
-                        editDate = historyContent[index].date,
-                    )
-                }
-            }
+            // TODO ActivityLog 라는 screen이 있습니다. 이것으로 historyContent를 만들어주세요
         }
     }
+
+
 }
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
     BoardMenuScreen(
-        boardId = 1,
         backHome = {},
-        workspaceId = 1,
-        historyContent = List(8) { HistoryData("rename", "손오공 renamed test(from testboard)", 300) },
-        selectBackGroundScreen = {},
+        moveToSelectBackGroundScreen = {},
+        moveToInviteMemberScreen = {},
         cover = Cover(
             type = CoverType.COLOR,
             value = "#FFFFFF"
