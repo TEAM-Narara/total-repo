@@ -31,7 +31,7 @@ class WorkspaceService @Inject constructor(
 
     suspend fun editWorkSpace(data: String) {
         val dto = gson.fromJson(data, EditWorkSpaceRequestDto::class.java)
-        val before = workspaceDao.getWorkspace(dto.workspaceId)
+        val before = workspaceDao.getWorkspace(dto.workspaceId) ?: throw Exception("존재하지 않는 workspace 입니다.")
         workspaceDao.updateWorkspace(before.copy(name = dto.workspaceName))
     }
 
@@ -61,10 +61,10 @@ class WorkspaceService @Inject constructor(
             dto.memberId
         )
         workspaceMemberDao.updateWorkspaceMember(
-            before.copy(
+            before?.copy(
                 authority = dto.authority,
                 isStatus = DataStatus.STAY
-            )
+            ) ?: throw Exception("존재하지 않는 workspace 입니다.")
         )
     }
 

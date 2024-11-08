@@ -51,7 +51,7 @@ class GetHomeInfoUseCase @Inject constructor(
     suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData> {
         workspaceStomp.connect(workspaceId)
         return combine(
-            workspaceRepository.getWorkspace(workspaceId),
+            workspaceRepository.getWorkspace(workspaceId) ?: throw Exception("존재하지 않는 workspace 입니다."),
             boardRepository.getBoardsByWorkspace(workspaceId)
         ) { workspace, boardList ->
             homeData.copy(

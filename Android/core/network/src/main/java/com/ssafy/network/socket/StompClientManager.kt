@@ -1,5 +1,6 @@
 package com.ssafy.network.socket
 
+import android.util.Log
 import com.google.gson.Gson
 import com.ssafy.network.module.AuthInterceptorOkHttpClient
 import javax.inject.Inject
@@ -49,6 +50,7 @@ class StompClientManager @Inject constructor(
     }
 
     suspend fun <T> subscribe(id: String, topic: String, clazz: Class<T>): Flow<T> {
+        Log.d("TAG", "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
             gson.fromJson(it.bodyAsText, clazz)

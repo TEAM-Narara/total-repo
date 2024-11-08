@@ -42,6 +42,6 @@ class BaseStompManager @Inject constructor(
 
     companion object {
         private const val SOCKET_ID = "SUPER_BOARD"
-        private const val BASE_URL = "${BuildConfig.BASE_URL}/ws"
+        private const val BASE_URL = "${BuildConfig.BASE_URL}/ws/websocket"
     }
 }

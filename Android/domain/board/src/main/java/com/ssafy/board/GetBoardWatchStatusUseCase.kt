@@ -9,7 +9,7 @@ class GetBoardWatchStatusUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(boardId: Long): Flow<Boolean> {
-        return boardRepository.getWatchStatus(boardId)
+        return boardRepository.getWatchStatus(boardId) ?: throw Exception("존재하지 않는 board 입니다.")
     }
 
 }

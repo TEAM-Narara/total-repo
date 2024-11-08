@@ -11,7 +11,7 @@ class GetDetailWorkspaceUseCase @Inject constructor(private val workspaceReposit
 
     suspend operator fun invoke(workspaceId: Long): Flow<DetailWorkspaceData?> {
         return combine(
-            workspaceRepository.getWorkspace(workspaceId),
+            workspaceRepository.getWorkspace(workspaceId) ?: throw Exception("존재하지 않는 workspace 입니다."),
             workspaceRepository.getWorkspaceMembers(workspaceId)
         ) { workspace, members ->
             workspace?.let {
