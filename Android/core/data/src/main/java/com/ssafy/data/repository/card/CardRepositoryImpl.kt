@@ -50,15 +50,12 @@ class CardRepositoryImpl @Inject constructor(
             // TODO
             cardDataSource.createCard(cardRequestDto).map { 5 }
         } else {
-            // TODO 카드 순서 등 백엔드에서 정해지면 함께 넣기
-            flow { cardDao.insertCard(
+            flowOf(cardDao.insertCard(
                 CardEntity(
-                name = cardRequestDto.cardName,
-                listId = cardRequestDto.listId,
-                isStatus = DataStatus.CREATE
-            )
-            ) }
-
+                    name = cardRequestDto.cardName,
+                    listId = cardRequestDto.listId,
+                    isStatus = DataStatus.CREATE)
+            ))
         }
     }
 

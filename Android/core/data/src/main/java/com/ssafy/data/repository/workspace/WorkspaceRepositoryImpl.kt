@@ -69,12 +69,12 @@ class WorkspaceRepositoryImpl @Inject constructor(
     override suspend fun createWorkspace(
         name: String,
         isConnected: Boolean
-    ): Flow<Long> = withContext(ioDispatcher) {
-        if (isConnected) {
-            workspaceDataSource.createWorkspace(name)
-        } else {
-            flowOf(
-                workspaceDao.insertWorkspace(
+    ): Flow<Long> =
+        withContext(ioDispatcher) {
+            if (isConnected) {
+                workspaceDataSource.createWorkspace(name).map { 5 }
+            } else {
+                flowOf(workspaceDao.insertWorkspace(
                     WorkspaceEntity(
                         name = name,
                         authority = "ADMIN",
@@ -110,7 +110,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         workspaceId: Long,
         name: String,
         isConnected: Boolean
-    ): Flow<Unit> = flow {
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             val workspace = workspaceDao.getWorkspace(workspaceId)
 
@@ -118,7 +118,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     workspaceDataSource.updateWorkspace(workspaceId, name)
                 } else {
-                    when (workspace.isStatus) {
+                    val result = when (workspace.isStatus) {
                         DataStatus.STAY ->
                             workspaceDao.updateWorkspace(
                                 workspace.copy(
@@ -132,7 +132,11 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
                         DataStatus.DELETE -> {}
                     }
+
+                    flowOf(result)
                 }
+            } else {
+                flowOf(Unit)
             }
         }
     }

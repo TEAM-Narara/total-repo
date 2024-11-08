@@ -16,9 +16,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Subject
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,6 +35,7 @@ import com.ssafy.designsystem.formatRangeTimeStamp
 import com.ssafy.designsystem.formatTimestamp
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
+import com.ssafy.designsystem.values.IconSmall
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingSmall
@@ -49,6 +53,8 @@ fun CardItem(
     startTime: Long? = null,
     endTime: Long? = null,
     description: Boolean = false,
+    attachment: Boolean = false,
+    isSynced: Boolean = true,
     commentCount: Int = 0,
     manager: (@Composable RowScope.() -> Unit)? = null,
     onClick: () -> Unit = {}
@@ -77,7 +83,16 @@ fun CardItem(
             modifier = Modifier.padding(vertical = PaddingDefault, horizontal = PaddingMedium),
         ) {
             if (labels != null) Row(horizontalArrangement = Arrangement.spacedBy(PaddingXSmall)) { labels() }
-            Text(text = title, fontSize = TextSmall)
+            Row {
+                Text(text = title, fontSize = TextSmall, modifier = Modifier.weight(1f))
+                if (!isSynced) Icon(
+                    imageVector = Icons.Default.Sync,
+                    contentDescription = null,
+                    modifier = Modifier.size(
+                        IconSmall
+                    )
+                )
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(PaddingSmall)) {
                 if (startTime != null && endTime != null) {
                     IconText(
@@ -89,7 +104,20 @@ fun CardItem(
                 } else if (endTime != null) {
                     IconText(icon = Icons.Default.AccessTime, text = endTime.formatTimestamp())
                 }
-                if (description) IconText(icon = Icons.AutoMirrored.Filled.Subject, text = "")
+                if (description) Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Subject,
+                    contentDescription = null,
+                    modifier = Modifier.size(
+                        IconSmall
+                    )
+                )
+                if (attachment) Icon(
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = null,
+                    modifier = Modifier.size(
+                        IconSmall
+                    )
+                )
                 if (commentCount != 0) IconText(
                     icon = Icons.Default.ChatBubbleOutline,
                     text = "$commentCount"
@@ -121,6 +149,8 @@ fun CardPreview() {
         },
         modifier = Modifier.width(300.dp),
         description = true,
+        isSynced = false,
+        attachment = true,
         manager = {
             Image(
                 painter = painterResource(id = R.drawable.logo),
