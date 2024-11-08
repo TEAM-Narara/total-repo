@@ -28,10 +28,10 @@ class GetHomeInfoUseCase @Inject constructor(
 
         return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
             val selectedWorkspaceFlow = workspaceList.firstOrNull()?.let { workspace ->
-                boardRepository.getBoardsByWorkspace(workspace.workSpaceId)
+                boardRepository.getBoardsByWorkspace(workspace.workspaceId)
                     .map { boardList ->
                         SelectedWorkSpace(
-                            workspaceId = workspace.workSpaceId,
+                            workspaceId = workspace.workspaceId,
                             workspaceName = workspace.name,
                             boards = boardList
                         )
@@ -61,7 +61,7 @@ class GetHomeInfoUseCase @Inject constructor(
         ) { workspace, boardList ->
             homeData.copy(
                 selectedWorkSpace = SelectedWorkSpace(
-                    workspaceId = workspace.workSpaceId,
+                    workspaceId = workspace.workspaceId,
                     workspaceName = workspace.name,
                     boards = boardList
                 )

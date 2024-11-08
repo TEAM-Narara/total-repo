@@ -24,7 +24,7 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 
 fun WorkSpaceDTO.toEntity(): WorkspaceEntity {
     return WorkspaceEntity(
-        id = this.workSpaceId,
+        id = this.workspaceId,
         name = this.name,
         authority = this.authority,
         isStatus = this.isStatus ?: DataStatus.STAY

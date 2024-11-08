@@ -97,7 +97,7 @@ fun DrawerSheet(
                     hasDivider = true,
                     sheetIcon = Icons.Default.Groups,
                     sheetName = workspace.name,
-                    onSheetItemClick = { onWorkSpaceClick(workspace.workSpaceId) }
+                    onSheetItemClick = { onWorkSpaceClick(workspace.workspaceId) }
                 )
             }
 
