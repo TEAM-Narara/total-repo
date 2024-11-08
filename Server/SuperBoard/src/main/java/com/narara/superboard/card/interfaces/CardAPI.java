@@ -1,8 +1,8 @@
 package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.interfaces.dto.*;
-import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardCombinedLogResponseDto;
+import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
+import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,12 +43,12 @@ public interface CardAPI {
 
     @GetMapping("/{cardId}/activity")
     @Operation(summary = "카드 로그 조회")
-    ResponseEntity<DefaultResponse<List<CardActivityDetailResponseDto>>> getCardActivity(@PathVariable Long cardId);
+    ResponseEntity<DefaultResponse<List<CardLogDetailResponseDto>>> getCardActivity(@PathVariable Long cardId);
 
 
     @GetMapping("/{cardId}/activity")
     @Operation(summary = "카드 액티비티(댓글+로그) 조회", description = "카드의 활동 및 댓글을 최신순으로 정렬하여 반환합니다.")
-    ResponseEntity<DefaultResponse<CardCombinedLogResponseDto>> getCardCombinedLog(
+    ResponseEntity<DefaultResponse<CardCombinedActivityResponseDto>> getCardCombinedLog(
             @PathVariable Long cardId,
             @RequestParam int page,
             @RequestParam int size);
