@@ -28,11 +28,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ListServiceImpl implements ListService{
-
     private final BoardService boardService;
 
     private final NameValidator nameValidator;
@@ -42,6 +43,7 @@ public class ListServiceImpl implements ListService{
     private final ListRepository listRepository;
     private final BoardHistoryRepository boardHistoryRepository;
 
+    @Transactional
     @Override
     public List createList(Member member, ListCreateRequestDto listCreateRequestDto) {
         nameValidator.validateListNameIsEmpty(listCreateRequestDto);
@@ -65,6 +67,7 @@ public class ListServiceImpl implements ListService{
         return savedlist;
     }
 
+    @Transactional
     @Override
     public List updateList(Member member, Long listId, ListUpdateRequestDto listUpdateRequestDto) {
         List list = getList(listId);
@@ -91,6 +94,7 @@ public class ListServiceImpl implements ListService{
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
     }
 
+    @Transactional
     @Override
     public List changeListIsArchived(Member member, Long listId) {
         List list = getList(listId);

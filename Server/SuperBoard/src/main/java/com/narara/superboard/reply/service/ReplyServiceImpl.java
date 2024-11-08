@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
 import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 
-
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
@@ -76,6 +76,7 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
+    @Transactional
     public Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyUpdateRequestDto);
 
@@ -105,6 +106,7 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
+    @Transactional
     public Reply deleteReply(Member member, Long replyId) {
         Reply reply = getReply(replyId);
         if (!member.getId().equals(reply.getMember().getId())){
@@ -133,6 +135,5 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
-
 }
 
