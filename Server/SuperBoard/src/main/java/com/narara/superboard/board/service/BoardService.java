@@ -34,4 +34,8 @@ public interface BoardService {
     MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword);
 
     List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId);
+
+    List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId, Pageable pageable);
+
+    List<BoardCombinedLogResponseDto> getBoardCombinedLog(Long boardId, Pageable pageable);
 }

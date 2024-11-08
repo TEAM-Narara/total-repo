@@ -45,8 +45,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -236,12 +238,11 @@ public class BoardServiceImpl implements BoardService {
     }
 //    1730955028912
 
-    @Override
-    public List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId) {
+//    @Override
+    public List<BoardCombinedLogDto> getBoardActivity(Long boardId) {
         List<BoardHistory> boardHistoryCollection = boardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
         List<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository.findByWhere_BoardIdOrderByWhenDesc(boardId);
 
-        List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
 
         // 각각의 컬렉션에서 DTO로 변환하면서 정렬된 상태 유지
         List<BoardActivityDetailResponseDto> boardDtoList = boardHistoryCollection.stream()
@@ -257,6 +258,14 @@ public class BoardServiceImpl implements BoardService {
            이유는 boardHistoryCollection과 cardHistoryCollectionByBoard가 이미 when 필드 기준으로 정렬된 상태로 조회되기 때문입니다.
            이러한 경우, 병합 정렬 (merge sort) 방식이 훨씬 더 효율적입니다.
          */
+        return sortBoardActivityList(boardDtoList, cardDtoList);
+    }
+
+    private static List<BoardCombinedLogDto> sortBoardActivityList(
+            List<BoardCombinedLogDto> boardDtoList,
+            List<BoardCombinedLogDto> cardDtoList) {
+        List<BoardCombinedLogDto> activities = new ArrayList<>();
+
         int i = 0, j = 0;
         while (i < boardDtoList.size() && j < cardDtoList.size()) {
             if (boardDtoList.get(i).when() >= cardDtoList.get(j).when()) {
@@ -279,6 +288,106 @@ public class BoardServiceImpl implements BoardService {
         }
         return activities;
     }
+
+
+    @Override
+    public BoardCombinedLogResponseDto getBoardActivity(Long boardId, Pageable pageable) {
+        // Pageable을 활용해 각각의 컬렉션을 가져옴
+        Page<BoardHistory> boardHistoryCollection = boardHistoryRepository
+                .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
+        Page<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository
+                .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
+
+        // 두 Page 객체의 총 페이지 수와 총 요소 수 계산
+        int totalPages = Math.max(boardHistoryCollection.getTotalPages(), cardHistoryCollectionByBoard.getTotalPages());
+        long totalElements = boardHistoryCollection.getTotalElements() + cardHistoryCollectionByBoard.getTotalElements();
+
+        // 각각의 컬렉션을 DTO로 변환
+        List<BoardActivityDetailResponseDto> boardDtoList = boardHistoryCollection.getContent().stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+        List<BoardActivityDetailResponseDto> cardDtoList = cardHistoryCollectionByBoard.getContent().stream()
+                .map(BoardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .toList();
+
+        // 두 리스트를 합치고 when() 기준으로 정렬 후, Pageable 사이즈에 맞게 결과를 반환
+        List<BoardActivityDetailResponseDto> boardActivityDetailResponseDtos = sortBoardActivityList(boardDtoList, cardDtoList, pageable.getPageSize());
+
+        return boardActivityDetailResponseDtos;
+    }
+
+    private static List<BoardActivityDetailResponseDto> sortBoardActivityList(
+            List<BoardActivityDetailResponseDto> boardDtoList,
+            List<BoardActivityDetailResponseDto> cardDtoList,
+            int pageSize) {
+
+        List<BoardActivityDetailResponseDto> activities = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < boardDtoList.size() && j < cardDtoList.size() && activities.size() < pageSize) {
+            if (boardDtoList.get(i).when() >= cardDtoList.get(j).when()) {
+                activities.add(boardDtoList.get(i++));
+            } else {
+                activities.add(cardDtoList.get(j++));
+            }
+        }
+
+        // 나머지 요소 추가 (pageSize에 도달할 때까지)
+        while (i < boardDtoList.size() && activities.size() < pageSize) {
+            activities.add(boardDtoList.get(i++));
+        }
+        while (j < cardDtoList.size() && activities.size() < pageSize) {
+            activities.add(cardDtoList.get(j++));
+        }
+
+        return activities;
+    }
+
+    @Override
+    public List<BoardCombinedLogResponseDto> getBoardCombinedLog(Long boardId, Pageable pageable) {
+        // 활동 목록과 댓글 목록을 각각 DTO로 가져옴
+        List<BoardActivityDetailResponseDto> boardLogList = getBoardActivity(boardId, pageable);
+        List<BoardReplyCollectionResponseDto> replyLogList = getRepliesByBoardId(boardId, pageable).boardReplyCollectionResponseDtos();
+
+        // 각각의 DTO 리스트를 CombinedBoardEvent로 변환하여 timestamp 기준으로 최신순 정렬
+        return mergeAndLimitSortedList(boardLogList, replyLogList, pageable.getPageSize());
+    }
+
+    private static List<BoardCombinedLogDto> mergeAndLimitSortedList(
+            List<BoardActivityDetailResponseDto> boardLogList,
+            List<BoardReplyCollectionResponseDto> replyLogList,
+            int pageSize) {
+
+        List<BoardCombinedLogDto> combinedList = new ArrayList<>();
+        int i = 0, j = 0;
+
+        // 두 리스트를 병합하여 최신순으로 정렬
+        while (i < boardLogList.size() && j < replyLogList.size() && combinedList.size() < pageSize) {
+            if (boardLogList.get(i).when() >= replyLogList.get(j).updatedAt()) {
+                combinedList.add(new BoardCombinedLogDto(boardLogList.get(i), boardLogList.get(i).when()));
+                i++;
+            } else {
+                combinedList.add(new BoardCombinedLogDto(replyLogList.get(j), replyLogList.get(j).updatedAt()));
+                j++;
+            }
+        }
+
+        // 남아 있는 요소를 pageSize에 도달할 때까지 추가
+        while (i < boardLogList.size() && combinedList.size() < pageSize) {
+            combinedList.add(new BoardCombinedLogDto(boardLogList.get(i), boardLogList.get(i).when()));
+            i++;
+        }
+
+        while (j < replyLogList.size() && combinedList.size() < pageSize) {
+            combinedList.add(new BoardCombinedLogDto(replyLogList.get(j), replyLogList.get(j).updatedAt()));
+            j++;
+        }
+
+        return combinedList;
+    }
+
+
+
 
 
     @Override

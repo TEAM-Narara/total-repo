@@ -12,8 +12,13 @@ import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -105,15 +110,32 @@ public class BoardController implements BoardAPI {
     @Operation(summary = "보드의 액티비티 목록 조회", description = "보드의 액티비티 목록 조회")
     public ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(Long boardId) {
         List<BoardActivityDetailResponseDto> boardActivity = boardService.getBoardActivity(boardId);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_LOG_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
     }
 
     @GetMapping
     @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다. keyword가 null이면 전체조회")
-    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false)String keyword) {
+    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false) String keyword) {
         Long memberId = getMemberId();
         MyBoardCollectionResponse myBoardList = boardService.getMyBoardList(memberId, keyword);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, myBoardList), HttpStatus.OK);
+    }
+
+
+    @Parameters({
+            @Parameter(name = "page", description = "조회할 페이지 번호 (1부터 시작)", example = "1", schema = @Schema(defaultValue = "1")),
+            @Parameter(name = "size", description = "페이지당 항목 수", example = "10", schema = @Schema(defaultValue = "10"))
+    })
+    @Override
+    public ResponseEntity<DefaultResponse<List<BoardCombinedLogResponseDto>>> getBoardCombinedLog(
+            @PathVariable Long boardId,
+            @RequestParam int page, @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        List<BoardCombinedLogResponseDto> combinedLogs = boardService.getBoardCombinedLog(boardId, pageable);
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, combinedLogs)
+        );
     }
 }

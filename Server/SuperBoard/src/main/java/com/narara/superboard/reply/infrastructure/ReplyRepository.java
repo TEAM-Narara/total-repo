@@ -18,5 +18,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     @Query("SELECT r FROM Reply r WHERE r.card.list.board.id = :boardId AND r.isDeleted = false")
     Page<Reply> findAllByBoardId(@Param("boardId") Long boardId, Pageable pageable);
 
+    @Query("SELECT r FROM Reply r WHERE r.card.id = :cardId AND r.isDeleted = false")
+    Page<Reply> findAllByCardId(@Param("cardId") Long cardId, Pageable pageable);
+
     Optional<Reply> findByIdAndIsDeletedFalse(Long replyId);
 }

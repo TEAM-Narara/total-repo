@@ -1,6 +1,7 @@
 package com.narara.superboard.common.interfaces.log;
 
 import com.narara.superboard.board.document.BoardHistory;
+import com.narara.superboard.board.interfaces.dto.BoardCombinedLogResponseDto;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
@@ -14,7 +15,6 @@ public record BoardActivityDetailResponseDto<T>(
         EventData eventData,
         T target
 ) {
-
     public static <T> BoardActivityDetailResponseDto<T> createActivityDetailResponseDto(
             BoardHistory<T> boardHistory
     ) {
