@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "회원 배경")
+@Tag(name = "g. 회원 배경")
 @RestController
 @RequiredArgsConstructor
 public class MemberBackgroundController implements MemberBackgroundAPI {

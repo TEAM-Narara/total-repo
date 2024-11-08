@@ -26,7 +26,7 @@ import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateD
 
 import java.util.List;
 
-@Tag(name = "워크스페이스")
+@Tag(name = "4. 워크스페이스")
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceController implements WorkSpaceAPI {

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "워크스페이스 회원")
+@Tag(name = "a. 워크스페이스 회원")
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {

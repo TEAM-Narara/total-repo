@@ -15,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "첨부파일")
+@Tag(name = "9. 첨부파일")
 @RestController
 @RequiredArgsConstructor
 public class AttachmentController implements AttachmentAPI {

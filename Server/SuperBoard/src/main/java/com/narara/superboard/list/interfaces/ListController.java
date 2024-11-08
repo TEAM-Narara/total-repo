@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "리스트")
+@Tag(name = "6. 리스트")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/list")
