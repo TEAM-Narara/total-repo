@@ -72,18 +72,16 @@ class WorkspaceRepositoryImpl @Inject constructor(
     ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                workspaceDataSource.createWorkspace(name)
+                workspaceDataSource.createWorkspace(name).map { 5 }
             } else {
-                flowOf(
-                    workspaceDao.insertWorkspace(
-                        WorkspaceEntity(
-                            name = name,
-                            authority = "ADMIN",
-                            isStatus = DataStatus.CREATE
-                        )
+                flowOf(workspaceDao.insertWorkspace(
+                    WorkspaceEntity(
+                        name = name,
+                        authority = "ADMIN",
+                        isStatus = DataStatus.CREATE
                     )
-                )
-            )
+                ))
+            }
         }
 
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
@@ -153,20 +151,31 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
+    override suspend fun addWorkspaceMember(
+        workspaceId: Long,
+        simpleMemberDto: SimpleMemberDto
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        workspaceDataSource.addWorkspaceMember(workspaceId, simpleMemberDto)
+            // TODO SOCKET 원래는 소켓오면 저장해야하는데 지금은 그냥 저장 (테스트용)
+//            .map { member: DetailMemberDto ->
+//                val workspaceEntity = member.toWorkspaceMemberEntity(workspaceId)
+//                workspaceMemberDao.insertWorkspaceMember(workspaceEntity)
+//                Unit
+//            }
+            .map { Unit }
+    }
+
     override suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val workspaceMember = workspaceMemberDao.getWorkspaceMember(id)
 
             if (workspaceMember != null) {
                 if (isConnected) {
-                    workspaceDataSource.deleteWorkspaceMember(id)
+                    workspaceDataSource.deleteWorkspaceMember(id).map { Unit }
                 } else {
                     val result = when (workspaceMember.isStatus) {
-                        DataStatus.CREATE ->
-                            workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
-
-                        else ->
-                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
+                        DataStatus.CREATE -> workspaceMemberDao.deleteLocalWorkspaceMember(workspaceMember)
+                        else -> workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
                     }
 
                     flowOf(result)
@@ -186,19 +195,19 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
             if (workspaceMember != null) {
                 if (isConnected) {
-                    workspaceDataSource.updateWorkspaceMember(id, authority)
+                    workspaceDataSource.updateWorkspaceMember(id, simpleMemberDto).map { Unit }
                 } else {
                     val result = when (workspaceMember.isStatus) {
                         DataStatus.STAY ->
                             workspaceMemberDao.updateWorkspaceMember(
                                 workspaceMember.copy(
                                     isStatus = DataStatus.UPDATE,
-                                    authority = authority
+                                    authority = simpleMemberDto.authority
                                 )
                             )
 
                         DataStatus.CREATE, DataStatus.UPDATE ->
-                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = authority))
+                            workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = simpleMemberDto.authority))
 
                         DataStatus.DELETE -> {}
                     }

@@ -27,7 +27,7 @@ interface WorkspaceDataSource {
         simpleMemberDto: SimpleMemberDto
     ): Flow<SimpleMemberDto>
 
-    suspend fun deleteWorkspaceMember(workspaceId: Long, memberId: Long): Flow<SimpleMemberDto>
+    suspend fun deleteWorkspaceMember(id: Long): Flow<SimpleMemberDto>
 
     suspend fun updateWorkspaceMember(
         id: Long,
