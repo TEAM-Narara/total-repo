@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkSpaceMemberServiceTest {
@@ -135,8 +136,8 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("워크스페이스 멤버 추가 성공")
     void addMember_Success() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.empty());
         given(workSpaceMemberRepository.save(any(WorkSpaceMember.class)))
@@ -157,6 +158,8 @@ class WorkSpaceMemberServiceTest {
         // given
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
+
+        when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any())).thenReturn(true);
 
         // when
         WorkSpaceMember result = workSpaceMemberService.deleteMember(WORKSPACE_ID_1, MEMBER_ID_1);
@@ -182,8 +185,8 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("이미 존재하는 워크스페이스 멤버 추가시 기존 멤버 반환")
     void addMember_AlreadyExists() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
 

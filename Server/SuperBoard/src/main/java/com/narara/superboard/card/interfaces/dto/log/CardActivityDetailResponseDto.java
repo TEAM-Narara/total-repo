@@ -1,0 +1,28 @@
+package com.narara.superboard.card.interfaces.dto.log;
+
+import com.narara.superboard.card.document.CardHistory;
+import com.narara.superboard.common.constant.enums.EventData;
+import com.narara.superboard.common.constant.enums.EventType;
+import com.narara.superboard.common.document.Who;
+
+public record CardActivityDetailResponseDto<T>(
+        Who who,
+        Long when,
+        CardWhereDto where,
+        EventType eventType,
+        EventData eventData,
+        T target
+) {
+    public static <T> CardActivityDetailResponseDto<T> createActivityDetailResponseDto(
+            CardHistory<T> cardHistory
+    ) {
+        return new CardActivityDetailResponseDto<>(
+                cardHistory.getWho(),
+                cardHistory.getWhen(),
+                new CardWhereDto(cardHistory.getWhere().cardId(), cardHistory.getWhere().cardName()),
+                cardHistory.getEventType(),
+                cardHistory.getEventData(),
+                cardHistory.getTarget()
+        );
+    }
+}

@@ -8,17 +8,20 @@ import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
-import com.narara.superboard.reply.interfaces.dto.CreateReplyInfo;
+import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +49,7 @@ public class ReplyServiceImpl implements ReplyService{
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
-        Card card = cardRepository.findById(replyCreateRequestDto.cardId())
+        Card card = cardRepository.findByIdAndIsDeletedFalse(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
         cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
@@ -56,12 +59,11 @@ public class ReplyServiceImpl implements ReplyService{
         Reply savedReply = replyRepository.save(reply);
 
 
-        CreateReplyInfo createReplyInfo = new CreateReplyInfo(reply.getContent());
-        Target target = Target.of(savedReply, createReplyInfo);
+        ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
                 member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-                EventType.CREATE, EventData.COMMENT, target);
+                EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -70,7 +72,7 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Reply getReply(Long replyId) {
-        return replyRepository.findById(replyId)
+        return replyRepository.findByIdAndIsDeletedFalse(replyId)
                 .orElseThrow(() -> new NotFoundEntityException(replyId, "댓글"));
     }
 
@@ -88,9 +90,19 @@ public class ReplyServiceImpl implements ReplyService{
         if (!member.getId().equals(reply.getMember().getId())){
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
+        reply.updateReply(replyUpdateRequestDto);
+
+        // 업데이트 로그 기록
+        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
+
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
+
+        cardHistoryRepository.save(cardHistory);
 
         // 댓글 내용 업데이트
-        return reply.updateReply(replyUpdateRequestDto);
+        return reply;
     }
 
     @Override
@@ -99,22 +111,28 @@ public class ReplyServiceImpl implements ReplyService{
         if (!member.getId().equals(reply.getMember().getId())){
             throw new UnauthorizedException(member.getNickname(), DELETE_REPLY);
         }
-        return reply.deleteReply();
+
+        // 삭제 로그 기록
+        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
+
+        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
+
+        cardHistoryRepository.save(cardHistory);
+
+        // 삭제 수행
+        reply.deleteReply();
+
+        return reply;
     }
 
     @Override
     public List<Reply> getRepliesByCardId(Long cardId) {
-        Card card = cardRepository.findById(cardId)
+        Card card = cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
 
         return replyRepository.findAllByCard(card);
-    }
-
-    public class CustomTestException extends RuntimeException {
-        public CustomTestException() {
-            super("몽고디비 트랜잭션 연결 관련 테스트");
-            System.out.println("excetion");
-        }
     }
 
 }

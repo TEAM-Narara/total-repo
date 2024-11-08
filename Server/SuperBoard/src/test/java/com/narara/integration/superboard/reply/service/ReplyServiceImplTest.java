@@ -3,7 +3,7 @@ package com.narara.integration.superboard.reply.service;
 import com.narara.integration.IntegrationTest;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
-import com.narara.superboard.board.interfaces.dto.CoverDto;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -27,7 +27,6 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -98,7 +97,6 @@ class ReplyServiceImplTest extends IntegrationTest {
         List list = List.createList(listRequest, board);
         listRepository.save(list);
 
-        System.out.println(list.getId());
         // Card 생성 및 저장
         CardCreateRequestDto cardRequest = new CardCreateRequestDto(list.getId(), "카드 이름");
         Card card = Card.createCard(cardRequest, list);

@@ -34,4 +34,13 @@ public class Attachment extends BaseTimeEntity {
     @Column(name = "is_cover", nullable = false, columnDefinition = "boolean default false")
     @Builder.Default
     private Boolean isCover = false; // 커버 이미지 여부
+
+    @Column(name = "is_deleted",nullable = false,columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isDeleted = false; //삭제 여부
+
+    public boolean changeIsCover() {
+        this.isCover = !isCover;
+        return this.isCover;
+    }
 }

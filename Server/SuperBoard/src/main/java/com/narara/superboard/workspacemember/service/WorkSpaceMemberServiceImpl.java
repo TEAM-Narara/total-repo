@@ -15,6 +15,7 @@ import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                     .memberNickname(workSpaceMember.getMember().getNickname())
                     .memberProfileImgUrl(workSpaceMember.getMember().getProfileImgUrl())
                     .authority(workSpaceMember.getAuthority().toString())
+                    .isDeleted(workSpaceMember.getIsDeleted())
                     .build();
 
             workspaceDetailResponseDtoList.add(dto);
@@ -84,6 +86,16 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
+
+        if (authority.equals(Authority.MEMBER)) {
+            //권한을 MEBMER로 바꾸는 경우 Workspace Admin이 한 명 이상인지 검증
+            boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(
+                    workSpaceMember.getWorkSpace());
+            if (!workspaceHasOneMember) {
+                throw new EmptyWorkspaceMemberException();
+            }
+        }
+
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
@@ -102,10 +114,10 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Transactional
     @Override
     public WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority) {
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+        WorkSpace workSpace = workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         //1. 워크스페이스에 이미 멤버가 추가되어 있으면 무시
@@ -139,6 +151,13 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Override
     public WorkSpaceMember deleteMember(Long workspaceId, Long memberId) {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
+        WorkSpace workSpace = workSpaceMember.getWorkSpace();
+
+        boolean workspaceHasOneMember = workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(workSpace);
+        if (!workspaceHasOneMember) {
+            throw new EmptyWorkspaceMemberException();
+        }
+
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 

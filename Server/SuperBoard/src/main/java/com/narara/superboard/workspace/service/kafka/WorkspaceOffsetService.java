@@ -25,7 +25,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-//TODO: MongoDB tx 추가해주세요
 @Slf4j
 @RequiredArgsConstructor
 @Service

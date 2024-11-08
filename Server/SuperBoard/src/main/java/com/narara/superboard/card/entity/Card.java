@@ -5,6 +5,7 @@ import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "card")
-public class Card extends BaseTimeEntity {
+public class Card extends BaseTimeEntity implements Identifiable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +48,7 @@ public class Card extends BaseTimeEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "cover", columnDefinition = "jsonb")
+    @Setter
     private Map<String, Object> cover;
 
     @Column(name = "my_order", nullable = false, columnDefinition = "bigint default 0")
@@ -71,6 +73,10 @@ public class Card extends BaseTimeEntity {
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
+                .cover(new HashMap<>(){{
+                    put("type", "NONE");
+                    put("value", "NONE");
+                }}) //default cover 지정
                 .myOrder(list.getLastCardOrder() + 1)
                 .myOrder(0L)
                 .isDeleted(false)

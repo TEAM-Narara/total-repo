@@ -1,16 +1,19 @@
 package com.narara.superboard.boardmember.interfaces;
 
-import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.interfaces.dto.*;
 import com.narara.superboard.boardmember.service.BoardMemberService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "b. 보드 회원")
 @RestController
 @RequiredArgsConstructor
 public class BoardMemberController implements BoardMemberAPI{
@@ -18,12 +21,16 @@ public class BoardMemberController implements BoardMemberAPI{
     private final BoardMemberService boardMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<MemberCollectionResponseDto>> getBoardMembers(Long boardId) {
-        MemberCollectionResponseDto memberCollectionResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
+    public ResponseEntity<DefaultResponse<BoardMemberResponseDto>> getBoardMembers(Long boardId) {
+        BoardMemberResponseDto boardMemberResponseDto = boardMemberService.getBoardMemberCollectionResponseDto(
                 boardId);
-        return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS, memberCollectionResponseDto)
-                , HttpStatus.OK);
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_FETCH_SUCCESS,
+                        boardMemberResponseDto
+                ));
     }
 
     @Override
@@ -41,5 +48,65 @@ public class BoardMemberController implements BoardMemberAPI{
         return new ResponseEntity<>(DefaultResponse.res(
                 StatusCode.OK, ResponseMessage.BOARD_MEMBER_WATCH_STATUS_UPDATE_SUCCESS),
                 HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+        BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
+                                .build()
+                )
+        );
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+        BoardMember boardMember = boardMemberService.deleteMember(boardId, dto.memberId());
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_DELETE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
+                                .build()
+                )
+        );
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<MemberResponseDto>> editBoardMemberAuthority(@PathVariable("boardId") Long boardId, @RequestBody EditBoardMemberAuthorityDto dto) {
+        BoardMember boardMember = boardMemberService.editBoardMemberAuthority(boardId, dto.memberId(), dto.authority());
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.BOARD_MEMBER_AUTHORITY_UPDATE_SUCCESS,
+                        MemberResponseDto.builder()
+                                .memberId(boardMember.getMember().getId())
+                                .memberEmail(boardMember.getMember().getEmail())
+                                .memberNickname(boardMember.getMember().getNickname())
+                                .memberProfileImgUrl(boardMember.getMember().getProfileImgUrl())
+                                .authority(boardMember.getAuthority().name())
+                                .isDeleted(boardMember.getIsDeleted())
+                                .build()
+                )
+        );
     }
 }

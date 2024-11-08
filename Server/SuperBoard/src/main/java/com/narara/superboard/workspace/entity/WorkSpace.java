@@ -60,6 +60,7 @@ public class WorkSpace extends BaseTimeEntity {
         this.name = name;
         this.workspaceMemberList = null;
         this.offset = offset;
+        this.isDeleted = false;
     }
 
     public void deleted() {

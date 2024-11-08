@@ -74,7 +74,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
      */
     private void updateMemberRefreshToken(String memberIdStr, String refreshToken) {
         Long memberId = Long.parseLong(memberIdStr);
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         member.setRefreshToken(refreshToken);
@@ -118,8 +118,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
      * @return
      */
     public Authentication getAuthentication(String token) {
+        System.out.println("getAuthentication" + token);
         Claims claims = parseClaims(token);
+        System.out.println(claims);
         String memberId = claims.getSubject(); //토큰에서 사용자Id 추출
+        System.out.println("getAuthentication" + memberId);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(memberId);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
@@ -206,7 +209,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
         Long memberId = getMemberIdFromToken(refreshToken);
 
         // 3. 해당 사용자의 정보를 가져옴
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         // 4. refreshToken이 일치하는지 확인 (DB에 저장된 값과 비교)

@@ -34,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
         memberValidator.registerValidate(memberCreateRequestDto);
 
         Member newMember = createNewMember(memberCreateRequestDto);
+
+        System.out.println(newMember.getId());
         // 워크 스페이스 생성
         workSpaceService.createWorkSpace(newMember.getId(),
                 new WorkSpaceCreateRequestDto(newMember.getNickname()+"의 워크스페이스"));
@@ -66,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         // Refresh Token을 null로 설정
@@ -76,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void withdrawal(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         if(member.getIsDeleted()) throw new AccountDeletedException();
