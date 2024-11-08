@@ -73,15 +73,15 @@ public class Board extends BaseTimeEntity implements Identifiable {
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
         Map<String, Object> coverMap;
 
-        if (boardCreateRequestDto.background() == null) {
+        if (boardCreateRequestDto.cover() == null) {
             coverMap = Map.of(
                     "type", "NONE",
                     "value", "NONE"
             );
         } else {
             coverMap = Map.of(
-                    "type", boardCreateRequestDto.background().type(),
-                    "value", boardCreateRequestDto.background().value()
+                    "type", boardCreateRequestDto.cover().type(),
+                    "value", boardCreateRequestDto.cover().value()
             );
         }
 
@@ -91,7 +91,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
                 .lastListOrder(0L)
-                .isArchived(false)
+                .isArchived(boardCreateRequestDto.isClosed())
                 .listOrderVersion(0L)
                 .build();
     }

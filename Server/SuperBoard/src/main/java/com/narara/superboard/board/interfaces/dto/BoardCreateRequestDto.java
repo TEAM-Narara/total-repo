@@ -6,5 +6,6 @@ public record BoardCreateRequestDto(
         Long workSpaceId,
         String name,
         String visibility,
-        CoverDto background) implements BoardCoreHolder {
+        CoverDto cover,
+        boolean isClosed) implements BoardCoreHolder {
 }
