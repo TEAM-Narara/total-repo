@@ -1,6 +1,7 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.DetailMemberDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.network.source.ApiResponse
@@ -19,7 +20,7 @@ interface WorkspaceAPI {
     suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")
-    suspend fun createWorkspace(@Query("name") name: String): Response<ApiResponse<Long>>
+    suspend fun createWorkspace(@Query("name") name: String): Response<ApiResponse<WorkSpaceDTO>>
 
     @DELETE("api/v1/workspaces/{workspaceId}")
     suspend fun deleteWorkspace(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<Unit>>
@@ -30,26 +31,26 @@ interface WorkspaceAPI {
         @Body name: String
     ): Response<ApiResponse<Unit>>
 
-    @GET("api/v1/workspaces/{workspaceId}/members")
+    @GET("api/v1/{workspaceId}/members")
     suspend fun getWorkspaceMembers(@Path("workspaceId") workspaceId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
 
-    @POST("api/v1/workspaces/{workspaceId}/members")
+    @POST("api/v1/{workspaceId}/members")
     suspend fun addWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
         @Body simpleMemberDto: SimpleMemberDto
-    ): Response<ApiResponse<SimpleMemberDto>>
+    ): Response<ApiResponse<DetailMemberDto>>
 
-    @DELETE("api/v1/workspaces/{workspaceId}/members")
+    @DELETE("api/v1/{workspaceId}/members")
     suspend fun deleteWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
         @Body memberId: Long
-    ): Response<ApiResponse<SimpleMemberDto>>
+    ): Response<ApiResponse<DetailMemberDto>>
 
-    @PATCH("api/v1/workspaces/{workspaceId}/members")
+    @PATCH("api/v1/{workspaceId}/members")
     suspend fun updateWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
-        @Body simpleMemberDto: SimpleMemberDto
-    ): Response<ApiResponse<SimpleMemberDto>>
+        @Body detailMemberDto: SimpleMemberDto
+    ): Response<ApiResponse<DetailMemberDto>>
 
     @GET("api/v1/members/{memberId}/workspaces")
     suspend fun getWorkspacesByMember(@Path("memberId") memberId: Long): Response<ApiResponse<List<WorkSpaceDTO>>>

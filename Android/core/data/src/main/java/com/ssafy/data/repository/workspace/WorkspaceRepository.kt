@@ -39,23 +39,16 @@ interface WorkspaceRepository {
     ): Flow<Unit>
 
     suspend fun deleteWorkspaceMember(
-        id: Long,
+        workspaceId: Long,
+        memberId: Long,
         isConnected: Boolean
     ): Flow<Unit>
 
     suspend fun updateWorkspaceMember(
-        id: Long,
+        workspaceId: Long,
         simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
     ): Flow<Unit>
-
-//    suspend fun deleteWorkspaceMember(id: Long, isConnected: Boolean): Flow<Unit>
-//
-//    suspend fun updateWorkspaceMember(
-//        id: Long,
-//        authority: String,
-//        isConnected: Boolean
-//    ): Flow<Unit>
 
     suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberDTO>
 }

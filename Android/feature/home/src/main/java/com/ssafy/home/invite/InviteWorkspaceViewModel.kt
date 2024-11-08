@@ -8,12 +8,16 @@ import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
 import com.ssafy.ui.viewmodel.BaseViewModel
+import com.ssafy.workspace.AddWorkspaceMemberUseCase
+import com.ssafy.workspace.ChangeWorkspaceMemberUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -26,6 +30,8 @@ import javax.inject.Inject
 class InviteWorkspaceViewModel @Inject constructor(
     private val getWorkspaceUseCase: GetDetailWorkspaceUseCase,
     private val searchMemberUseCase: SearchMembersUseCase,
+    private val addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
+    private val changeWorkspaceMemberUseCase: ChangeWorkspaceMemberUseCase
 ) : BaseViewModel() {
 
     private val _workspace = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
@@ -51,12 +57,12 @@ class InviteWorkspaceViewModel @Inject constructor(
 
     fun setSearchParams(search: String) = searchParams.update { search }
 
-    fun changeAuth(memberId: Long, auth: String) {
-
+    fun changeAuth(memberId: Long, auth: String) = viewModelScope.launch(Dispatchers.IO) {
+        changeWorkspaceMemberUseCase(workspace.value.workspaceId, memberId, auth).withUiState().collect()
     }
 
-    fun inviteMember(memberId: Long) {
-
+    fun inviteMember(memberId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        addWorkspaceMemberUseCase(workspace.value.workspaceId, memberId).withUiState().collect()
     }
 
 }

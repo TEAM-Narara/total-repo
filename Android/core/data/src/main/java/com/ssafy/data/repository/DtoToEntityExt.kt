@@ -7,12 +7,14 @@ import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.MemberBackgroundEntity
 import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.CardLabelWithLabelInfo
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.list.ListResponseDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
@@ -28,6 +30,7 @@ fun WorkSpaceDTO.toEntity(): WorkspaceEntity {
         isStatus = this.isStatus ?: DataStatus.STAY
     )
 }
+
 fun BoardDTO.toEntity(): BoardEntity {
     return BoardEntity(
         id = this.id,
@@ -45,7 +48,7 @@ fun BoardDTO.toEntity(): BoardEntity {
 fun LabelDTO.toEntity(): LabelEntity {
     return LabelEntity(
         id = this.id,
-        boardId = this.boardId ,
+        boardId = this.boardId,
         name = this.name,
         color = this.color,
         isStatus = this.isStatus
@@ -123,5 +126,14 @@ fun ReplyWithMemberInfo.toDto(): ReplyWithMemberDTO {
         memberNickname = this.member.nickname,
         memberProfileImgUrl = this.member.profileImageUrl,
         isStatus = this.reply.isStatus
+    )
+}
+
+fun SimpleMemberDto.toWorkspaceMemberEntity(workspaceId: Long): WorkspaceMemberEntity {
+    return WorkspaceMemberEntity(
+        memberId = memberId,
+        workspaceId = workspaceId,
+        authority = authority,
+        isStatus = isStatus ?: DataStatus.STAY
     )
 }
