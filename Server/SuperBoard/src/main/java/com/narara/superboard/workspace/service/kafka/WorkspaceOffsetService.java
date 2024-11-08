@@ -93,9 +93,13 @@ public class WorkspaceOffsetService {
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_NAME_COLUMN, workspace.getId());
-        data.put(AUTHORITY_COLUMN, workspace.getName());
+        data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
+        data.put(MEMBER_NAME_COLUMN, workspaceMember.getMember().getNickname());
+        data.put("memberEmail", workspaceMember.getMember().getEmail());
+        data.put("profileImgUrl", workspaceMember.getMember().getProfileImgUrl());
+        data.put("isDeleted", workspaceMember.getMember().getIsDeleted());
+//        data.put("loginType", workspaceMember.getMember().getIsDeleted()); //로그인타입 줄까말까
+        data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
                 workspace.getOffset(),
