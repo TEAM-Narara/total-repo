@@ -79,8 +79,7 @@ public class KafkaConsumerService {
         activeListeners.put(listenerKey, container);
     }
 
-    /**
-     * STOMP 구독 이벤트 리스너: 구독 시 Kafka에서 밀린 메시지 가져와 STOMP로 전송
+    /**TOMP 구독 이벤트 리스너: 구독 시 Kafka에서 밀린 메시지 가져와 STOMP로 전송
      */
     @EventListener
     public void handleSubscription(SessionSubscribeEvent event) {
@@ -95,44 +94,44 @@ public class KafkaConsumerService {
         Long memberId = Long.parseLong(destinationParts[5]);
 
         // Kafka에서 밀린 메시지 가져오기
-        List<String> missedMessages = getMissedMessagesForMember(entityType + "-" + primaryId,memberId);
-        for (String message : missedMessages) {
-            messagingTemplate.convertAndSend(destination, message);
-        }
+//        List<String> missedMessages = getMissedMessagesForMember(entityType + "-" + primaryId,memberId);
+//        for (String message : missedMessages) {
+//            messagingTemplate.convertAndSend(destination, message);
+//        }
     }
 
     /**
      * Kafka의 밀린 메시지를 특정 파티션과 Offset에서부터 가져오는 메서드
      */
-    private List<String> getMissedMessagesForMember(String topic, Long memberId) {
-        List<String> messages = new ArrayList<>();
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "member-" + memberId); // memberId 기반 그룹 ID 설정
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
-            TopicPartition partition = new TopicPartition(topic, 0);
-            consumer.assign(Collections.singletonList(partition));
-
-            // 해당 memberId의 마지막 커밋된 Offset 위치부터 읽기 시작
-            consumer.seek(partition, consumer.position(partition));
-
-            // 메시지 읽기
-            while (true) {
-                var records = consumer.poll(Duration.ofMillis(100));
-                if (records.isEmpty()) break;
-
-                for (ConsumerRecord<String, String> record : records) {
-                    messages.add(record.value());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return messages;
-    }
+//    private List<String> getMissedMessagesForMember(String topic, Long memberId) {
+//        List<String> messages = new ArrayList<>();
+//        Properties props = new Properties();
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+//        props.put(ConsumerConfig.GROUP_ID_CONFIG, "member-" + memberId); // memberId 기반 그룹 ID 설정
+//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+//
+//        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+//            TopicPartition partition = new TopicPartition(topic, 0);
+//            consumer.assign(Collections.singletonList(partition));
+//
+//            // 해당 memberId의 마지막 커밋된 Offset 위치부터 읽기 시작
+//            consumer.seek(partition, consumer.position(partition));
+//
+//            // 메시지 읽기
+//            while (true) {
+//                var records = consumer.poll(Duration.ofMillis(100));
+//                if (records.isEmpty()) break;
+//
+//                for (ConsumerRecord<String, String> record : records) {
+//                    messages.add(record.value());
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return messages;
+//    }
 
     /**
      * Kafka의 밀린 메시지를 특정 파티션과 Offset에서부터 가져오는 메서드
