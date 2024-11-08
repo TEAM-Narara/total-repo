@@ -8,8 +8,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberAlarmEntity
-import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 

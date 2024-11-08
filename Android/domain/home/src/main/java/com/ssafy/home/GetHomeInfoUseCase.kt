@@ -28,10 +28,10 @@ class GetHomeInfoUseCase @Inject constructor(
 
         return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
             val selectedWorkspaceFlow = workspaceList.firstOrNull()?.let { workspace ->
-                boardRepository.getBoardsByWorkspace(workspace.workSpaceId)
+                boardRepository.getBoardsByWorkspace(workspace.workspaceId)
                     .map { boardList ->
                         SelectedWorkSpace(
-                            workspaceId = workspace.workSpaceId,
+                            workspaceId = workspace.workspaceId,
                             workspaceName = workspace.name,
                             boards = boardList
                         )
@@ -49,23 +49,22 @@ class GetHomeInfoUseCase @Inject constructor(
         }
     }
 
-    suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData> {
+    suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData?> {
         workspaceStomp.connect(workspaceId)
-        val workspaceFlow = workspaceRepository.getWorkspace(workspaceId) ?: return flowOf(
-            homeData.copy(selectedWorkSpace = SelectedWorkSpace())
-        )
 
         return combine(
-            workspaceFlow,
+            workspaceRepository.getWorkspace(workspaceId),
             boardRepository.getBoardsByWorkspace(workspaceId)
         ) { workspace, boardList ->
-            homeData.copy(
-                selectedWorkSpace = SelectedWorkSpace(
-                    workspaceId = workspace.workSpaceId,
-                    workspaceName = workspace.name,
-                    boards = boardList
+            workspace?.let {
+                homeData.copy(
+                    selectedWorkSpace = SelectedWorkSpace(
+                        workspaceId = workspace.workspaceId,
+                        workspaceName = workspace.name,
+                        boards = boardList
+                    )
                 )
-            )
+            }
         }
     }
 }

@@ -35,7 +35,7 @@ fun NavGraphBuilder.boardScreen(
             searchParameters = board.searchParameters,
             navigateToFilterScreen = navigateToFilterScreen,
             navigateToNotificationScreen = navigateToNotificationScreen,
-            navigateToBoardMenuScreen = { navigateToBoardMenuScreen(board.boardId, 0L) },
+            navigateToBoardMenuScreen = navigateToBoardMenuScreen,
             navigateToCardScreen = { cardId -> navigateToCardScreen(cardId) }
         )
     }

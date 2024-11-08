@@ -52,7 +52,7 @@ class CreateBoardViewModel @Inject constructor(
     }
 
     fun changeWorkspaceId(workSpaceDTO: WorkSpaceDTO) {
-        boardData = boardData.copy(workspaceId = workSpaceDTO.workSpaceId)
+        boardData = boardData.copy(workspaceId = workSpaceDTO.workspaceId)
     }
 
     fun changeCover(cover: Cover) {
