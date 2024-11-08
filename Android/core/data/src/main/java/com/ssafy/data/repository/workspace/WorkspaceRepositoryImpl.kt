@@ -126,6 +126,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
+
                         DataStatus.CREATE, DataStatus.UPDATE ->
                             workspaceDao.updateWorkspace(workspace.copy(name = name))
 
@@ -155,9 +156,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         workspaceId: Long,
         simpleMemberDto: SimpleMemberDto
     ): Flow<Unit> = withContext(ioDispatcher) {
-        workspaceDataSource.addWorkspaceMember(workspaceId, simpleMemberDto).map {
-            // TODO 원래는 소켓오면 저장해야하는데 지금은 그냥 저장 (테스트용)
-        }
+        workspaceDataSource.addWorkspaceMember(workspaceId, simpleMemberDto).map { }
     }
 
     override suspend fun deleteWorkspaceMember(
