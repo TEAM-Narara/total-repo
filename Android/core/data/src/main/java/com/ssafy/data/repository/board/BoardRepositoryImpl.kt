@@ -12,6 +12,7 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
@@ -196,6 +197,63 @@ class BoardRepositoryImpl @Inject constructor(
             boardMemberDao.getBoardMembers(boardId)
                 .map { list -> list.map { it.toDTO() } }
         }
+
+    override suspend fun deleteBoardMember(
+        boardId: Long,
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val boardMember = boardMemberDao.getBoardMember(boardId, memberId)
+
+            if (boardMember != null) {
+                if (isConnected) {
+                    boardDataSource.deleteBoardMember(boardId, memberId).map { Unit }
+                } else {
+                    val result = when (boardMember.isStatus) {
+                        DataStatus.CREATE -> boardMemberDao.deleteLocalBoardMember(boardId, memberId)
+                        else -> boardMemberDao.updateBoardMember(boardMember.copy(isStatus = DataStatus.DELETE))
+                    }
+
+                    flowOf(result)
+                }
+            } else {
+                flowOf(Unit)
+            }
+        }
+
+    override suspend fun updateBoardMember(
+        boardId: Long,
+        simpleMemberDto: SimpleMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val boardMember = boardMemberDao.getBoardMember(boardId, simpleMemberDto.memberId)
+
+        if (boardMember != null) {
+            if (isConnected) {
+                boardDataSource.updateBoardMember(boardId, simpleMemberDto).map { Unit }
+            } else {
+                val result = when (boardMember.isStatus) {
+                    DataStatus.STAY ->
+                        boardMemberDao.updateBoardMember(
+                            boardMember.copy(
+                                isStatus = DataStatus.UPDATE,
+                                authority = simpleMemberDto.authority
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        boardMemberDao.updateBoardMember(boardMember.copy(authority = simpleMemberDto.authority))
+
+                    DataStatus.DELETE -> {}
+                }
+
+                flowOf(result)
+            }
+        } else {
+            flowOf(Unit)
+        }
+    }
 
     override suspend fun getLocalOperationBoardMember(): List<BoardMemberDTO> =
         withContext(ioDispatcher) {

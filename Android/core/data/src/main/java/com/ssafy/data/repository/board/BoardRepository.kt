@@ -8,6 +8,7 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
@@ -39,6 +40,18 @@ interface BoardRepository {
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
+
+    suspend fun deleteBoardMember(
+        boardId: Long,
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<Unit>
+
+    suspend fun updateBoardMember(
+        boardId: Long,
+        simpleMemberDto: SimpleMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit>
 
     suspend fun getLocalOperationBoardMember(): List<BoardMemberDTO>
 

@@ -23,8 +23,8 @@ interface WorkspaceMemberDao {
     suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberEntity>
 
     // 워크스페이스 단일 조회
-    @Query("SELECT * FROM workspace_member WHERE id = :id")
-    fun getWorkspaceMember(id: Long): WorkspaceMemberEntity
+    @Query("SELECT * FROM workspace_member WHERE workspaceId == :workspaceId AND memberId == :memberId")
+    fun getWorkspaceMember(workspaceId: Long, memberId: Long): WorkspaceMemberEntity
 
     // 워크스페이스 멤버 조회
     @Transaction
@@ -71,8 +71,11 @@ interface WorkspaceMemberDao {
     suspend fun updateWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
-    @Delete
-    suspend fun deleteLocalWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
+    @Query("""
+        DELETE FROM workspace_member 
+        WHERE memberId = :memberId AND workspaceId = :workspaceId;
+    """)
+    suspend fun deleteLocalWorkspaceMember(memberId: Long, workspaceId: Long)
 
     @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
     fun getWorkspaceMemberByWorkspaceIdAndMemberId(workspaceId: Long, memberId: Long): WorkspaceMemberEntity
