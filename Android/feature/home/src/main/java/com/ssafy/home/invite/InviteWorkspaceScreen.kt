@@ -1,6 +1,5 @@
 package com.ssafy.home.invite
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +42,6 @@ import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
 
-@SuppressLint("FlowOperatorInvokedInComposition")
 @Composable
 fun InviteWorkspaceScreen(
     viewModel: InviteWorkspaceViewModel = hiltViewModel(),
