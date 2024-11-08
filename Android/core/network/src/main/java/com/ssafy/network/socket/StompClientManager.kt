@@ -3,10 +3,9 @@ package com.ssafy.network.socket
 import android.util.Log
 import com.google.gson.Gson
 import com.ssafy.network.module.AuthInterceptorOkHttpClient
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import okhttp3.OkHttpClient
@@ -15,6 +14,8 @@ import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.stomp.subscribe
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class StompClientManager @Inject constructor(
@@ -53,7 +54,11 @@ class StompClientManager @Inject constructor(
         Log.d("TAG", "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
+            Log.d("TAG", "data: ${it.bodyAsText}")
             gson.fromJson(it.bodyAsText, clazz)
+        }.catch { exception ->
+            exception.printStackTrace()
+            updateConnectionState(id, ConnectionState.Error(exception))
         }
     }
 

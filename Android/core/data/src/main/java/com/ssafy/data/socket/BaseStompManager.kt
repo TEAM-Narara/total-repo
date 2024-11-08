@@ -23,7 +23,7 @@ class BaseStompManager @Inject constructor(
             when (it) {
                 ConnectionState.Connected -> stompClientManager.subscribe(
                     SOCKET_ID,
-                    "topic/$topic/member/$memberId",
+                    "/topic/$topic/member/$memberId",
                     StompResponse::class.java
                 ).collect(::emit)
 
