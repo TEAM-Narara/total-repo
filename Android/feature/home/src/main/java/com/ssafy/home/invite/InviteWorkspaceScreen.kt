@@ -144,20 +144,6 @@ private fun InviteWorkspaceScreen(
                         error = rememberVectorPainter(Icons.Default.AccountCircle)
                     )
                 }
-//                UserSearchItem(
-//                    nickname = member.memberNickname,
-//                    email = member.memberEmail,
-//                    userAuth = member.authority,
-//                    onChangeUserAuth = { newAuth -> changeAuth(member.memberId, newAuth) },
-//                    icon = {
-//                        AsyncImage(
-//                            modifier = Modifier.fillMaxSize(),
-//                            model = member.memberProfileImgUrl,
-//                            contentDescription = null,
-//                            error = rememberVectorPainter(Icons.Default.AccountCircle)
-//                        )
-//                    }
-//                )
             }
 
             item {
@@ -184,7 +170,6 @@ private fun InviteWorkspaceScreen(
                     )
                 }
             }
-
         }
     }
 
