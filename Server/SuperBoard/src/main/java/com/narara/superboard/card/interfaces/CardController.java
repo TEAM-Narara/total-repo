@@ -2,8 +2,8 @@ package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
-import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
-import com.narara.superboard.card.interfaces.dto.CardCombinedLogResponseDto;
+import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
+import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
@@ -119,8 +119,8 @@ public class CardController implements CardAPI {
 
     @Override
     @Operation(summary = "카드의 액티비티 목록 조회", description = "카드의 액티비티 목록 조회")
-    public ResponseEntity<DefaultResponse<List<CardActivityDetailResponseDto>>> getCardActivity(Long cardId) {
-        List<CardActivityDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
+    public ResponseEntity<DefaultResponse<List<CardLogDetailResponseDto>>> getCardActivity(Long cardId) {
+        List<CardLogDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, cardActivity), HttpStatus.OK);
     }
 
@@ -129,13 +129,13 @@ public class CardController implements CardAPI {
             @Parameter(name = "size", description = "페이지당 항목 수", example = "10", schema = @Schema(defaultValue = "10"))
     })
     @Override
-    public ResponseEntity<DefaultResponse<CardCombinedLogResponseDto>> getCardCombinedLog(
+    public ResponseEntity<DefaultResponse<CardCombinedActivityResponseDto>> getCardCombinedLog(
             @PathVariable Long cardId,
             @RequestParam int page,
             @RequestParam int size) {
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        CardCombinedLogResponseDto combinedLogs = cardService.getCardCombinedLog(cardId, pageable);
+        CardCombinedActivityResponseDto combinedLogs = cardService.getCardCombinedLog(cardId, pageable);
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, combinedLogs)

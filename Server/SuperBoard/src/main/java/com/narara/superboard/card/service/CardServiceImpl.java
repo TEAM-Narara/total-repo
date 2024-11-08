@@ -7,7 +7,8 @@ import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
-import com.narara.superboard.card.interfaces.dto.CardCombinedLogResponseDto;
+import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityDto;
+import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
 import com.narara.superboard.card.interfaces.dto.log.*;
@@ -30,7 +31,6 @@ import com.narara.superboard.websocket.constant.Action;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -70,7 +70,8 @@ public class CardServiceImpl implements CardService {
         cardMemberRepository.save(cardMember);
 
         // 로그 기록 추가
-        CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(), savedCard.getName());
+        CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(),
+                savedCard.getName());
 
         CardHistory<CreateCardInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), savedCard,
@@ -94,10 +95,12 @@ public class CardServiceImpl implements CardService {
         card.delete();
 
         // 로그 기록 추가
-        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(), card.getId(), card.getName());
+        DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(),
+                card.getId(), card.getName());
 
         CardHistory<DeleteCardInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -114,10 +117,12 @@ public class CardServiceImpl implements CardService {
         Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
         // 로그 기록 추가
-        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(), updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
+        UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(),
+                updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
 
         CardHistory<UpdateCardInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), updatedCard.getList().getBoard(), updatedCard,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
+                updatedCard.getList().getBoard(), updatedCard,
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -132,7 +137,7 @@ public class CardServiceImpl implements CardService {
             return new ArrayList<>();
         }
         java.util.List<Card> cardCollection = new ArrayList<>();
-        listService.checkBoardMember(allListByBoard.getFirst(),member, GET_ARCHIVE_CARD);
+        listService.checkBoardMember(allListByBoard.getFirst(), member, GET_ARCHIVE_CARD);
         for (List list : allListByBoard) {
             cardCollection.addAll(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list));
         }
@@ -147,10 +152,12 @@ public class CardServiceImpl implements CardService {
         card.changeArchiveStatus();
 
         // 로그 기록 추가
-        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());
+        ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(),
+                card.getIsArchived());
 
         CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -168,58 +175,63 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public java.util.List<CardActivityDetailResponseDto> getCardActivity(Long cardId) {
-        java.util.List<CardHistory> cardHistoryCollection = cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(cardId);
+    public java.util.List<CardLogDetailResponseDto> getCardActivity(Long cardId) {
+        java.util.List<CardHistory> cardHistoryCollection = cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(
+                cardId);
         if (cardHistoryCollection.isEmpty()) {
             return new ArrayList<>();
         }
         return cardHistoryCollection.stream()
-                .map(CardActivityDetailResponseDto::createActivityDetailResponseDto)
+                .map(CardLogDetailResponseDto::createLogDetailResponseDto)
                 .toList();
     }
 
-    public CardCombinedLogResponseDto getCardCombinedLog(Long cardId, Pageable pageable) {
+    @Override
+    public CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable) {
         // 카드 활동 및 댓글 리스트를 Page로 가져옴
-        Page<CardHistory> cardActivities = cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(cardId, pageable);
-        Page<Reply> cardReplies = replyRepository.findAllByCardId(cardId, pageable);
+        Page<CardHistory> cardActivities =
+                cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(cardId, pageable);
+        Page<Reply> cardReplies =
+                replyRepository.findAllByCardId(cardId, pageable);
 
         // 두 Page 객체의 총 페이지 수와 총 요소 수 계산
-        int totalPages = Math.max(cardActivities.getTotalPages(), cardReplies.getTotalPages());
         long totalElements = cardActivities.getTotalElements() + cardReplies.getTotalElements();
+        long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
 
         // DTO로 변환 및 최신순 정렬
-        List<Object> combinedLogs = mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(), pageable.getPageSize());
+        java.util.List<CardCombinedActivityDto> combinedLogs =
+                mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(), pageable.getPageSize());
 
-        return new CardCombinedLogResponseDto(combinedLogs, totalPages, totalElements);
+        return new CardCombinedActivityResponseDto(combinedLogs, totalPages, totalElements);
     }
 
-    private static List<Object> mergeAndLimitSortedList(
-            List<CardActivityDetailResponseDto> cardActivities,
-            List<Reply> cardReplies,
+    private static java.util.List<CardCombinedActivityDto> mergeAndLimitSortedList(
+            java.util.List<CardHistory> cardLogs,
+            java.util.List<Reply> cardReplies,
             int pageSize) {
 
-        List<Object> combinedList = new ArrayList<>();
+        java.util.List<CardCombinedActivityDto> combinedList = new ArrayList<>();
         int i = 0, j = 0;
 
         // 병합하면서 최신순으로 정렬
-        while (i < cardActivities.size() && j < cardReplies.size() && combinedList.size() < pageSize) {
-            if (cardActivities.get(i).timestamp().isAfter(cardReplies.get(j).getCreatedAt())) {
-                combinedList.add(cardActivities.get(i));
+        while (i < cardLogs.size() && j < cardReplies.size() && combinedList.size() < pageSize) {
+            if (cardLogs.get(i).getWhen() >= cardReplies.get(j).getCreatedAt()) {
+                combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
                 i++;
             } else {
-                combinedList.add(cardReplies.get(j));
+                combinedList.add(CardCombinedActivityDto.of(cardReplies.get(j)));
                 j++;
             }
         }
 
         // 나머지 요소를 pageSize에 도달할 때까지 추가
-        while (i < cardActivities.size() && combinedList.size() < pageSize) {
-            combinedList.add(cardActivities.get(i));
+        while (i < cardLogs.size() && combinedList.size() < pageSize) {
+            combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
             i++;
         }
 
         while (j < cardReplies.size() && combinedList.size() < pageSize) {
-            combinedList.add(cardReplies.get(j));
+            combinedList.add(CardCombinedActivityDto.of(cardReplies.get(j)));
             j++;
         }
 
