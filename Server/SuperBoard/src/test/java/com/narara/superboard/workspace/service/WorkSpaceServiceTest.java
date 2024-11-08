@@ -8,6 +8,7 @@ import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
@@ -222,14 +223,12 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                         BoardDetailResponseDto.builder()
                                 .id(1L)
                                 .name("나의 보드1")
-                                .backgroundType("COLOR")
-                                .backgroundValue("#fffffff")
+                                .cover(new CoverDto("COLOR", "#fffffff"))
                                 .build(),
                         BoardDetailResponseDto.builder()
                                 .id(2L)
                                 .name("나의 보드2")
-                                .backgroundType("IMAGE")
-                                .backgroundValue("https!!~~~")
+                                .cover(new CoverDto("IMAGE", "httssdfsdf"))
                                 .build()
                 ))
                 .build();

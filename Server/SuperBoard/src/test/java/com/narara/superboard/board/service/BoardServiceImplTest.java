@@ -146,14 +146,14 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         BoardDetailResponseDto board1 = result.get(0);
         assertEquals(1L, board1.id());
         assertEquals("보드 1", board1.name());
-        assertEquals("COLOR", board1.backgroundType());
-        assertEquals("#ffffff", board1.backgroundValue());
+        assertEquals("COLOR", board1.cover().type());
+        assertEquals("#ffffff", board1.cover().value());
 
         BoardDetailResponseDto board2 = result.get(1);
         assertEquals(2L, board2.id());
         assertEquals("보드 2", board2.name());
-        assertEquals("IMAGE", board2.backgroundType());
-        assertEquals("https://example.com/image.jpg", board2.backgroundValue());
+        assertEquals("IMAGE", board2.cover().type());
+        assertEquals("https://example.com/image.jpg", board2.cover().value());
     }
 
     @ParameterizedTest
@@ -161,7 +161,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("워크스페이스 ID가 존재하지 않을 때 예외 발생")
     void shouldThrowNotFoundEntityExceptionWhenWorkspaceIdNotFound(Long workspaceId) {
         // given
-        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null);
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, "Test Board", "PUBLIC", null, false);
         Member member = new Member(1L, "시현", "sisi@naver.com");
         // Mocking workspaceRepository to return empty Optional
         when(workspaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.empty());
@@ -198,7 +198,8 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 workspaceId,
                 name,
                 visibility,
-                new CoverDto(backgroundType, backgroundValue)
+                new CoverDto(backgroundType, backgroundValue),
+                false
         );
 
         Member member = new Member(1L, "시현", "sisi@naver.com");
@@ -244,7 +245,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Map<String, Object> background = null;
         String visibility = "WORKSPACE";
 
-        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, null);
+        BoardCreateRequestDto requestDto = new BoardCreateRequestDto(workspaceId, name, visibility, null, false);
 
         WorkSpace workSpace = WorkSpace.builder()
                 .id(workspaceId)
