@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember, Long> {
-    @Query("SELECT wsm from WorkSpaceMember wsm left join wsm.workSpace ws left join wsm.member where ws.id = :workspaceId and wsm.isDeleted = false")
+    @Query("SELECT wsm from WorkSpaceMember wsm left join wsm.workSpace ws left join wsm.member where ws.id = :workspaceId and ws.isDeleted = false")
     List<WorkSpaceMember> findAllByWorkSpaceId(@Param("workspaceId") Long workspaceId);
 
     List<WorkSpaceMember> findAllByMemberId(Long memberId);
