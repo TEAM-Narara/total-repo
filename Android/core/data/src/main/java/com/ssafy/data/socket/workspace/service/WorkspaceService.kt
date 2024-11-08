@@ -17,8 +17,8 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
+import com.ssafy.model.member.Authority
 import com.ssafy.model.with.DataStatus
-import java.lang.reflect.Member
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,11 +50,12 @@ class WorkspaceService @Inject constructor(
     suspend fun addMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceMemberDto::class.java)
 
-        // TODO : memberDao에 먼저 사람 넣기
         memberDao.insertMember(
             MemberEntity(
                 id = dto.memberId,
-                nickname = dto.memberName
+                nickname = dto.memberName,
+                email = dto.memberEmail,
+                profileImageUrl = dto.profileImgUrl,
             )
         )
 
@@ -62,7 +63,7 @@ class WorkspaceService @Inject constructor(
             WorkspaceMemberEntity(
                 id = dto.memberId,
                 workspaceId = dto.workspaceId,
-                authority = dto.authority,
+                authority = Authority.valueOf(dto.authority),
                 isStatus = DataStatus.STAY
             )
         )
