@@ -59,7 +59,8 @@ interface CardLabelDao {
             label.boardId AS label_boardId,
             label.name AS label_name,
             label.color AS label_color,
-            label.isStatus AS label_isStatus
+            label.isStatus AS label_isStatus,
+            label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
         WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE'
@@ -79,7 +80,8 @@ interface CardLabelDao {
             label.boardId AS label_boardId,
             label.name AS label_name,
             label.color AS label_color,
-            label.isStatus AS label_isStatus
+            label.isStatus AS label_isStatus,
+            label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
         WHERE card_label.cardId IN (:cardIds) AND card_label.isStatus != 'DELETE'
