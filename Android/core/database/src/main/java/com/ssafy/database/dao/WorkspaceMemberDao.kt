@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
@@ -22,9 +23,16 @@ interface WorkspaceMemberDao {
     """)
     suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberEntity>
 
+    // 보드 멤버 단일 id 조회
+    @Query("SELECT * FROM workspace_member WHERE id == :id")
+    fun getWorkspaceMember(id: Long): WorkspaceMemberEntity?
+
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId AND memberId = :memberId")
     fun getWorkspaceMember(workspaceId: Long, memberId: Long): WorkspaceMemberEntity?
+
+    @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId AND memberId = :memberId")
+    fun getWorkspaceMemberFlow(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberEntity>?
 
     // 워크스페이스 멤버 조회
     @Transaction

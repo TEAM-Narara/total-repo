@@ -32,9 +32,13 @@ interface BoardMemberDao {
     """)
     suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmEntity>
 
-    // 보드 멤버 단일 조회
+    // 보드 멤버 단일 id 조회
     @Query("SELECT * FROM board_member WHERE id == :id")
     fun getBoardMember(id: Long): BoardMemberEntity?
+
+    // 보드 멤버 단일 조회
+    @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
+    fun getBoardMemberFlow(boardId: Long, memberId: Long): Flow<BoardMemberEntity>?
 
     @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
     fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity?

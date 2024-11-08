@@ -7,6 +7,7 @@ import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.Authority
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
@@ -77,7 +78,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                     workspaceDao.insertWorkspace(
                         WorkspaceEntity(
                             name = name,
-                            authority = "ADMIN",
+                            authority = Authority.ADMIN,
                             isStatus = DataStatus.CREATE
                         )
                     )
@@ -137,6 +138,15 @@ class WorkspaceRepositoryImpl @Inject constructor(
             } else {
                 flowOf(Unit)
             }
+        }
+
+    override suspend fun getWorkspaceMemberMyInfo(
+        workspaceId: Long,
+        memberId: Long
+    ): Flow<WorkspaceMemberDTO>?  =
+        withContext(ioDispatcher) {
+            workspaceMemberDao.getWorkspaceMemberFlow(workspaceId, memberId)
+                ?.map { it.toDTO() }
         }
 
 

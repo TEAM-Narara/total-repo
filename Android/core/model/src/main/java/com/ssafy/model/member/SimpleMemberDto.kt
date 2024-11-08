@@ -4,7 +4,7 @@ import com.ssafy.model.with.DataStatus
 
 data class SimpleMemberDto(
     val memberId: Long,
-    val authority: String,
+    val authority: Authority,
 
     @Transient
     val isStatus: DataStatus? = DataStatus.STAY
@@ -13,8 +13,13 @@ data class SimpleMemberDto(
 data class DetailMemberDto(
     val workspaceMemberId: Long,
     val memberId: Long,
-    val authority: String,
+    val authority: Authority,
 
     @Transient
     val isStatus: DataStatus? = DataStatus.STAY
 )
+
+enum class Authority(name: String) {
+    ADMIN("ADMIN"),
+    MEMBER("MEMBER")
+}

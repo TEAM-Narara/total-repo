@@ -18,7 +18,7 @@ interface LabelDao {
     @Query("""
         SELECT * 
         FROM label
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateLabels(): List<LabelEntity>
 

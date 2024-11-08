@@ -41,7 +41,6 @@ class CardRepositoryImpl @Inject constructor(
     private val attachmentDao: AttachmentDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
-
     override suspend fun createCard(
         cardRequestDto: CardRequestDto,
         isConnected: Boolean
