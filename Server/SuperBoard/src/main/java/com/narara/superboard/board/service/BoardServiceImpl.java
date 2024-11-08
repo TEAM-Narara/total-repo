@@ -104,10 +104,12 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workspaceId(), "워크스페이스"));
 
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
+        //TODO Websocket board 생성
 
         Board saveBoard = boardRepository.save(board);
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
         boardMemberRepository.save(boardMemberByAdmin);
+        //TODO Websocket boardMember 생성
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
@@ -120,7 +122,7 @@ public class BoardServiceImpl implements BoardService {
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket board 생성 히스토리 생성
 
         return saveBoard;
     }
@@ -135,6 +137,7 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Member member, Long boardId) {
         Board board = getBoard(boardId);
         board.deleted();
+        //TODO Websocket board 삭제
 
         //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset();
@@ -147,7 +150,7 @@ public class BoardServiceImpl implements BoardService {
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.DELETE, EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket board 삭제 히스토리 생성
     }
 
     @Override
@@ -173,6 +176,7 @@ public class BoardServiceImpl implements BoardService {
         } else {
             throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
         }
+        //TODO Websocket board 업데이트
 
         // Board 업데이트 로그 기록
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
@@ -183,6 +187,7 @@ public class BoardServiceImpl implements BoardService {
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket board 업데이트 히스토리 생성
 
         return updatedBoard;
     }
@@ -198,12 +203,14 @@ public class BoardServiceImpl implements BoardService {
     public void changeArchiveStatus(Member member, Long boardId) {
         Board board = getBoard(boardId);
         board.changeArchiveStatus();
+        //TODO Websocket 보드 아카이브 상태 변경
 
         // 아카이브 상태 변경 로그 기록
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, EventData.BOARD, archiveStatusChangeInfo);
+        //TODO Websocket 보드 아카이브 상태 변경 로그 생성
 
         boardHistoryRepository.save(boardHistory);
     }
@@ -282,7 +289,6 @@ public class BoardServiceImpl implements BoardService {
         return activities;
     }
 
-
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 
@@ -318,6 +324,4 @@ public class BoardServiceImpl implements BoardService {
                 reply.getCard().getList().getName()
         );
     }
-
-
 }
