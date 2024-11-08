@@ -16,13 +16,13 @@ import retrofit2.http.Path
 interface BoardAPI {
 
     @POST("api/v1/boards")
-    suspend fun createBoard(): Response<ApiResponse<Unit>>
+    suspend fun createBoard(@Body boardDTO: BoardDTO): Response<ApiResponse<BoardDTO>>
 
     @GET("api/v1/boards/{boardId}")
-    suspend fun getBoard(@Path("boardId") id: Long): Response<ApiResponse<BoardDTO>>
+    suspend fun getBoard(@Path("boardId") boardId: Long): Response<ApiResponse<BoardDTO>>
 
     @DELETE("api/v1/boards/{boardId}")
-    suspend fun deleteBoard(@Path("boardId") id: Long): Response<ApiResponse<Unit>>
+    suspend fun deleteBoard(@Path("boardId") boardId: Long): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/boards/{boardId}")
     suspend fun updateBoard(

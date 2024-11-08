@@ -39,14 +39,21 @@ import com.ssafy.model.workspace.WorkSpaceDTO
 fun CreateBoardBody(
     modifier: Modifier = Modifier,
     workSpaceList: List<WorkSpaceDTO>,
-    cover: Cover,
+    boardData: BoardDTO,
+    changeBoardName: (String) -> Unit,
+    changeWorkspace: (WorkSpaceDTO) -> Unit,
+    changeVisibleScope: (Visibility) -> Unit,
     moveToSelectBackgroundScreen: (Cover) -> Unit,
-    createBoardClick: (boardDTO: BoardDTO) -> Unit
+    createBoardClick: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    val (boardName, setBoardName) = remember { mutableStateOf("") }
-    val (workSpace, setWorkSpace) = remember { mutableStateOf(workSpaceList.firstOrNull()) }
-    val (visibleScope, setVisibleScope) = remember { mutableStateOf(Visibility.WORKSPACE) }
+    val (boardName, setBoardName) = remember(boardData.name) { mutableStateOf(boardData.name) }
+    val (workSpace, setWorkSpace) = remember(boardData.workspaceId) {
+        mutableStateOf(workSpaceList.find { it.workSpaceId == boardData.workspaceId })
+    }
+    val (visibleScope, setVisibleScope) = remember(boardData.visibility) {
+        mutableStateOf(boardData.visibility)
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(PaddingDefault),
@@ -57,7 +64,10 @@ fun CreateBoardBody(
         EditText(
             title = "보드명",
             text = boardName,
-            onTextChange = setBoardName,
+            onTextChange = {
+                setBoardName(it)
+                changeBoardName(it)
+            },
             textColor = Primary
         )
 
@@ -65,7 +75,10 @@ fun CreateBoardBody(
             title = "워크 스페이스",
             dropdownList = workSpaceList,
             initItem = workSpace,
-            onItemChange = setWorkSpace,
+            onItemChange = {
+                setWorkSpace(it)
+                if (it != null) changeWorkspace(it)
+            },
             dropdownItemToText = { it?.name ?: "" }
         )
 
@@ -73,7 +86,10 @@ fun CreateBoardBody(
             title = "공개 범위",
             dropdownList = Visibility.entries,
             initItem = visibleScope,
-            onItemChange = setVisibleScope,
+            onItemChange = {
+                setVisibleScope(it)
+                changeVisibleScope(it)
+            },
         )
 
         Row(
@@ -88,24 +104,24 @@ fun CreateBoardBody(
                 color = Primary
             )
 
-            when (cover.type) {
+            when (boardData.cover.type) {
                 CoverType.COLOR -> {
                     Image(
-                        painter = ColorPainter(cover.value.toColor()),
+                        painter = ColorPainter(boardData.cover.value.toColor()),
                         contentDescription = "Color",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(cover) }
+                            .clickable { moveToSelectBackgroundScreen(boardData.cover) }
                     )
                 }
 
                 CoverType.IMAGE -> {
                     AsyncImage(
-                        model = cover.value,
+                        model = boardData.cover.value,
                         contentDescription = "Image",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(cover) }
+                            .clickable { moveToSelectBackgroundScreen(boardData.cover) }
                     )
                 }
 
@@ -115,7 +131,7 @@ fun CreateBoardBody(
                         contentDescription = "Color",
                         modifier = Modifier
                             .size(BackgroundMini)
-                            .clickable { moveToSelectBackgroundScreen(cover) }
+                            .clickable { moveToSelectBackgroundScreen(boardData.cover) }
                     )
                 }
             }
@@ -124,17 +140,7 @@ fun CreateBoardBody(
         HorizontalDivider(color = LightGray)
 
         if (workSpace != null) {
-            FilledButton(text = "보드 생성", onClick = {
-                val boardDTO = BoardDTO(
-                    id = 0,
-                    workspaceId = workSpace.workSpaceId,
-                    name = boardName,
-                    cover = cover,
-                    isClosed = false,
-                    visibility = visibleScope
-                )
-                createBoardClick(boardDTO)
-            })
+            FilledButton(text = "보드 생성", onClick = createBoardClick)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.ssafy.model.background
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 data class CoverDto(
     val id: Long = 0,
@@ -19,7 +20,9 @@ data class Cover(
     val type: CoverType,
     val value: String,
 
+    @Transient
     val id: Long = 0,
+    @Transient
     val isStatus: DataStatus = DataStatus.STAY
 )
 
