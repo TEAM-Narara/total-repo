@@ -103,4 +103,10 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleAuthenticationException(Exception ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(Exception ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()) + "\n 혹시, dto를 보새실때, 대소문자를 잘못하시진 않으셨는지 확인해보세요", HttpStatus.BAD_REQUEST);
+    }
+
 }
