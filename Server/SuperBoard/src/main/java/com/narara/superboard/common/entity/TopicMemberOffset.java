@@ -8,9 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Table(name = "topic_member_offset", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"topic", "member_id"})
-})
+@Table(name = "topic_member_offset")
 public class TopicMemberOffset extends BaseTimeEntity {
 
     @Id
@@ -27,9 +25,10 @@ public class TopicMemberOffset extends BaseTimeEntity {
     @Builder.Default
     private Long lastOffset = -1L;
 
-    public TopicMemberOffset(String topic, Long memberId) {
+    public TopicMemberOffset(String topic, Long memberId, Long lastOffset) {
         this.topic = topic;
         this.memberId = memberId;
+        this.lastOffset = lastOffset;
     }
 
     public void updateLastOffset(Long newOffset) {

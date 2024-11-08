@@ -22,6 +22,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.*;
@@ -57,6 +58,7 @@ public class KafkaConsumerService {
      * @param event
      */
     @EventListener
+    @Transactional
     public void registerListener(SessionSubscribeEvent event) {
         String destination = (String) event.getMessage().getHeaders().get("simpDestination");
 
@@ -88,11 +90,15 @@ public class KafkaConsumerService {
                 processRecord(record, acknowledgment, entityType, primaryId, memberId);
             });
 
+            // TODO : 컨슈머 그룹 생성할떄, topicMemberOffset 생성하기
+            System.out.println("topicMemberOffset 생성하기");
+            TopicMemberOffset topicMemberOffset = TopicMemberOffset.builder()
+                            .topic(topic).memberId(memberId).build();
+            topicMemberOffsetRepository.save(topicMemberOffset);
             container.start();
+            System.out.println("11111");
             activeListeners.put(listenerKey, container);
 
-            // TODO : 컨슈머 그룹 생성할떄, topicMemberOffset 생성하기
-            topicMemberOffsetRepository.save(new TopicMemberOffset(topic,memberId));
         }
 
         // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
@@ -220,7 +226,7 @@ public class KafkaConsumerService {
      */
     private void updateLastOffsetInDB(String topic, Long memberId, Long newOffset) {
         TopicMemberOffset offsetRecord = topicMemberOffsetRepository.findByTopicAndMemberId(topic, memberId)
-                .orElse(new TopicMemberOffset(topic, memberId));
+                .orElse(new TopicMemberOffset(topic, memberId,-1L));
 
         offsetRecord.updateLastOffset(newOffset);
         topicMemberOffsetRepository.save(offsetRecord);
