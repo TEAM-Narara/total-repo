@@ -49,14 +49,16 @@ public class BoardMemberController implements BoardMemberAPI{
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<MemberResponseDto>> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+    public ResponseEntity<DefaultResponse<BoardMemberDto>> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
         BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(
                         StatusCode.OK,
                         ResponseMessage.BOARD_MEMBER_CREATE_SUCCESS,
-                        MemberResponseDto.builder()
+                        BoardMemberDto.builder()
+                                .boardId(boardMember.getBoard().getId())
+                                .boardMemberId(boardMember.getId())
                                 .memberId(boardMember.getMember().getId())
                                 .memberEmail(boardMember.getMember().getEmail())
                                 .memberNickname(boardMember.getMember().getNickname())
@@ -69,14 +71,16 @@ public class BoardMemberController implements BoardMemberAPI{
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<MemberResponseDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
+    public ResponseEntity<DefaultResponse<BoardMemberDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
         BoardMember boardMember = boardMemberService.deleteMember(boardId, dto.memberId());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(
                         StatusCode.OK,
                         ResponseMessage.BOARD_MEMBER_DELETE_SUCCESS,
-                        MemberResponseDto.builder()
+                        BoardMemberDto.builder()
+                                .boardId(boardMember.getBoard().getId())
+                                .boardMemberId(boardMember.getId())
                                 .memberId(boardMember.getMember().getId())
                                 .memberEmail(boardMember.getMember().getEmail())
                                 .memberNickname(boardMember.getMember().getNickname())
@@ -89,14 +93,16 @@ public class BoardMemberController implements BoardMemberAPI{
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<MemberResponseDto>> editBoardMemberAuthority(@PathVariable("boardId") Long boardId, @RequestBody EditBoardMemberAuthorityDto dto) {
+    public ResponseEntity<DefaultResponse<BoardMemberDto>> editBoardMemberAuthority(@PathVariable("boardId") Long boardId, @RequestBody EditBoardMemberAuthorityDto dto) {
         BoardMember boardMember = boardMemberService.editBoardMemberAuthority(boardId, dto.memberId(), dto.authority());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(
                         StatusCode.OK,
                         ResponseMessage.BOARD_MEMBER_AUTHORITY_UPDATE_SUCCESS,
-                        MemberResponseDto.builder()
+                        BoardMemberDto.builder()
+                                .boardId(boardMember.getBoard().getId())
+                                .boardMemberId(boardMember.getId())
                                 .memberId(boardMember.getMember().getId())
                                 .memberEmail(boardMember.getMember().getEmail())
                                 .memberNickname(boardMember.getMember().getNickname())
