@@ -66,7 +66,7 @@ public class CardServiceImpl implements CardService {
         // 로그 기록 추가
         CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(), savedCard.getName());
 
-        CardHistory<CreateCardInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<CreateCardInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), savedCard,
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
@@ -90,7 +90,7 @@ public class CardServiceImpl implements CardService {
         // 로그 기록 추가
         DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(), card.getId(), card.getName());
 
-        CardHistory<DeleteCardInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<DeleteCardInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
@@ -110,7 +110,7 @@ public class CardServiceImpl implements CardService {
         // 로그 기록 추가
         UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(), updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
 
-        CardHistory<UpdateCardInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<UpdateCardInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), updatedCard.getList().getBoard(), updatedCard,
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
@@ -143,7 +143,7 @@ public class CardServiceImpl implements CardService {
         // 로그 기록 추가
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());
 
-        CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
