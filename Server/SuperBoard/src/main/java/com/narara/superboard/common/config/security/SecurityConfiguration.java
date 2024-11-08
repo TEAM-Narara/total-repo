@@ -49,7 +49,7 @@ public class SecurityConfiguration {
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
                 .requestMatchers(
                         "/ws/**", "/index.html", //웹소켓 엔드포인트
-                        "/theme-outline.css" // swagger ui
+                        "/theme-outline.css","/theme-material.css" // swagger ui
                 );
     }
 

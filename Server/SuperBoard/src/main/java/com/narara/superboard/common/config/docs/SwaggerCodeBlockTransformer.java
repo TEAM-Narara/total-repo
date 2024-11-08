@@ -37,17 +37,17 @@ public class SwaggerCodeBlockTransformer extends SwaggerIndexPageTransformer {
     @Override
     public Resource transform(HttpServletRequest request, Resource resource,
                               ResourceTransformerChain transformer) throws IOException {
-        // index.html을 수정하여 theme-outline.css를 포함
+        // index.html을 수정하여 theme-material.css를 포함
         if (resource.toString().contains("index.html")) {
             try (InputStream is = resource.getInputStream();
                  BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
                 String html = br.lines().collect(Collectors.joining("\n"));
 
-                // theme-outline.css를 추가하는 링크 태그 (절대 경로로 설정)
-                String themeLink = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/theme-outline.css\">";
+                // theme-material.css를 추가하는 링크 태그 (절대 경로로 설정)
+                String themeLink = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/theme-material.css\">";
 
-                // </head> 태그 바로 앞에 theme-outline.css 링크 삽입
+                // </head> 태그 바로 앞에 theme-material.css 링크 삽입
                 String transformedHtml = html.replace("</head>", themeLink + "\n</head>");
 
                 // 변환된 HTML 반환
