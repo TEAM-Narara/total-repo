@@ -93,6 +93,7 @@ public class WorkspaceOffsetService {
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put("workspaceMemberId", workspaceMember.getId());
         data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
         data.put(MEMBER_NAME_COLUMN, workspaceMember.getMember().getNickname());
         data.put("memberEmail", workspaceMember.getMember().getEmail());
@@ -122,7 +123,8 @@ public class WorkspaceOffsetService {
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
+        data.put("workspaceMemberId", workspaceMember.getId());
+        data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
 
         DiffInfo diffInfo = new DiffInfo(
                 workspace.getOffset(),
@@ -145,6 +147,7 @@ public class WorkspaceOffsetService {
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put("workspaceMemberId", workspaceMember.getId());
         data.put(MEMBER_ID_COLUMN, workspace.getId());
         data.put(AUTHORITY_COLUMN, workspace.getName());
 
