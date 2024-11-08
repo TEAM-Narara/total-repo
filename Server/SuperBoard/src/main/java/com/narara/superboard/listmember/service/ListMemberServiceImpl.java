@@ -29,6 +29,22 @@ public class ListMemberServiceImpl implements ListMemberService {
                 );
     }
 
+    @Override
+    public Boolean getListMemberIsAlert(Member member, Long listId) {
+        ListMember listMember = listMemberRepository.findByListIdAndMember(listId, member)
+                .orElse(null);
+
+        List list = listRepository.findById(listId)
+                .orElseThrow(() -> new NotFoundEntityException(listId, "list"));
+
+        //없으면 새로 추가
+        if (listMember == null) {
+            addNewListMember(member, list);
+        }
+
+        return listMember.isAlert();
+    }
+
     // 리스트 존재 확인 및 조회
     private List validateListExists(Long listId) {
         return listRepository.findById(listId)

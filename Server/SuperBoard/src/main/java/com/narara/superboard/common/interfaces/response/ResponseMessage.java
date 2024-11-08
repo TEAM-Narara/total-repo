@@ -103,6 +103,7 @@ public class ResponseMessage {
 
     // 리스트 멤버 관련 상수
     public static final String LIST_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "리스트 멤버 알림 상태 업데이트 성공";
+    public static final String LIST_MEMBER_ALERT_FETCH_SUCCESS = "리스트 멤버 알림 상태 조회 성공";
 
     // 회원 배경 관련 상수
     public static final String MEMBER_BACKGROUND_ADD_SUCCESS = "회원 배경 추가 성공";
