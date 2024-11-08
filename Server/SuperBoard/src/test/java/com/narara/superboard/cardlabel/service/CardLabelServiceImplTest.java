@@ -215,11 +215,17 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
                 new Label(3L,board, "Label3", 3L)
         );
 
+        List<CardLabel> cardLabelList = Arrays.asList(
+                new CardLabel(1L, boardLabels.get(0), null, true),
+                new CardLabel(2L,boardLabels.get(1), null, false),
+                new CardLabel(3L,boardLabels.get(2), null, true)
+        );
+
         when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
 
         // 카드에 사용된 라벨 ID 목록을 모킹합니다. 카드가 Label1과 Label3을 사용한다고 가정합니다.
-        Set<Long> cardLabelIds = Set.of(1L, 3L);
-        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(cardLabelIds);
+//        Set<Long> cardLabelIds = Set.of(1L, 3L);
+        when(cardLabelRepository.findByCardId(cardId)).thenReturn(cardLabelList);
 
         // Act
         List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
@@ -287,10 +293,15 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
                 new Label(1L, board, "Label1", 1L),
                 new Label(2L, board, "Label2", 2L)
         );
+
+        List<CardLabel> cardLabelList = Arrays.asList(
+                new CardLabel(1L, boardLabels.get(0), null, false),
+                new CardLabel(2L,boardLabels.get(1), null, false)
+        );
         when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
 
         // 카드에 연결된 라벨이 없도록 빈 Set을 모킹합니다.
-        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(Collections.emptySet());
+        when(cardLabelRepository.findByCardId(cardId)).thenReturn(cardLabelList);
 
         // Act
         List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);

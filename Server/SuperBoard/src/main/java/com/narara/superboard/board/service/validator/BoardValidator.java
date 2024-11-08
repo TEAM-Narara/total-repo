@@ -45,7 +45,7 @@ public class BoardValidator {
     }
 
     public void validateBackgroundIsValid(BoardCoreHolder boardCoreHolder) {
-        CoverDto background = boardCoreHolder.background();
+        CoverDto background = boardCoreHolder.cover();
 
         //변경되지 않음, return
         if (background == null) {

@@ -23,6 +23,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -78,8 +79,7 @@ public class BoardServiceImpl implements BoardService {
             BoardDetailResponseDto boardDto = BoardDetailResponseDto.builder()
                     .id(board.getId())
                     .name(board.getName())
-                    .backgroundType(coverHandler.getTypeValue(board.getCover()))
-                    .backgroundValue(coverHandler.getValue(board.getCover()))
+                    .cover(new CoverDto(coverHandler.getTypeValue(board.getCover()), coverHandler.getValue(board.getCover())))
                     .build();
 
             boardDetailResponseDtoList.add(boardDto);
