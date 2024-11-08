@@ -29,6 +29,10 @@ interface MemberDao {
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMember(members: MemberEntity): Long
+
+    // 서버 변경사항 동기화
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMembers(members: List<MemberEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제

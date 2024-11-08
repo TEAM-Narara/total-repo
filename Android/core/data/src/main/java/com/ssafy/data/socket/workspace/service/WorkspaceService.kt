@@ -37,32 +37,33 @@ class WorkspaceService @Inject constructor(
 
     suspend fun editWorkSpace(data: JsonObject) {
         val dto = gson.fromJson(data, EditWorkSpaceRequestDto::class.java)
-        val before =
-            workspaceDao.getWorkspace(dto.workspaceId) ?: throw Exception("존재하지 않는 workspace 입니다.")
-        workspaceDao.updateWorkspace(before.copy(name = dto.workspaceName))
+        val before = workspaceDao.getWorkspace(dto.workspaceId)
+            ?: throw Exception("존재하지 않는 workspace 입니다.")
+        workspaceDao.updateWorkspace(
+            before.copy(
+                name = dto.workspaceName,
+                isStatus = DataStatus.STAY
+            )
+        )
     }
 
     suspend fun addMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceMemberDto::class.java)
 
         // TODO : memberDao에 먼저 사람 넣기
-        memberDao.insertMembers(
-            listOf(
-                MemberEntity(
-                    id = dto.memberId,
-                    nickname = dto.memberName
-                )
+        memberDao.insertMember(
+            MemberEntity(
+                id = dto.memberId,
+                nickname = dto.memberName
             )
         )
 
-        workspaceMemberDao.insertWorkspaceMembers(
-            listOf(
-                WorkspaceMemberEntity(
-                    id = dto.memberId,
-                    workspaceId = dto.workspaceId,
-                    authority = dto.authority,
-                    isStatus = DataStatus.STAY
-                )
+        workspaceMemberDao.insertWorkspaceMember(
+            WorkspaceMemberEntity(
+                id = dto.memberId,
+                workspaceId = dto.workspaceId,
+                authority = dto.authority,
+                isStatus = DataStatus.STAY
             )
         )
     }
@@ -77,12 +78,12 @@ class WorkspaceService @Inject constructor(
         val before = workspaceMemberDao.getWorkspaceMemberByWorkspaceIdAndMemberId(
             dto.workspaceId,
             dto.memberId
-        )
+        ) ?: throw Exception("워크스페이스에 존재하지 않는 맴버 입니다.")
         workspaceMemberDao.updateWorkspaceMember(
-            before?.copy(
+            before.copy(
                 authority = dto.authority,
                 isStatus = DataStatus.STAY
-            ) ?: throw Exception("존재하지 않는 workspace 입니다.")
+            )
         )
     }
 
@@ -103,15 +104,15 @@ class WorkspaceService @Inject constructor(
 
     suspend fun editBoard(data: JsonObject) {
         val dto = gson.fromJson(data, EditWorkspaceBoardRequestDto::class.java)
+        val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
         boardDao.updateBoard(
-            BoardEntity(
-                id = dto.boardId,
-                workspaceId = dto.workspaceId,
+            before.copy(
                 name = dto.boardName,
                 coverType = dto.backgroundType,
                 coverValue = dto.backgroundValue,
                 visibility = dto.visibility,
                 isClosed = dto.isClosed,
+                isStatus = DataStatus.STAY,
             )
         )
     }
