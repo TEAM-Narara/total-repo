@@ -20,13 +20,14 @@ public class ListMemberController implements ListMemberAPI {
     private final ListMemberService listMemberService;
 
     @Override
-    public ResponseEntity<DefaultResponse<Void>> setListMemberIsAlert(
+    public ResponseEntity<DefaultResponse<AlertDto>> setListMemberIsAlert(
             @AuthenticationPrincipal Member member,
             @PathVariable Long listId) {
 
-        listMemberService.setListMemberIsAlert(member, listId);
+        Boolean listMemberIsAlert = listMemberService.setListMemberIsAlert(member, listId);
+
         return ResponseEntity.ok(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_MEMBER_ALERT_STATUS_UPDATE_SUCCESS)
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_MEMBER_ALERT_STATUS_UPDATE_SUCCESS, new AlertDto(listMemberIsAlert))
         );
     }
 
