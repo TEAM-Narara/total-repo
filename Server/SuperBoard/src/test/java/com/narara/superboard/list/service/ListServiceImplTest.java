@@ -15,7 +15,6 @@ import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundNameException;
-import com.narara.superboard.list.ListAction;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
@@ -248,7 +247,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(exception.getMessage(), "해당하는 보드(이)가 존재하지 않습니다. 보드ID: " + boardId);
 
         verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
-        verify(listRepository, never()).findByBoardAndIsArchived(any(Board.class), anyBoolean());
+        verify(listRepository, never()).findByBoardAndIsArchivedAndIsDeletedFalse(any(Board.class), anyBoolean());
     }
 
     @ParameterizedTest
@@ -261,7 +260,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // 리스트가 비어있는 경우를 처리
-        when(listRepository.findByBoardAndIsArchived(board, true)).thenReturn(Collections.emptyList());
+        when(listRepository.findByBoardAndIsArchivedAndIsDeletedFalse(board, true)).thenReturn(Collections.emptyList());
 
         // when
         java.util.List<List> archivedLists = listService.getArchivedList(member, boardId);
@@ -271,7 +270,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         assertTrue(archivedLists.isEmpty());
 
         verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
-        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+        verify(listRepository, times(1)).findByBoardAndIsArchivedAndIsDeletedFalse(board, true);
     }
 
     @ParameterizedTest
@@ -282,7 +281,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         Board board = mock(Board.class);
         List archivedList = mock(List.class); // 단일 리스트를 모킹
         when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
-        when(listRepository.findByBoardAndIsArchived(board, true))
+        when(listRepository.findByBoardAndIsArchivedAndIsDeletedFalse(board, true))
                 .thenReturn(Collections.singletonList(archivedList)); // 단일 아카이브 리스트 반환
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
@@ -295,7 +294,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(archivedList, archivedLists.get(0));
 
         verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
-        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+        verify(listRepository, times(1)).findByBoardAndIsArchivedAndIsDeletedFalse(board, true);
     }
 
     @Test
@@ -307,7 +306,7 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         List archivedList1 = mock(List.class);
         List archivedList2 = mock(List.class);
         when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
-        when(listRepository.findByBoardAndIsArchived(board, true))
+        when(listRepository.findByBoardAndIsArchivedAndIsDeletedFalse(board, true))
                 .thenReturn(Arrays.asList(archivedList1, archivedList2)); // 두 개의 아카이브 리스트 반환
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
@@ -321,6 +320,6 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(archivedList2, archivedLists.get(1));
 
         verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
-        verify(listRepository, times(1)).findByBoardAndIsArchived(board, true);
+        verify(listRepository, times(1)).findByBoardAndIsArchivedAndIsDeletedFalse(board, true);
     }
 }

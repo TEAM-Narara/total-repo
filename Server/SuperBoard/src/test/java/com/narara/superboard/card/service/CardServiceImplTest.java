@@ -264,8 +264,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L , "시현", "sisi@naver.com");
         // 리스트와 아카이브된 카드 설정
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Arrays.asList(list1, list2));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list1)).thenReturn(Collections.singletonList(card1));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list2)).thenReturn(Collections.singletonList(card2));
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list1)).thenReturn(Collections.singletonList(card1));
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list2)).thenReturn(Collections.singletonList(card2));
 
         // when: 아카이브된 카드 리스트 조회
         java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
@@ -276,8 +276,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertTrue(result.contains(card2));
 
         verify(listRepository, times(1)).findAllByBoardId(boardId);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list1);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list2);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list1);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list2);
     }
 
     @Test
@@ -288,7 +288,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         List list = List.builder().id(1L).name("List 1").build();
         Member member = new Member(1L , "시현", "sisi@naver.com");
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Collections.singletonList(list));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list)).thenReturn(Collections.emptyList());
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list)).thenReturn(Collections.emptyList());
 
         // when: 아카이브된 카드 리스트 조회
         java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
@@ -296,7 +296,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         // then: 빈 리스트가 반환되는지 확인
         assertTrue(result.isEmpty());
         verify(listRepository, times(1)).findAllByBoardId(boardId);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list);
     }
 
     @ParameterizedTest
