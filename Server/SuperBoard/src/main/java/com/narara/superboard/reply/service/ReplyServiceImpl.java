@@ -54,9 +54,9 @@ public class ReplyServiceImpl implements ReplyService{
         cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
 
         Reply reply = Reply.createReply(replyCreateRequestDto, card, member);
+        //TODO Websocket reply 추가
 
         Reply savedReply = replyRepository.save(reply);
-
 
         ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
@@ -65,6 +65,7 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket reply 생성 히스토리 추가
 
         return savedReply;
     }
@@ -91,6 +92,7 @@ public class ReplyServiceImpl implements ReplyService{
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
         reply.updateReply(replyUpdateRequestDto);
+        //TODO Websocket reply 업데이트
 
         // 업데이트 로그 기록
         ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
@@ -100,6 +102,7 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket reply update 히스토리
 
         // 댓글 내용 업데이트
         return reply;
@@ -115,6 +118,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 로그 기록
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
+        //TODO Websocket reply 삭제 로그
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
@@ -124,6 +128,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 수행
         reply.deleteReply();
+        //TODO Websocket reply 삭제
 
         return reply;
     }
