@@ -26,7 +26,7 @@ interface LabelDao {
     @Query("""
         SELECT * 
         FROM label
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationLabels(): List<LabelEntity>
 
@@ -34,23 +34,23 @@ interface LabelDao {
     @Query("""
         SELECT * 
         FROM label 
-        WHERE id == :id
+        WHERE id = :id
     """)
-    fun getLabel(id: Long): LabelEntity
+    fun getLabel(id: Long): LabelEntity?
 
     // 보드 라벨 단일 조회
     @Query("""
         SELECT * 
         FROM label 
-        WHERE id == :id
+        WHERE id = :id
     """)
-    fun getLabelFlow(id: Long): Flow<LabelEntity>
+    fun getLabelFlow(id: Long): Flow<LabelEntity>?
 
     // 보드 라벨 모두 조회
     @Query("""
         SELECT * 
         FROM label 
-        WHERE boardId == :boardId And isStatus != 'DELETE'
+        WHERE boardId = :boardId And isStatus != 'DELETE'
     """)
     fun getAllLabels(boardId: Long): Flow<List<LabelEntity>>
 

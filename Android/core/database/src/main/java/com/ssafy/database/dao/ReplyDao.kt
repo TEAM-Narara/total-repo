@@ -18,7 +18,7 @@ interface ReplyDao {
     @Query("""
         SELECT * 
         FROM reply
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateReplies(): List<ReplyEntity>
 
@@ -26,13 +26,13 @@ interface ReplyDao {
     @Query("""
         SELECT * 
         FROM reply
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationReplies(): List<ReplyEntity>
 
     // 댓글 단일 조회
     @Query("SELECT * FROM reply WHERE id = :replyId")
-    fun getReply(replyId: Long): ReplyEntity
+    fun getReply(replyId: Long): ReplyEntity?
 
     // 댓글 수 조회
     @Query("""

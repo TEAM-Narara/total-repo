@@ -161,13 +161,13 @@ class CardRepositoryImpl @Inject constructor(
                 .map { entity -> entity.toDto() }
         }
 
-    override suspend fun getCard(id: Long): Flow<CardResponseDto> =
+    override suspend fun getCard(id: Long): Flow<CardResponseDto>? =
         withContext(ioDispatcher) {
             cardDao.getCardFlow(id)
-                .map { it.toDto() }
+                ?.map { it.toDto() }
         }
 
-    override suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName> =
+    override suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>? =
         withContext(ioDispatcher) {
             cardDao.getCardWithListAndBoardName(cardId)
         }
@@ -226,10 +226,10 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO> =
+    override suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO>? =
         withContext(ioDispatcher) {
             cardLabelDao.getLabelFlow(id)
-                .map { it.toDTO() }
+                ?.map { it.toDTO() }
         }
 
     override suspend fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelDTO>> =
@@ -322,16 +322,16 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO> =
+    override suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO>? =
         withContext(ioDispatcher) {
             attachmentDao.getAttachmentFlow(id)
-                .map { it.toDTO() }
+                ?.map { it.toDTO() }
         }
 
-    override suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO> =
+    override suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO>? =
         withContext(ioDispatcher) {
             attachmentDao.getCoverAttachment(cardId)
-                .map { it.toDTO() }
+                ?.map { it.toDTO() }
         }
 
     override suspend fun getAllAttachments(cardId: Long): Flow<List<AttachmentDTO>> =

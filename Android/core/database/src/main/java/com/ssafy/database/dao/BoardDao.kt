@@ -19,7 +19,7 @@ interface BoardDao {
     @Query("""
         SELECT * 
         FROM board
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateBoards(): List<BoardInList>
 
@@ -27,23 +27,23 @@ interface BoardDao {
     @Query("""
         SELECT * 
         FROM board
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationBoards(): List<BoardEntity>
 
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
-    fun getBoard(boardId: Long): BoardEntity
+    fun getBoard(boardId: Long): BoardEntity?
 
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
-    fun getBoardFlow(boardId: Long): Flow<BoardEntity>
+    fun getBoardFlow(boardId: Long): Flow<BoardEntity>?
 
     // 워크스페이스에서 볼 것
     @Query("""
         SELECT * 
         FROM board 
-        WHERE workspaceId == :workspaceId And isStatus != 'DELETE' And isClosed == 0
+        WHERE workspaceId = :workspaceId And isStatus != 'DELETE' And isClosed = 0
     """)
     fun getAllBoards(workspaceId: Long): Flow<List<BoardEntity>>
 
@@ -51,7 +51,7 @@ interface BoardDao {
     @Query("""
         SELECT * 
         FROM board 
-        WHERE workspaceId == :workspaceId And isStatus != 'DELETE' And isClosed == 1
+        WHERE workspaceId = :workspaceId And isStatus != 'DELETE' And isClosed = 1
     """)
     fun getAllBoardsArchived(workspaceId: Long): Flow<List<BoardEntity>>
 

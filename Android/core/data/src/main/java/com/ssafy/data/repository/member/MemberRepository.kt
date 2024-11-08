@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MemberRepository {
 
-    suspend fun getMember(memberId: Long): Flow<User>
+    suspend fun getMember(memberId: Long): Flow<User>?
 
     suspend fun updateMember(
         memberUpdateRequestDto: MemberUpdateRequestDto,
@@ -25,7 +25,7 @@ interface MemberRepository {
 
     suspend fun getLocalOperationMemberBackgrounds(): List<CoverDto>
 
-    suspend fun getMemberBackground(id: Long): CoverDto
+    suspend fun getMemberBackground(id: Long): CoverDto?
 
     suspend fun getAllMemberBackgrounds(): Flow<List<CoverDto>>
 

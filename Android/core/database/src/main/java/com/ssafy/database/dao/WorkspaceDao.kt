@@ -19,7 +19,7 @@ interface WorkspaceDao {
     @Query("""
         SELECT * 
         FROM workspace 
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateWorkspaces(): List<WorkspaceInBoard>
 
@@ -27,17 +27,17 @@ interface WorkspaceDao {
     @Query("""
         SELECT * 
         FROM workspace
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationWorkspaces(): List<WorkspaceEntity>
 
     // 워크스페이스 단일 조회
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
-    fun getWorkspace(workspaceId: Long): WorkspaceEntity
+    fun getWorkspace(workspaceId: Long): WorkspaceEntity?
 
     // 워크스페이스 조회 + Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE id = :workspaceId")
-    fun getWorkspaceForDrawable(workspaceId: Long): Flow<WorkspaceEntity?>
+    fun getWorkspaceForDrawable(workspaceId: Long): Flow<WorkspaceEntity>?
 
     // Drawable에서 볼 것
     @Query("SELECT * FROM workspace WHERE isStatus != 'DELETE'")

@@ -53,7 +53,7 @@ interface CardMemberDao {
             member.profileImageUrl AS member_profileImageUrl
         FROM card_member 
         INNER JOIN member ON member.id = card_member.memberId
-        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE' AND isRepresentative == 1
+        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE' AND isRepresentative = 1
     """)
     fun getCardRepresentativesInCard(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
 
@@ -73,7 +73,7 @@ interface CardMemberDao {
             member.profileImageUrl AS member_profileImageUrl
         FROM card_member 
         INNER JOIN member ON member.id = card_member.memberId
-        WHERE card_member.cardId IN (:cardIds) AND card_member.isStatus != 'DELETE' AND isRepresentative == 1
+        WHERE card_member.cardId IN (:cardIds) AND card_member.isStatus != 'DELETE' AND isRepresentative = 1
     """)
     fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<CardMemberWithMemberInfo>>
 

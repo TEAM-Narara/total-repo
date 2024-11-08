@@ -32,9 +32,10 @@ class MemberRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
-    override suspend fun getMember(memberId: Long): Flow<User> = withContext(ioDispatcher) {
+    override suspend fun getMember(memberId: Long): Flow<User>? =
+        withContext(ioDispatcher) {
         memberDao.getMember(memberId)
-            .map { it.toDTO() }
+            ?.map { it.toDTO() }
     }
 
     override suspend fun updateMember(
@@ -77,10 +78,10 @@ class MemberRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getMemberBackground(id: Long): CoverDto =
+    override suspend fun getMemberBackground(id: Long): CoverDto? =
         withContext(ioDispatcher) {
             memberBackgroundDao.getMemberBackground(id)
-                .toDTO()
+                ?.toDTO()
         }
 
     override suspend fun getAllMemberBackgrounds(): Flow<List<CoverDto>> =

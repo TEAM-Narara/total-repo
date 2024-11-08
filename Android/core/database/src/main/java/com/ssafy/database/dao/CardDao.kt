@@ -20,7 +20,7 @@ interface CardDao {
     @Query("""
         SELECT * 
         FROM card
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateCard(): List<CardAllInfo>
 
@@ -28,7 +28,7 @@ interface CardDao {
     @Query("""
         SELECT * 
         FROM card
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationCard(): List<CardEntity>
     
@@ -37,18 +37,18 @@ interface CardDao {
     @Query("""
         SELECT * 
         FROM card 
-        WHERE id == :cardId
+        WHERE id = :cardId
     """)
-    fun getCard(cardId: Long): CardEntity
+    fun getCard(cardId: Long): CardEntity?
 
     // 카드 단일 조회
     @Transaction
     @Query("""
         SELECT * 
         FROM card 
-        WHERE id == :cardId
+        WHERE id = :cardId
     """)
-    fun getCardFlow(cardId: Long): Flow<CardEntity>
+    fun getCardFlow(cardId: Long): Flow<CardEntity>?
     
     // 카드 상위의 List, Board 이름 조회
     @Transaction
@@ -63,15 +63,15 @@ interface CardDao {
         INNER JOIN board ON board.id = list.boardId
         WHERE card.id = :cardId
     """)
-    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>
+    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>?
 
     // 리스트 내에 카드들 조회
     @Query("""
         SELECT * 
         FROM card 
-        WHERE listId == :listId
+        WHERE listId = :listId
             And isStatus != 'DELETE' 
-            And isArchived == 0
+            And isArchived = 0
         ORDER BY myOrder
     """)
     fun getAllCardsInList(listId: Long): Flow<List<CardEntity>>
@@ -82,7 +82,7 @@ interface CardDao {
         FROM card 
         WHERE listId IN (:listIds) 
             And isStatus != 'DELETE' 
-            And isArchived == 0
+            And isArchived = 0
         ORDER BY myOrder
     """)
     fun getAllCardsInLists(listIds: List<Long>): Flow<List<CardEntity>>
@@ -91,7 +91,7 @@ interface CardDao {
     @Query("""
         SELECT * 
         FROM card 
-        WHERE listId == :listId AND isStatus != 'DELETE' And isArchived == 1
+        WHERE listId = :listId AND isStatus != 'DELETE' And isArchived = 1
         ORDER BY myOrder
     """)
     fun getAllCardsArchived(listId: Long): Flow<List<CardEntity>>
