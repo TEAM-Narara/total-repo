@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findAllByWorkSpaceId(Long workSpaceId); // workSpaceId
-    List<Board> findAllByWorkSpaceIdAndIsArchivedTrue(Long workSpaceId);
+    List<Board> findAllByWorkSpaceIdAndIsArchivedTrueAndIsDeletedFalse(Long workSpaceId);
     Optional<Board> findByIdAndIsDeletedFalse(Long boardId);
 }

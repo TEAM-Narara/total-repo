@@ -534,7 +534,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         );
 
         // Mock: boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue 호출 시 모킹된 보드 리스트 반환
-        when(boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId)).thenReturn(archivedBoards);
+        when(boardRepository.findAllByWorkSpaceIdAndIsArchivedTrueAndIsDeletedFalse(workspaceId)).thenReturn(archivedBoards);
 
         // when: 아카이브된 보드 리스트 조회
         List<Board> result = boardService.getArchivedBoards(workspaceId);
@@ -543,7 +543,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(archivedBoards.size(), result.size());
         assertEquals(archivedBoards.get(0).getName(), result.get(0).getName());
         assertEquals(archivedBoards.get(1).getName(), result.get(1).getName());
-        verify(boardRepository, times(1)).findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
+        verify(boardRepository, times(1)).findAllByWorkSpaceIdAndIsArchivedTrueAndIsDeletedFalse(workspaceId);
     }
 
 

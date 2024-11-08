@@ -128,7 +128,7 @@ public class CardServiceImpl implements CardService {
         java.util.List<Card> cardCollection = new ArrayList<>();
         listService.checkBoardMember(allListByBoard.getFirst(),member, GET_ARCHIVE_CARD);
         for (List list : allListByBoard) {
-            cardCollection.addAll(cardRepository.findAllByListAndIsArchivedTrue(list));
+            cardCollection.addAll(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list));
         }
 
         return cardCollection;

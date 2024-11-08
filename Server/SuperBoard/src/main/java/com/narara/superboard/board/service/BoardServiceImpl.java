@@ -114,7 +114,7 @@ public class BoardServiceImpl implements BoardService {
         // Board 생성 로그 기록
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
-        BoardHistory boardHistory = BoardHistory.createBoardHistory(
+        BoardHistory<CreateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -188,7 +188,7 @@ public class BoardServiceImpl implements BoardService {
     // 아카이브된 보드 리스트 조회
     @Override
     public List<Board> getArchivedBoards(Long workspaceId) {
-        return boardRepository.findAllByWorkSpaceIdAndIsArchivedTrue(workspaceId);
+        return boardRepository.findAllByWorkSpaceIdAndIsArchivedTrueAndIsDeletedFalse(workspaceId);
     }
 
     // 보드 아카이브 상태 변경
