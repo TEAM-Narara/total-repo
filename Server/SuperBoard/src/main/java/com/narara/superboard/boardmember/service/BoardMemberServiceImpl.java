@@ -120,6 +120,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     public void updateWatchStatus(Long boardId, Member member) {
         BoardMember boardMember = getBoardMember(boardId, member);
         boardMember.changeIsAlert();
+        //TODO 보드 멤버 알림 설정 수정 (프론트와 협의 필요. 오프라인모드에서 안되게 할건가?)
     }
 
     @Override
@@ -137,6 +138,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         //보드멤버가 없으면 새로 만들기
         BoardMember newBoardMember = BoardMember.createBoardMemberByAdmin(board, inviteMember);
         boardMemberRepository.save(newBoardMember);
+        //TODO Websocket 보드멤버 추가
 
         // 멤버 추가 로그 기록
         AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
@@ -146,7 +148,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket 보드멤버 추가 로그 생성
 
         return newBoardMember;
     }
@@ -169,6 +171,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, editMember);
 
         boardMember.editAuthority(authority);
+        //TODO Websocket 보드멤버 권한 수정
 
         return boardMember;
     }
@@ -181,6 +184,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, deleteMember);
 
         boardMember.deleted();
+        //TODO Websocket 보드멤버 삭제
 
         // 멤버 삭제 로그 기록
         DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
@@ -190,7 +194,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket 보드멤버 삭제 로그 추가
 
         return boardMember;
     }
