@@ -53,6 +53,7 @@ public class ListServiceImpl implements ListService{
         boardService.checkBoardMember(board, member, ListAction.ADD_LIST);
 
         List list = List.createList(listCreateRequestDto, board);
+        //TODO Websocket 리스트 생성
 
         List savedlist = listRepository.save(list);
         // 리스트 생성 로그 기록
@@ -62,7 +63,7 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket 리스트 생성 로그 추가
 
         return savedlist;
     }
@@ -76,6 +77,7 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.EDIT_LIST);
 
         list.updateList(listUpdateRequestDto);
+        //TODO Websocket 리스트 업데이트
 
         // 리스트 업데이트 로그 기록
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
@@ -84,6 +86,7 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket 리스트 업데이트 로그 추가
 
         return list;
     }
@@ -101,6 +104,7 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
+        //TODO Websocket 리스트 아카이브화
 
         // 리스트 아카이브 상태 변경 로그 기록
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
@@ -109,6 +113,7 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket 리스트 아카이브 로그 생성
 
         return list;
     }
