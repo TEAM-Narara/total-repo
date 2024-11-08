@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #messageArea {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            min-height: 100px;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .disconnected {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>웹소켓 테스트</h2>
+
+    <div id="connectionStatus" class="status disconnected">연결 상태: 연결되지 않음</div>
+
+    <div class="form-group">
+        <label for="wsUrl">웹소켓 연결 URL:</label>
+        <input type="text" id="wsUrl" placeholder="/ws"  required>
+        <button onclick="connect()">웹소켓 연결</button>
+        <button onclick="disconnect()">연결 해제</button>
+    </div>
+
+    <div class="form-group">
+        <label for="subscribeUrl1">구독 URL 1:</label>
+        <input type="text" id="subscribeUrl1" placeholder="/topic/board/..." required>
+        <button onclick="subscribe(1)">구독</button>
+    </div>
+
+    <div class="form-group">
+        <label for="subscribeUrl2">구독 URL 2:</label>
+        <input type="text" id="subscribeUrl2" placeholder="/topic/board/..." required>
+        <button onclick="subscribe(2)">구독</button>
+    </div>
+
+    <div class="form-group">
+        <label for="endPoint">/app을 포함한 url:</label>
+        <input type="text" id="endPoint" required>
+    </div>
+
+    <div class="form-group">
+        <label for="jwtToken">JWT Token(Bearer는 자동 포함됨):</label>
+        <input type="text" id="jwtToken" required>
+    </div>
+
+    <div class="form-group">
+        <label for="body">body:</label>
+        <textarea id="body" style="height: 300px"></textarea>
+    </div>
+
+    <button onclick="sendHttp()">전송</button>
+
+    <div id="messageArea">
+        <h3>response:</h3>
+        <div id="messages"></div>
+    </div>
+</div>
+
+<script>
+    let stompClient = null;
+    let subscriptions = {
+        1: null,
+        2: null
+    };
+
+    function connect() {
+        if (stompClient && stompClient.connected) {
+            alert('이미 연결되어 있습니다.');
+            return;
+        }
+
+        const wsUrl = document.getElementById('wsUrl').value || '/game';
+        const jwtToken = document.getElementById('jwtToken').value;
+
+        if (!jwtToken) {
+            alert('JWT 토큰을 입력해주세요.');
+            return;
+        }
+
+        const socket = new SockJS(wsUrl);
+        stompClient = Stomp.over(socket);
+
+        const headers = {
+            'Authorization': 'Bearer ' + jwtToken
+        };
+
+        stompClient.connect(headers, function(frame) {
+            console.log('Connected: ' + frame);
+            updateConnectionStatus(true);
+        }, function(error) {
+            console.log('Connection error:', error);
+            updateConnectionStatus(false);
+            setTimeout(connect, 5000);
+        });
+    }
+
+    function disconnect() {
+        if (stompClient) {
+            // Unsubscribe from all subscriptions
+            Object.values(subscriptions).forEach(subscription => {
+                if (subscription) {
+                    subscription.unsubscribe();
+                }
+            });
+            subscriptions = {
+                1: null,
+                2: null
+            };
+
+            stompClient.disconnect();
+            stompClient = null;
+            updateConnectionStatus(false);
+        }
+    }
+
+    function updateConnectionStatus(connected) {
+        const statusDiv = document.getElementById('connectionStatus');
+        if (connected) {
+            statusDiv.className = 'status connected';
+            statusDiv.textContent = '연결 상태: 연결됨';
+        } else {
+            statusDiv.className = 'status disconnected';
+            statusDiv.textContent = '연결 상태: 연결되지 않음';
+        }
+    }
+
+    function subscribe(subscriptionNumber) {
+        if (!stompClient || !stompClient.connected) {
+            alert('먼저 웹소켓을 연결해주세요.');
+            return;
+        }
+
+        const subscribeUrl = document.getElementById(`subscribeUrl${subscriptionNumber}`).value;
+        if (!subscribeUrl) {
+            alert('구독할 URL을 입력해주세요.');
+            return;
+        }
+
+        if (subscriptions[subscriptionNumber]) {
+            subscriptions[subscriptionNumber].unsubscribe();
+        }
+
+        subscriptions[subscriptionNumber] = stompClient.subscribe(subscribeUrl, function(response) {
+            console.log('Received:', response);
+            displayMessage(response, subscriptionNumber);
+        });
+
+        alert(`${subscribeUrl} 구독 완료`);
+    }
+
+    function sendHttp() {
+        if (!stompClient || !stompClient.connected) {
+            alert('서버와 연결되어 있지 않습니다. 웹소켓을 먼저 연결해주세요.');
+            return;
+        }
+
+        const endPoint = document.getElementById('endPoint').value;
+        const jwtToken = document.getElementById('jwtToken').value;
+        const body = document.getElementById('body').value;
+
+        if (!endPoint || !jwtToken) {
+            alert('모든 필드를 입력해주세요.');
+            return;
+        }
+
+        let request;
+        try {
+            request = JSON.parse(body);
+        } catch (error) {
+            request = '';
+        }
+
+        const headers = {
+            'Authorization': 'Bearer ' + jwtToken
+        };
+
+        console.log('Sending:', request);
+        stompClient.send(endPoint, headers, JSON.stringify(request));
+    }
+
+    function displayMessage(message, subscriptionNumber) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.style.marginBottom = '10px';
+
+        let content = `<strong>수신된 메시지 (구독 ${subscriptionNumber}):</strong><br>`;
+
+        if (message) {
+            const formattedMessage = message
+                .toString()
+                .replace(/\n/g, '<br>')
+                .replace(/\u0000/g, '');
+
+            content += `<pre style="white-space: pre-wrap; word-wrap: break-word;">${formattedMessage}</pre>`;
+        } else {
+            content += '정보 없음<br>';
+        }
+
+        content += '<hr>';
+
+        messageElement.innerHTML = content;
+        messagesDiv.insertBefore(messageElement, messagesDiv.firstChild);
+    }
+</script>
+</body>
+</html>
