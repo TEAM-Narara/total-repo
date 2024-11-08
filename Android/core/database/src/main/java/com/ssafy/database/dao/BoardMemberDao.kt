@@ -33,8 +33,11 @@ interface BoardMemberDao {
     suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmEntity>
 
     // 보드 멤버 단일 조회
-    @Query("SELECT * FROM board_member WHERE id = :id")
+    @Query("SELECT * FROM board_member WHERE id == :id")
     fun getBoardMember(id: Long): BoardMemberEntity
+
+    @Query("SELECT * FROM board_member WHERE boardId == :boardId AND memberId == :memberId")
+    fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity
 
     // 보드 멤버 조회
     @Transaction
@@ -54,6 +57,17 @@ interface BoardMemberDao {
         WHERE board_member.boardId = :boardId AND board_member.isStatus != 'DELETE'
     """)
     fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
+
+    // 상태 업데이트
+    @Update
+    suspend fun updateBoardMember(boardMember: BoardMemberEntity)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Query("""
+        DELETE FROM board_member 
+        WHERE memberId = :memberId AND boardId = :boardId;
+    """)
+    suspend fun deleteLocalBoardMember(boardId: Long, memberId: Long)
 
     // 보드 알람 조회
     @Query("""
