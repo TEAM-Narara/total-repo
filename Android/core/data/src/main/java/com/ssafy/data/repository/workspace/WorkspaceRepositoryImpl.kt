@@ -164,15 +164,18 @@ class WorkspaceRepositoryImpl @Inject constructor(
         memberId: Long,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-//    TODO    val workspaceMember = workspaceMemberDao.getWorkspaceMember(멤버 id + 워크스페이스 id 로 가져오세요)
-        val workspaceMember = true
+        val workspaceMember = workspaceMemberDao.getWorkspaceMember(workspaceId, memberId)
 
         if (workspaceMember != null) {
             if (isConnected) {
                 workspaceDataSource.deleteWorkspaceMember(workspaceId, memberId).map { Unit }
             } else {
-                // TODO 적절히 db처리 해주세요
-                flowOf(Unit)
+                val result = when (workspaceMember.isStatus) {
+                    DataStatus.CREATE -> workspaceMemberDao.deleteLocalWorkspaceMember(workspaceId, memberId)
+                    else -> workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(isStatus = DataStatus.DELETE))
+                }
+
+                flowOf(result)
             }
         } else {
             flowOf(Unit)
@@ -184,16 +187,28 @@ class WorkspaceRepositoryImpl @Inject constructor(
         simpleMemberDto: SimpleMemberDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-//  TODO    val workspaceMember = workspaceMemberDao.getWorkspaceMember(멤버 id + 워크스페이스 id 로 가져오세요)
-
-        val workspaceMember = true
+        val workspaceMember = workspaceMemberDao.getWorkspaceMember(workspaceId, simpleMemberDto.memberId)
 
         if (workspaceMember != null) {
             if (isConnected) {
                 workspaceDataSource.updateWorkspaceMember(workspaceId, simpleMemberDto).map { Unit }
             } else {
-                // TODO 적절히 db처리 해주세요
-                flowOf(Unit)
+                val result = when (workspaceMember.isStatus) {
+                    DataStatus.STAY ->
+                        workspaceMemberDao.updateWorkspaceMember(
+                            workspaceMember.copy(
+                                isStatus = DataStatus.UPDATE,
+                                authority = simpleMemberDto.authority
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        workspaceMemberDao.updateWorkspaceMember(workspaceMember.copy(authority = simpleMemberDto.authority))
+
+                    DataStatus.DELETE -> {}
+                }
+
+                flowOf(result)
             }
         } else {
             flowOf(Unit)

@@ -80,8 +80,11 @@ interface ListMemberDao {
     suspend fun updateListMemberAlarm(listMemberAlarm: ListMemberAlarmEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
-    @Delete
-    suspend fun deleteLocalListMember(listMember: ListMemberEntity)
+    @Query("""
+        DELETE FROM workspace_member 
+        WHERE memberId = :memberId AND workspaceId = :listId;
+    """)
+    suspend fun deleteLocalListMember(memberId: Long, listId: Long)
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
