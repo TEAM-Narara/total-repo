@@ -4,6 +4,7 @@ import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.BoardCreateRequestDto;
 import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -25,7 +26,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "board")
-public class Board extends BaseTimeEntity {
+public class Board extends BaseTimeEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
@@ -70,12 +71,22 @@ public class Board extends BaseTimeEntity {
     private Long offset = 0L;
 
     public static Board createBoard(BoardCreateRequestDto boardCreateRequestDto, WorkSpace workSpace) {
+        Map<String, Object> coverMap;
+
+        if (boardCreateRequestDto.background() == null) {
+            coverMap = Map.of(
+                    "type", "NONE",
+                    "value", "NONE"
+            );
+        } else {
+            coverMap = Map.of(
+                    "type", boardCreateRequestDto.background().type(),
+                    "value", boardCreateRequestDto.background().value()
+            );
+        }
+
         return Board.builder()
-                .cover(boardCreateRequestDto.background() != null
-                        ? Map.of(
-                        "type", boardCreateRequestDto.background().type(),
-                        "value", boardCreateRequestDto.background().value())
-                        : null)
+                .cover(coverMap)
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
@@ -86,20 +97,30 @@ public class Board extends BaseTimeEntity {
     }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = new HashMap<>(){{
-            put("type", boardUpdateRequestDto.background().type());
-            put("value", boardUpdateRequestDto.background().value());
-        }};
-        this.name = boardUpdateRequestDto.name();
-        this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
+        if (boardUpdateRequestDto.cover() != null) {
+            this.cover = new HashMap<>();
+            this.cover.put("type", boardUpdateRequestDto.cover().type());
+            this.cover.put("value", boardUpdateRequestDto.cover().value());
+        }
+        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+            this.name = boardUpdateRequestDto.name();
+        }
+        if (!(boardUpdateRequestDto.visibility() == null || boardUpdateRequestDto.visibility().isEmpty() || boardUpdateRequestDto.visibility().isBlank())) {
+            this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
+        }
         return this;
     }
+
     public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
-        this.cover = new HashMap<>(){{
-            put("type", boardUpdateRequestDto.background().type());
-            put("value", boardUpdateRequestDto.background().value());
-        }};
-        this.name = boardUpdateRequestDto.name();
+        if (boardUpdateRequestDto.cover() != null) {
+            this.cover = new HashMap<>();
+            this.cover.put("type", boardUpdateRequestDto.cover().type());
+            this.cover.put("value", boardUpdateRequestDto.cover().value());
+        }
+
+        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+            this.name = boardUpdateRequestDto.name();
+        }
         return this;
     }
 
@@ -111,7 +132,7 @@ public class Board extends BaseTimeEntity {
         this.listOrderVersion += 1;
     }
 
-    public Board deleted(){
+    public Board deleted() {
         this.isDeleted = true;
         return this;
     }
@@ -122,7 +143,7 @@ public class Board extends BaseTimeEntity {
         this.cover = cover;
     }
 
-    public Board(Long id, String name){
+    public Board(Long id, String name) {
         this.id = id;
         this.name = name;
     }

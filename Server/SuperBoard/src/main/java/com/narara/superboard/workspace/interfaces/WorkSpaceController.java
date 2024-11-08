@@ -16,6 +16,7 @@ import com.narara.superboard.workspace.service.WorkSpaceService;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceCreateD
 
 import java.util.List;
 
+@Tag(name = "4. 워크스페이스")
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceController implements WorkSpaceAPI {
@@ -37,16 +39,17 @@ public class WorkSpaceController implements WorkSpaceAPI {
 
     @Operation(summary = "워크스페이스 생성")
     @PostMapping
-    public ResponseEntity<DefaultResponse<WorkspaceCreateData>> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<WorkSpaceResponseDto>> createWorkSpace(WorkSpaceCreateRequestDto workspaceCreateRequestDto) {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();
 
-        WorkSpace workSpace = workSpaceService.createWorkSpace(
+        WorkSpaceMember workSpaceMember = workSpaceService.createWorkSpace(
                 memberId,
                 workspaceCreateRequestDto
         );
 
-        WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
+        WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.from(workSpaceMember);
+
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workSpaceResponseDto));
     }
 
     @Operation(summary = "워크스페이스 삭제")
@@ -65,7 +68,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
         WorkSpace workSpace = workSpaceService.updateWorkSpace(workspaceId, requestDto.name());
         WorkspaceCreateData workspaceCreateData = new WorkspaceCreateData(workSpace.getId(), workSpace.getName());
 
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_CREATE_SUCCESS, workspaceCreateData));
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_UPDATE_SUCCESS, workspaceCreateData));
     }
 
     @Operation(summary = "나의 워크스페이스 리스트 조회")

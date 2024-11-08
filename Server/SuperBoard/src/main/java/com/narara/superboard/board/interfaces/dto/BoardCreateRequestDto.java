@@ -1,6 +1,6 @@
 package com.narara.superboard.board.interfaces.dto;
 
-import java.util.Map;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 
 public record BoardCreateRequestDto(
         Long workSpaceId,

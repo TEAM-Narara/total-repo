@@ -48,8 +48,7 @@ public class SecurityConfiguration {
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
                 .requestMatchers(
-                        "/ws/**", "/index.html", //웹소켓 엔드포인트
-                        "/error", "/favicon.ico","/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**"
+                        "/ws/**", "/index.html" //웹소켓 엔드포인트
                 );
     }
 
@@ -71,6 +70,7 @@ public class SecurityConfiguration {
                         request.requestMatchers("api/v1/members/register","api/v1/members/login"
                                         ,"api/v1/members/reissue","api/v1/members/email-code"
                                 ,"api/v1/members/email-code/verify","api/v1/members/oauth2/login/**").permitAll()
+                                .requestMatchers("/error", "/favicon.ico","/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 // jwt 관련 설정

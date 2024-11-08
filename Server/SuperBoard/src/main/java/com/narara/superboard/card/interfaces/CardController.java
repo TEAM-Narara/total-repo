@@ -2,6 +2,7 @@ package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
+import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
@@ -22,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "카드")
+@Tag(name = "7. 카드")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CardController implements CardAPI {
 
@@ -109,5 +110,12 @@ public class CardController implements CardAPI {
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ARCHIVE_STATUS_CHANGE_SUCCESS)
         );
+    }
+
+    @Override
+    @Operation(summary = "카드의 액티비티 목록 조회", description = "카드의 액티비티 목록 조회")
+    public ResponseEntity<DefaultResponse<List<CardActivityDetailResponseDto>>> getCardActivity(Long cardId) {
+        List<CardActivityDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, cardActivity), HttpStatus.OK);
     }
 }

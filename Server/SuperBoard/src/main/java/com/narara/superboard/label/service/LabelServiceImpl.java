@@ -26,7 +26,7 @@ public class LabelServiceImpl implements LabelService {
     public Label createLabel(Long boardId, LabelCreateRequestDto createLabelRequestDto) {
         colorValidator.validateLabelColor(createLabelRequestDto);
 
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         Label label = Label.createLabel(board, createLabelRequestDto);
@@ -58,7 +58,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public List<Label> getAllLabelsByBoardId(Long boardId) {
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         return labelRepository.findAllByBoard(board);

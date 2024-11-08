@@ -11,4 +11,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
     Page<Member> findByNicknameContainingIgnoreCaseOrEmailContainingIgnoreCase
             (String nicknameTerm, String emailTerm, Pageable pageable);
+
+    Optional<Member> findByIdAndIsDeletedFalse(Long memberId);
 }

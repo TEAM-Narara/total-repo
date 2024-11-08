@@ -9,7 +9,8 @@ import lombok.Builder;
 public record ReplySimpleResponseDto(
     Long cardId,
     Long replyId,
-    String content
+    String content,
+    Long lastUpdatedAt
 ) implements WebSocketData {
 
     public static ReplySimpleResponseDto of(Reply reply){
@@ -17,6 +18,7 @@ public record ReplySimpleResponseDto(
                 .replyId(reply.getId())
                 .cardId(reply.getCard().getId())
                 .content(reply.getContent())
+                .lastUpdatedAt(reply.getUpdatedAt())
                 .build();
     }
 }

@@ -19,11 +19,10 @@ public class ListMemberServiceImpl implements ListMemberService {
     private final ListMemberRepository listMemberRepository;
 
     @Override
-    public void setListMemberIsAlert(Long memberId, Long listId) {
+    public void setListMemberIsAlert(Member member, Long listId) {
         List list = validateListExists(listId);
-        Member member = validateMemberExists(memberId);
 
-        listMemberRepository.findByListIdAndMemberId(listId, memberId)
+        listMemberRepository.findByListIdAndMember(listId, member)
                 .ifPresentOrElse(
                         this::toggleAlertAndSave,
                         () -> addNewListMember(member, list)
@@ -38,7 +37,7 @@ public class ListMemberServiceImpl implements ListMemberService {
 
     // 멤버 존재 확인 및 조회
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

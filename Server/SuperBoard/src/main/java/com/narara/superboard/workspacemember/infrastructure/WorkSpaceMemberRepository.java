@@ -18,7 +18,7 @@ public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember
     List<WorkSpaceMember> findAllByMemberId(Long memberId);
 
     boolean existsByMemberAndWorkSpaceAndAuthority(Member member, WorkSpace workSpace, Authority authority);
-
+    boolean existsByWorkSpaceAndIsDeletedIsFalse(WorkSpace workspace);
 
     List<WorkSpaceMember> findAllByMember(Member member);
 
@@ -29,4 +29,7 @@ public interface WorkSpaceMemberRepository extends JpaRepository<WorkSpaceMember
     Optional<WorkSpaceMember> findFirstByWorkSpaceIdAndMemberId(@Param("workspaceId") Long workspaceId,
                                                                 @Param("memberId") Long memberId);
 
+    @Query("select wm.member from WorkSpaceMember wm" +
+            " where wm.workSpace.id = :workspaceId and wm.isDeleted = false")
+    List<Member> findAllMembersByWorkspaceId(@Param("workspaceId") Long workspaceId);
 }

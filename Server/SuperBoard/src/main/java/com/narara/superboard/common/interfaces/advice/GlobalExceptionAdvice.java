@@ -9,6 +9,7 @@ import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.exception.AccountDeletedException;
 import com.narara.superboard.member.exception.AlreadyRegisteredLoginException;
 import com.narara.superboard.member.exception.InvalidRefreshTokenException;
+import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -29,6 +31,11 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.FORBIDDEN, ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(EmptyWorkspaceMemberException.class)
+    public ResponseEntity<?> handleEmptyWorkspaceMemberException(EmptyWorkspaceMemberException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     //잘못된 입력
@@ -89,6 +96,11 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(Exception ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuthenticationException(Exception ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

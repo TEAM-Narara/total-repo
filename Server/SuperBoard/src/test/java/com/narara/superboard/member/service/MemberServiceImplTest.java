@@ -56,7 +56,7 @@ class MemberServiceImplTest {
         Member member = new Member(memberId, "testUser", "test@example.com");
 
         // When
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(member));
 
         // Then
         MemberResponseDto result = memberService.getMember(memberId);
@@ -73,7 +73,7 @@ class MemberServiceImplTest {
         Long memberId = 1L;
 
         // When
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThrows(MemberNotFoundException.class, () -> memberService.getMember(memberId));
@@ -93,7 +93,7 @@ class MemberServiceImplTest {
         Member updatedMember = new Member(memberId, updateRequest.nickname(),existingMember.getEmail() ,updateRequest.profileImgUrl());
 
         // When
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.of(existingMember));
         when(memberRepository.save(any(Member.class))).thenReturn(updatedMember);
 
         // Then
@@ -126,7 +126,7 @@ class MemberServiceImplTest {
         MemberUpdateRequestDto updateRequest = new MemberUpdateRequestDto("updatedUser", "updated@example.com");
 
         // When
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThrows(MemberNotFoundException.class, () -> memberService.updateMember(memberId,updateRequest));
