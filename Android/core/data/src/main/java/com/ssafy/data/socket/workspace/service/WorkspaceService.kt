@@ -32,7 +32,8 @@ class WorkspaceService @Inject constructor(
     suspend fun editWorkSpace(data: String) {
         val dto = gson.fromJson(data, EditWorkSpaceRequestDto::class.java)
         val before = workspaceDao.getWorkspace(dto.workspaceId)
-        workspaceDao.updateWorkspace(before.copy(name = dto.workspaceName))
+        // TODO 준식
+//        workspaceDao.updateWorkspace(before.copy(name = dto.workspaceName))
     }
 
     suspend fun addMember(data: String) {
@@ -60,12 +61,13 @@ class WorkspaceService @Inject constructor(
             dto.workspaceId,
             dto.memberId
         )
-        workspaceMemberDao.updateWorkspaceMember(
-            before.copy(
-                authority = dto.authority,
-                isStatus = DataStatus.STAY
-            )
-        )
+        // TODO 준식
+//        workspaceMemberDao.updateWorkspaceMember(
+//            before.copy(
+//                authority = dto.authority,
+//                isStatus = DataStatus.STAY
+//            )
+//        )
     }
 
     suspend fun addBoard(data: String) {

@@ -1,6 +1,5 @@
 package com.ssafy.home.invite
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,11 +37,11 @@ import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.data.UserData
+import com.ssafy.model.member.Authority
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
 
-@SuppressLint("FlowOperatorInvokedInComposition")
 @Composable
 fun InviteWorkspaceScreen(
     viewModel: InviteWorkspaceViewModel = hiltViewModel(),
@@ -83,7 +82,7 @@ private fun InviteWorkspaceScreen(
     lazyMemberItems: LazyPagingItems<UserData>,
     popBackToHome: () -> Unit,
     setSearchParams: (String) -> Unit,
-    changeAuth: (Long, String) -> Unit,
+    changeAuth: (Long, Authority) -> Unit,
     onInvite: (Long) -> Unit
 ) {
     val activity = LocalContext.current as? Activity
@@ -156,7 +155,7 @@ private fun InviteWorkspaceScreen(
                         nickname = user.nickname,
                         email = user.email,
                         userAuth = "",
-                        onChangeUserAuth = { auth -> changeAuth(user.memberId, auth) },
+                        onChangeUserAuth = { auth -> changeAuth(user.memberId, Authority.valueOf(auth)) },
                         clickAction = { onInvite(user.memberId) },
                         canChangeAuth = false,
                         icon = {

@@ -5,22 +5,24 @@ import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.home.data.toMemberData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class GetDetailWorkspaceUseCase @Inject constructor(private val workspaceRepository: WorkspaceRepository) {
 
     suspend operator fun invoke(workspaceId: Long): Flow<DetailWorkspaceData?> {
+
+        val workspaceFlow = workspaceRepository.getWorkspace(workspaceId) ?: return flowOf(null)
+
         return combine(
-            workspaceRepository.getWorkspace(workspaceId),
+            workspaceFlow,
             workspaceRepository.getWorkspaceMembers(workspaceId)
         ) { workspace, members ->
-            workspace?.let {
-                DetailWorkspaceData(
-                    workspaceId = workspaceId,
-                    workspaceName = workspace.name,
-                    members = members.map { it.toMemberData() }
-                )
-            }
+            DetailWorkspaceData(
+                workspaceId = workspaceId,
+                workspaceName = workspace.name,
+                members = members.map { it.toMemberData() }
+            )
         }
     }
 

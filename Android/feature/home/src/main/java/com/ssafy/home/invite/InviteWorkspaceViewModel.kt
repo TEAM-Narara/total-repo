@@ -7,6 +7,7 @@ import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
+import com.ssafy.model.member.Authority
 import com.ssafy.ui.networkstate.NetworkState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.AddWorkspaceMemberUseCase
@@ -58,7 +59,7 @@ class InviteWorkspaceViewModel @Inject constructor(
 
     fun setSearchParams(search: String) = searchParams.update { search }
 
-    fun changeAuth(memberId: Long, auth: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun changeAuth(memberId: Long, auth: Authority) = viewModelScope.launch(Dispatchers.IO) {
         val workspaceId = workspace.value.workspaceId
         val isConnected = NetworkState.isConnected.value
         changeWorkspaceMemberUseCase(workspaceId, memberId, auth, isConnected).withUiState().collect()

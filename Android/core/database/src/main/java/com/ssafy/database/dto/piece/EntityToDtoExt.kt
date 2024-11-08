@@ -48,7 +48,6 @@ import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardThumbnail
 import com.ssafy.model.with.CoverType
-import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO

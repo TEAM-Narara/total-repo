@@ -28,7 +28,7 @@ interface WorkspaceAPI {
     @PATCH("api/v1/workspaces/{workspaceId}")
     suspend fun updateWorkspace(
         @Path("workspaceId") workspaceId: Long,
-        @Body name: String
+        @Body name: Map<String, String>
     ): Response<ApiResponse<Unit>>
 
     @GET("api/v1/{workspaceId}/members")

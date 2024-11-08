@@ -14,7 +14,7 @@ data class HomeData(
 
 @Immutable
 data class SelectedWorkSpace(
-    val workSpaceId: Long = 0,
-    val workSpaceName: String = "",
+    val workspaceId: Long = 0,
+    val workspaceName: String = "",
     val boards: List<BoardDTO> = emptyList()
 )

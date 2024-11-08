@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.model.background.Cover
 import com.ssafy.model.board.BoardDTO
+import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.uistate.ErrorScreen
@@ -31,15 +32,23 @@ fun CreateBoardScreen(
     moveToSelectBackgroundScreen: (Cover) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val workspaceList by viewModel.workspace.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) { viewModel.resetUiState() }
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.getWorkspaceList()
+        viewModel.changeCover(cover)
+    }
 
     CreateBoardScreen(
-        cover = cover,
-        workspaceList = emptyList(),
+        boardData = viewModel.boardData,
+        workspaceList = workspaceList,
         popBackToHome = popBackToHome,
         moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
-        createBoard = viewModel::createBoard,
+        createBoard = { viewModel.createBoard(popBackToHome) },
+        changeBoardName = viewModel::changeBoardName,
+        changeWorkspace = viewModel::changeWorkspaceId,
+        changeVisibleScope = viewModel::changeVisibility,
     )
 
     when (uiState) {
@@ -52,11 +61,14 @@ fun CreateBoardScreen(
 
 @Composable
 private fun CreateBoardScreen(
-    cover: Cover,
+    boardData: BoardDTO,
     workspaceList: List<WorkSpaceDTO>,
     popBackToHome: () -> Unit,
     moveToSelectBackgroundScreen: (Cover) -> Unit,
-    createBoard: (BoardDTO) -> Unit,
+    createBoard: () -> Unit,
+    changeBoardName: (String) -> Unit,
+    changeWorkspace: (WorkSpaceDTO) -> Unit,
+    changeVisibleScope: (Visibility) -> Unit,
 ) {
     with(LocalContext.current as Activity) {
         WindowCompat.getInsetsController(window, window.decorView).apply {
@@ -75,10 +87,13 @@ private fun CreateBoardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            cover = cover,
+            boardData = boardData,
             workSpaceList = workspaceList,
             moveToSelectBackgroundScreen = moveToSelectBackgroundScreen,
             createBoardClick = createBoard,
+            changeBoardName = changeBoardName,
+            changeWorkspace = changeWorkspace,
+            changeVisibleScope = changeVisibleScope
         )
     }
 }
