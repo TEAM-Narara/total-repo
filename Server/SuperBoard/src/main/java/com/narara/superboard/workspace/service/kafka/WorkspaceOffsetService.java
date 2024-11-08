@@ -1,15 +1,12 @@
-package com.narara.superboard.workspace.service.mongo;
+package com.narara.superboard.workspace.service.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.board.enums.BoardAction;
-import com.narara.superboard.board.interfaces.dto.websocket.BoardUpdateData;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WebSocketResponse;
 import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.util.ArrayList;
@@ -41,13 +38,15 @@ public class WorkspaceOffsetService {
     public static final String BOARD_ID_COLUMN = "boardId";
     public static final String BOARD_NAME_COLUMN = "boardName";
     private final MongoTemplate mongoTemplate;
-    private final SimpMessagingTemplate messagingTemplate;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
+    /**
+     * 워크 스페이스 수정
+     * @param workspace
+     */
     public void saveEditWorkspaceDiff(WorkSpace workspace) {
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
@@ -61,37 +60,151 @@ public class WorkspaceOffsetService {
                 data
         );
 
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
         // 워크 스페이스 이름 수정시, 카프카로 메시지 전송
-        String topic = "workspace-" + workspace.getId();
-        sendMessageToKafka(topic,diffInfo);
-
-        // messagingTemplate.convertAndSend("/topic/workspace/" + workspace.getId(), diffInfo);
-//        mongoTemplate.save(workspaceOffset);
+        sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
-    private <T> void sendMessageToKafka(String topic, T object) {
-        // DiffInfo 객체를 JSON 문자열로 변환
-        String jsonMessage = null;
-        try {
-            jsonMessage = objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        // Kafka에 메시지 전송
-        kafkaTemplate.send(topic, jsonMessage);
-        System.out.println("Message sent to Kafka: " + jsonMessage);
+    /**
+     * 워크스페이스 삭제
+     * @param workspace
+     */
+    public void saveDeleteWorkspaceDiff(WorkSpace workspace) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.DELETE_WORKSPACE.name(),
+                data
+        );
+
+        // 워크 스페이스 삭제시, 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
-    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
-        Query query = new Query(Criteria.where("workspaceId").is(workspace));
-        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
-        return workspaceOffset;
+    /**
+     * 워크스페이스 멤버 추가
+     * @param workspaceMember
+     */
+    public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
+        WorkSpace workspace = workspaceMember.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_NAME_COLUMN, workspace.getId());
+        data.put(AUTHORITY_COLUMN, workspace.getName());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.ADD_MEMBER.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    /**
+     * 워크스페이스 멤버 삭제
+     * @param workspaceMember
+     */
+    public void saveDeleteMemberDiff(WorkSpaceMember workspaceMember) {
+        WorkSpace workspace = workspaceMember.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_ID_COLUMN, workspace.getId());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.DELETE_MEMBER.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    /**
+     * 워크스페이스 멤버 권한 수정
+     * @param workspaceMember
+     */
+    public void saveEditMemberDiff(WorkSpaceMember workspaceMember) {
+        WorkSpace workspace = workspaceMember.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_ID_COLUMN, workspace.getId());
+        data.put(AUTHORITY_COLUMN, workspace.getName());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_MEMBER.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    /**
+     * 워크스페이스 보드 생성
+     * @param board
+     */
+    public void saveAddBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(BOARD_NAME_COLUMN, board.getName());
+        data.put("backgroundType", board.getCover().get("type"));
+        data.put("backgroundValue", board.getCover().get("value"));
+        data.put("isClosed", board.getIsArchived());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.ADD_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    /**
+     * 워크스페이스 보드 삭제
+     * @param board
+     */
+    public void saveDeleteBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put("isClosed", board.getIsArchived()); //true로 나와야해
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.DELETE_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
     //특정 offset 이후 변경사항 불러오는 로직
@@ -110,159 +223,24 @@ public class WorkspaceOffsetService {
                 .collect(Collectors.toList());
     }
 
-    public void saveDeleteWorkspaceDiff(WorkSpace workspace) {
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
+    private <T> void sendMessageToKafka(Long workspaceId, T object) {
+        String topic = "workspace-" + workspaceId;
 
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.DELETE_WORKSPACE.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
+        // DiffInfo 객체를 JSON 문자열로 변환
+        String jsonMessage = null;
+        try {
+            jsonMessage = objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
+        // Kafka에 메시지 전송
+        kafkaTemplate.send(topic, jsonMessage);
+        System.out.println("Message sent to Kafka: " + jsonMessage);
     }
 
-    public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
-        WorkSpace workspace = workspaceMember.getWorkSpace();
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_NAME_COLUMN, workspace.getId());
-        data.put(AUTHORITY_COLUMN, workspace.getName());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.ADD_MEMBER.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
-    }
-
-    public void saveEditMemberDiff(WorkSpaceMember workspaceMember) {
-        WorkSpace workspace = workspaceMember.getWorkSpace();
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-        data.put(AUTHORITY_COLUMN, workspace.getName());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.EDIT_MEMBER.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
-    }
-
-    public void saveDeleteMemberDiff(WorkSpaceMember workspaceMember) {
-        WorkSpace workspace = workspaceMember.getWorkSpace();
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.DELETE_MEMBER.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
-    }
-
-    public void saveAddBoardDiff(Board board) {
-        WorkSpace workspace = board.getWorkSpace();
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(BOARD_ID_COLUMN, board.getId());
-        data.put(BOARD_NAME_COLUMN, board.getName());
-        data.put("backgroundType", board.getCover().get("type"));
-        data.put("backgroundValue", board.getCover().get("value"));
-        data.put("isClosed", board.getIsArchived());
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.ADD_BOARD.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-        mongoTemplate.save(workspaceOffset);
-    }
-
-    public void saveDeleteBoardDiff(Board board) {
-        WorkSpace workspace = board.getWorkSpace();
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspace.getId());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(BOARD_ID_COLUMN, board.getId());
-        data.put("isClosed", board.getIsArchived()); //true로 나와야해
-
-        DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
-                workspace.getUpdatedAt(),
-                WORKSPACE,
-                WorkspaceAction.DELETE_BOARD.name(),
-                data
-        );
-
-        if (workspaceOffset == null) {
-            workspaceOffset = new WorkspaceOffset(workspace.getId(), new ArrayList<>());
-        }
-
-        workspaceOffset.getDiffList().add(diffInfo);
-
-//        mongoTemplate.save(workspaceOffset);
+    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
+        Query query = new Query(Criteria.where("workspaceId").is(workspace));
+        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+        return workspaceOffset;
     }
 }
