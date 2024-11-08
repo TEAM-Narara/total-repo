@@ -19,7 +19,7 @@ interface BoardRepository {
 
     suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
 
-    suspend fun getBoard(id: Long): Flow<BoardDTO>
+    suspend fun getBoard(id: Long): Flow<BoardDTO>?
 
     suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit>
 
@@ -35,7 +35,7 @@ interface BoardRepository {
 
     suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
-    suspend fun getWatchStatus(id: Long): Flow<Boolean>
+    suspend fun getWatchStatus(id: Long): Flow<Boolean>?
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
@@ -59,7 +59,7 @@ interface BoardRepository {
 
     suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long>
 
-    suspend fun getLabel(id: Long): Flow<LabelDTO>
+    suspend fun getLabel(id: Long): Flow<LabelDTO>?
 
     suspend fun getLabels(boardId: Long): Flow<List<LabelDTO>>
 

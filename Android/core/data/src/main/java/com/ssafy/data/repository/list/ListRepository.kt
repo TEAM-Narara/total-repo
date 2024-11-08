@@ -38,7 +38,7 @@ interface ListRepository {
 
     suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getListWatchStatus(id: Long): Flow<Boolean>
+    suspend fun getListWatchStatus(id: Long): Flow<Boolean>?
 
     suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit>
 

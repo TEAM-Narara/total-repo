@@ -28,24 +28,24 @@ interface AttachmentDao {
     @Query("""
         SELECT * 
         FROM attachment
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationAttachments(): List<AttachmentEntity>
 
     // 첨부파일 단일 조회
-    @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
+    @Query("SELECT * FROM attachment WHERE id = :id And isStatus != 'DELETE'")
     fun getAttachment(id: Long): AttachmentEntity?
 
     // 첨부파일 단일 조회
-    @Query("SELECT * FROM attachment WHERE id == :id And isStatus != 'DELETE'")
+    @Query("SELECT * FROM attachment WHERE id = :id And isStatus != 'DELETE'")
     fun getAttachmentFlow(id: Long): Flow<AttachmentEntity>?
 
     // 카드의 커버이미지 조회
-    @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isCover == 1 AND isStatus != 'DELETE'")
+    @Query("SELECT * FROM attachment WHERE cardId = :cardId AND isCover = 1 AND isStatus != 'DELETE'")
     fun getCoverAttachment(cardId: Long): Flow<AttachmentEntity>?
 
     // 카드의 첨부파일 조회
-    @Query("SELECT * FROM attachment WHERE cardId == :cardId AND isStatus != 'DELETE'")
+    @Query("SELECT * FROM attachment WHERE cardId = :cardId AND isStatus != 'DELETE'")
     fun getAllAttachments(cardId: Long): Flow<List<AttachmentEntity>>
 
     // 카드들의 첨부파일 여부 조회

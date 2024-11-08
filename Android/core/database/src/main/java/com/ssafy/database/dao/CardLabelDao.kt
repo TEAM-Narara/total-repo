@@ -18,7 +18,7 @@ interface CardLabelDao {
     @Query("""
         SELECT * 
         FROM card_label
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateCardLabels(): List<CardLabelEntity>
 
@@ -26,7 +26,7 @@ interface CardLabelDao {
     @Query("""
         SELECT * 
         FROM card_label
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationCardLabels(): List<CardLabelEntity>
 
@@ -34,17 +34,17 @@ interface CardLabelDao {
     @Query("""
         SELECT * 
         FROM card_label 
-        WHERE id == :id
+        WHERE id = :id
     """)
-    fun getCardLabel(id: Long): CardLabelEntity
+    fun getCardLabel(id: Long): CardLabelEntity?
 
     // 카드 라벨 단일 조회
     @Query("""
         SELECT * 
         FROM card_label 
-        WHERE id == :id
+        WHERE id = :id
     """)
-    fun getLabelFlow(id: Long): Flow<CardLabelEntity>
+    fun getLabelFlow(id: Long): Flow<CardLabelEntity>?
 
     // 카드의 라벨을 조회
     @Transaction

@@ -11,7 +11,7 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
 
-    suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?>
+    suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO>?
 
     suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Long>
 

@@ -34,10 +34,10 @@ interface BoardMemberDao {
 
     // 보드 멤버 단일 조회
     @Query("SELECT * FROM board_member WHERE id == :id")
-    fun getBoardMember(id: Long): BoardMemberEntity
+    fun getBoardMember(id: Long): BoardMemberEntity?
 
-    @Query("SELECT * FROM board_member WHERE boardId == :boardId AND memberId == :memberId")
-    fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity
+    @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
+    fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity?
 
     // 보드 멤버 조회
     @Transaction
@@ -73,17 +73,17 @@ interface BoardMemberDao {
     @Query("""
         SELECT *
         FROM board_member_alarm 
-        WHERE boardId == :boardId
+        WHERE boardId = :boardId
     """)
-    fun getBoardMemberAlarm(boardId: Long): BoardMemberAlarmEntity
+    fun getBoardMemberAlarm(boardId: Long): BoardMemberAlarmEntity?
 
     // 보드 알람 조회
     @Query("""
         SELECT *
         FROM board_member_alarm 
-        WHERE boardId == :boardId
+        WHERE boardId = :boardId
     """)
-    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity>
+    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity>?
 
     // 알람 상태 업데이트
     @Update

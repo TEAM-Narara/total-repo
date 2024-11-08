@@ -19,7 +19,7 @@ interface ListDao {
     @Query("""
         SELECT * 
         FROM list
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateList(): List<ListInCards>
 
@@ -27,7 +27,7 @@ interface ListDao {
     @Query("""
         SELECT * 
         FROM list
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationList(): List<ListEntity>
 
@@ -36,9 +36,9 @@ interface ListDao {
     @Query("""
         SELECT * 
         FROM list 
-        WHERE id == :listId And isStatus != 'DELETE' And isArchived == 0
+        WHERE id = :listId And isStatus != 'DELETE' And isArchived = 0
     """)
-    fun getList(listId: Long): ListEntity
+    fun getList(listId: Long): ListEntity?
 
     // 현재 보드에서 볼 것
     @Transaction
@@ -58,8 +58,8 @@ interface ListDao {
         SELECT * 
         FROM list 
         WHERE isStatus != 'DELETE' 
-            And isArchived == 1
-            And boardId == :boardId
+            And isArchived = 1
+            And boardId = :boardId
         ORDER BY myOrder
     """)
     fun getAllListsArchived(boardId: Long): Flow<List<ListEntity>>

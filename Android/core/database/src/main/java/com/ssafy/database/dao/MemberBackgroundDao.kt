@@ -16,7 +16,7 @@ interface MemberBackgroundDao {
     @Query("""
         SELECT * 
         FROM member_background
-        WHERE isStatus == 'CREATE'
+        WHERE isStatus = 'CREATE'
     """)
     suspend fun getLocalCreateMemberBackgrounds(): List<MemberBackgroundEntity>
 
@@ -24,7 +24,7 @@ interface MemberBackgroundDao {
     @Query("""
         SELECT * 
         FROM member_background
-        WHERE isStatus == 'UPDATE' OR isStatus == 'DELETE'
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationMemberBackgrounds(): List<MemberBackgroundEntity>
 
@@ -32,9 +32,9 @@ interface MemberBackgroundDao {
     @Query("""
             SELECT * 
             FROM member_background
-            WHERE id == :id And isStatus != 'DELETE'
+            WHERE id = :id And isStatus != 'DELETE'
         """)
-    fun getMemberBackground(id: Long): MemberBackgroundEntity
+    fun getMemberBackground(id: Long): MemberBackgroundEntity?
     
     // 멤버 배경 모두 조회
     @Query("""

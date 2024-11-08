@@ -197,9 +197,9 @@ class ListRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getListWatchStatus(id: Long): Flow<Boolean> =
+    override suspend fun getListWatchStatus(id: Long): Flow<Boolean>? =
         withContext(ioDispatcher) {
-            listMemberDao.getListMemberAlarmFlow(id).map { it.toDTO().isAlert }
+            listMemberDao.getListMemberAlarmFlow(id)?.map { it.toDTO().isAlert }
         }
 
     override suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit> =
