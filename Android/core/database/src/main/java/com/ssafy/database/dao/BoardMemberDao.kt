@@ -8,8 +8,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberAlarmEntity
-import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -87,7 +85,7 @@ interface BoardMemberDao {
         FROM board_member_alarm 
         WHERE boardId = :boardId
     """)
-    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity>?
+    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity?>
 
     // 알람 상태 업데이트
     @Update
