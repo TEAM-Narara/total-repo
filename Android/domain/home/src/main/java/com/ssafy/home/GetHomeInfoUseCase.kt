@@ -50,14 +50,18 @@ class GetHomeInfoUseCase @Inject constructor(
 
     suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData> {
         workspaceStomp.connect(workspaceId)
+        val workspaceFlow = workspaceRepository.getWorkspace(workspaceId) ?: return flowOf(
+            homeData.copy(selectedWorkSpace = SelectedWorkSpace())
+        )
+
         return combine(
-            workspaceRepository.getWorkspace(workspaceId),
+            workspaceFlow,
             boardRepository.getBoardsByWorkspace(workspaceId)
         ) { workspace, boardList ->
             homeData.copy(
                 selectedWorkSpace = SelectedWorkSpace(
-                    workSpaceId = workspace?.workSpaceId ?: -1,
-                    workSpaceName = workspace?.name ?: "",
+                    workSpaceId = workspace.workSpaceId,
+                    workSpaceName = workspace.name,
                     boards = boardList
                 )
             )
