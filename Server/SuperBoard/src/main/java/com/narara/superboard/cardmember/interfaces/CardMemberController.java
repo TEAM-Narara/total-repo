@@ -34,24 +34,24 @@ public class CardMemberController implements CardMemberAPI {
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<Void>> setCardMemberIsAlert(
+    public ResponseEntity<DefaultResponse<Boolean>> setCardMemberIsAlert(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId) {
 
-        cardMemberService.setCardMemberIsAlert(member, cardId);
+        Boolean isAlert = cardMemberService.setCardMemberIsAlert(member, cardId);
         return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS),
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS, isAlert),
                 HttpStatus.OK
         );
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<Void>> setCardMemberIsRepresentative(
+    public ResponseEntity<DefaultResponse<Boolean>> setCardMemberIsRepresentative(
             @RequestBody UpdateCardMemberRequestDto updateCardMemberRequestDto) {
 
-        cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
+        Boolean isRepresentative = cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
         return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS),
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS, isRepresentative),
                 HttpStatus.OK
         );
     }
