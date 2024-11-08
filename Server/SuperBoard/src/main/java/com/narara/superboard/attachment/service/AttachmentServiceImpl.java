@@ -43,7 +43,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         // 첨부 파일 추가 로그 기록
         AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), url, isCover);
 
-        CardHistory<AddAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<AddAttachmentInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
 
@@ -70,7 +70,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         DeleteAttachmentInfo deleteAttachmentInfo = new DeleteAttachmentInfo(
                 card.getId(), card.getName(), attachmentId, attachment.getIsCover());
 
-        CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 

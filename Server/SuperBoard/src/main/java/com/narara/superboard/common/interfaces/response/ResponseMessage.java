@@ -92,7 +92,7 @@ public class ResponseMessage {
     // 카드 멤버 관련 상수
     public static final String CARD_MEMBER_ALERT_STATUS_FETCH_SUCCESS = "카드 멤버 알림 상태 조회 성공";
     public static final String CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "카드 멤버 알림 상태 업데이트 성공";
-    public static final String CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS = "카드 멤버 대표자 설정 성공";
+    public static final String CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS = "카드 멤버 담당자 설정 성공";
 
     // 라벨 관련 상수
     public static final String LABEL_CREATE_SUCCESS = "라벨 생성 성공";

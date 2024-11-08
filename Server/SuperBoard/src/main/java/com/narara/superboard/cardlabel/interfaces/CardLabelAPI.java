@@ -21,7 +21,7 @@ public interface CardLabelAPI {
             @RequestBody Long labelId);
 
     @PatchMapping("/activate")
-    @Operation(summary = "카드 라벨 활성화 변경", description = "카드 라벨의 활성화 상태를 변경합니다.")
+    @Operation(summary = "카드에 라벨 활성화 상태 변경", description = "카드 라벨의 활성화 상태를 변경합니다.")
     ResponseEntity<DefaultResponse<CardLabelDto>> changeCardLabelIsActivated(
             @AuthenticationPrincipal Member member,
             @RequestBody Long cardId,

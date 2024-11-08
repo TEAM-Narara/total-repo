@@ -20,12 +20,12 @@ public interface CardMemberAPI {
 
     @PatchMapping("/{cardId}/alert/{memberId}")
     @Operation(summary = "카드 멤버 알림 상태 설정", description = "특정 카드에서 멤버의 알림 상태를 설정합니다.")
-    ResponseEntity<DefaultResponse<Void>> setCardMemberIsAlert(
+    ResponseEntity<DefaultResponse<Boolean>> setCardMemberIsAlert(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId);
 
     @PatchMapping("/representative")
-    @Operation(summary = "카드 멤버 대표자 설정", description = "특정 카드 멤버를 대표자로 설정합니다.")
-    ResponseEntity<DefaultResponse<Void>> setCardMemberIsRepresentative(
+    @Operation(summary = "카드 멤버 대표자 설정", description = "특정 카드 멤버를 담당자로 설정합니다.")
+    ResponseEntity<DefaultResponse<Boolean>> setCardMemberIsRepresentative(
             @RequestBody UpdateCardMemberRequestDto updateCardMemberRequestDto);
 }
