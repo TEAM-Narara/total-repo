@@ -70,6 +70,8 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace newWorkSpace = workSpaceRepository.save(workSpace);
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
+        //TODO Websocket workspace 생성
+        //TODO Websocket workspace 초기 멤버 추가
 
         // Kafka 토픽 생성 및 Consumer group Listener 설정
         String topicName = "workspace-" + newWorkSpace.getId();
@@ -134,9 +136,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return false;
     }
 
-
-
-
 //    public void createTopicIfNotExists(String topicName) {
 //        try {
 //            Map<String, TopicDescription> topics = kafkaAdmin.describeTopics(new String[]{topicName});
@@ -150,12 +149,12 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //        }
 //    }
 
-
     @Override
     @Transactional
     public void deleteWorkSpace(Long workspaceId) {
         WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.deleted(); //삭제 처리 offset++
+        //TODO Websocket workspace 삭제
 
         workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
@@ -207,6 +206,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpace.updateWorkSpace(name); //offset++
 
         workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
+        //TODO Websocket workspace 업데이트
 
         return workSpace;
     }

@@ -98,6 +98,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
+        //TODO Websocket authority 상태 변경
 
         workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
 
@@ -138,6 +139,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         workSpaceMemberRepository.save(workSpaceMember);
         workSpace.addOffset(); //workspace offset++
+        //TODO Websocket workspace member 추가
 
         // 3. 새로운 멤버를 Kafka Consumer Group에 등록
         // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
@@ -160,6 +162,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
+        //TODO Websocket workspace member 삭제
 
         workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
 
