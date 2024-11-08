@@ -39,6 +39,8 @@ interface BoardRepository {
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
+    suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO>?
+
     suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
 
     suspend fun deleteBoardMember(

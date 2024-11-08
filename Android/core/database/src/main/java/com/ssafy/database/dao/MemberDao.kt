@@ -17,7 +17,15 @@ interface MemberDao {
         FROM member 
         WHERE id = :memberId
     """)
-    fun getMember(memberId: Long): Flow<MemberEntity>?
+    fun getMember(memberId: Long): MemberEntity?
+
+    // 멤버 단일 조회
+    @Query("""
+        SELECT * 
+        FROM member 
+        WHERE id = :memberId
+    """)
+    fun getMemberFlow(memberId: Long): Flow<MemberEntity>?
 
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)

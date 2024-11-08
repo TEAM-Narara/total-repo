@@ -191,6 +191,12 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO>? =
+        withContext(ioDispatcher) {
+            boardMemberDao.getBoardMemberFlow(boardId, memberId)
+                ?.map { it.toDTO() }
+        }
+
     override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMembers(boardId)

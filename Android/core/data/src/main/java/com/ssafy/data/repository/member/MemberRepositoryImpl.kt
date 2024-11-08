@@ -7,6 +7,7 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
@@ -34,20 +35,33 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun getMember(memberId: Long): Flow<User>? =
         withContext(ioDispatcher) {
-        memberDao.getMember(memberId)
+        memberDao.getMemberFlow(memberId)
             ?.map { it.toDTO() }
     }
 
     override suspend fun updateMember(
+        memberId: Long,
         memberUpdateRequestDto: MemberUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> =
         withContext(ioDispatcher) {
-            if (isConnected) {
-                memberDataSource.updateMember(memberUpdateRequestDto)
+            val myInfo = memberDao.getMember(memberId)
+
+            if(myInfo != null) {
+                if (isConnected) {
+                    memberDataSource.updateMember(memberUpdateRequestDto)
+                } else {
+                    // TODO 서버에 동기화 isStatus
+                    val result = memberDao.updateMember(myInfo.copy(
+                        nickname = memberUpdateRequestDto.nickname,
+                        profileImageUrl = memberUpdateRequestDto.profileImgUrl,
+                    ))
+
+                    flowOf(result)
+                }
+            } else {
+                flowOf(Unit)
             }
-            flowOf()
-            // TODO 내 PK 또는 이메일
         }
 
     override suspend fun searchMembers(
