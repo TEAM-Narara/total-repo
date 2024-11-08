@@ -83,7 +83,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private NameValidator nameValidator;
 
-    
+
     @Mock
     private CoverHandler coverHandler;
 
