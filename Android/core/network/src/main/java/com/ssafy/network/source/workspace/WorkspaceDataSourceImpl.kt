@@ -28,7 +28,7 @@ class WorkspaceDataSourceImpl @Inject constructor(
         workspaceId: Long,
         name: String
     ): Flow<Unit> =
-        safeApiCall { workspaceAPI.updateWorkspace(workspaceId, name) }.toFlow()
+        safeApiCall { workspaceAPI.updateWorkspace(workspaceId, mapOf("name" to name)) }.toFlow()
 
     override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>> =
         safeApiCall { workspaceAPI.getWorkspaceMembers(workspaceId) }.toFlow()
