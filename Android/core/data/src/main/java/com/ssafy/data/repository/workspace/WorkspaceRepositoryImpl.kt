@@ -16,7 +16,6 @@ import com.ssafy.network.source.workspace.WorkspaceDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -74,16 +73,17 @@ class WorkspaceRepositoryImpl @Inject constructor(
             if (isConnected) {
                 workspaceDataSource.createWorkspace(name).map { 5 }
             } else {
-                flowOf(workspaceDao.insertWorkspace(
-                    WorkspaceEntity(
-                        name = name,
-                        authority = "ADMIN",
-                        isStatus = DataStatus.CREATE
+                flowOf(
+                    workspaceDao.insertWorkspace(
+                        WorkspaceEntity(
+                            name = name,
+                            authority = "ADMIN",
+                            isStatus = DataStatus.CREATE
+                        )
                     )
                 )
-            )
+            }
         }
-    }
 
     override suspend fun deleteWorkspace(workspaceId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -126,20 +126,18 @@ class WorkspaceRepositoryImpl @Inject constructor(
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
-
                         DataStatus.CREATE, DataStatus.UPDATE ->
                             workspaceDao.updateWorkspace(workspace.copy(name = name))
 
                         DataStatus.DELETE -> {}
                     }
-
                     flowOf(result)
                 }
             } else {
                 flowOf(Unit)
             }
         }
-    }
+
 
     override suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {

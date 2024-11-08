@@ -39,7 +39,8 @@ interface WorkspaceRepository {
     ): Flow<Unit>
 
     suspend fun deleteWorkspaceMember(
-        id: Long,
+        workspaceId: Long,
+        memberId: Long,
         isConnected: Boolean
     ): Flow<Unit>
 
