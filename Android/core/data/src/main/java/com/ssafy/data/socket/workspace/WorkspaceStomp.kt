@@ -30,6 +30,7 @@ class WorkspaceStomp @Inject constructor(
                     "DELETE_MEMBER" -> workspaceService.deleteMember(it.data)
                     "EDIT_MEMBER" -> workspaceService.editMember(it.data)
                     "ADD_BOARD" -> workspaceService.addBoard(it.data)
+                    "EDIT_BOARD" -> workspaceService.editBoard(it.data)
                     "DELETE_BOARD" -> workspaceService.deleteBoard(it.data)
                     else -> {}
                 }

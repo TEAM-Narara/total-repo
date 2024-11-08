@@ -8,6 +8,7 @@ import com.ssafy.data.socket.workspace.model.DeleteWorkSpaceRequestDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkspaceBoardRequestDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkspaceMemberRequestDto
 import com.ssafy.data.socket.workspace.model.EditWorkSpaceRequestDto
+import com.ssafy.data.socket.workspace.model.EditWorkspaceBoardRequestDto
 import com.ssafy.data.socket.workspace.model.EditWorkspaceMemberRequestDto
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.MemberDao
@@ -48,10 +49,12 @@ class WorkspaceService @Inject constructor(
         memberDao.insertMembers(
             listOf(
                 MemberEntity(
-                    id = dto.memberId
+                    id = dto.memberId,
+                    nickname = dto.memberName
                 )
             )
         )
+
         workspaceMemberDao.insertWorkspaceMembers(
             listOf(
                 WorkspaceMemberEntity(
@@ -86,6 +89,21 @@ class WorkspaceService @Inject constructor(
     suspend fun addBoard(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceBoardRequestDto::class.java)
         boardDao.insertBoard(
+            BoardEntity(
+                id = dto.boardId,
+                workspaceId = dto.workspaceId,
+                name = dto.boardName,
+                coverType = dto.backgroundType,
+                coverValue = dto.backgroundValue,
+                visibility = dto.visibility,
+                isClosed = dto.isClosed,
+            )
+        )
+    }
+
+    suspend fun editBoard(data: JsonObject) {
+        val dto = gson.fromJson(data, EditWorkspaceBoardRequestDto::class.java)
+        boardDao.updateBoard(
             BoardEntity(
                 id = dto.boardId,
                 workspaceId = dto.workspaceId,
