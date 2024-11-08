@@ -33,6 +33,7 @@ public class LabelServiceImpl implements LabelService {
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         Label label = Label.createLabel(board, createLabelRequestDto);
+        //TODO Websocket 라벨 추가
 
         return labelRepository.save(label);
     }
@@ -49,6 +50,7 @@ public class LabelServiceImpl implements LabelService {
         colorValidator.validateLabelColor(updateLabelRequestDto);
 
         Label label = getLabel(labelId);
+        //TODO Websocket 라벨 업데이트
 
         return label.updateLabel(updateLabelRequestDto);
     }
@@ -58,6 +60,8 @@ public class LabelServiceImpl implements LabelService {
     public void deleteLabel(Long labelId) {
         Label label = getLabel(labelId);
         labelRepository.delete(label);
+
+        //TODO Websocket 라벨 삭제
     }
 
     @Override

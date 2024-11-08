@@ -37,6 +37,7 @@ public class CardLabelServiceImpl implements CardLabelService {
             return createCardLabel(card, label);
         }
 
+        //TODO Websocket 카드라벨 아카이브
         return cardLabel.get().changeIsActivated();
     }
 
@@ -49,6 +50,7 @@ public class CardLabelServiceImpl implements CardLabelService {
             throw new EntityAlreadyExistsException("카드의 라벨");
         }
 
+        //TODO Websocket 카드라벨 추가
         return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
     }
 
