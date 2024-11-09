@@ -57,7 +57,7 @@ class BoardService @Inject constructor(
 
     suspend fun deleteBoardMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteBoardMemberRequestDto::class.java)
-        boardMemberDao.deleteBoardMemberByBoardIdAndMemberId(dto.boardId, dto.memberId)
+        boardMemberDao.deleteBoardMemberById(dto.boardMemberId)
     }
 
     suspend fun editBoardWatch(data: JsonObject) {

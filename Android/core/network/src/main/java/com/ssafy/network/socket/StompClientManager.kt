@@ -55,13 +55,13 @@ class StompClientManager @Inject constructor(
         id: String,
         topic: String,
         clazz: Class<T>,
-        ack: suspend (StompFrame.Message) -> Unit = {}
+        ack: suspend (headers: MutableMap<String, String>) -> Unit = {}
     ): Flow<T> {
         Log.d("TAG", "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
             Log.d("TAG", "data: ${it.bodyAsText}")
-            ack(it)
+            ack(it.headers)
             gson.fromJson(it.bodyAsText, clazz)
         }.catch { exception ->
             exception.printStackTrace()

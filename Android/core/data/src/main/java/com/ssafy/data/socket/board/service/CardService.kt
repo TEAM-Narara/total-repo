@@ -82,6 +82,6 @@ class CardService @Inject constructor(
 
     suspend fun deleteCardMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardMemberRequestDto::class.java)
-        cardMemberDao.deleteCardMember(dto.cardMemberId)
+        cardMemberDao.deleteCardMemberById(dto.cardMemberId)
     }
 }

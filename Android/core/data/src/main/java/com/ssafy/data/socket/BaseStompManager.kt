@@ -26,11 +26,12 @@ class BaseStompManager @Inject constructor(
                     SOCKET_ID,
                     "/topic/$topic/member/$memberId",
                     StompResponse::class.java
-                ) {
+                ) { headers ->
                     val ackMessage = AckMessage(
-                        offset = it.headers["offset"]?.toLong() ?: throw Exception(""),
+                        offset = headers["offset"]?.toLong()
+                            ?: 0,// throw Exception("offset이 존재하지 않습니다."),
                         topic = topic.split("/").joinToString("-"),
-                        partition = it.headers["partition"]?.toLong() ?: 0,
+                        partition = headers["partition"]?.toLong() ?: 0,
                         groupId = "member-$memberId"
                     )
                     stompClientManager.send(SOCKET_ID, ACK_URL, ackMessage)
