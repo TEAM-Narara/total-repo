@@ -25,7 +25,7 @@ public interface WorkSpaceMemberAPI {
             @Parameter(description = "조회할 워크스페이스의 ID", required = true) @PathVariable Long workspaceId
     );
 
-    @Operation(summary = "멤버의 워크스페이스 리스트 조회", description = "멤버 ID를 통해 멤버가 속한 워크스페이스 리스트를 조회합니다.")
+    @Operation(summary = "나의 워크스페이스들 조회", description = "멤버 ID를 통해 멤버가 속한 워크스페이스 리스트를 조회합니다.")
     @GetMapping("/member/workspaces")
     ResponseEntity<DefaultResponse<List<WorkSpaceResponseDto>>> getMemberWorkspaceList(
             @AuthenticationPrincipal @Parameter(hidden = true) Member member
