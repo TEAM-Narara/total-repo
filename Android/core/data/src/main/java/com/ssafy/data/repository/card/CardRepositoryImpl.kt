@@ -74,6 +74,9 @@ class CardRepositoryImpl @Inject constructor(
             )
         }
     }
+    
+    // 카드 멤버는 Board, Workspace 멤버 조인
+    // 담당자 설정이나, watch를 설정하면 cardTable에 생성
 
     override suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -228,6 +231,15 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             cardMemberDao.getCardMembers(cardId)
                 .map { list -> list.map { it.toDTO() } }
+        }
+
+    override suspend fun getMembersWithRepresentativeFlag(
+        workspaceId: Long,
+        boardId: Long,
+        cardId: Long
+    ): Flow<List<MemberResponseDTO>> =
+        withContext(ioDispatcher) {
+            cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
         }
 
     override suspend fun createCardMember(
