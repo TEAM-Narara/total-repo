@@ -13,11 +13,12 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.DataStatus
 import kotlinx.coroutines.flow.Flow
 
 interface CardRepository {
 
-    suspend fun createCard(cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long>
+    suspend fun createCard(myMemberId: Long, cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit>
 
@@ -51,6 +52,10 @@ interface CardRepository {
     suspend fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<MemberResponseDTO>>
 
     suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>>
+
+    suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
+
+    suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long>
 
     suspend fun getLocalCreateCardLabels(): List<CardLabelDTO>
 

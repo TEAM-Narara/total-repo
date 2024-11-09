@@ -7,6 +7,7 @@ import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
@@ -40,7 +41,7 @@ class BoardRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
-    override suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long> =
+    override suspend fun createBoard(myMemberId: Long, boardDTO: BoardDTO, isConnected: Boolean): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 boardDataSource.createBoard(boardDTO).map { it.id }
@@ -53,7 +54,13 @@ class BoardRepositoryImpl @Inject constructor(
                         id = localBoardId,
                         isStatus = DataStatus.CREATE).toEntity()
                     ).also {
-                        boardMemberDao.insertBoardAlarm(BoardMemberAlarmEntity(localBoardId))
+                        createBoardMember(
+                            boardId = localBoardId,
+                            memberId = myMemberId,
+                            isStatus = DataStatus.CREATE)
+                        createBoardWatch(
+                            boardId = localBoardId,
+                            isStatus = DataStatus.CREATE)
                     }
                 )
             }
@@ -172,6 +179,15 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { entities -> entities.map { it.toDto() } }
         }
 
+    override suspend fun createBoardWatch(boardId: Long, isStatus: DataStatus): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(boardMemberDao.insertBoardAlarm(
+                BoardMemberAlarmEntity(
+                    boardId = boardId,
+                    isStatus = isStatus)
+            ))
+        }
+
     override suspend fun getWatchStatus(id: Long): Flow<Boolean?> =
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMemberAlarmFlow(id).map { it?.toDTO()?.isAlert }
@@ -214,6 +230,16 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMembers(boardId)
                 .map { list -> list.map { it.toDTO() } }
+        }
+
+    override suspend fun createBoardMember(boardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(boardMemberDao.insertBoardMember(
+                BoardMemberEntity(
+                    boardId = boardId,
+                    memberId = memberId,
+                    isStatus = isStatus)
+            ))
         }
 
     override suspend fun deleteBoardMember(
