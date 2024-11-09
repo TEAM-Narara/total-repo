@@ -72,6 +72,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                 WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
                         .workspaceId(workSpace.getId())
                         .name(workSpace.getName())
+                        .authority(workSpaceMember.getAuthority())
                         .build();
                 workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
 
