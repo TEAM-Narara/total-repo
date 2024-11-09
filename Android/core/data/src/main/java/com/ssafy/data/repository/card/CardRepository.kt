@@ -2,22 +2,26 @@ package com.ssafy.data.repository.card
 
 import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.DataStatus
 import kotlinx.coroutines.flow.Flow
 
 interface CardRepository {
 
-    suspend fun createCard(cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long>
+    suspend fun createCard(myMemberId: Long, cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit>
 
@@ -34,9 +38,9 @@ interface CardRepository {
 
     suspend fun getLocalOperationCard(): List<CardResponseDto>
 
-    suspend fun getCard(id: Long): Flow<CardResponseDto>?
+    suspend fun getCard(id: Long): Flow<CardResponseDto?>
 
-    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>?
+    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
 
     suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>>
 
@@ -44,7 +48,7 @@ interface CardRepository {
 
     suspend fun getLocalOperationCardMember(): List<CardMemberDTO>
 
-    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmDTO>?
+    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmDTO>
 
     suspend fun getCardRepresentativesInCard(cardId: Long): Flow<List<MemberResponseDTO>>
 
@@ -52,11 +56,26 @@ interface CardRepository {
 
     suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>>
 
+    suspend fun getMembersWithRepresentativeFlag(
+        workspaceId: Long,
+        boardId: Long,
+        cardId: Long
+    ): Flow<List<MemberWithRepresentative>>
+
+    suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
+
+    suspend fun updateCardMember(
+        simpleCardMemberDto: SimpleCardMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit>
+
+    suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long>
+
     suspend fun getLocalCreateCardLabels(): List<CardLabelDTO>
 
     suspend fun getLocalOperationCardLabels(): List<CardLabelDTO>
 
-    suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO>?
+    suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO?>
 
     suspend fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelDTO>>
 
@@ -72,9 +91,9 @@ interface CardRepository {
 
     suspend fun getLocalOperationAttachment(): List<AttachmentDTO>
 
-    suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO>?
+    suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO?>
 
-    suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO>?
+    suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO?>
 
     suspend fun getAllAttachments(cardId: Long): Flow<List<AttachmentDTO>>
 

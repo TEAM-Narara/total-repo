@@ -1,6 +1,7 @@
 package com.ssafy.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -8,8 +9,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberAlarmEntity
-import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -38,7 +37,7 @@ interface BoardMemberDao {
 
     // 보드 멤버 단일 조회
     @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
-    fun getBoardMemberFlow(boardId: Long, memberId: Long): Flow<BoardMemberEntity>?
+    fun getBoardMemberFlow(boardId: Long, memberId: Long): Flow<BoardMemberEntity?>
 
     @Query("SELECT * FROM board_member WHERE boardId = :boardId AND memberId = :memberId")
     fun getBoardMember(boardId: Long, memberId: Long): BoardMemberEntity?
@@ -62,6 +61,14 @@ interface BoardMemberDao {
     """)
     fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
 
+    // 단일 추가
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBoardMember(boardMember: BoardMemberEntity): Long
+
+    // 서버 변경사항 동기화
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBoardMembers(boardMembers: List<BoardMemberEntity>): List<Long>
+
     // 상태 업데이트
     @Update
     suspend fun updateBoardMember(boardMember: BoardMemberEntity)
@@ -69,9 +76,17 @@ interface BoardMemberDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Query("""
         DELETE FROM board_member 
-        WHERE memberId = :memberId AND boardId = :boardId;
+        WHERE memberId = :memberId AND boardId = :boardId
     """)
     suspend fun deleteLocalBoardMember(boardId: Long, memberId: Long)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Delete
+    suspend fun deleteBoardMember(boardMember: BoardMemberEntity)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM board_member WHERE id NOT IN (:ids)")
+    suspend fun deleteBoardMembersNotIn(ids: List<Long>)
 
     // 보드 알람 조회
     @Query("""
@@ -87,26 +102,13 @@ interface BoardMemberDao {
         FROM board_member_alarm 
         WHERE boardId = :boardId
     """)
-    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity>?
+    fun getBoardMemberAlarmFlow(boardId: Long): Flow<BoardMemberAlarmEntity?>
+
+    // 보드 알람 추가
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBoardAlarm(boardMemberAlarm: BoardMemberAlarmEntity): Long
 
     // 알람 상태 업데이트
     @Update
     suspend fun updateBoardMemberAlarm(boardMemberAlarm: BoardMemberAlarmEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBoardMember(boardMember: BoardMemberEntity): Long
-
-    // 서버 변경사항 동기화
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBoardMembers(boardMembers: List<BoardMemberEntity>): List<Long>
-
-    // 서버에 존재하지 않는 로컬 데이터 삭제
-    @Query("DELETE FROM board_member WHERE id NOT IN (:ids)")
-    suspend fun deleteBoardMembersNotIn(ids: List<Long>)
-
-    @Query("""
-        DELETE FROM board_member 
-        WHERE memberId = :memberId AND boardId = :boardId;
-    """)
-    suspend fun deleteBoardMemberByBoardIdAndMemberId(boardId: Long, memberId: Long)
 }

@@ -184,7 +184,7 @@ fun GreetingPreview() {
     HomeScreen(
         workSpaceList = emptyList(),
         selectedWorkspace = SelectedWorkSpace(),
-        user = User(0L,"", "", null),
+        user = User(0L, "", "", null),
         moveToBoardScreen = {},
         moveToCreateNewBoardScreen = {},
         moveToLoginScreen = {},

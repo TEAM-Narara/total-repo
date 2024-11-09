@@ -8,7 +8,7 @@ class GetBoardWatchStatusUseCase @Inject constructor(
     private val boardRepository: BoardRepository
 ) {
 
-    suspend operator fun invoke(boardId: Long): Flow<Boolean>? {
+    suspend operator fun invoke(boardId: Long): Flow<Boolean?> {
         return boardRepository.getWatchStatus(boardId)
     }
 

@@ -48,4 +48,9 @@ open class BaseViewModel : ViewModel() {
             block()
         }
     }
+
+    protected fun withIO(block: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        block()
+    }
+
 }

@@ -6,7 +6,7 @@ import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "board")
 data class BoardEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = false) val id: Long = 0L,
     val workspaceId: Long = 0L,
     val name: String = "",
     val coverType: String? = "COLOR",

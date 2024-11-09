@@ -2,19 +2,27 @@ package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
+import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
@@ -25,7 +33,6 @@ import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -39,9 +46,11 @@ class CardRepositoryImpl @Inject constructor(
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
     private val attachmentDao: AttachmentDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
     override suspend fun createCard(
+        myMemberId: Long,
         cardRequestDto: CardRequestDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
@@ -49,12 +58,22 @@ class CardRepositoryImpl @Inject constructor(
             // TODO
             cardDataSource.createCard(cardRequestDto).map { 5 }
         } else {
+            val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
+
             flowOf(cardDao.insertCard(
                 CardEntity(
+                    id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE)
-            ))
+                    isStatus = DataStatus.CREATE))
+                .also {
+                    createCardMember(
+                        cardId = localCardId,
+                        memberId = myMemberId,
+                        isStatus = DataStatus.CREATE)
+                    createCardWatch(localCardId, isStatus = DataStatus.CREATE)
+                }
+            )
         }
     }
 
@@ -160,13 +179,13 @@ class CardRepositoryImpl @Inject constructor(
                 .map { entity -> entity.toDto() }
         }
 
-    override suspend fun getCard(id: Long): Flow<CardResponseDto>? =
+    override suspend fun getCard(id: Long): Flow<CardResponseDto?> =
         withContext(ioDispatcher) {
             cardDao.getCardFlow(id)
-                ?.map { it.toDto() }
+                .map { it?.toDto() }
         }
 
-    override suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName>? =
+    override suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?> =
         withContext(ioDispatcher) {
             cardDao.getCardWithListAndBoardName(cardId)
         }
@@ -213,6 +232,72 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
+    override suspend fun getMembersWithRepresentativeFlag(
+        workspaceId: Long,
+        boardId: Long,
+        cardId: Long
+    ): Flow<List<MemberWithRepresentative>> =
+        withContext(ioDispatcher) {
+            cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
+        }
+
+    override suspend fun createCardMember(
+        cardId: Long,
+        memberId: Long,
+        isStatus: DataStatus
+    ): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(cardMemberDao.insertCardMember(
+                CardMemberEntity(
+                    cardId = cardId,
+                    memberId = memberId,
+                    isStatus = isStatus)
+            ))
+        }
+
+    override suspend fun updateCardMember(
+        simpleCardMemberDto: SimpleCardMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val cardMember = cardMemberDao.getCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto.memberId)
+
+        if (cardMember != null) {
+            if (isConnected) {
+                cardDataSource.updateCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto).map { Unit }
+            } else {
+                val result = when (cardMember.isStatus) {
+                    DataStatus.STAY ->
+                        cardMemberDao.updateCardMember(
+                            cardMember.copy(
+                                isStatus = DataStatus.UPDATE,
+                                cardId = simpleCardMemberDto.cardId
+                            )
+                        )
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        cardMemberDao.updateCardMember(
+                            cardMember.copy(
+                                cardId = simpleCardMemberDto.cardId
+                            )
+                        )
+                    DataStatus.DELETE -> {}
+                }
+
+                flowOf(result)
+            }
+        } else {
+            flowOf(Unit)
+        }
+    }
+
+    override suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(cardMemberDao.insertCardAlarm(
+                CardMemberAlarmEntity(
+                    cardId = cardId,
+                    isStatus = isStatus)
+            ))
+        }
+
     override suspend fun getLocalCreateCardLabels(): List<CardLabelDTO> =
         withContext(ioDispatcher) {
             cardLabelDao.getLocalCreateCardLabels()
@@ -225,10 +310,10 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO>? =
+    override suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO?> =
         withContext(ioDispatcher) {
             cardLabelDao.getLabelFlow(id)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
     override suspend fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelDTO>> =
@@ -321,16 +406,16 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO>? =
+    override suspend fun getAttachmentFlow(id: Long): Flow<AttachmentDTO?> =
         withContext(ioDispatcher) {
             attachmentDao.getAttachmentFlow(id)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
-    override suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO>? =
+    override suspend fun getCoverAttachment(cardId: Long): Flow<AttachmentDTO?> =
         withContext(ioDispatcher) {
             attachmentDao.getCoverAttachment(cardId)
-                ?.map { it.toDTO() }
+                .map { it?.toDTO() }
         }
 
     override suspend fun getAllAttachments(cardId: Long): Flow<List<AttachmentDTO>> =
@@ -349,7 +434,10 @@ class CardRepositoryImpl @Inject constructor(
                 cardDataSource.createAttachment(attachment).map { 5 }
             } else {
                 flowOf(attachmentDao.insertAttachment(
-                    attachment.copy(isStatus = DataStatus.CREATE).toEntity()
+                    attachment.copy(
+                        id = negativeIdGenerator.getNextNegativeId(LocalTable.ATTACHMENT),
+                        isStatus = DataStatus.CREATE
+                    ).toEntity()
                 ))
             }
         }

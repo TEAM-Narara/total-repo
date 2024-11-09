@@ -59,7 +59,7 @@ fun BoardScreen(
     popBack: () -> Unit,
     navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
-    navigateToBoardMenuScreen: () -> Unit,
+    navigateToBoardMenuScreen: (boardId: Long, workspaceId: Long) -> Unit,
     navigateToCardScreen: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,7 +74,9 @@ fun BoardScreen(
                 onBoardNameChanged = viewModel::updateBoardName,
                 onFilterPressed = { navigateToFilterScreen(searchParameters) },
                 onNotificationPressed = navigateToNotificationScreen,
-                onMorePressed = { navigateToBoardMenuScreen() },
+                onMorePressed = {
+                    boardData?.let { navigateToBoardMenuScreen(it.id, it.workspaceId) }
+                },
             )
         },
     ) { paddingValues ->

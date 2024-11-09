@@ -7,7 +7,7 @@ import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "card")
 data class CardEntity(
-    @PrimaryKey(autoGenerate = true)  val id: Long = 0L,
+    @PrimaryKey(autoGenerate = false)  val id: Long = 0L,
     val listId: Long = 0L,
     val name: String = "",
     val description: String? = null,

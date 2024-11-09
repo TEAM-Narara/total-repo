@@ -38,11 +38,11 @@ interface AttachmentDao {
 
     // 첨부파일 단일 조회
     @Query("SELECT * FROM attachment WHERE id = :id And isStatus != 'DELETE'")
-    fun getAttachmentFlow(id: Long): Flow<AttachmentEntity>?
+    fun getAttachmentFlow(id: Long): Flow<AttachmentEntity?>
 
     // 카드의 커버이미지 조회
     @Query("SELECT * FROM attachment WHERE cardId = :cardId AND isCover = 1 AND isStatus != 'DELETE'")
-    fun getCoverAttachment(cardId: Long): Flow<AttachmentEntity>?
+    fun getCoverAttachment(cardId: Long): Flow<AttachmentEntity?>
 
     // 카드의 첨부파일 조회
     @Query("SELECT * FROM attachment WHERE cardId = :cardId AND isStatus != 'DELETE'")

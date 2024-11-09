@@ -2,7 +2,7 @@ package com.ssafy.data.repository.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.member.SimpleMemberDto
-import com.ssafy.model.with.BoardMemberDTO
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
@@ -12,9 +12,9 @@ interface WorkspaceRepository {
 
     suspend fun getWorkspaceList(isConnected: Boolean): Flow<List<WorkSpaceDTO>>
 
-    suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO>?
+    suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?>
 
-    suspend fun createWorkspace(name: String, isConnected: Boolean): Flow<Long>
+    suspend fun createWorkspace(myMemberId: Long, name: String, isConnected: Boolean): Flow<Long>
 
     suspend fun getLocalScreenWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
@@ -30,11 +30,13 @@ interface WorkspaceRepository {
         isConnected: Boolean
     ): Flow<Unit>
 
-    suspend fun getWorkspaceMemberMyInfo(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberDTO>?
+    suspend fun getWorkspaceMemberMyInfo(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberDTO?>
 
     suspend fun getWorkspaceMembers(workspaceId: Long): Flow<List<MemberResponseDTO>>
 
     suspend fun getWorkspacesByMember(memberId: Long): Flow<List<WorkSpaceDTO>>
+
+    suspend fun createWorkspaceMember(workspaceId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 
     suspend fun addWorkspaceMember(
         workspaceId: Long,

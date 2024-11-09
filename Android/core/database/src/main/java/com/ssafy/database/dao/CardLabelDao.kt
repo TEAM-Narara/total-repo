@@ -44,7 +44,7 @@ interface CardLabelDao {
         FROM card_label 
         WHERE id = :id
     """)
-    fun getLabelFlow(id: Long): Flow<CardLabelEntity>?
+    fun getLabelFlow(id: Long): Flow<CardLabelEntity?>
 
     // 카드의 라벨을 조회
     @Transaction
@@ -59,7 +59,8 @@ interface CardLabelDao {
             label.boardId AS label_boardId,
             label.name AS label_name,
             label.color AS label_color,
-            label.isStatus AS label_isStatus
+            label.isStatus AS label_isStatus,
+            label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
         WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE'
@@ -79,7 +80,8 @@ interface CardLabelDao {
             label.boardId AS label_boardId,
             label.name AS label_name,
             label.color AS label_color,
-            label.isStatus AS label_isStatus
+            label.isStatus AS label_isStatus,
+            label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
         WHERE card_label.cardId IN (:cardIds) AND card_label.isStatus != 'DELETE'

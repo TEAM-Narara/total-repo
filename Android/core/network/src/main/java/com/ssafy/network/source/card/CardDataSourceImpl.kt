@@ -4,6 +4,7 @@ import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.network.api.CardAPI
@@ -23,6 +24,13 @@ class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : Car
     override suspend fun updateCard(
         cardUpdateRequestDto: CardUpdateRequestDto
     ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardUpdateRequestDto.cardId, cardUpdateRequestDto) }.toFlow()
+
+    override suspend fun updateCardMember(
+        boardId: Long,
+        simpleCardMemberDto: SimpleCardMemberDto
+    ): Flow<SimpleCardMemberDto> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun setCardArchive(cardId: Long): Flow<Unit> =
         safeApiCall { cardAPI.setCardArchive(cardId) }.toFlow()

@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 fun ErrorScreen(
     modifier: Modifier = Modifier,
     errorMessage: String,
-    duration: SnackbarDuration = SnackbarDuration.Short
+    duration: SnackbarDuration = SnackbarDuration.Short,
+    afterAction: (() -> Unit)? = null
 ) {
     val scope = rememberCoroutineScope()
     val snackBarHost = remember { SnackbarHostState() }
@@ -31,6 +32,7 @@ fun ErrorScreen(
         LaunchedEffect(errorMessage) {
             scope.launch {
                 snackBarHost.showSnackbar(errorMessage, duration = duration)
+                afterAction?.invoke()
             }
         }
     }

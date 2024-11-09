@@ -6,7 +6,7 @@ import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "list")
 data class ListEntity(
-    @PrimaryKey(autoGenerate = true)  val id: Long = 0L,
+    @PrimaryKey(autoGenerate = false)  val id: Long = 0L,
     val boardId: Long = 0L,
     val name: String = "",
     val myOrder: Long = 0L,

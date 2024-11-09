@@ -11,5 +11,6 @@ data class LabelEntity(
     val name: String = "",
     val color: Long = 0L,
 
-    val isStatus: DataStatus = DataStatus.STAY
+    val isStatus: DataStatus = DataStatus.STAY,
+    val columnUpdate: Long = 0L
 )

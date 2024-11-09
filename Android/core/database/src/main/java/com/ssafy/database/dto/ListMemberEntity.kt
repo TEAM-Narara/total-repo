@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ssafy.model.with.DataStatus
 
-@Entity(tableName = "list_member")
+@Entity(tableName = "list_member", primaryKeys = ["memberId", "listId"])
 data class ListMemberEntity(
-    @PrimaryKey val id: Long = 0L,
+    val id: Long = 0L,
     val memberId: Long = 0L,
     val listId: Long = 0L,
 
@@ -17,7 +17,7 @@ data class ListMemberEntity(
 @Entity(tableName = "list_member_alarm")
 data class ListMemberAlarmEntity(
     @PrimaryKey val listId: Long = 0L,
-    val isAlert: Boolean = false,
+    val isAlert: Boolean = true,
 
     val isStatus: DataStatus = DataStatus.STAY
 )

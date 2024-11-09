@@ -1,10 +1,10 @@
 package com.ssafy.board.boardMenu
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ssafy.model.background.Cover
-import com.ssafy.model.card.HistoryData
 import com.ssafy.model.with.CoverType
 import com.ssafy.ui.safetype.coverType
 import kotlinx.serialization.Serializable
@@ -19,7 +19,8 @@ data class BoardMenu(
 
 fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
-    selectBackGroundScreen: (Cover) -> Unit
+    moveToSelectBackGroundScreen: (Cover) -> Unit,
+    moveToInviteMemberScreen: () -> Unit
 ) {
     composable<BoardMenu>(
         mapOf(typeOf<Cover?>() to coverType)
@@ -28,23 +29,20 @@ fun NavGraphBuilder.boardMenuScreen(
         val boardId = boardSearch.boardId
         val workspaceId = boardSearch.workspaceId
         val background = boardSearch.cover
+        val viewModel: BoardMenuViewModel = hiltViewModel<BoardMenuViewModel>().apply {
+            setBoardId(boardId)
+            setWorkspaceId(workspaceId)
+        }
 
         BoardMenuScreen(
-            boardId = boardId,
-            backHome = popBack,
-            workspaceId = workspaceId,
-            historyContent = List(8) {//TODO: 추후 삭제, viewmodel에서 받아오도록 함.
-                HistoryData(
-                    "rename",
-                    "손오공 renamed test(from testboard)",
-                    300
-                )
-            },
+            viewModel = viewModel,
+            popBack = popBack,
             cover = background ?: Cover(
                 type = CoverType.COLOR,
                 value = "#FFFFFF"
             ),
-            selectBackGroundScreen = selectBackGroundScreen,
+            moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
+            moveToInviteMemberScreen = moveToInviteMemberScreen,
         )
     }
 }

@@ -12,6 +12,7 @@ import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
+import com.ssafy.database.dao.LocalKeyDao
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dao.ReplyDao
@@ -35,6 +36,7 @@ import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
+import com.ssafy.database.dto.piece.LocalKeyEntity
 
 @Database(entities = [
     WorkspaceEntity::class, WorkspaceMemberEntity::class,
@@ -42,7 +44,8 @@ import com.ssafy.database.dto.WorkspaceMemberEntity
     ListEntity::class, ListMemberEntity::class, ListMemberAlarmEntity::class,
     BoardEntity::class, BoardMemberEntity::class, BoardMemberAlarmEntity::class, LabelEntity::class,
     CardEntity::class, CardLabelEntity::class, CardMemberEntity::class, CardMemberAlarmEntity::class, AttachmentEntity::class,
-    ReplyEntity::class, AlertEntity::class], version = 1)
+    ReplyEntity::class, AlertEntity::class,
+    LocalKeyEntity::class], version = 1)
 abstract class SBDatabase : RoomDatabase() {
     abstract fun AlertDao(): AlertDao
     abstract fun AttachmentDao(): AttachmentDao
@@ -59,4 +62,5 @@ abstract class SBDatabase : RoomDatabase() {
     abstract fun ReplyDao(): ReplyDao
     abstract fun WorkspaceDao(): WorkspaceDao
     abstract fun WorkspaceMemberDao(): WorkspaceMemberDao
+    abstract fun LocalKeyDao(): LocalKeyDao
 }

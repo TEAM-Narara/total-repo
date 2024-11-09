@@ -81,7 +81,7 @@ fun MemberBackgroundEntity.toDTO(): CoverDto {
 
 fun WorkspaceEntity.toDTO(): WorkSpaceDTO {
     return WorkSpaceDTO(
-        workSpaceId = this.id,
+        workspaceId = this.id,
         authority = Authority.valueOf(this.authority.name),
         name = this.name,
         isStatus = this.isStatus

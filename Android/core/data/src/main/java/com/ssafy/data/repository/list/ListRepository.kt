@@ -4,6 +4,7 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface ListRepository {
 
     suspend fun createList(
+        myMemberId: Long,
         createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
     ): Flow<Long>
@@ -36,9 +38,13 @@ interface ListRepository {
 
     suspend fun getListMembers(listId: Long): Flow<List<MemberResponseDTO>>
 
+    suspend fun createListMember(listId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
+
     suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun getListWatchStatus(id: Long): Flow<Boolean>?
+    suspend fun getListWatchStatus(id: Long): Flow<Boolean?>
+
+    suspend fun createListWatch(listId: Long, isStatus: DataStatus): Flow<Long>
 
     suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit>
 
