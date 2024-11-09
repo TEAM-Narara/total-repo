@@ -2,9 +2,11 @@ package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.WorkspaceDao
 import com.ssafy.database.dao.WorkspaceMemberDao
 import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.member.Authority
@@ -28,6 +30,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
     private val workspaceDataSource: WorkspaceDataSource,
     private val workspaceDao: WorkspaceDao,
     private val workspaceMemberDao: WorkspaceMemberDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WorkspaceRepository {
 
@@ -77,6 +80,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 flowOf(
                     workspaceDao.insertWorkspace(
                         WorkspaceEntity(
+                            id = negativeIdGenerator.getNextNegativeId(LocalTable.WORKSPACE),
                             name = name,
                             authority = Authority.ADMIN,
                             isStatus = DataStatus.CREATE

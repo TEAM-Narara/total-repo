@@ -12,6 +12,7 @@ import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
+import com.ssafy.database.dao.LocalKeyDao
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dao.ReplyDao
@@ -96,4 +97,8 @@ object DBModule {
     @Singleton
     @Provides
     fun provideWorkspaceMemberDao(appDatabase: SBDatabase): WorkspaceMemberDao = appDatabase.WorkspaceMemberDao()
+
+    @Singleton
+    @Provides
+    fun provideLocalKeyDao(appDatabase: SBDatabase): LocalKeyDao = appDatabase.LocalKeyDao()
 }

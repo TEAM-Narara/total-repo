@@ -6,7 +6,7 @@ import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "reply")
 data class ReplyEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = false) val id: Long = 0L,
     val cardId: Long = 0L,
     val memberId: Long = 0L,
     val content: String = "",

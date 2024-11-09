@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
@@ -11,6 +12,7 @@ import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.MemberResponseDTO
@@ -28,7 +30,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -45,6 +46,7 @@ class ListRepositoryImpl @Inject constructor(
     private val attachmentDao: AttachmentDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ListRepository {
 
@@ -58,6 +60,7 @@ class ListRepositoryImpl @Inject constructor(
             flowOf (
                 listDao.insertList(
                     ListEntity(
+                        id = negativeIdGenerator.getNextNegativeId(LocalTable.LIST),
                         name = createListRequestDto.listName,
                         boardId = createListRequestDto.boardId,
                         isStatus = DataStatus.CREATE

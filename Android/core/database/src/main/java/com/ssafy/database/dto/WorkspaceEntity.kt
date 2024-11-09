@@ -7,7 +7,7 @@ import com.ssafy.model.with.DataStatus
 
 @Entity(tableName = "workspace")
 data class WorkspaceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = false) val id: Long = 0L,
     val name: String = "",
     val authority: Authority = Authority.MEMBER,
 //    val offset: Long = 0L,
