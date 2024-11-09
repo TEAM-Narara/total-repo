@@ -12,7 +12,7 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.GetWorkspaceUseCase
@@ -39,8 +39,9 @@ class BoardMenuViewModel @Inject constructor(
     private val updateBoardUseCase: UpdateBoardUseCase,
     private val getBoardMembersUseCase: GetBoardMembersUseCase,
     private val getBoardWatchStatusUseCase: GetBoardWatchStatusUseCase,
-    private val toggleBoardWatchUseCase: ToggleBoardWatchUseCase
-) : BaseViewModel() {
+    private val toggleBoardWatchUseCase: ToggleBoardWatchUseCase,
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
 
     private val _workspaceId = MutableStateFlow<Long?>(null)
     private val _boardId = MutableStateFlow<Long?>(null)
@@ -71,7 +72,6 @@ class BoardMenuViewModel @Inject constructor(
 
     fun changeBoardName(name: String) = withIO {
         val boardState = boardState.value ?: return@withIO
-        val isConnected = NetworkState.isConnected.value
         val boardId = boardState.boardDto.id
         val cover = boardState.boardDto.cover
         val visibility = boardState.boardDto.visibility
@@ -80,29 +80,32 @@ class BoardMenuViewModel @Inject constructor(
             cover = cover,
             visibility = visibility
         )
-        updateBoardUseCase(boardId, boardRequestDto, isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            updateBoardUseCase(boardId, boardRequestDto, isConnected).withUiState().collect()
+        }
     }
 
     fun changeWorkspaceName(name: String) = withIO {
         val workspaceId = _workspaceId.value ?: return@withIO
-        val isConnected = NetworkState.isConnected.value
-        updateWorkspaceUseCase(workspaceId, name, isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            updateWorkspaceUseCase(workspaceId, name, isConnected).withUiState().collect()
+        }
     }
 
 
     fun changeWatch(watchStatus: Boolean) = withIO {
         val boardState = boardState.value ?: return@withIO
-        val isConnected = NetworkState.isConnected.value
         val boardId = boardState.boardDto.id
         val isWatch = boardState.watchStatus
 
         if (isWatch == watchStatus) return@withIO
-        toggleBoardWatchUseCase(boardId, isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            toggleBoardWatchUseCase(boardId, isConnected).withUiState().collect()
+        }
     }
 
     fun changeVisibility(visibility: Visibility) = withIO {
         val boardState = boardState.value ?: return@withIO
-        val isConnected = NetworkState.isConnected.value
         val boardId = boardState.boardDto.id
         val name = boardState.boardDto.name
         val cover = boardState.boardDto.cover
@@ -111,7 +114,9 @@ class BoardMenuViewModel @Inject constructor(
             cover = cover,
             visibility = visibility
         )
-        updateBoardUseCase(boardId, boardRequestDto, isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            updateBoardUseCase(boardId, boardRequestDto, isConnected).withUiState().collect()
+        }
     }
 
 

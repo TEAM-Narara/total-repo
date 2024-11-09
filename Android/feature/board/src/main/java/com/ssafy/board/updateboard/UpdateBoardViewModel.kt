@@ -2,8 +2,10 @@ package com.ssafy.board.updateboard
 
 import androidx.lifecycle.viewModelScope
 import com.ssafy.board.updateboard.data.BoardData
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +16,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class UpdateBoardViewModel @Inject constructor() : BaseViewModel() {
+class UpdateBoardViewModel @Inject constructor(
+    getSocketStateUseCase: GetSocketStateUseCase
+) : BaseViewModel(getSocketStateUseCase) {
     private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
 

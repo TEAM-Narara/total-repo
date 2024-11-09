@@ -14,6 +14,7 @@ import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCard
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +38,8 @@ class BoardViewModel @Inject constructor(
     private val createListUseCase: CreateListUseCase,
     private val updatedListUseCase: UpdateListUseCase,
     private val setListArchiveUseCase: SetListArchiveUseCase,
-) : BaseViewModel() {
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
     private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
 

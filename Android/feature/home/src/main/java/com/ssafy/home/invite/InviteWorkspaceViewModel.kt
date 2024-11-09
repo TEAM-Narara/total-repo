@@ -8,7 +8,7 @@ import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
 import com.ssafy.model.member.Authority
-import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.AddWorkspaceMemberUseCase
 import com.ssafy.workspace.ChangeWorkspaceMemberUseCase
@@ -33,8 +33,9 @@ class InviteWorkspaceViewModel @Inject constructor(
     private val getWorkspaceUseCase: GetDetailWorkspaceUseCase,
     private val searchMemberUseCase: SearchMembersUseCase,
     private val addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
-    private val changeWorkspaceMemberUseCase: ChangeWorkspaceMemberUseCase
-) : BaseViewModel() {
+    private val changeWorkspaceMemberUseCase: ChangeWorkspaceMemberUseCase,
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
 
     private val _workspace = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
     val workspace = _workspace.asStateFlow()
@@ -61,8 +62,9 @@ class InviteWorkspaceViewModel @Inject constructor(
 
     fun changeAuth(memberId: Long, auth: Authority) = viewModelScope.launch(Dispatchers.IO) {
         val workspaceId = workspace.value.workspaceId
-        val isConnected = NetworkState.isConnected.value
-        changeWorkspaceMemberUseCase(workspaceId, memberId, auth, isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            changeWorkspaceMemberUseCase(workspaceId, memberId, auth, isConnected).withUiState().collect()
+        }
     }
 
     fun inviteMember(memberId: Long) = viewModelScope.launch(Dispatchers.IO) {

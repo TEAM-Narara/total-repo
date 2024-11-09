@@ -7,6 +7,7 @@ import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.workspace.WorkSpaceDTO
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.networkstate.NetworkState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.GetWorkspaceListUseCase
@@ -20,8 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateBoardViewModel @Inject constructor(
     private val getWorkspaceListUseCase: GetWorkspaceListUseCase,
-    private val createBoardUseCase: CreateBoardUseCase
-) : BaseViewModel() {
+    private val createBoardUseCase: CreateBoardUseCase,
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
 
     var boardData = BoardDTO(
         id = 0,
@@ -43,8 +45,9 @@ class CreateBoardViewModel @Inject constructor(
     }
 
     fun getWorkspaceList() = viewModelScope.launch(Dispatchers.IO) {
-        val isConnected = NetworkState.isConnected.value
-        getWorkspaceListUseCase(isConnected).safeCollect { _workspace.emit(it) }
+        withSocketState { isConnected ->
+            getWorkspaceListUseCase(isConnected).safeCollect { _workspace.emit(it) }
+        }
     }
 
     fun changeBoardName(name: String) {

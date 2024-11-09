@@ -45,6 +45,7 @@ class GetHomeInfoUseCase @Inject constructor(
                 } ?: flowOf(SelectedWorkSpace())
 
             selectedWorkspaceFlow.map { selectedWorkspace ->
+                workspaceStomp.connect(selectedWorkspace.workspaceId)
                 HomeData(
                     user = user,
                     workspaceList = workspaceList,

@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":domain:list"))
     implementation(project(":domain:card"))
     implementation(project(":domain:workspace"))
+    implementation(project(":domain:socket"))
 
     // Coil
     implementation(libs.coil.compose)

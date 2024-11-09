@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.viewModelScope
 import com.ssafy.card.label.data.LabelData
 import com.ssafy.designsystem.values.backgroundColorList
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +21,9 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class LabelViewModel @Inject constructor() : BaseViewModel() {
+class LabelViewModel @Inject constructor(
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(boardId: Long) = _cardId.update { boardId }
 
