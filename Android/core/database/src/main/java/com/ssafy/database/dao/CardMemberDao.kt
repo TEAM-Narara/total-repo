@@ -167,4 +167,8 @@ interface CardMemberDao {
     // 알람 상태 업데이트
     @Update
     suspend fun updateCardMemberAlarm(cardMemberAlarm: CardMemberAlarmEntity)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM card_member WHERE id = :cardMemberId")
+    suspend fun deleteCardMemberById(cardMemberId: Long)
 }
