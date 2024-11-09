@@ -78,7 +78,6 @@ fun MemberBackgroundEntity.toDTO(): CoverDto {
 }
 
 // Workspace
-
 fun WorkspaceEntity.toDTO(): WorkSpaceDTO {
     return WorkSpaceDTO(
         workspaceId = this.id,
@@ -95,6 +94,45 @@ fun WorkspaceInBoard.toDTO(): WorkspaceInBoardDTO {
         authority = this.workspace.authority,
         isStatus = this.workspace.isStatus,
         boards = this.board.map { it.toDTO() }
+    )
+}
+
+// WORKSPACE MEMBER
+fun WorkspaceMemberEntity.toDTO(): WorkspaceMemberDTO {
+    return WorkspaceMemberDTO(
+        id = this.id,
+        memberId = this.memberId,
+        workspaceId = this.workspaceId,
+        authority = this.authority,
+        isStatus = this.isStatus
+    )
+}
+
+fun WorkspaceMemberWithMemberInfo.toDTO(): MemberResponseDTO {
+    return MemberResponseDTO(
+        memberId = this.member.id,
+        authority = this.workspaceMember.authority,
+        memberEmail = this.member.email,
+        memberNickname = this.member.nickname,
+        memberProfileImgUrl = this.member.profileImageUrl,
+        isStatus = this.workspaceMember.isStatus,
+        isRepresentative = false,
+        componentId = this.workspaceMember.workspaceId
+    )
+}
+
+// BOARD
+fun BoardEntity.toDto(): BoardDTO {
+    return BoardDTO(
+        id = this.id,
+        workspaceId = this.workspaceId,
+        name = this.name,
+        cover = Cover(
+            type = CoverType.valueOf(coverType ?: "COLOR"),
+            value = coverValue ?: "0xff000000"
+        ),
+        isClosed = this.isClosed,
+        visibility = Visibility.valueOf(visibility)
     )
 }
 
@@ -116,55 +154,7 @@ fun BoardInList.toDTO(): BoardInListDTO {
     )
 }
 
-fun ListInCards.toDTO(): ListInCardsDTO {
-    return ListInCardsDTO(
-        id = this.list.id,
-        boardId = this.list.boardId,
-        name = this.list.name,
-        myOrder = this.list.myOrder,
-        isArchived = this.list.isArchived,
-        isStatus = this.list.isStatus,
-        columnUpdate = this.list.columnUpdate,
-        cards = this.cards.map { it.toDTO() },
-        listMembers = this.listMembers.map { it.toDTO() },
-        listMemberAlarm = this.listMemberAlarm?.isAlert ?: false
-    )
-}
-
-fun CardAllInfo.toDTO(): CardAllInfoDTO {
-    return CardAllInfoDTO(
-        id = this.card.id,
-        listId = this.card.listId,
-        name = this.card.name,
-        description = this.card.description,
-        startAt = this.card.startAt,
-        endAt = this.card.endAt,
-        cover = Cover(
-            type = CoverType.valueOf(card.coverType ?: "COLOR"),
-            value = card.coverValue ?: "0xff000000"
-        ),
-        myOrder = this.card.myOrder,
-        isArchived = this.card.isArchived,
-        isStatus = this.card.isStatus,
-        columnUpdate = this.card.columnUpdate,
-        cardLabels = this.cardLabels.map { it.toDTO() },
-        cardMembers = this.cardMembers.map { it.toDTO() },
-        cardMemberAlarm = this.cardMemberAlarm?.isAlert ?: false,
-        cardAttachment = this.cardAttachment.map { it.toDTO() },
-        cardReplies = this.cardReplies.map { it.toDTO() }
-    )
-}
-
-fun LabelEntity.toDTO(): LabelDTO {
-    return LabelDTO(
-        id = this.id,
-        boardId = this.boardId,
-        name = this.name,
-        color = this.color,
-        isStatus = this.isStatus
-    )
-}
-
+// BOARD MEMBER
 fun BoardMemberEntity.toDTO(): BoardMemberDTO {
     return BoardMemberDTO(
         id = this.id,
@@ -172,118 +162,6 @@ fun BoardMemberEntity.toDTO(): BoardMemberDTO {
         memberId = this.memberId,
         authority = this.authority,
         isStatus = this.isStatus
-    )
-}
-
-fun ListMemberEntity.toDTO(): ListMemberDTO {
-    return ListMemberDTO(
-        id = this.id,
-        memberId = this.memberId,
-        listId = this.listId,
-        isStatus = this.isStatus
-    )
-}
-
-fun WorkspaceMemberEntity.toDTO(): WorkspaceMemberDTO {
-    return WorkspaceMemberDTO(
-        id = this.id,
-        memberId = this.memberId,
-        workspaceId = this.workspaceId,
-        authority = this.authority,
-        isStatus = this.isStatus
-    )
-}
-
-fun ListMemberAlarmEntity.toDTO(): ListMemberAlarmDTO {
-    return ListMemberAlarmDTO(
-        isAlert = this.isAlert,
-        listId = this.listId,
-        isStatus = this.isStatus
-    )
-}
-
-fun BoardMemberAlarmEntity.toDTO(): BoardMemberAlarmDTO {
-    return BoardMemberAlarmDTO(
-        isAlert = this.isAlert,
-        boardId = this.boardId,
-        isStatus = this.isStatus
-    )
-}
-
-fun CardMemberAlarmEntity.toDTO(): CardMemberAlarmDTO {
-    return CardMemberAlarmDTO(
-        isAlert = this.isAlert,
-        cardId = this.cardId,
-        isStatus = this.isStatus
-    )
-}
-
-fun CardLabelEntity.toDTO(): CardLabelDTO {
-    return CardLabelDTO(
-        id = this.id,
-        labelId = this.labelId,
-        cardId = this.cardId,
-        isActivated = this.isActivated,
-        isStatus = this.isStatus
-    )
-}
-
-fun CardMemberEntity.toDTO(): CardMemberDTO {
-    return CardMemberDTO(
-        id = this.id,
-        memberId = this.memberId,
-        cardId = this.cardId,
-        isRepresentative = this.isRepresentative,
-        isStatus = this.isStatus
-    )
-}
-
-fun AttachmentEntity.toDTO(): AttachmentDTO {
-    return AttachmentDTO(
-        id = this.id,
-        cardId = this.cardId,
-        url = this.url,
-        type = this.type,
-        isCover = this.isCover,
-        isStatus = this.isStatus
-    )
-}
-
-fun ReplyEntity.toDTO(): ReplyDTO {
-    return ReplyDTO(
-        id = this.id,
-        cardId = this.cardId,
-        memberId = this.memberId,
-        content = this.content,
-        createAt = this.createAt,
-        updateAt = this.updateAt,
-        isStatus = this.isStatus
-    )
-}
-
-fun WorkspaceMemberWithMemberInfo.toDTO(): MemberResponseDTO {
-    return MemberResponseDTO(
-        memberId = this.member.id,
-        authority = this.workspaceMember.authority,
-        memberEmail = this.member.email,
-        memberNickname = this.member.nickname,
-        memberProfileImgUrl = this.member.profileImageUrl,
-        isStatus = this.workspaceMember.isStatus,
-        isRepresentative = false,
-        componentId = this.workspaceMember.workspaceId
-    )
-}
-
-fun ListMemberWithMemberInfo.toDTO(): MemberResponseDTO {
-    return MemberResponseDTO(
-        memberId = this.member.id,
-        memberEmail = this.member.email,
-        memberNickname = this.member.nickname,
-        memberProfileImgUrl = this.member.profileImageUrl,
-        isStatus = this.listMember.isStatus,
-        authority = Authority.MEMBER,
-        isRepresentative = false,
-        componentId = this.listMember.listId
     )
 }
 
@@ -300,35 +178,25 @@ fun BoardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
     )
 }
 
-fun CardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
-    return MemberResponseDTO(
-        memberId = this.member.id,
-        memberEmail = this.member.email,
-        memberNickname = this.member.nickname,
-        memberProfileImgUrl = this.member.profileImageUrl,
-        componentId = this.cardMember.cardId,
-        authority = Authority.MEMBER,
-        isRepresentative = this.cardMember.isRepresentative,
-        isStatus = this.cardMember.isStatus
+fun BoardMemberAlarmEntity.toDTO(): BoardMemberAlarmDTO {
+    return BoardMemberAlarmDTO(
+        isAlert = this.isAlert,
+        boardId = this.boardId,
+        isStatus = this.isStatus
     )
 }
 
-// Board
-fun BoardEntity.toDto(): BoardDTO {
-    return BoardDTO(
+// LABEL
+fun LabelEntity.toDTO(): LabelDTO {
+    return LabelDTO(
         id = this.id,
-        workspaceId = this.workspaceId,
+        boardId = this.boardId,
         name = this.name,
-        cover = Cover(
-            type = CoverType.valueOf(coverType ?: "COLOR"),
-            value = coverValue ?: "0xff000000"
-        ),
-        isClosed = this.isClosed,
-        visibility = Visibility.valueOf(visibility)
+        color = this.color,
+        isStatus = this.isStatus
     )
 }
 
-// List
 fun ListEntity.toDto(): ListResponseDto {
     return ListResponseDto(
         boardId = this.boardId,
@@ -340,19 +208,65 @@ fun ListEntity.toDto(): ListResponseDto {
     )
 }
 
-fun ListResponseDto.toEntity(): ListEntity {
-    return ListEntity(
-        boardId = this.boardId,
-        isStatus = this.isStatus,
+fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList(), isWatch: Boolean): ListInCard {
+    return ListInCard(
+        id = this.id,
         name = this.name,
-        isArchived = this.isArchived,
         myOrder = this.myOrder,
-        id = this.listId
+        isArchived = this.isArchived,
+        cards = cards,
+        isStatus = this.isStatus,
+        isWatch = isWatch
     )
 }
 
-// Card
+fun ListInCards.toDTO(): ListInCardsDTO {
+    return ListInCardsDTO(
+        id = this.list.id,
+        boardId = this.list.boardId,
+        name = this.list.name,
+        myOrder = this.list.myOrder,
+        isArchived = this.list.isArchived,
+        isStatus = this.list.isStatus,
+        columnUpdate = this.list.columnUpdate,
+        cards = this.cards.map { it.toDTO() },
+        listMembers = this.listMembers.map { it.toDTO() },
+        listMemberAlarm = this.listMemberAlarm?.isAlert ?: false
+    )
+}
 
+// LIST MEMBER
+fun ListMemberEntity.toDTO(): ListMemberDTO {
+    return ListMemberDTO(
+        id = this.id,
+        memberId = this.memberId,
+        listId = this.listId,
+        isStatus = this.isStatus
+    )
+}
+
+fun ListMemberWithMemberInfo.toDTO(): MemberResponseDTO {
+    return MemberResponseDTO(
+        memberId = this.member.id,
+        memberEmail = this.member.email,
+        memberNickname = this.member.nickname,
+        memberProfileImgUrl = this.member.profileImageUrl,
+        isStatus = this.listMember.isStatus,
+        authority = Authority.MEMBER,
+        isRepresentative = false,
+        componentId = this.listMember.listId
+    )
+}
+
+fun ListMemberAlarmEntity.toDTO(): ListMemberAlarmDTO {
+    return ListMemberAlarmDTO(
+        isAlert = this.isAlert,
+        listId = this.listId,
+        isStatus = this.isStatus
+    )
+}
+
+// CARD
 fun CardEntity.toDto(): CardResponseDto {
     return CardResponseDto(
         id = this.id,
@@ -369,69 +283,6 @@ fun CardEntity.toDto(): CardResponseDto {
         isArchived = this.isArchived,
         isStatus = this.isStatus,
         columnUpdate = this.columnUpdate
-    )
-}
-
-fun CardLabelWithLabelInfo.toDto(): CardLabelWithLabelDTO {
-    return CardLabelWithLabelDTO(
-        cardLabelId = this.cardLabel.id,
-        labelId = this.cardLabel.labelId,
-        cardId = this.cardLabel.cardId,
-        isActivated = this.cardLabel.isActivated,
-        cardLabelStatus = this.cardLabel.isStatus,
-
-        labelBoardId = this.label.boardId,
-        labelName = this.label.name,
-        labelColor = this.label.color,
-        labelStatus = this.label.isStatus
-    )
-}
-
-fun AttachmentEntity.toDto(): AttachmentDTO {
-    return AttachmentDTO(
-        id = this.id,
-        cardId = this.cardId,
-        url = this.url,
-        type = this.type,
-        isCover = this.isCover,
-        isStatus = this.isStatus
-    )
-}
-
-// Reply
-fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
-    val replyEntity = ReplyEntity(
-        id = this.id,
-        cardId = this.cardId,
-        memberId = this.memberId,
-        content = this.content,
-        createAt = this.createAt,
-        updateAt = this.updateAt,
-        isStatus = this.isStatus
-    )
-
-    val memberEntity = MemberEntity(
-        id = this.memberId,
-        email = this.memberEmail,
-        nickname = this.memberNickname,
-        profileImageUrl = this.memberProfileImgUrl
-    )
-
-    return ReplyWithMemberInfo(
-        reply = replyEntity,
-        member = memberEntity
-    )
-}
-
-fun ListEntity.toDto(cards: List<CardThumbnail> = emptyList(), isWatch: Boolean): ListInCard {
-    return ListInCard(
-        id = this.id,
-        name = this.name,
-        myOrder = this.myOrder,
-        isArchived = this.isArchived,
-        cards = cards,
-        isStatus = this.isStatus,
-        isWatch = isWatch
     )
 }
 
@@ -459,5 +310,137 @@ fun CardEntity.toDTO(
         isStatus = this.isStatus,
         isAttachment = isAttachment,
         isWatch = isWatch
+    )
+}
+
+fun CardAllInfo.toDTO(): CardAllInfoDTO {
+    return CardAllInfoDTO(
+        id = this.card.id,
+        listId = this.card.listId,
+        name = this.card.name,
+        description = this.card.description,
+        startAt = this.card.startAt,
+        endAt = this.card.endAt,
+        cover = Cover(
+            type = CoverType.valueOf(card.coverType ?: "COLOR"),
+            value = card.coverValue ?: "0xff000000"
+        ),
+        myOrder = this.card.myOrder,
+        isArchived = this.card.isArchived,
+        isStatus = this.card.isStatus,
+        columnUpdate = this.card.columnUpdate,
+        cardLabels = this.cardLabels.map { it.toDTO() },
+        cardMembers = this.cardMembers.map { it.toDTO() },
+        cardMemberAlarm = this.cardMemberAlarm?.isAlert ?: false,
+        cardAttachment = this.cardAttachment.map { it.toDTO() },
+        cardReplies = this.cardReplies.map { it.toDTO() }
+    )
+}
+
+// CARD MEMBER
+fun CardMemberEntity.toDTO(): CardMemberDTO {
+    return CardMemberDTO(
+        id = this.id,
+        memberId = this.memberId,
+        cardId = this.cardId,
+        isRepresentative = this.isRepresentative,
+        isStatus = this.isStatus
+    )
+}
+
+fun CardMemberWithMemberInfo.toDTO(): MemberResponseDTO {
+    return MemberResponseDTO(
+        memberId = this.member.id,
+        memberEmail = this.member.email,
+        memberNickname = this.member.nickname,
+        memberProfileImgUrl = this.member.profileImageUrl,
+        componentId = this.cardMember.cardId,
+        authority = Authority.MEMBER,
+        isRepresentative = this.cardMember.isRepresentative,
+        isStatus = this.cardMember.isStatus
+    )
+}
+
+fun CardMemberAlarmEntity.toDTO(): CardMemberAlarmDTO {
+    return CardMemberAlarmDTO(
+        isAlert = this.isAlert,
+        cardId = this.cardId,
+        isStatus = this.isStatus
+    )
+}
+
+// CARD LABEL
+
+fun CardLabelEntity.toDTO(): CardLabelDTO {
+    return CardLabelDTO(
+        id = this.id,
+        labelId = this.labelId,
+        cardId = this.cardId,
+        isActivated = this.isActivated,
+        isStatus = this.isStatus
+    )
+}
+
+fun CardLabelWithLabelInfo.toDto(): CardLabelWithLabelDTO {
+    return CardLabelWithLabelDTO(
+        cardLabelId = this.cardLabel.id,
+        labelId = this.cardLabel.labelId,
+        cardId = this.cardLabel.cardId,
+        isActivated = this.cardLabel.isActivated,
+        cardLabelStatus = this.cardLabel.isStatus,
+
+        labelBoardId = this.label.boardId,
+        labelName = this.label.name,
+        labelColor = this.label.color,
+        labelStatus = this.label.isStatus
+    )
+}
+
+// Attachment
+fun AttachmentEntity.toDTO(): AttachmentDTO {
+    return AttachmentDTO(
+        id = this.id,
+        cardId = this.cardId,
+        url = this.url,
+        type = this.type,
+        isCover = this.isCover,
+        isStatus = this.isStatus
+    )
+}
+
+// Reply
+fun ReplyEntity.toDTO(): ReplyDTO {
+    return ReplyDTO(
+        id = this.id,
+        cardId = this.cardId,
+        memberId = this.memberId,
+        content = this.content,
+        createAt = this.createAt,
+        updateAt = this.updateAt,
+        isStatus = this.isStatus
+    )
+}
+
+fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
+    val replyEntity = ReplyEntity(
+        id = this.id,
+        cardId = this.cardId,
+        memberId = this.memberId,
+        content = this.content,
+        createAt = this.createAt,
+        updateAt = this.updateAt,
+        isStatus = this.isStatus
+    )
+
+    val memberEntity = MemberEntity(
+        id = this.memberId,
+        email = this.memberEmail,
+        nickname = this.memberNickname,
+        profileImageUrl = this.memberProfileImgUrl
+    )
+
+    return ReplyWithMemberInfo(
+        reply = replyEntity,
+        member = memberEntity
     )
 }
