@@ -109,4 +109,9 @@ public class GlobalExceptionAdvice {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()) + "\n 혹시, dto를 보새실때, 대소문자를 잘못하시진 않으셨는지 확인해보세요", HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<?> handleTokenException(TokenException ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, "유효하지 않은 JWT 토큰 때문에 예외가 발생했습니다. \n" + ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
 }
