@@ -139,11 +139,11 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Member member, Long boardId) {
         Board board = getBoard(boardId);
         board.deleted();
-        //TODO Websocket board 삭제
+
 
         //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset();
-        workspaceOffsetService.saveDeleteBoardDiff(board);
+        workspaceOffsetService.saveDeleteBoardDiff(board); // Websocket board 삭제
 
         // Board 삭제 로그 기록
         DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(), board.getWorkSpace().getName());
@@ -206,9 +206,8 @@ public class BoardServiceImpl implements BoardService {
     public void changeArchiveStatus(Member member, Long boardId) {
         Board board = getBoard(boardId);
         board.changeArchiveStatus();
-        //TODO Websocket 보드 아카이브 상태 변경
 
-        workspaceOffsetService.saveEditBoardArchiveDiff(board);
+        workspaceOffsetService.saveEditBoardArchiveDiff(board);  //Websocket 보드 아카이브 상태 변경
 
         // 아카이브 상태 변경 로그 기록
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());

@@ -188,8 +188,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, deleteMember);
 
         boardMember.deleted();
-        boardOffsetService.saveDeleteBoardMemberDiff(boardMember);
-        //TODO Websocket 보드멤버 삭제
+        boardOffsetService.saveDeleteBoardMemberDiff(boardMember); // Websocket 보드멤버 삭제
 
         // 멤버 삭제 로그 기록
         DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
