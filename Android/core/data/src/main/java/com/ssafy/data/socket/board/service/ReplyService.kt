@@ -7,6 +7,7 @@ import com.ssafy.data.socket.board.model.reply.DeleteReplyRequestDto
 import com.ssafy.data.socket.board.model.reply.EditReplyRequestDto
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ReplyEntity
+import com.ssafy.model.with.DataStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,7 +36,8 @@ class ReplyService @Inject constructor(
         replyDao.updateReply(
             before.copy(
                 content = dto.content,
-                updateAt = dto.updatedAt
+                updateAt = dto.updatedAt,
+                isStatus = DataStatus.STAY,
             )
         )
     }

@@ -2,14 +2,19 @@ package com.ssafy.data.socket.board.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ssafy.data.socket.board.model.board.AddBoardLabelRequestDto
 import com.ssafy.data.socket.board.model.board.AddBoardMemberRequestDto
+import com.ssafy.data.socket.board.model.board.DeleteBoardLabelRequestDto
 import com.ssafy.data.socket.board.model.board.DeleteBoardMemberRequestDto
+import com.ssafy.data.socket.board.model.board.EditBoardLabelRequestDto
 import com.ssafy.data.socket.board.model.board.EditBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.board.EditBoardWatchRequestDto
 import com.ssafy.database.dao.BoardMemberDao
+import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.MemberEntity
 import com.ssafy.model.member.Authority
 import com.ssafy.model.with.DataStatus
@@ -20,6 +25,7 @@ import javax.inject.Singleton
 class BoardService @Inject constructor(
     private val memberDao: MemberDao,
     private val boardMemberDao: BoardMemberDao,
+    private val labelDao: LabelDao,
     private val gson: Gson
 ) {
     suspend fun addBoardMember(data: JsonObject) {
@@ -66,7 +72,36 @@ class BoardService @Inject constructor(
             BoardMemberAlarmEntity(
                 boardId = dto.boardId,
                 isAlert = dto.isAlert,
+                isStatus = DataStatus.STAY,
             )
         )
+    }
+
+    suspend fun addBoardLabel(data: JsonObject) {
+        val dto = gson.fromJson(data, AddBoardLabelRequestDto::class.java)
+        labelDao.insertLabel(
+            LabelEntity(
+                id = dto.labelId,
+                boardId = dto.boardId,
+                name = dto.name,
+                color = dto.color
+            )
+        )
+    }
+
+    suspend fun editBoardLabel(data: JsonObject) {
+        val dto = gson.fromJson(data, EditBoardLabelRequestDto::class.java)
+        val before = labelDao.getLabel(dto.labelId) ?: throw Exception("존재하지 않는 라벨입니다.")
+        labelDao.updateLabel(
+            before.copy(
+                name = dto.name,
+                color = dto.color,
+            )
+        )
+    }
+
+    suspend fun deleteBoardLabel(data: JsonObject) {
+        val dto = gson.fromJson(data, DeleteBoardLabelRequestDto::class.java)
+        labelDao.deleteLabelByLabelId(dto.labelId)
     }
 }
