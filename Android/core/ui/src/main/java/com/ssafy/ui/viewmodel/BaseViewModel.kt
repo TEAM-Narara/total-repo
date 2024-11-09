@@ -3,6 +3,7 @@ package com.ssafy.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.model.socket.ConnectionState
+import com.ssafy.socket.ConnectSocketUseCase
 import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.uistate.UiState
 import kotlinx.coroutines.Dispatchers
@@ -33,17 +34,21 @@ open class BaseViewModel : ViewModel() {
     @Inject
     lateinit var getSocketStateUseCase: GetSocketStateUseCase
 
+    @Inject
+    lateinit var connectSocketUseCase: ConnectSocketUseCase
+
     val socketState by lazy {
+        viewModelScope.launch { connectSocketUseCase() }
         getSocketStateUseCase().filterNotNull().flatMapLatest {
             when (it) {
-                ConnectionState.Connecting -> _uiState.update { UiState.Loading }
+                ConnectionState.Disconnected, ConnectionState.Connecting -> _uiState.update { UiState.Loading }
                 else -> _uiState.update { UiState.Success }
             }
             flow { emit(it) }
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = null,
+            initialValue = ConnectionState.Disconnected,
         )
     }
 
@@ -83,7 +88,9 @@ open class BaseViewModel : ViewModel() {
     }
 
     suspend fun withSocketState(block: suspend (isConnected: Boolean) -> Unit) {
-        socketState.filter { it != ConnectionState.Connecting }.take(1).collect {
+        socketState.filter {
+            it != ConnectionState.Disconnected && it != ConnectionState.Connecting
+        }.take(1).collect {
             block(it == ConnectionState.Connected)
         }
     }

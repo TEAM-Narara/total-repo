@@ -37,13 +37,17 @@ class BaseStompManager @Inject constructor(
                     stompClientManager.send(SOCKET_ID, ACK_URL, ackMessage)
                 }.collect(::emit)
 
-                ConnectionState.Disconnected -> stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
-                    Log.d("TAG", "subscribe: Socket is connected")
-                    // TODO : 데이터 동기화 작업 추가하기
-                }
+                ConnectionState.Disconnected -> connect()
 
                 else -> {}
             }
+        }
+    }
+
+    suspend fun connect() {
+        stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
+            Log.d("TAG", "subscribe: Socket is connected")
+            // TODO : 데이터 동기화 작업 추가하기
         }
     }
 
