@@ -2,11 +2,12 @@ package com.ssafy.data.repository.comment
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toDto
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ReplyEntity
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.ReplyCount
 import com.ssafy.database.dto.piece.toDTO
-import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.comment.CommentRequestDto
 import com.ssafy.model.comment.UpdateCommentDto
 import com.ssafy.model.with.DataStatus
@@ -15,7 +16,6 @@ import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.network.source.comment.CommentDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -26,6 +26,7 @@ import javax.inject.Singleton
 class CommentRepositoryImpl @Inject constructor(
     private val commentDataSource: CommentDataSource,
     private val replyDao: ReplyDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CommentRepository {
 
@@ -37,6 +38,7 @@ class CommentRepositoryImpl @Inject constructor(
             commentDataSource.createComment(commentRequestDto).map { 5 }
         } else {
             flowOf(replyDao.insertReply(ReplyEntity(
+                id = negativeIdGenerator.getNextNegativeId(LocalTable.REPLY),
                 content = commentRequestDto.content,
                 cardId = commentRequestDto.cardId,
                 isStatus = DataStatus.CREATE,

@@ -2,11 +2,13 @@ package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.with.CardWithListAndBoardName
@@ -25,7 +27,6 @@ import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -39,6 +40,7 @@ class CardRepositoryImpl @Inject constructor(
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
     private val attachmentDao: AttachmentDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
     override suspend fun createCard(
@@ -51,6 +53,7 @@ class CardRepositoryImpl @Inject constructor(
         } else {
             flowOf(cardDao.insertCard(
                 CardEntity(
+                    id = negativeIdGenerator.getNextNegativeId(LocalTable.CARD),
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
                     isStatus = DataStatus.CREATE)
@@ -349,7 +352,10 @@ class CardRepositoryImpl @Inject constructor(
                 cardDataSource.createAttachment(attachment).map { 5 }
             } else {
                 flowOf(attachmentDao.insertAttachment(
-                    attachment.copy(isStatus = DataStatus.CREATE).toEntity()
+                    attachment.copy(
+                        id = negativeIdGenerator.getNextNegativeId(LocalTable.ATTACHMENT),
+                        isStatus = DataStatus.CREATE
+                    ).toEntity()
                 ))
             }
         }

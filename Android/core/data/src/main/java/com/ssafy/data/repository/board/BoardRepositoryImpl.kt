@@ -2,9 +2,11 @@ package com.ssafy.data.repository.board
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
+import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.BoardDTO
@@ -32,6 +34,7 @@ class BoardRepositoryImpl @Inject constructor(
     private val boardDao: BoardDao,
     private val boardMemberDao: BoardMemberDao,
     private val labelDao: LabelDao,
+    private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
@@ -41,7 +44,10 @@ class BoardRepositoryImpl @Inject constructor(
                 boardDataSource.createBoard(boardDTO).map { it.id }
             } else {
                 flowOf(boardDao.insertBoard(
-                    boardDTO.copy(isStatus = DataStatus.CREATE).toEntity()
+                    boardDTO.copy(
+                        id = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD),
+                        isStatus = DataStatus.CREATE
+                    ).toEntity()
                 ))
             }
         }
