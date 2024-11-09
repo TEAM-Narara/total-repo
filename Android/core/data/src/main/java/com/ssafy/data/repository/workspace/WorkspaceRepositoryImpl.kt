@@ -44,7 +44,9 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 }
             }
 
-            getLocalScreenWorkspaceList()
+            getLocalScreenWorkspaceList().map { workspaceList ->
+                workspaceList.filter { it.isStatus != DataStatus.DELETE }
+            }
         }
 
     override suspend fun getWorkspace(workspaceId: Long): Flow<WorkSpaceDTO?> =
@@ -109,7 +111,9 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
             if (workspace != null) {
                 if (isConnected) {
-                    workspaceDataSource.deleteWorkspace(workspaceId)
+                    workspaceDataSource.deleteWorkspace(workspaceId).map {
+                        workspaceDao.updateWorkspace(workspace.copy(isStatus = DataStatus.DELETE))
+                    }
                 } else {
                     when (workspace.isStatus) {
                         DataStatus.CREATE ->
