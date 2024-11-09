@@ -226,6 +226,30 @@ public class WorkspaceOffsetService {
         sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
+    public void saveEditBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(BOARD_NAME_COLUMN, board.getName());
+        data.put(COVER_TYPE_COLUMN, board.getCover().get("type"));
+        data.put(COVER_VALUE_COLUMN, board.getCover().get("value"));
+        data.put(IS_CLOSED_COLUMN, board.getIsArchived());
+        data.put(VISIBILITY_COLUMN, board.getVisibility().name());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
     private <T> void sendMessageToKafka(Long workspaceId, T object) {
         String topic = "workspace-" + workspaceId;
 

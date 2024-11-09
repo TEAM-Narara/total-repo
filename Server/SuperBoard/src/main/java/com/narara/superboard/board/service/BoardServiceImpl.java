@@ -178,7 +178,8 @@ public class BoardServiceImpl implements BoardService {
         } else {
             throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
         }
-        //TODO Websocket board 업데이트
+
+        workspaceOffsetService.saveEditBoardDiff(board); //보드 수정 웹소켓 response
 
         // Board 업데이트 로그 기록
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(), updatedBoard.getWorkSpace().getName());
