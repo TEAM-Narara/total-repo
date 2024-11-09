@@ -3,7 +3,6 @@ package com.ssafy.board.member
 import androidx.lifecycle.viewModelScope
 import com.ssafy.board.member.data.BoardMemberData
 import com.ssafy.board.member.data.SearchMemberData
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,9 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class InviteMemberViewModel @Inject constructor(
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+class InviteMemberViewModel @Inject constructor() : BaseViewModel() {
     private val _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
 

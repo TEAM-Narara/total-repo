@@ -12,7 +12,6 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.GetWorkspaceUseCase
@@ -40,8 +39,7 @@ class BoardMenuViewModel @Inject constructor(
     private val getBoardMembersUseCase: GetBoardMembersUseCase,
     private val getBoardWatchStatusUseCase: GetBoardWatchStatusUseCase,
     private val toggleBoardWatchUseCase: ToggleBoardWatchUseCase,
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+) : BaseViewModel() {
 
     private val _workspaceId = MutableStateFlow<Long?>(null)
     private val _boardId = MutableStateFlow<Long?>(null)
