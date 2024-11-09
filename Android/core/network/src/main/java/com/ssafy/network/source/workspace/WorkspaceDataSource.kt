@@ -3,7 +3,6 @@ package com.ssafy.network.source.workspace
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.member.DetailMemberDto
 import com.ssafy.model.member.SimpleMemberDto
-import com.ssafy.model.with.DataStatus
 import com.ssafy.model.workspace.WorkSpaceDTO
 import kotlinx.coroutines.flow.Flow
 
@@ -11,7 +10,7 @@ interface WorkspaceDataSource {
 
     suspend fun getWorkspaceList(): Flow<List<WorkSpaceDTO>>
 
-    suspend fun createWorkspace(name: String): Flow<Long>
+    suspend fun createWorkspace(name: String): Flow<WorkSpaceDTO>
 
     suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit>
 
