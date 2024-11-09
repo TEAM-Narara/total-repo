@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.MemberEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -37,14 +36,14 @@ interface MemberDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMembers(members: List<MemberEntity>): List<Long>
 
-    // 서버에 존재하지 않는 로컬 데이터 삭제
-    @Query("DELETE FROM member WHERE id NOT IN (:ids)")
-    suspend fun deleteMembersNotIn(ids: List<Long>)
-
     @Update
     suspend fun updateMember(member: MemberEntity)
 
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteMember(member: MemberEntity)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM member WHERE id NOT IN (:ids)")
+    suspend fun deleteMembersNotIn(ids: List<Long>)
 }

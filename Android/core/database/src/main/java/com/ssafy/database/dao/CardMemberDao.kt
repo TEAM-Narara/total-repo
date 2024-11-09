@@ -17,36 +17,31 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CardMemberDao {
 
-    // 서버에 연산할 카드 멤버 조회
-    @Query("""
-        SELECT * 
-        FROM card_member
-        WHERE isStatus != 'STAY'
-    """)
-    suspend fun getLocalOperationCardMember(): List<CardMemberEntity>
-
-    // 서버에 연산할 카드 멤버 알람 조회
-    @Query("""
-        SELECT * 
-        FROM card_member_alarm
-        WHERE isStatus != 'STAY'
-    """)
-    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmEntity>
-
-    // 카드 멤버 알람 조회
-    @Query("""
-        SELECT * 
-        FROM card_member_alarm
-        WHERE cardId IN (:cardIds) 
-    """)
-    fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
-
     @Query("SELECT * FROM card_member WHERE cardId = :cardId AND memberId = :memberId")
     fun getCardMember(cardId: Long, memberId: Long): CardMemberEntity?
 
     // 카드 멤버 단일 조회
     @Query("SELECT * FROM card_member WHERE cardId = :cardId AND memberId = :memberId")
     fun getCardMemberFlow(cardId: Long, memberId: Long): Flow<CardMemberEntity?>
+
+    // 카드 멤버들 조회
+    @Transaction
+    @Query("""
+        SELECT 
+            card_member.id AS card_member_id,
+            card_member.memberId AS card_member_memberId,
+            card_member.cardId AS card_member_cardId,
+            card_member.isRepresentative AS card_member_isRepresentative,
+            card_member.isStatus AS card_member_isStatus,
+            member.id AS member_id,
+            member.email AS member_email,
+            member.nickname AS member_nickname,
+            member.profileImageUrl AS member_profileImageUrl
+        FROM card_member 
+        INNER JOIN member ON member.id = card_member.memberId
+        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE'
+    """)
+    fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
 
     // 카드의 담당자들 조회
     @Transaction
@@ -88,25 +83,6 @@ interface CardMemberDao {
     """)
     fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<CardMemberWithMemberInfo>>
 
-    // 카드 멤버들 조회
-    @Transaction
-    @Query("""
-        SELECT 
-            card_member.id AS card_member_id,
-            card_member.memberId AS card_member_memberId,
-            card_member.cardId AS card_member_cardId,
-            card_member.isRepresentative AS card_member_isRepresentative,
-            card_member.isStatus AS card_member_isStatus,
-            member.id AS member_id,
-            member.email AS member_email,
-            member.nickname AS member_nickname,
-            member.profileImageUrl AS member_profileImageUrl
-        FROM card_member 
-        INNER JOIN member ON member.id = card_member.memberId
-        WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE'
-    """)
-    fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
-
     @Transaction
     @Query("""
         SELECT 
@@ -136,6 +112,14 @@ interface CardMemberDao {
         cardId: Long
     ): Flow<List<MemberWithRepresentative>>
 
+    // 서버에 연산할 카드 멤버 조회
+    @Query("""
+        SELECT * 
+        FROM card_member
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getLocalOperationCardMember(): List<CardMemberEntity>
+
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCardMember(cardMember: CardMemberEntity): Long
@@ -152,6 +136,7 @@ interface CardMemberDao {
     @Query("DELETE FROM card_member WHERE id NOT IN (:ids)")
     suspend fun deleteCardMembersNotIn(ids: List<Long>)
 
+
     // 카드 멤버 알람 단일 조회
     @Query("SELECT * FROM card_member_alarm WHERE cardId = :cardId")
     fun getCardMemberAlarm(cardId: Long): CardMemberAlarmEntity?
@@ -159,6 +144,22 @@ interface CardMemberDao {
     // 카드 멤버 알람 단일 조회
     @Query("SELECT * FROM card_member_alarm WHERE cardId = :cardId")
     fun getCardMemberAlarmFlow(cardId: Long): Flow<CardMemberAlarmEntity?>
+
+    // 카드 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM card_member_alarm
+        WHERE cardId IN (:cardIds) 
+    """)
+    fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
+
+    // 서버에 연산할 카드 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM card_member_alarm
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmEntity>
 
     // 카드 알람 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)

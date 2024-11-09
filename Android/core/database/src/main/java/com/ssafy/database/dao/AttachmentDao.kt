@@ -14,24 +14,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AttachmentDao {
 
-    // 로컬에서 생성한 오프라인 첨부파일 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM attachment
-        WHERE isStatus == 'CREATE'
-    """)
-    suspend fun getLocalCreateAttachments(): List<AttachmentEntity>
-
-    // 서버에 연산할 첨부파일 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM attachment
-        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
-    """)
-    suspend fun getLocalOperationAttachments(): List<AttachmentEntity>
-
     // 첨부파일 단일 조회
     @Query("SELECT * FROM attachment WHERE id = :id And isStatus != 'DELETE'")
     fun getAttachment(id: Long): AttachmentEntity?
@@ -57,8 +39,29 @@ interface AttachmentDao {
     """)
     fun getCardsIsAttachment(cardIds: List<Long>): Flow<List<CardIsAttachment>>
 
+    // 오프라인 로컬에서 생성한 첨부파일 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM attachment
+        WHERE isStatus = 'CREATE'
+    """)
+    suspend fun getLocalCreateAttachments(): List<AttachmentEntity>
+
+    // 서버에 연산할 첨부파일 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM attachment
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
+    """)
+    suspend fun getLocalOperationAttachments(): List<AttachmentEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttachment(attachment: AttachmentEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAttachments(attachments: List<AttachmentEntity>): List<Long>
 
     // 원격 삭제(isStatus == STAY)
     @Update
@@ -67,9 +70,6 @@ interface AttachmentDao {
     // 로컬 삭제(isStatus == CREATE)
     @Delete
     suspend fun deleteAttachment(attachment: AttachmentEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAttachments(attachments: List<AttachmentEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM attachment WHERE id NOT IN (:ids)")

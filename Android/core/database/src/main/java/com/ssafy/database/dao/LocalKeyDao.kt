@@ -6,7 +6,6 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.ssafy.database.dto.piece.LocalKeyEntity
 import com.ssafy.database.dto.piece.LocalTable
-import kotlinx.coroutines.sync.Mutex
 
 @Dao
 interface LocalKeyDao {
