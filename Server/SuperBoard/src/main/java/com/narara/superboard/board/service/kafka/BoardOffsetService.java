@@ -3,6 +3,7 @@ package com.narara.superboard.board.service.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.list.entity.List;
 import com.narara.superboard.websocket.enums.BoardAction;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BoardOffsetService {
     public static final String BOARD = "BOARD";
+    public static final String BOARD_ID_COLUMN = "boardId";
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
@@ -25,7 +27,7 @@ public class BoardOffsetService {
         Map<String, Object> data = new HashMap<>();
 
         data.put("boardMemberId", boardMember.getId());
-        data.put("boardId", boardMember.getBoard().getId());
+        data.put(BOARD_ID_COLUMN, boardMember.getBoard().getId());
         data.put("memberId", boardMember.getMember().getId());
         data.put("memberEmail", boardMember.getMember().getEmail());
         data.put("memberName", boardMember.getMember().getNickname());
@@ -41,7 +43,7 @@ public class BoardOffsetService {
                 data
         );
 
-        // 워크 스페이스 이름 수정시, 카프카로 메시지 전송
+        // 카프카로 메시지 전송
         sendMessageToKafka(boardMember.getBoard().getId(),diffInfo);
     }
 
@@ -49,7 +51,7 @@ public class BoardOffsetService {
         Map<String, Object> data = new HashMap<>();
 
         data.put("boardMemberId", boardMember.getId());
-        data.put("boardId", boardMember.getBoard().getId());
+        data.put(BOARD_ID_COLUMN, boardMember.getBoard().getId());
         data.put("memberId", boardMember.getMember().getId());
         data.put("memberEmail", boardMember.getMember().getEmail());
         data.put("memberName", boardMember.getMember().getNickname());
@@ -65,8 +67,54 @@ public class BoardOffsetService {
                 data
         );
 
-        // 워크 스페이스 이름 수정시, 카프카로 메시지 전송
+        // 카프카로 메시지 전송
         sendMessageToKafka(boardMember.getBoard().getId(),diffInfo);
+    }
+
+    public void saveEditBoardMemberDiff(BoardMember boardMember) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("boardMemberId", boardMember.getId());
+        data.put(BOARD_ID_COLUMN, boardMember.getBoard().getId());
+        data.put("memberId", boardMember.getMember().getId());
+        data.put("memberEmail", boardMember.getMember().getEmail());
+        data.put("memberName", boardMember.getMember().getNickname());
+        data.put("profileImgUrl", boardMember.getMember().getProfileImgUrl());
+        data.put("authority", boardMember.getAuthority());
+        data.put("isDeleted", boardMember.getIsDeleted());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                boardMember.getUpdatedAt(),
+                BOARD,
+                BoardAction.EDIT_BOARD_MEMBER.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(boardMember.getBoard().getId(),diffInfo);
+    }
+
+    public void saveAddListDiff(List list) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("listId", list.getId());
+        data.put(BOARD_ID_COLUMN, list.getBoard().getId());
+        data.put("name", list.getName());
+        data.put("myOrder", list.getMyOrder());
+        data.put("isArchive", list.getIsArchived());
+        data.put("isDeleted", list.getIsDeleted());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                list.getUpdatedAt(),
+                BOARD,
+                BoardAction.ADD_LIST.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(list.getBoard().getId(),diffInfo);
     }
 
     private <T> void sendMessageToKafka(Long boardId, T object) {

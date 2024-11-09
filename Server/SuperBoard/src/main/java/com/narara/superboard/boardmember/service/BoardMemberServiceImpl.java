@@ -175,7 +175,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, editMember);
 
         boardMember.editAuthority(authority);
-        //TODO Websocket 보드멤버 권한 수정
+        boardOffsetService.saveEditBoardMemberDiff(boardMember); //Websocket 보드멤버 권한 수정
 
         return boardMember;
     }

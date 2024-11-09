@@ -5,6 +5,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -43,6 +44,8 @@ public class ListServiceImpl implements ListService{
     private final ListRepository listRepository;
     private final BoardHistoryRepository boardHistoryRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Transactional
     @Override
     public List createList(Member member, ListCreateRequestDto listCreateRequestDto) {
@@ -53,7 +56,8 @@ public class ListServiceImpl implements ListService{
         boardService.checkBoardMember(board, member, ListAction.ADD_LIST);
 
         List list = List.createList(listCreateRequestDto, board);
-        //TODO Websocket 리스트 생성
+
+        boardOffsetService.saveAddListDiff(list); //Websocket 리스트 생성
 
         List savedlist = listRepository.save(list);
         // 리스트 생성 로그 기록
