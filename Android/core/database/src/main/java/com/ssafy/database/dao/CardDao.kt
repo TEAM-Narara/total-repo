@@ -15,23 +15,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CardDao {
 
-    // 로컬에서 오프라인으로 생성한 카드 하위 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM card
-        WHERE isStatus = 'CREATE'
-    """)
-    suspend fun getLocalCreateCard(): List<CardAllInfo>
-
-    // 서버에 연산할 카드 조회
-    @Query("""
-        SELECT * 
-        FROM card
-        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
-    """)
-    suspend fun getLocalOperationCard(): List<CardEntity>
-
     // 카드 단일 조회
     @Transaction
     @Query("""
@@ -49,21 +32,6 @@ interface CardDao {
         WHERE id = :cardId
     """)
     fun getCardFlow(cardId: Long): Flow<CardEntity?>
-
-    // 카드 상위의 List, Board 이름 조회
-    @Transaction
-    @Query("""
-        SELECT 
-            card.id AS cardId,
-            card.name AS cardName,
-            list.name AS listName,
-            board.name AS boardName
-        FROM card
-        INNER JOIN list ON list.id = card.listId
-        INNER JOIN board ON board.id = list.boardId
-        WHERE card.id = :cardId
-    """)
-    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
 
     // 리스트 내에 카드들 조회
     @Query("""
