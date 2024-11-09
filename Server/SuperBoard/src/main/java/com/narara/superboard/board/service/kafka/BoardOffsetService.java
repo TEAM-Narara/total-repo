@@ -492,6 +492,7 @@ public class BoardOffsetService {
         Board board = cardLabel.getCard().getList().getBoard();
         Label label = cardLabel.getLabel();
 
+        data.put("cardLabelId", cardLabel.getId());
         data.put("labelId", label.getId());
         data.put("cardId", cardLabel.getCard().getId());
         data.put("isActivated", label.getName());
@@ -513,6 +514,7 @@ public class BoardOffsetService {
         Board board = cardLabel.getCard().getList().getBoard();
         Label label = cardLabel.getLabel();
 
+        data.put("cardLabelId", cardLabel.getId());
         data.put("labelId", label.getId());
         data.put("cardId", cardLabel.getCard().getId());
         data.put("isActivated", label.getName());
