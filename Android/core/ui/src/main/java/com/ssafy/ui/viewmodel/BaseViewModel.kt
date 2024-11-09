@@ -23,25 +23,29 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-open class BaseViewModel(
-    getSocketStateUseCase: GetSocketStateUseCase
-) : ViewModel() {
+open class BaseViewModel : ViewModel() {
     val uiState: StateFlow<UiState> get() = _uiState
     protected val _uiState = MutableStateFlow<UiState>(UiState.Idle)
 
-    val socketState = getSocketStateUseCase().filterNotNull().flatMapLatest{
-        when(it) {
-            ConnectionState.Connecting -> _uiState.update { UiState.Loading }
-            else -> _uiState.update { UiState.Success }
-        }
-        flow { emit(it) }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = null,
-    )
+    @Inject
+    lateinit var getSocketStateUseCase: GetSocketStateUseCase
+
+    val socketState by lazy {
+        getSocketStateUseCase().filterNotNull().flatMapLatest {
+            when (it) {
+                ConnectionState.Connecting -> _uiState.update { UiState.Loading }
+                else -> _uiState.update { UiState.Success }
+            }
+            flow { emit(it) }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null,
+        )
+    }
 
     fun <T> Flow<T>.withUiState(onError: (Throwable) -> Unit = {}) = this.onStart {
         _uiState.update { UiState.Loading }

@@ -3,7 +3,6 @@ package com.ssafy.home.setting
 import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.DeleteWorkspaceUseCase
 import com.ssafy.workspace.UpdateWorkspaceUseCase
@@ -19,8 +18,7 @@ class HomeSettingViewModel @Inject constructor(
     private val getDetailWorkspaceUseCase: GetDetailWorkspaceUseCase,
     private val deleteWorkspaceUseCase: DeleteWorkspaceUseCase,
     private val updateWorkspaceUseCase: UpdateWorkspaceUseCase,
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+) : BaseViewModel() {
 
     private val _detailWorkspaceData = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
     val settingData = _detailWorkspaceData.asStateFlow()

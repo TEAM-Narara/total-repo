@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetHomeInfoUseCase
 import com.ssafy.home.data.HomeData
 import com.ssafy.logout.LogoutUseCase
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.CreateWorkspaceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +20,7 @@ class HomeViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val getHomeInfoUseCase: GetHomeInfoUseCase,
     private val createWorkspaceUseCase: CreateWorkspaceUseCase,
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+) : BaseViewModel() {
 
     private var workspaceId: Long? = null
     private val _homeData: MutableStateFlow<HomeData> = MutableStateFlow(HomeData())

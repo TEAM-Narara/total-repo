@@ -7,7 +7,6 @@ import com.ssafy.login.SendEmailUseCase
 import com.ssafy.login.VerifyEmailUseCase
 import com.ssafy.model.user.signup.RegisterDTO
 import com.ssafy.model.user.signup.SignState
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +24,7 @@ class SignUpViewModel @Inject constructor(
     private val sendEmailUseCase: SendEmailUseCase,
     private val verifyEmailUseCase: VerifyEmailUseCase,
     private val registerUseCase: RegisterUseCase,
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+) : BaseViewModel() {
 
     private val _timeFlow: MutableStateFlow<String> = MutableStateFlow("")
     val timeFlow: StateFlow<String> = _timeFlow.asStateFlow()

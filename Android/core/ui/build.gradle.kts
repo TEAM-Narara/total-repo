@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -37,6 +39,10 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":domain:socket"))
     implementation(project(":core:designsystem"))
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation.compose)
