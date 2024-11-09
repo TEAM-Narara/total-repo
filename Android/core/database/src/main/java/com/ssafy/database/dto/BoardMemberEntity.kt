@@ -6,9 +6,9 @@ import com.ssafy.model.member.Authority
 import com.ssafy.model.with.DataStatus
 
 // 보드에 연관된 모든 사용자
-@Entity(tableName = "board_member")
+@Entity(tableName = "board_member", primaryKeys = ["memberId", "boardId"])
 data class BoardMemberEntity(
-    @PrimaryKey val id: Long = 0L,
+    val id: Long = 0L,
     val memberId: Long = 0L,
     val boardId: Long = 0L,
     val authority: Authority = Authority.MEMBER,

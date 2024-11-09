@@ -1,18 +1,15 @@
 package com.ssafy.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.BoardMemberEntity
-import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -100,6 +97,35 @@ interface CardMemberDao {
         WHERE card_member.cardId = :cardId AND card_member.isStatus != 'DELETE'
     """)
     fun getCardMembers(cardId: Long): Flow<List<CardMemberWithMemberInfo>>
+
+    @Transaction
+    @Query("""
+        SELECT 
+            m.id AS memberId,
+            m.email AS email,
+            m.nickname AS nickname,
+            m.profileImageUrl AS profileImageUrl,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM card_member cm 
+                    WHERE cm.memberId = m.id AND cm.isRepresentative = 1 AND cm.isStatus != 'DELETE'
+                ) THEN 1 
+                ELSE 0 
+            END AS isRepresentative
+        FROM member m
+        WHERE m.id IN (
+            SELECT memberId FROM workspace_member WHERE workspaceId = :workspaceId AND isStatus != 'DELETE'
+            UNION
+            SELECT memberId FROM board_member WHERE boardId = :boardId AND isStatus != 'DELETE'
+            UNION
+            SELECT memberId FROM card_member WHERE cardId = :cardId AND isStatus != 'DELETE'
+        )
+    """)
+    fun getMembersWithRepresentativeFlag(
+        workspaceId: Long,
+        boardId: Long,
+        cardId: Long
+    ): Flow<List<MemberResponseDTO>>
 
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)
