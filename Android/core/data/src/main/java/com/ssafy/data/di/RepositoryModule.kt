@@ -1,5 +1,7 @@
 package com.ssafy.data.di
 
+import com.ssafy.data.repository.auth.AuthRepository
+import com.ssafy.data.repository.auth.AuthRepositoryImpl
 import com.ssafy.data.repository.board.BoardRepository
 import com.ssafy.data.repository.board.BoardRepositoryImpl
 import com.ssafy.data.repository.card.CardRepository
@@ -31,6 +33,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindGitHubRepository(gitHubRepositoryImpl: GitHubRepositoryImpl): GitHubRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
 
     @Singleton
     @Binds
