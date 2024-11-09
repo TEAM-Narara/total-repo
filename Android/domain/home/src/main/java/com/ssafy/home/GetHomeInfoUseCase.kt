@@ -23,21 +23,26 @@ class GetHomeInfoUseCase @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend operator fun invoke(isConnected: Boolean): Flow<HomeData> {
+    suspend operator fun invoke(isConnected: Boolean, workspaceId: Long?): Flow<HomeData> {
         val user = dataStoreRepository.getUser()
 
         return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
-            val selectedWorkspaceFlow = workspaceList.firstOrNull()?.let { workspace ->
-                boardRepository.getBoardsByWorkspace(workspace.workspaceId)
-                    .map { boardList ->
+            val selectedWorkSpace = if (workspaceId == null) {
+                workspaceList.firstOrNull()
+            } else {
+                workspaceList.singleOrNull { it.workspaceId == workspaceId }
+            }
+
+            val selectedWorkspaceFlow =
+                selectedWorkSpace?.let { workspace ->
+                    boardRepository.getBoardsByWorkspace(workspace.workspaceId).map { boardList ->
                         SelectedWorkSpace(
                             workspaceId = workspace.workspaceId,
                             workspaceName = workspace.name,
                             boards = boardList
                         )
-
                     }
-            } ?: flowOf(SelectedWorkSpace())
+                } ?: flowOf(SelectedWorkSpace())
 
             selectedWorkspaceFlow.map { selectedWorkspace ->
                 HomeData(
