@@ -8,16 +8,21 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ssafy.splash.SplashViewModel
 import com.ssafy.superboard.navigation.SuperBoardNavHost
 import com.ssafy.superboard.ui.theme.SuperBoardTheme
 import com.ssafy.ui.networkstate.NetworkState
@@ -26,8 +31,15 @@ import kotlinx.coroutines.flow.update
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val splashViewModel: SplashViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().setKeepOnScreenCondition {
+            splashViewModel.isLoading
+        }
+
         setContent {
             SuperBoardTheme {
                 Surface(
@@ -71,6 +83,14 @@ class MainActivity : ComponentActivity() {
         navController: NavHostController = rememberNavController(),
         viewModel: MainViewModel = hiltViewModel()
     ) {
-        SuperBoardNavHost(navController = navController, viewModel = viewModel)
+        val direction by splashViewModel.direction.collectAsStateWithLifecycle()
+
+        direction?.let {
+            SuperBoardNavHost(
+                navController = navController,
+                viewModel = viewModel,
+                direction = it
+            )
+        }
     }
 }
