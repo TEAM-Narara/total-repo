@@ -104,7 +104,6 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new NotFoundEntityException(boardCreateRequestDto.workspaceId(), "워크스페이스"));
 
         Board board = Board.createBoard(boardCreateRequestDto, workSpace);
-        //TODO Websocket board 생성
 
         Board saveBoard = boardRepository.save(board);
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);

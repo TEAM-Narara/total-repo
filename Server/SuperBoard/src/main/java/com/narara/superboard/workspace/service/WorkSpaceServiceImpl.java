@@ -154,7 +154,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public void deleteWorkSpace(Long workspaceId) {
         WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.deleted(); //삭제 처리 offset++
-        //TODO Websocket workspace 삭제
 
         workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
@@ -206,7 +205,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpace.updateWorkSpace(name); //offset++
 
         workspaceOffsetService.saveEditWorkspaceDiff(workSpace);
-        //TODO Websocket workspace 업데이트
 
         return workSpace;
     }
