@@ -8,7 +8,6 @@ import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
 import com.ssafy.model.member.Authority
-import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.AddWorkspaceMemberUseCase
 import com.ssafy.workspace.ChangeWorkspaceMemberUseCase
@@ -34,8 +33,7 @@ class InviteWorkspaceViewModel @Inject constructor(
     private val searchMemberUseCase: SearchMembersUseCase,
     private val addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
     private val changeWorkspaceMemberUseCase: ChangeWorkspaceMemberUseCase,
-    getSocketStateUseCase: GetSocketStateUseCase,
-) : BaseViewModel(getSocketStateUseCase) {
+) : BaseViewModel() {
 
     private val _workspace = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
     val workspace = _workspace.asStateFlow()
