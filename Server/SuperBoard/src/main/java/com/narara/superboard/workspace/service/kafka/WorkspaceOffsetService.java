@@ -5,21 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
-import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +34,7 @@ public class WorkspaceOffsetService {
     public static final String COVER_VALUE_COLUMN = "coverValue";
     public static final String IS_CLOSED_COLUMN = "isClosed";
     public static final String VISIBILITY_COLUMN = "visibility";
-    private final MongoTemplate mongoTemplate;
+//    private final MongoTemplate mongoTemplate;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -126,7 +117,7 @@ public class WorkspaceOffsetService {
                 workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.ADD_MEMBER.name(),
+                WorkspaceAction.ADD_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -150,7 +141,7 @@ public class WorkspaceOffsetService {
                 workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.DELETE_MEMBER.name(),
+                WorkspaceAction.DELETE_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -175,7 +166,7 @@ public class WorkspaceOffsetService {
                 workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.EDIT_MEMBER.name(),
+                WorkspaceAction.EDIT_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -235,22 +226,6 @@ public class WorkspaceOffsetService {
         sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
-    //특정 offset 이후 변경사항 불러오는 로직
-    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
-        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
-
-        if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
-            log.debug("No diff list found for workspace: {}", workspaceId);
-            return Collections.emptyList();
-        }
-
-        return workspaceOffset.getDiffList().stream()
-                .filter(diffInfo -> diffInfo.getOffset() >= fromOffset)
-                .sorted(Comparator.comparing(DiffInfo::getOffset))
-                .map(WorkspaceDiffDto::from)
-                .collect(Collectors.toList());
-    }
-
     private <T> void sendMessageToKafka(Long workspaceId, T object) {
         String topic = "workspace-" + workspaceId;
 
@@ -266,9 +241,25 @@ public class WorkspaceOffsetService {
         System.out.println("Message sent to Kafka: " + jsonMessage);
     }
 
-    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
-        Query query = new Query(Criteria.where("workspaceId").is(workspace));
-        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
-        return workspaceOffset;
-    }
+    //특정 offset 이후 변경사항 불러오는 로직
+//    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
+//        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
+//
+//        if (workspaceOffset == null || workspaceOffset.getDiffList() == null) {
+//            log.debug("No diff list found for workspace: {}", workspaceId);
+//            return Collections.emptyList();
+//        }
+//
+//        return workspaceOffset.getDiffList().stream()
+//                .filter(diffInfo -> diffInfo.getOffset() >= fromOffset)
+//                .sorted(Comparator.comparing(DiffInfo::getOffset))
+//                .map(WorkspaceDiffDto::from)
+//                .collect(Collectors.toList());
+//    }
+
+//    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
+//        Query query = new Query(Criteria.where("workspaceId").is(workspace));
+//        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+//        return workspaceOffset;
+//    }
 }

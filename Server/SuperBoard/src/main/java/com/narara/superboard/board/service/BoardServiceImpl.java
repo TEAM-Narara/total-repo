@@ -11,6 +11,7 @@ import com.narara.superboard.board.interfaces.dto.log.ArchiveStatusChangeInfo;
 import com.narara.superboard.board.interfaces.dto.log.CreateBoardInfo;
 import com.narara.superboard.board.interfaces.dto.log.DeleteBoardInfo;
 import com.narara.superboard.board.interfaces.dto.log.UpdateBoardInfo;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -54,13 +55,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
-
     private final BoardRepository boardRepository;
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
-    private final WorkspaceOffsetService workspaceOffsetService;
     private final BoardHistoryRepository boardHistoryRepository;
     private final CardHistoryRepository cardHistoryRepository;
+
+    private final WorkspaceOffsetService workspaceOffsetService;
+    private final BoardOffsetService boardOffsetService;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -108,11 +110,12 @@ public class BoardServiceImpl implements BoardService {
         Board saveBoard = boardRepository.save(board);
         BoardMember boardMemberByAdmin = BoardMember.createBoardMemberByAdmin(saveBoard, member);
         boardMemberRepository.save(boardMemberByAdmin);
-        //TODO Websocket boardMember 생성
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
-        workspaceOffsetService.saveAddBoardDiff(board);
+
+        workspaceOffsetService.saveAddBoardDiff(board); //워크스페이스 보드 생성 웹소켓 response
+        boardOffsetService.saveAddMemberDiff(boardMemberByAdmin); //보드멤버 생성 웹소켓 response
 
         // Board 생성 로그 기록
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
