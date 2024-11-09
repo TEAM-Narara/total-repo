@@ -255,28 +255,27 @@ class CardRepositoryImpl @Inject constructor(
         }
 
     override suspend fun updateCardMember(
-        cardId: Long,
         simpleCardMemberDto: SimpleCardMemberDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val cardMember = cardMemberDao.getCardMember(cardId, simpleCardMemberDto.memberId)
+        val cardMember = cardMemberDao.getCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto.memberId)
 
         if (cardMember != null) {
             if (isConnected) {
-                cardDataSource.updateCardMember(cardId, simpleCardMemberDto).map { Unit }
+                cardDataSource.updateCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto).map { Unit }
             } else {
                 val result = when (cardMember.isStatus) {
                     DataStatus.STAY ->
                         cardMemberDao.updateCardMember(
                             cardMember.copy(
                                 isStatus = DataStatus.UPDATE,
-                                isRepresentative = simpleCardMemberDto.isRepresentative
+                                cardId = simpleCardMemberDto.cardId
                             )
                         )
                     DataStatus.CREATE, DataStatus.UPDATE ->
                         cardMemberDao.updateCardMember(
                             cardMember.copy(
-                                isRepresentative = simpleCardMemberDto.isRepresentative
+                                cardId = simpleCardMemberDto.cardId
                             )
                         )
                     DataStatus.DELETE -> {}

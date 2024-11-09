@@ -64,7 +64,6 @@ interface CardRepository {
     suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 
     suspend fun updateCardMember(
-        cardId: Long,
         simpleCardMemberDto: SimpleCardMemberDto,
         isConnected: Boolean
     ): Flow<Unit>

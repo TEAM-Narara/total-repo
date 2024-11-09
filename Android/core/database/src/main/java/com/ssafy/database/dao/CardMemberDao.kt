@@ -10,6 +10,7 @@ import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
@@ -133,7 +134,7 @@ interface CardMemberDao {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>>
+    ): Flow<List<MemberWithRepresentative>>
 
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -12,7 +12,7 @@ data class SimpleMemberDto(
 
 data class SimpleCardMemberDto(
     val memberId: Long,
-    val isRepresentative: Boolean,
+    val cardId: Long,
 
     @Transient
     val isStatus: DataStatus? = DataStatus.STAY
