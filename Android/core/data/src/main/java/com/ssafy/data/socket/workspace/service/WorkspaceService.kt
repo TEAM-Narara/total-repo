@@ -90,6 +90,7 @@ class WorkspaceService @Inject constructor(
 
     suspend fun addBoard(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceBoardRequestDto::class.java)
+        // TODO : 이미지 저장 로직 구현
         boardDao.insertBoard(
             BoardEntity(
                 id = dto.boardId,
@@ -106,6 +107,7 @@ class WorkspaceService @Inject constructor(
     suspend fun editBoard(data: JsonObject) {
         val dto = gson.fromJson(data, EditWorkspaceBoardRequestDto::class.java)
         val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
+        // TODO : 이미지 저장 로직 구현
         boardDao.updateBoard(
             before.copy(
                 name = dto.boardName,

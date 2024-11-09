@@ -23,6 +23,7 @@ class CardService @Inject constructor(
 ) {
     suspend fun addCard(data: JsonObject) {
         val dto = gson.fromJson(data, AddCardRequestDto::class.java)
+        // TODO : 이미지 저장 로직 구현
         cardDao.insertCard(
             CardEntity(
                 id = dto.cardId,
@@ -41,6 +42,7 @@ class CardService @Inject constructor(
     suspend fun editCard(data: JsonObject) {
         val dto = gson.fromJson(data, EditCardRequestDto::class.java)
         val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
+        // TODO : 이미지 저장 로직 구현
         cardDao.updateCard(
             before.copy(
                 name = dto.name,
