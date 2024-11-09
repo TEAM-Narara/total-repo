@@ -6,7 +6,6 @@ import com.ssafy.data.socket.board.model.AddBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.DeleteBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.EditBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.EditBoardWatchRequestDto
-import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dto.BoardMemberAlarmEntity
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 
 @Singleton
 class BoardService @Inject constructor(
-    private val boardDao: BoardDao,
     private val memberDao: MemberDao,
     private val boardMemberDao: BoardMemberDao,
     private val gson: Gson
@@ -30,8 +28,8 @@ class BoardService @Inject constructor(
             MemberEntity(
                 id = dto.memberId,
                 email = dto.memberEmail,
-                nickname = dto.memberNickname,
-                profileImageUrl = dto.memberProfileImgUrl,
+                nickname = dto.memberName,
+                profileImageUrl = dto.profileImgUrl,
             )
         )
 
@@ -67,7 +65,7 @@ class BoardService @Inject constructor(
         boardMemberDao.updateBoardMemberAlarm(
             BoardMemberAlarmEntity(
                 boardId = dto.boardId,
-                isAlert = dto.watch,
+                isAlert = dto.isAlert,
             )
         )
     }

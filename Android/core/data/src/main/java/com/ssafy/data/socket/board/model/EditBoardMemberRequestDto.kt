@@ -5,8 +5,8 @@ data class EditBoardMemberRequestDto(
     val boardId: Long,
     val memberId: Long,
     val memberEmail: String,
-    val memberNickname: String,
-    val memberProfileImgUrl: String,
+    val memberName: String,
+    val profileImgUrl: String,
     val authority: String,
     val isDeleted: Boolean
 )
