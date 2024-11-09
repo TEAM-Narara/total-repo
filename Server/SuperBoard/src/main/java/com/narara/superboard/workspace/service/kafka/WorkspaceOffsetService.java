@@ -34,7 +34,8 @@ public class WorkspaceOffsetService {
     public static final String COVER_VALUE_COLUMN = "coverValue";
     public static final String IS_CLOSED_COLUMN = "isClosed";
     public static final String VISIBILITY_COLUMN = "visibility";
-//    private final MongoTemplate mongoTemplate;
+    public static final String IS_ARCHIVE_COLUMN = "isArchive";
+    //    private final MongoTemplate mongoTemplate;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -243,6 +244,26 @@ public class WorkspaceOffsetService {
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    public void saveEditBoardArchiveDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(IS_ARCHIVE_COLUMN, board.getIsArchived());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getOffset(),
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_ARCHIVE_BOARD.name(),
                 data
         );
 

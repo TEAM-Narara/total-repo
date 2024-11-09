@@ -208,6 +208,8 @@ public class BoardServiceImpl implements BoardService {
         board.changeArchiveStatus();
         //TODO Websocket 보드 아카이브 상태 변경
 
+        workspaceOffsetService.saveEditBoardArchiveDiff(board);
+
         // 아카이브 상태 변경 로그 기록
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(), board.getIsArchived());
 
