@@ -13,6 +13,7 @@ import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.workspace.WorkSpaceDTO
 import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.GetWorkspaceUseCase
 import com.ssafy.workspace.UpdateWorkspaceUseCase
@@ -59,7 +60,7 @@ class BoardMenuViewModel @Inject constructor(
                 if (workspace != null && board != null && watchStatus != null) {
                     BoardMenuData(workspace, board, members, watchStatus)
                 } else {
-                    null
+                    null.also { _uiState.emit(UiState.Error(ERROR)) }
                 }
             }
         }.stateIn(
@@ -95,7 +96,7 @@ class BoardMenuViewModel @Inject constructor(
         val boardId = boardState.boardDto.id
         val isWatch = boardState.watchStatus
 
-        if(isWatch == watchStatus) return@withIO
+        if (isWatch == watchStatus) return@withIO
         toggleBoardWatchUseCase(boardId, isConnected).withUiState().collect()
     }
 
@@ -117,4 +118,7 @@ class BoardMenuViewModel @Inject constructor(
     fun setBoardId(id: Long) = _boardId.update { id }
     fun setWorkspaceId(id: Long) = _workspaceId.update { id }
 
+    companion object {
+        const val ERROR = "보드 정보를 가져오는데 실패했습니다.\n잠시 뒤에 시도해주세요."
+    }
 }

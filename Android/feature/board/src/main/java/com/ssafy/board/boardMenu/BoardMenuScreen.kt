@@ -64,7 +64,7 @@ import com.ssafy.ui.uistate.UiState
 fun BoardMenuScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardMenuViewModel = hiltViewModel(),
-    backHome: () -> Unit,
+    popBack: () -> Unit,
     cover: Cover,
     moveToSelectBackGroundScreen: (Cover) -> Unit,
     moveToInviteMemberScreen: () -> Unit
@@ -77,7 +77,7 @@ fun BoardMenuScreen(
         BoardMenuScreen(
             modifier = modifier,
             boardMenuData = boardMenuData,
-            backHome = backHome,
+            backHome = popBack,
             moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
             moveToInviteMemberScreen = moveToInviteMemberScreen,
             cover = cover,
@@ -86,11 +86,11 @@ fun BoardMenuScreen(
             changeWatch = viewModel::changeWatch,
             changeVisibility = viewModel::changeVisibility
         )
-    }
+    } ?: LoadingScreen()
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()
-        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it, afterAction = popBack) }
         is UiState.Success -> {}
         is UiState.Idle -> {}
     }
@@ -279,7 +279,7 @@ private fun BoardMenuScreen(
 @Composable
 fun GreetingPreview() {
     BoardMenuScreen(
-        backHome = {},
+        popBack = {},
         moveToSelectBackGroundScreen = {},
         moveToInviteMemberScreen = {},
         cover = Cover(
