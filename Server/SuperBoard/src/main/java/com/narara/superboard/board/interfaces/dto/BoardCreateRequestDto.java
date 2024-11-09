@@ -7,5 +7,6 @@ public record BoardCreateRequestDto(
         String name,
         String visibility,
         CoverDto cover,
-        boolean isClosed) implements BoardCoreHolder {
+        boolean isClosed // TODO: 생성 시, 보드 close 여부를 넣는게 맞는가?
+) implements BoardCoreHolder {
 }
