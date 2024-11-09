@@ -269,14 +269,16 @@ class CardRepositoryImpl @Inject constructor(
                     DataStatus.STAY ->
                         cardMemberDao.updateCardMember(
                             cardMember.copy(
-                                isStatus = DataStatus.UPDATE,
-                                cardId = simpleCardMemberDto.cardId
+                                cardId = simpleCardMemberDto.cardId,
+                                isRepresentative = !cardMember.isRepresentative,
+                                isStatus = DataStatus.UPDATE
                             )
                         )
                     DataStatus.CREATE, DataStatus.UPDATE ->
                         cardMemberDao.updateCardMember(
                             cardMember.copy(
-                                cardId = simpleCardMemberDto.cardId
+                                cardId = simpleCardMemberDto.cardId,
+                                isRepresentative = !cardMember.isRepresentative,
                             )
                         )
                     DataStatus.DELETE -> {}

@@ -1,51 +1,22 @@
 package com.ssafy.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.BoardMemberEntity
-import com.ssafy.database.dto.CardMemberAlarmEntity
-import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
-import com.ssafy.database.dto.WorkspaceMemberEntity
+import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListMemberDao {
 
-    // 서버에 연산할 리스트 멤버 조회
-    @Query("""
-        SELECT * 
-        FROM list_member
-        WHERE isStatus != 'STAY'
-    """)
-    suspend fun getLocalOperationListMember(): List<ListMemberEntity>
-
-    // 서버에 연산할 리스트 멤버 알람 조회
-    @Query("""
-        SELECT * 
-        FROM list_member_alarm
-        WHERE isStatus != 'STAY'
-    """)
-    suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmEntity>
-
     // 리스트 멤버 단일 조회
     @Query("SELECT * FROM list_member WHERE memberId = :memberId AND listId = :listId")
     fun getListMember(memberId: Long, listId: Long): ListMemberEntity?
-
-    // 리스트 멤버 알람 조회
-    @Query("""
-        SELECT * 
-        FROM list_member_alarm
-        WHERE listId IN (:listIds) 
-    """)
-    fun getListsMemberAlarms(listIds: List<Long>): Flow<List<ListMemberAlarmEntity>>
 
     // 리스트 멤버들 조회
     @Transaction
@@ -65,16 +36,13 @@ interface ListMemberDao {
     """)
     fun getListMembers(listId: Long): Flow<List<ListMemberWithMemberInfo>>
 
-    // 상태 업데이트
-    @Update
-    suspend fun updateListMember(listMember: ListMemberEntity)
-
-    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    // 오프라인 로컬에서 생성한 리스트 멤버 조회
     @Query("""
-        DELETE FROM workspace_member 
-        WHERE memberId = :memberId AND workspaceId = :listId;
+        SELECT * 
+        FROM list_member
+        WHERE isStatus != 'STAY'
     """)
-    suspend fun deleteLocalListMember(memberId: Long, listId: Long)
+    suspend fun getLocalOperationListMember(): List<ListMemberEntity>
 
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -84,16 +52,21 @@ interface ListMemberDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertListMembers(listMembers: List<ListMemberEntity>): List<Long>
 
+    // 상태 업데이트
+    @Update
+    suspend fun updateListMember(listMember: ListMemberEntity)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Query("""
+        DELETE FROM list_member 
+        WHERE memberId = :memberId AND listId = :listId;
+    """)
+    suspend fun deleteLocalListMember(memberId: Long, listId: Long)
+
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM list_member WHERE id NOT IN (:ids)")
     suspend fun deleteListMembersNotIn(ids: List<Long>)
 
-    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
-    @Query("""
-        DELETE FROM list_member
-        WHERE memberId = :memberId AND listId = :listId
-    """)
-    suspend fun deleteListMember(memberId: Long, listId: Long)
 
     // 리스트 멤버 알람 단일 조회
     @Query("SELECT * FROM list_member_alarm WHERE listId = :listId")
@@ -102,6 +75,22 @@ interface ListMemberDao {
     // 리스트 멤버 알람 단일 조회
     @Query("SELECT * FROM list_member_alarm WHERE listId = :listId")
     fun getListMemberAlarmFlow(listId: Long): Flow<ListMemberAlarmEntity?>
+
+    // 리스트 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM list_member_alarm
+        WHERE listId IN (:listIds) 
+    """)
+    fun getListsMemberAlarms(listIds: List<Long>): Flow<List<ListMemberAlarmEntity>>
+
+    // 서버에 연산할 리스트 멤버 알람 조회
+    @Query("""
+        SELECT * 
+        FROM list_member_alarm
+        WHERE isStatus != 'STAY'
+    """)
+    suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmEntity>
 
     // 리스트 알람 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)

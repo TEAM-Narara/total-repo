@@ -13,23 +13,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface LabelDao {
 
-    // 로컬에서 오프라인으로 생성한 라벨 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM label
-        WHERE isStatus = 'CREATE'
-    """)
-    suspend fun getLocalCreateLabels(): List<LabelEntity>
-
-    // 서버에 연산할 라벨 조회
-    @Query("""
-        SELECT * 
-        FROM label
-        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
-    """)
-    suspend fun getLocalOperationLabels(): List<LabelEntity>
-
     // 보드 라벨 단일 조회
     @Query("""
         SELECT * 
@@ -54,9 +37,30 @@ interface LabelDao {
     """)
     fun getAllLabels(boardId: Long): Flow<List<LabelEntity>>
 
+    // 로컬에서 오프라인으로 생성한 라벨 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM label
+        WHERE isStatus = 'CREATE'
+    """)
+    suspend fun getLocalCreateLabels(): List<LabelEntity>
+
+    // 서버에 연산할 라벨 조회
+    @Query("""
+        SELECT * 
+        FROM label
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
+    """)
+    suspend fun getLocalOperationLabels(): List<LabelEntity>
+
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertLabel(label: LabelEntity): Long
+
+    // 서버 변경사항 동기화
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLabels(labels: List<LabelEntity>): List<Long>
 
     // 원격 삭제 (isStatus: 'STAY' -> isStatus: 'DELETE')
     @Update
@@ -65,10 +69,6 @@ interface LabelDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteLabel(label: LabelEntity)
-
-    // 서버 변경사항 동기화
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLabels(labels: List<LabelEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM label WHERE id NOT IN (:ids)")

@@ -7,8 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.BoardMemberEntity
-import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
@@ -17,25 +15,36 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WorkspaceMemberDao {
 
-    // 서버에 연산할 워크스페이스 멤버 조회
-    @Query("""SELECT * 
-        FROM workspace_member
-        WHERE isStatus != 'STAY'
-    """)
-    suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberEntity>
-
-    // 보드 멤버 단일 id 조회
+    // 워크스페이스 멤버 단일 id 조회
     @Query("SELECT * FROM workspace_member WHERE id == :id")
     fun getWorkspaceMember(id: Long): WorkspaceMemberEntity?
 
     // 워크스페이스 단일 조회
-    @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId AND memberId = :memberId")
+    @Query("""
+       SELECT * 
+        FROM workspace_member 
+        WHERE workspaceId = :workspaceId AND memberId = :memberId 
+    """)
     fun getWorkspaceMember(workspaceId: Long, memberId: Long): WorkspaceMemberEntity?
 
-    @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId AND memberId = :memberId")
+    @Query("""
+       SELECT * 
+        FROM workspace_member 
+        WHERE workspaceId = :workspaceId AND memberId = :memberId 
+    """)
     fun getWorkspaceMemberFlow(workspaceId: Long, memberId: Long): Flow<WorkspaceMemberEntity?>
 
-    // 워크스페이스 멤버 조회
+    // 멤버의 워크스페이스 조회
+    @Transaction
+    @Query("""
+        SELECT workspace.* 
+        FROM workspace 
+        INNER JOIN workspace_member ON workspace.id = workspace_member.workspaceId 
+        WHERE workspace_member.memberId = :memberId
+    """)
+    fun getWorkspacesByMember(memberId: Long): Flow<List<WorkspaceEntity>>
+
+    // 워크스페이스 멤버 상세 조회
     @Transaction
     @Query("""
         SELECT 
@@ -54,26 +63,20 @@ interface WorkspaceMemberDao {
     """)
     fun getWorkspaceMembers(workspaceId: Long): Flow<List<WorkspaceMemberWithMemberInfo>>
 
-    @Transaction
-    @Query("""
-        SELECT workspace.* 
-        FROM workspace 
-        INNER JOIN workspace_member ON workspace.id = workspace_member.workspaceId 
-        WHERE workspace_member.memberId = :memberId
+    // 서버에 연산할 워크스페이스 멤버 조회
+    @Query("""SELECT * 
+        FROM workspace_member
+        WHERE isStatus != 'STAY'
     """)
-    fun getWorkspacesByMember(memberId: Long): Flow<List<WorkspaceEntity>>
-
-    // 서버 변경사항 동기화
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWorkspaceMembers(workspaceMembers: List<WorkspaceMemberEntity>): List<Long>
+    suspend fun getLocalOperationWorkspaceMember(): List<WorkspaceMemberEntity>
 
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkspaceMember(workspaceMember: WorkspaceMemberEntity): Long
 
-    // 서버에 존재하지 않는 로컬 데이터 삭제
-    @Query("DELETE FROM workspace_member WHERE id NOT IN (:ids)")
-    suspend fun deleteWorkspaceMembersNotIn(ids: List<Long>)
+    // 서버 변경사항 동기화
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWorkspaceMembers(workspaceMembers: List<WorkspaceMemberEntity>): List<Long>
 
     // 상태 업데이트
     @Update
@@ -86,13 +89,11 @@ interface WorkspaceMemberDao {
     """)
     suspend fun deleteLocalWorkspaceMember(memberId: Long, workspaceId: Long)
 
-    @Query("SELECT * FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
-    fun getWorkspaceMemberByWorkspaceIdAndMemberId(workspaceId: Long, memberId: Long): WorkspaceMemberEntity?
-
-    @Query("DELETE FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
-    suspend fun deleteByWorkspaceId(workspaceId: Long, memberId: Long)
-
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM workspace_member WHERE id NOT IN (:ids)")
+    suspend fun deleteWorkspaceMembersNotIn(ids: List<Long>)
 }
