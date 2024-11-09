@@ -108,6 +108,7 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
+        boardOffsetService.saveEditListArchiveDiff(list);
         //TODO Websocket 리스트 아카이브화
 
         // 리스트 아카이브 상태 변경 로그 기록
