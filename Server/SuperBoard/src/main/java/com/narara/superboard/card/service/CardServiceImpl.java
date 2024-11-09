@@ -155,9 +155,8 @@ public class CardServiceImpl implements CardService {
         Card card = getCard(cardId);
         checkBoardMember(card, member, ARCHIVE_CARD);
         card.changeArchiveStatus();
-        //TODO Websocket 카드 아카이브 상태 변경
 
-        boardOffsetService.saveEditCardArchiveDiff(card);
+        boardOffsetService.saveEditCardArchiveDiff(card); //Websocket 카드 아카이브 상태 변경
 
         // 로그 기록 추가
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(), card.getIsArchived());

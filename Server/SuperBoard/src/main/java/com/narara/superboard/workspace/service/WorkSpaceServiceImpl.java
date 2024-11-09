@@ -4,7 +4,6 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
-import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -70,8 +69,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace newWorkSpace = workSpaceRepository.save(workSpace);
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
-        //TODO Websocket workspace 생성
-        //TODO Websocket workspace 초기 멤버 추가
 
         // Kafka 토픽 생성 및 Consumer group Listener 설정
         String topicName = "workspace-" + newWorkSpace.getId();

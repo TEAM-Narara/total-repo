@@ -26,8 +26,7 @@ public class BoardOffsetService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    //boardMember 추가
-    public void saveAddMemberDiff(BoardMember boardMember) {
+    public void saveAddBoardMemberDiff(BoardMember boardMember) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("boardMemberId", boardMember.getId());
@@ -343,6 +342,8 @@ public class BoardOffsetService {
         data.put("memberId", reply.getMember().getId());
         data.put("content", reply.getContent());
         data.put("isDeleted", reply.getIsDeleted());
+        data.put("createdAt", reply.getCreatedAt());
+        data.put("updatedAt", reply.getUpdatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
                 1L, //offset 임시값
@@ -387,6 +388,8 @@ public class BoardOffsetService {
         data.put("memberId", reply.getMember().getId());
         data.put("content", reply.getContent());
         data.put("isDeleted", reply.getIsDeleted());
+        data.put("createdAt", reply.getCreatedAt());
+        data.put("updatedAt", reply.getUpdatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
                 1L, //offset 임시값

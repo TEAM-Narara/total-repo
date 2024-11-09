@@ -115,7 +115,7 @@ public class BoardServiceImpl implements BoardService {
         board.getWorkSpace().addOffset(); //workspace offset++
 
         workspaceOffsetService.saveAddBoardDiff(board); //워크스페이스 보드 생성 웹소켓 response
-        boardOffsetService.saveAddMemberDiff(boardMemberByAdmin); //보드멤버 생성 웹소켓 response
+        boardOffsetService.saveAddBoardMemberDiff(boardMemberByAdmin); //보드멤버 생성 웹소켓 response
 
         // Board 생성 로그 기록
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());

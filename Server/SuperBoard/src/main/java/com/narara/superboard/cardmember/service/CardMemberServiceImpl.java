@@ -65,7 +65,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                 .map(cardMember -> {
                     toggleRepresentativeAndSave(cardMember);
 
-                    if (cardMember.isRepresentative()) { //TODO Websocket 카드멤버 추가
+                    if (cardMember.isRepresentative()) { // Websocket 카드멤버 추가
                         boardOffsetService.saveAddCardMember(cardMember);
                     } else {
                         boardOffsetService.saveDeleteCardMember(cardMember);
