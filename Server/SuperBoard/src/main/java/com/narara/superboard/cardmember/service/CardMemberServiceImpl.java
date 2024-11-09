@@ -1,5 +1,6 @@
 package com.narara.superboard.cardmember.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -26,6 +27,7 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final MemberRepository memberRepository;
     private final CardRepository cardRepository;
     private final CardHistoryRepository cardHistoryRepository;
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     public boolean getCardMemberIsAlert(Member member, Long cardId) {
@@ -58,12 +60,16 @@ public class CardMemberServiceImpl implements CardMemberService {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
         Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
 
-        //TODO Websocket 카드멤버 추가
-
         return cardMemberRepository.findByCardIdAndMemberId(
                         updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
                 .map(cardMember -> {
                     toggleRepresentativeAndSave(cardMember);
+
+                    if (cardMember.isRepresentative()) { //TODO Websocket 카드멤버 추가
+                        boardOffsetService.saveAddCardMember(cardMember);
+                    } else {
+                        boardOffsetService.saveDeleteCardMember(cardMember);
+                    }
 
                     // 로그 기록 추가
                     RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(

@@ -81,7 +81,8 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.EDIT_LIST);
 
         list.updateList(listUpdateRequestDto);
-        //TODO Websocket 리스트 업데이트
+
+        boardOffsetService.saveEditListDiff(list);  //Websocket 리스트 업데이트
 
         // 리스트 업데이트 로그 기록
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
@@ -108,8 +109,7 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
-        boardOffsetService.saveEditListArchiveDiff(list);
-        //TODO Websocket 리스트 아카이브화
+        boardOffsetService.saveEditListArchiveDiff(list); // Websocket 리스트 아카이브화
 
         // 리스트 아카이브 상태 변경 로그 기록
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());

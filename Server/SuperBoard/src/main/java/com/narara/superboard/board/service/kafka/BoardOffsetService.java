@@ -252,12 +252,6 @@ public class BoardOffsetService {
 
         data.put("cardId", card.getId());
         data.put("listId", card.getList().getId());
-        data.put("name", card.getName());
-        data.put("description", card.getDescription());
-        data.put("startAt", card.getStartAt());
-        data.put("endAt", card.getEndAt());
-        data.put("coverType", card.getCover().get("type"));
-        data.put("coverValue", card.getCover().get("value"));
         data.put("isDeleted", card.getIsDeleted());
         data.put("isArchived", card.getIsArchived());
 
@@ -369,8 +363,6 @@ public class BoardOffsetService {
 
         data.put("cardId", card.getId());
         data.put("replyId", reply.getId());
-        data.put("memberId", reply.getMember().getId());
-        data.put("content", reply.getContent());
         data.put("isDeleted", reply.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
@@ -401,6 +393,26 @@ public class BoardOffsetService {
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_REPLY.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(board.getId(), diffInfo);
+    }
+
+    public void saveEditCardArchiveDiff(Card card) {
+        Map<String, Object> data = new HashMap<>();
+        Board board = card.getList().getBoard();
+
+        data.put("cardId", card.getId());
+        data.put("listId", card.getList().getId());
+        data.put("isArchived", card.getIsArchived());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                card.getUpdatedAt(),
+                BOARD,
+                BoardAction.ARCHIVE_CARD.name(),
                 data
         );
 
