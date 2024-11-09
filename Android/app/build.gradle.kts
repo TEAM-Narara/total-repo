@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:card"))
     implementation(project(":feature:notification"))
+    implementation(project(":feature:splash"))
     implementation(project(":domain:logout"))
 
     // DTO
@@ -73,6 +74,10 @@ dependencies {
 
     // Navigator
     implementation(libs.androidx.navigation.compose)
+
+    // Splash
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation(project(":core:designsystem"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

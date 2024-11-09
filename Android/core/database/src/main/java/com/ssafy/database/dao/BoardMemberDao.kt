@@ -112,4 +112,8 @@ interface BoardMemberDao {
     // 알람 상태 업데이트
     @Update
     suspend fun updateBoardMemberAlarm(boardMemberAlarm: BoardMemberAlarmEntity)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM board_member WHERE id = :boardMemberId")
+    suspend fun deleteBoardMemberById(boardMemberId: Long)
 }

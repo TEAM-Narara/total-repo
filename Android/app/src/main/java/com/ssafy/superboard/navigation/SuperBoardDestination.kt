@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
+import com.ssafy.splash.StartDirection
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
@@ -53,7 +54,8 @@ import com.ssafy.ui.uistate.ErrorScreen
 fun SuperBoardNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    direction: StartDirection = StartDirection.LOGIN
 ) {
     val authEvent by viewModel.authEvent.collectAsStateWithLifecycle(false)
 
@@ -64,7 +66,7 @@ fun SuperBoardNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = LogIn,
+        startDestination = if (direction == StartDirection.LOGIN) LogIn else Home,
         modifier = modifier
     ) {
         loginScreen(
