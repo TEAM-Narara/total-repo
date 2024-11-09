@@ -8,7 +8,6 @@ import com.ssafy.network.api.WorkspaceAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class WorkspaceDataSourceImpl @Inject constructor(
@@ -18,8 +17,8 @@ class WorkspaceDataSourceImpl @Inject constructor(
     override suspend fun getWorkspaceList(): Flow<List<WorkSpaceDTO>> =
         safeApiCall { workspaceAPI.getWorkspaces() }.toFlow()
 
-    override suspend fun createWorkspace(name: String): Flow<Long> =
-        safeApiCall { workspaceAPI.createWorkspace(name) }.toFlow().map { it.workspaceId }
+    override suspend fun createWorkspace(name: String): Flow<WorkSpaceDTO> =
+        safeApiCall { workspaceAPI.createWorkspace(name) }.toFlow()
 
     override suspend fun deleteWorkspace(workspaceId: Long): Flow<Unit> =
         safeApiCall { workspaceAPI.deleteWorkspace(workspaceId) }.toFlow()
