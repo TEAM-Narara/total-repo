@@ -25,6 +25,10 @@ public enum BoardAction {
     DELETE_BOARD_LABEL,
     EDIT_CARD_LABEL,
 
+    //CardLabel
+    ADD_CARD_LABEL,
+    DELETE_CARD_LABEL,
+
     //List
     ADD_LIST,
     EDIT_LIST_ARCHIVE,

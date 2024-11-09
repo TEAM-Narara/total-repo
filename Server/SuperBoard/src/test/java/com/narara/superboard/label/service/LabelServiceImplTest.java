@@ -3,6 +3,7 @@ package com.narara.superboard.label.service;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
@@ -38,6 +39,9 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private ColorValidator colorValidator;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @Test
     @DisplayName("존재하지 않는 보드 ID로 라벨 생성 시 NotFoundEntityException 발생")
