@@ -105,7 +105,7 @@ public class WorkspaceWebSocketController {
         // workspace 브로드캐스트
         WebSocketResponse memberResponse = new WebSocketResponse(
                 WORKSPACE,
-                WorkspaceAction.ADD_MEMBER.toString(),
+                WorkspaceAction.ADD_WORKSPACE_MEMBER.toString(),
                 new WorkspaceMemberAddResponse(
                         workspaceId,
                         member.getId(),

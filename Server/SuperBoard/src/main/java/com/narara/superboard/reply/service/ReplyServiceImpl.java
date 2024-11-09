@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -43,6 +44,8 @@ public class ReplyServiceImpl implements ReplyService{
 
     private final ContentValidator contentValidator;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
     @Transactional
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
@@ -57,6 +60,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         Reply savedReply = replyRepository.save(reply);
 
+        boardOffsetService.saveAddReply(savedReply); //Websocket reply 추가
 
         ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
@@ -65,6 +69,7 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket reply 생성 히스토리 추가
 
         return savedReply;
     }
@@ -91,6 +96,7 @@ public class ReplyServiceImpl implements ReplyService{
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
         reply.updateReply(replyUpdateRequestDto);
+        boardOffsetService.saveEditReply(reply); //Websocket reply 업데이트
 
         // 업데이트 로그 기록
         ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
@@ -100,6 +106,7 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket reply update 히스토리
 
         // 댓글 내용 업데이트
         return reply;
@@ -115,6 +122,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 로그 기록
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
+        //TODO Websocket reply 삭제 로그
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
@@ -124,6 +132,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 수행
         reply.deleteReply();
+        boardOffsetService.saveDeleteReply(reply); //Websocket reply 삭제
 
         return reply;
     }
