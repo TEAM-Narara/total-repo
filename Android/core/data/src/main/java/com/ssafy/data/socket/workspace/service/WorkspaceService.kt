@@ -73,7 +73,8 @@ class WorkspaceService @Inject constructor(
 
     suspend fun deleteMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceMemberRequestDto::class.java)
-        workspaceMemberDao.deleteByWorkspaceId(dto.workspaceId, dto.memberId)
+        workspaceMemberDao.deleteLocalWorkspaceMember(
+            workspaceId = dto.workspaceId, memberId = dto.memberId)
     }
 
     suspend fun editMember(data: JsonObject) {

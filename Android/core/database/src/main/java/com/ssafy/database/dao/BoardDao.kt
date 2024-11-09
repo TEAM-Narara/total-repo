@@ -14,23 +14,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BoardDao {
 
-    // 로컬에서 오프라인으로 생성한 보드 하위 조회
-    @Transaction
-    @Query("""
-        SELECT * 
-        FROM board
-        WHERE isStatus = 'CREATE'
-    """)
-    suspend fun getLocalCreateBoards(): List<BoardInList>
-
-    // 서버에 연산할 보드 조회
-    @Query("""
-        SELECT * 
-        FROM board
-        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
-    """)
-    suspend fun getLocalOperationBoards(): List<BoardEntity>
-
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
     fun getBoard(boardId: Long): BoardEntity?
@@ -55,6 +38,23 @@ interface BoardDao {
     """)
     fun getAllBoardsArchived(workspaceId: Long): Flow<List<BoardEntity>>
 
+    // 오프라인 로컬에서 생성한 보드 하위 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM board
+        WHERE isStatus = 'CREATE'
+    """)
+    suspend fun getLocalCreateBoards(): List<BoardInList>
+
+    // 서버에 연산할 보드 조회
+    @Query("""
+        SELECT * 
+        FROM board
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
+    """)
+    suspend fun getLocalOperationBoards(): List<BoardEntity>
+
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBoard(board: BoardEntity): Long
@@ -62,10 +62,6 @@ interface BoardDao {
     // 서버 변경사항 동기화
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBoards(boards: List<BoardEntity>): List<Long>
-
-    // 서버에 존재하지 않는 로컬 데이터 삭제
-    @Query("DELETE FROM board WHERE id NOT IN (:ids)")
-    suspend fun deleteBoardsNotIn(ids: List<Long>)
 
     // 1. 휴지통 이동 (isArchive: false -> isArchive: true)
     // 2. 원격 삭제 (isArchive: true -> isStatus: 'DELETE')
@@ -78,7 +74,8 @@ interface BoardDao {
 
     @Query("DELETE FROM board WHERE id = :id")
     suspend fun deleteBoardByBoardId(id: Long)
-}
 
-// STAY(원격) -> DELETE, UPDATE
-// CREATE(로컬) -> UD 연산을 바로 해도 됨
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM board WHERE id NOT IN (:ids)")
+    suspend fun deleteBoardsNotIn(ids: List<Long>)
+}

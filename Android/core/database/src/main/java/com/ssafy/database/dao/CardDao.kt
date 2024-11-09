@@ -96,9 +96,45 @@ interface CardDao {
     """)
     fun getAllCardsArchived(listId: Long): Flow<List<CardEntity>>
 
+    // 카드 상위의 List, Board 이름 조회
+    @Transaction
+    @Query("""
+        SELECT 
+            card.id AS cardId,
+            card.name AS cardName,
+            list.name AS listName,
+            board.name AS boardName
+        FROM card
+        INNER JOIN list ON list.id = card.listId
+        INNER JOIN board ON board.id = list.boardId
+        WHERE card.id = :cardId
+    """)
+    fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
+
+    // 로컬에서 오프라인으로 생성한 카드 하위 조회
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE isStatus = 'CREATE'
+    """)
+    suspend fun getLocalCreateCard(): List<CardAllInfo>
+
+    // 서버에 연산할 카드 조회
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
+    """)
+    suspend fun getLocalOperationCard(): List<CardEntity>
+
     // 로컬에서 생성
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: CardEntity): Long
+
+    // 서버 변경사항 동기화
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCards(cards: List<CardEntity>): List<Long>
 
     // 1. 휴지통 이동 (isArchive: false -> isArchive: true)
     // 2. 원격 삭제 (isArchive: true -> isStatus: 'DELETE')
@@ -108,10 +144,6 @@ interface CardDao {
     // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
     @Delete
     suspend fun deleteCard(card: CardEntity)
-
-    // 서버 변경사항 동기화
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCards(cards: List<CardEntity>): List<Long>
 
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM card WHERE id NOT IN (:ids)")
