@@ -26,12 +26,13 @@ class WorkspaceStomp @Inject constructor(
                 when (it.action) {
                     "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(it.data)
                     "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(it.data)
-                    "ADD_MEMBER" -> workspaceService.addMember(it.data)
-                    "DELETE_MEMBER" -> workspaceService.deleteMember(it.data)
-                    "EDIT_MEMBER" -> workspaceService.editMember(it.data)
+                    "ADD_WORKSPACE_MEMBER" -> workspaceService.addMember(it.data)
+                    "DELETE_WORKSPACE_MEMBER" -> workspaceService.deleteMember(it.data)
+                    "EDIT_WORKSPACE_MEMBER" -> workspaceService.editMember(it.data)
                     "ADD_BOARD" -> workspaceService.addBoard(it.data)
                     "EDIT_BOARD" -> workspaceService.editBoard(it.data)
                     "DELETE_BOARD" -> workspaceService.deleteBoard(it.data)
+                    "EDIT_ARCHIVE_BOARD" -> workspaceService.editArchivedBoard(it.data)
                     else -> {}
                 }
             }

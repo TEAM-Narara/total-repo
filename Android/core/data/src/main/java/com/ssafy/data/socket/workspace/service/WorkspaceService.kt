@@ -7,6 +7,7 @@ import com.ssafy.data.socket.workspace.model.AddWorkspaceMemberDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkSpaceRequestDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkspaceBoardRequestDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkspaceMemberRequestDto
+import com.ssafy.data.socket.workspace.model.EditArchiveBoardRequestDto
 import com.ssafy.data.socket.workspace.model.EditWorkSpaceRequestDto
 import com.ssafy.data.socket.workspace.model.EditWorkspaceBoardRequestDto
 import com.ssafy.data.socket.workspace.model.EditWorkspaceMemberRequestDto
@@ -121,5 +122,15 @@ class WorkspaceService @Inject constructor(
     suspend fun deleteBoard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceBoardRequestDto::class.java)
         boardDao.deleteBoardByBoardId(dto.boardId)
+    }
+
+    suspend fun editArchivedBoard(data: JsonObject) {
+        val dto = gson.fromJson(data, EditArchiveBoardRequestDto::class.java)
+        val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
+        boardDao.updateBoard(
+            before.copy(
+                isClosed = dto.isArchive
+            )
+        )
     }
 }
