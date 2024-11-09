@@ -1,4 +1,4 @@
-package com.ssafy.board.components
+package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
@@ -27,10 +29,13 @@ import com.ssafy.designsystem.values.PEOPLE_ICON
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.TextXLarge
+import com.ssafy.model.board.MemberResponseDTO
 
 @Composable
 fun BoardMemberItem(
-    modifier: Modifier
+    modifier: Modifier = Modifier,
+    boardMember: List<MemberResponseDTO>,
+    moveToBoardInviteMemberScreen: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
@@ -46,9 +51,7 @@ fun BoardMemberItem(
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(PaddingSmall),
             ) {
-                val images =
-                    List(3) { "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z" }
-                items(images.size) { index ->
+                items(boardMember.size) { index ->
                     Box(
                         modifier = Modifier
                             .height(IconXLarge)
@@ -56,15 +59,16 @@ fun BoardMemberItem(
                             .aspectRatio(1f)
                     ) {
                         AsyncImage(
-                            model = images[index],
+                            model = boardMember[index].memberProfileImgUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            error = rememberVectorPainter(image = Icons.Default.AccountCircle)
                         )
                     }
                 }
             }
-            FilledButton(text = "Invite", onClick = { /*TODO*/ })
+            FilledButton(text = "Invite", onClick = moveToBoardInviteMemberScreen)
         }
     }
 }
@@ -72,5 +76,8 @@ fun BoardMemberItem(
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
-    BoardMemberItem(Modifier)
+    BoardMemberItem(
+        boardMember = emptyList(),
+        moveToBoardInviteMemberScreen = {}
+    )
 }

@@ -4,7 +4,7 @@ import com.ssafy.model.member.Authority
 import com.ssafy.model.with.DataStatus
 
 data class WorkSpaceDTO(
-    val workSpaceId: Long,
+    val workspaceId: Long,
     val authority: Authority,
     val name: String,
 

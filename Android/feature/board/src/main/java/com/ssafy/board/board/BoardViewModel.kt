@@ -9,9 +9,11 @@ import com.ssafy.list.CreateListUseCase
 import com.ssafy.list.GetListsInCardsUseCase
 import com.ssafy.list.SetListArchiveUseCase
 import com.ssafy.list.UpdateListUseCase
+import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.with.ListInCard
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,18 +44,12 @@ class BoardViewModel @Inject constructor(
     private var isConnected = MutableStateFlow(true)
 
     val boardData: StateFlow<BoardData?> = _boardId.filterNotNull().flatMapLatest { boardId ->
-        val boardFlow = getBoardUseCase(boardId)
-        val listsFlow = getListsUseCase(boardId)
-
-        if (boardFlow != null) {
-            combine(
-                boardFlow.withUiState(),
-                listsFlow.withUiState()
-            ) { board, lists ->
-                BoardDataMapper.fromDto(board, lists)
-            }
-        } else {
-            flowOf(null)
+        combine(
+            getBoardUseCase(boardId),
+            getListsUseCase(boardId)
+        ) { board: BoardDTO?, lists: List<ListInCard> ->
+            val filteredList = lists.filter { !it.isArchived }
+            board?.let { BoardDataMapper.fromDto(board, filteredList) }
         }
     }.stateIn(
         scope = viewModelScope,

@@ -59,9 +59,9 @@ class BoardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getBoard(id: Long): Flow<BoardDTO?> =
+    override suspend fun getBoard(boardId: Long): Flow<BoardDTO?> =
         withContext(ioDispatcher) {
-            boardDao.getBoardFlow(id).map { it?.toDto() }
+            boardDao.getBoardFlow(boardId).map { it?.toDto() }
         }
 
     override suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit> =

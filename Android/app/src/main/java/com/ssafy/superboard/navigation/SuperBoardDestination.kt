@@ -139,8 +139,11 @@ fun SuperBoardNavHost(
 
         boardMenuScreen(
             popBack = { navController.popBackStack() },
-            selectBackGroundScreen = { cover: Cover? ->
+            moveToSelectBackGroundScreen = { cover: Cover? ->
                 navController.navigate(SelectBackGround(cover))
+            },
+            moveToInviteMemberScreen = {
+                TODO("Move to invite member screen")
             }
         )
 

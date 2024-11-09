@@ -49,7 +49,7 @@ fun CreateBoardBody(
     val scrollState = rememberScrollState()
     val (boardName, setBoardName) = remember(boardData.name) { mutableStateOf(boardData.name) }
     val (workSpace, setWorkSpace) = remember(boardData.workspaceId) {
-        mutableStateOf(workSpaceList.find { it.workSpaceId == boardData.workspaceId })
+        mutableStateOf(workSpaceList.find { it.workspaceId == boardData.workspaceId })
     }
     val (visibleScope, setVisibleScope) = remember(boardData.visibility) {
         mutableStateOf(boardData.visibility)

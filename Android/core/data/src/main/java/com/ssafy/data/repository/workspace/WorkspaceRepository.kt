@@ -2,7 +2,6 @@ package com.ssafy.data.repository.workspace
 
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.member.SimpleMemberDto
-import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
