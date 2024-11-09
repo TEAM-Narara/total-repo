@@ -1,4 +1,4 @@
-package com.ssafy.network.socket
+package com.ssafy.model.socket
 
 sealed class ConnectionState {
     data object Connected : ConnectionState()

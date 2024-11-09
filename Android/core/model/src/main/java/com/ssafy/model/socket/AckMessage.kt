@@ -1,4 +1,4 @@
-package com.ssafy.network.socket
+package com.ssafy.model.socket
 
 data class AckMessage(
     val offset: Long,

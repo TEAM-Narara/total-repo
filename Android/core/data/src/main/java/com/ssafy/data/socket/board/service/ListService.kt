@@ -7,6 +7,7 @@ import com.ssafy.data.socket.board.model.list.EditListArchiveRequestDto
 import com.ssafy.data.socket.board.model.list.EditListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.ListEntity
+import com.ssafy.model.with.DataStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,7 +34,8 @@ class ListService @Inject constructor(
         val before = listDao.getList(dto.listId) ?: throw Exception("존재하지 않는 리스트입니다.")
         listDao.updateList(
             before.copy(
-                isArchived = dto.isArchived
+                isArchived = dto.isArchived,
+                isStatus = DataStatus.STAY,
             )
         )
     }
@@ -46,6 +48,7 @@ class ListService @Inject constructor(
                 name = dto.name,
                 myOrder = dto.myOrder,
                 isArchived = dto.isArchived,
+                isStatus = DataStatus.STAY,
             )
         )
     }

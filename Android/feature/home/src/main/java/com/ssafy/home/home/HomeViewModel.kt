@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetHomeInfoUseCase
 import com.ssafy.home.data.HomeData
 import com.ssafy.logout.LogoutUseCase
-import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.CreateWorkspaceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,8 +20,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val getHomeInfoUseCase: GetHomeInfoUseCase,
-    private val createWorkspaceUseCase: CreateWorkspaceUseCase
-) : BaseViewModel() {
+    private val createWorkspaceUseCase: CreateWorkspaceUseCase,
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
 
     private var workspaceId: Long? = null
     private val _homeData: MutableStateFlow<HomeData> = MutableStateFlow(HomeData())
@@ -34,8 +35,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getHomeInfo() = viewModelScope.launch(Dispatchers.IO) {
-        val isConnected = NetworkState.isConnected.value
-        getHomeInfoUseCase(isConnected, workspaceId).safeCollect { _homeData.emit(it) }
+        withSocketState { isConnected ->
+            getHomeInfoUseCase(isConnected, workspaceId).safeCollect { _homeData.emit(it) }
+        }
     }
 
     fun changeSelectedWorkSpace(newWorkspaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
@@ -46,8 +48,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun createWorkSpace() = viewModelScope.launch(Dispatchers.IO) {
-        val isConnected = NetworkState.isConnected.value
-        createWorkspaceUseCase(isConnected).withUiState().collect()
+        withSocketState { isConnected ->
+            createWorkspaceUseCase(isConnected).withUiState().collect()
+        }
     }
 
 }

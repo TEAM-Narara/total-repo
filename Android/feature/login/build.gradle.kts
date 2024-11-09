@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":domain:login"))
+    implementation(project(":domain:socket"))
 
     // naver Auth
     implementation(libs.oauth)

@@ -3,12 +3,11 @@ package com.ssafy.data.socket
 import android.util.Log
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.network.BuildConfig
-import com.ssafy.network.socket.AckMessage
-import com.ssafy.network.socket.ConnectionState
+import com.ssafy.model.socket.AckMessage
+import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.socket.StompClientManager
 import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,12 +16,11 @@ class BaseStompManager @Inject constructor(
     private val stompClientManager: StompClientManager,
     private val dataStoreRepository: DataStoreRepository,
 ) {
-    private val _state = stompClientManager.observeConnectionState(SOCKET_ID)
-    val isConnected = _state.map { it == ConnectionState.Connected }
+    val state = stompClientManager.observeConnectionState(SOCKET_ID)
 
     suspend fun subscribe(topic: String) = flow {
         val memberId = dataStoreRepository.getUser().memberId
-        _state.collect {
+        state.collect {
             when (it) {
                 ConnectionState.Connected -> stompClientManager.subscribe(
                     SOCKET_ID,

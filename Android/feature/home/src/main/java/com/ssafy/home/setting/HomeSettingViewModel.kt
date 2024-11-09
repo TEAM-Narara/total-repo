@@ -3,7 +3,7 @@ package com.ssafy.home.setting
 import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
-import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.socket.GetSocketStateUseCase
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.DeleteWorkspaceUseCase
 import com.ssafy.workspace.UpdateWorkspaceUseCase
@@ -18,8 +18,9 @@ import javax.inject.Inject
 class HomeSettingViewModel @Inject constructor(
     private val getDetailWorkspaceUseCase: GetDetailWorkspaceUseCase,
     private val deleteWorkspaceUseCase: DeleteWorkspaceUseCase,
-    private val updateWorkspaceUseCase: UpdateWorkspaceUseCase
-) : BaseViewModel() {
+    private val updateWorkspaceUseCase: UpdateWorkspaceUseCase,
+    getSocketStateUseCase: GetSocketStateUseCase,
+) : BaseViewModel(getSocketStateUseCase) {
 
     private val _detailWorkspaceData = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
     val settingData = _detailWorkspaceData.asStateFlow()
@@ -34,9 +35,10 @@ class HomeSettingViewModel @Inject constructor(
         workspaceId: Long,
         backHome: () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val isConnected = NetworkState.isConnected.value
-        deleteWorkspaceUseCase(workspaceId, isConnected).safeCollect {
-            withMain { backHome() }
+        withSocketState { isConnected ->
+            deleteWorkspaceUseCase(workspaceId, isConnected).safeCollect {
+                withMain { backHome() }
+            }
         }
     }
 
@@ -44,8 +46,9 @@ class HomeSettingViewModel @Inject constructor(
         workspaceId: Long,
         name: String
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val isConnected = NetworkState.isConnected.value
-        updateWorkspaceUseCase(workspaceId, name, isConnected).safeCollect()
+        withSocketState { isConnected ->
+            updateWorkspaceUseCase(workspaceId, name, isConnected).safeCollect()
+        }
     }
 
 }

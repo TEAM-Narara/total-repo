@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":domain:login"))
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation(project(":domain:socket"))
 
     // Hilt
     implementation(libs.hilt.android)

@@ -107,4 +107,8 @@ interface CardLabelDao {
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM card_label WHERE id NOT IN (:ids)")
     suspend fun deleteCardLabelsNotIn(ids: List<Long>)
+
+    // 서버에 존재하지 않는 로컬 데이터 삭제
+    @Query("DELETE FROM card_label WHERE id = :cardLabelId")
+    suspend fun deleteCardLabelById(cardLabelId: Long)
 }
