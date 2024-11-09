@@ -5,11 +5,13 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -44,6 +46,8 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     private final MemberRepository memberRepository;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
     private final BoardHistoryRepository boardHistoryRepository;
+
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
@@ -184,6 +188,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, deleteMember);
 
         boardMember.deleted();
+        boardOffsetService.saveDeleteBoardMemberDiff(boardMember);
         //TODO Websocket 보드멤버 삭제
 
         // 멤버 삭제 로그 기록
