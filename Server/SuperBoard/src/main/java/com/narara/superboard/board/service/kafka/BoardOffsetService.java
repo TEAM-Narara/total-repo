@@ -6,6 +6,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.websocket.enums.BoardAction;
@@ -416,6 +417,67 @@ public class BoardOffsetService {
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ARCHIVE_CARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(board.getId(), diffInfo);
+    }
+
+    public void saveAddLabel(Label label) {
+        Map<String, Object> data = new HashMap<>();
+        Board board = label.getBoard();
+
+        data.put("labelId", label.getId());
+        data.put("boardId", board.getId());
+        data.put("name", label.getName());
+        data.put("color", label.getColor());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                label.getUpdatedAt(),
+                BOARD,
+                BoardAction.ADD_BOARD_LABEL.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(board.getId(), diffInfo);
+    }
+
+    public void saveEditLabel(Label label) {
+        Map<String, Object> data = new HashMap<>();
+        Board board = label.getBoard();
+
+        data.put("labelId", label.getId());
+        data.put("boardId", board.getId());
+        data.put("name", label.getName());
+        data.put("color", label.getColor());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                label.getUpdatedAt(),
+                BOARD,
+                BoardAction.EDIT_BOARD_LABEL.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(board.getId(), diffInfo);
+    }
+
+    public void saveDeleteLabel(Label label) {
+        Map<String, Object> data = new HashMap<>();
+        Board board = label.getBoard();
+
+        data.put("labelId", label.getId());
+        data.put("boardId", board.getId());
+
+        DiffInfo diffInfo = new DiffInfo(
+                1L, //offset 임시값
+                label.getUpdatedAt(),
+                BOARD,
+                BoardAction.DELETE_BOARD_LABEL.name(),
                 data
         );
 
