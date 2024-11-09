@@ -2,10 +2,10 @@ package com.ssafy.data.socket.board.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.ssafy.data.socket.board.model.AddBoardMemberRequestDto
-import com.ssafy.data.socket.board.model.DeleteBoardMemberRequestDto
-import com.ssafy.data.socket.board.model.EditBoardMemberRequestDto
-import com.ssafy.data.socket.board.model.EditBoardWatchRequestDto
+import com.ssafy.data.socket.board.model.board.AddBoardMemberRequestDto
+import com.ssafy.data.socket.board.model.board.DeleteBoardMemberRequestDto
+import com.ssafy.data.socket.board.model.board.EditBoardMemberRequestDto
+import com.ssafy.data.socket.board.model.board.EditBoardWatchRequestDto
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dto.BoardMemberAlarmEntity

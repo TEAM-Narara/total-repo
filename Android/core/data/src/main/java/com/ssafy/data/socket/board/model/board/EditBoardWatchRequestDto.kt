@@ -1,4 +1,4 @@
-package com.ssafy.data.socket.board.model
+package com.ssafy.data.socket.board.model.board
 
 data class EditBoardWatchRequestDto(
     val boardId: Long,

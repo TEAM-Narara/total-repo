@@ -1,6 +1,6 @@
-package com.ssafy.data.socket.board.model
+package com.ssafy.data.socket.board.model.board
 
-data class DeleteBoardMemberRequestDto(
+data class AddBoardMemberRequestDto(
     val boardMemberId: Long,
     val boardId: Long,
     val memberId: Long,

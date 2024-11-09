@@ -3,6 +3,7 @@ package com.ssafy.data.socket.board
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.socket.BaseStompManager
 import com.ssafy.data.socket.board.service.BoardService
+import com.ssafy.data.socket.board.service.ListService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 class BoardStomp @Inject constructor(
     private val stomp: BaseStompManager,
     private val boardService: BoardService,
+    private val listService: ListService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private var _job: Job? = null
@@ -28,6 +30,9 @@ class BoardStomp @Inject constructor(
                     "EDIT_BOARD_MEMBER" -> boardService.editBoardMember(it.data)
                     "DELETE_BOARD_MEMBER" -> boardService.deleteBoardMember(it.data)
                     "EDIT_BOARD_WATCH" -> boardService.editBoardWatch(it.data)
+                    "ADD_LIST" -> listService.addList(it.data)
+                    "EDIT_LIST" -> listService.editList(it.data)
+                    "EDIT_LIST_ARCHIVE" -> listService.editListArchive(it.data)
                     else -> {}
                 }
             }
