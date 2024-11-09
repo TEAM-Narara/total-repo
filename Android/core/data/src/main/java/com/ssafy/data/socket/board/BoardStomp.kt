@@ -3,7 +3,9 @@ package com.ssafy.data.socket.board
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.socket.BaseStompManager
 import com.ssafy.data.socket.board.service.BoardService
+import com.ssafy.data.socket.board.service.CardService
 import com.ssafy.data.socket.board.service.ListService
+import com.ssafy.data.socket.board.service.ReplyService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -17,6 +19,8 @@ class BoardStomp @Inject constructor(
     private val stomp: BaseStompManager,
     private val boardService: BoardService,
     private val listService: ListService,
+    private val cardService: CardService,
+    private val replyService: ReplyService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private var _job: Job? = null
@@ -33,6 +37,15 @@ class BoardStomp @Inject constructor(
                     "ADD_LIST" -> listService.addList(it.data)
                     "EDIT_LIST" -> listService.editList(it.data)
                     "EDIT_LIST_ARCHIVE" -> listService.editListArchive(it.data)
+                    "ADD_CARD" -> cardService.addCard(it.data)
+                    "EDIT_CARD" -> cardService.editCard(it.data)
+                    "ARCHIVE_CARD" -> cardService.archiveCard(it.data)
+                    "DELETE_CARD" -> cardService.deleteCard(it.data)
+                    "ADD_CARD_MEMBER" -> cardService.addCardMember(it.data)
+                    "DELETE_CARD_MEMBER" -> cardService.deleteCardMember(it.data)
+                    "ADD_REPLY" -> replyService.addReply(it.data)
+                    "EDIT_REPLY" -> replyService.editReply(it.data)
+                    "DELETE_REPLY" -> replyService.deleteReply(it.data)
                     else -> {}
                 }
             }

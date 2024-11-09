@@ -31,7 +31,7 @@ interface CardDao {
         WHERE isStatus = 'UPDATE' OR isStatus = 'DELETE'
     """)
     suspend fun getLocalOperationCard(): List<CardEntity>
-    
+
     // 카드 단일 조회
     @Transaction
     @Query("""
@@ -49,7 +49,7 @@ interface CardDao {
         WHERE id = :cardId
     """)
     fun getCardFlow(cardId: Long): Flow<CardEntity>?
-    
+
     // 카드 상위의 List, Board 이름 조회
     @Transaction
     @Query("""
@@ -116,4 +116,7 @@ interface CardDao {
     // 서버에 존재하지 않는 로컬 데이터 삭제
     @Query("DELETE FROM card WHERE id NOT IN (:ids)")
     suspend fun deleteCardsNotIn(ids: List<Long>)
+
+    @Query("DELETE FROM card WHERE id = :cardId")
+    suspend fun deleteCardById(cardId: Long)
 }
