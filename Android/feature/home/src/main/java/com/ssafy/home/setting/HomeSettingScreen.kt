@@ -54,7 +54,6 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.MemberData
-import com.ssafy.home.invite.InviteWorkspace
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
 import com.ssafy.ui.uistate.UiState
@@ -152,7 +151,8 @@ private fun HomeSettingScreen(
                     text = workspaceName,
                     onInputFinished = updateWorkspaceName,
                     modifier = Modifier.weight(1f),
-                    alignStyle = TextAlign.End
+                    alignStyle = TextAlign.End,
+                    maxTitleLength = 30
                 )
             }
             HorizontalDivider(

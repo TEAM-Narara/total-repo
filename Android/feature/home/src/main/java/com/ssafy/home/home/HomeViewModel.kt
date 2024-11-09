@@ -23,6 +23,7 @@ class HomeViewModel @Inject constructor(
     private val createWorkspaceUseCase: CreateWorkspaceUseCase
 ) : BaseViewModel() {
 
+    private var workspaceId: Long? = null
     private val _homeData: MutableStateFlow<HomeData> = MutableStateFlow(HomeData())
     val homeData: StateFlow<HomeData> = _homeData.asStateFlow()
 
@@ -34,11 +35,12 @@ class HomeViewModel @Inject constructor(
 
     fun getHomeInfo() = viewModelScope.launch(Dispatchers.IO) {
         val isConnected = NetworkState.isConnected.value
-        getHomeInfoUseCase(isConnected).safeCollect { _homeData.emit(it) }
+        getHomeInfoUseCase(isConnected, workspaceId).safeCollect { _homeData.emit(it) }
     }
 
-    fun changeSelectedWorkSpace(workSpaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        getHomeInfoUseCase(homeData.value, workSpaceId).safeCollect { homeData ->
+    fun changeSelectedWorkSpace(newWorkspaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        workspaceId = newWorkspaceId
+        getHomeInfoUseCase(homeData.value, newWorkspaceId).safeCollect { homeData ->
             homeData?.let { _homeData.emit(it) }
         }
     }
