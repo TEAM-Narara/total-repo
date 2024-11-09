@@ -16,6 +16,7 @@ import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
@@ -235,7 +236,7 @@ class CardRepositoryImpl @Inject constructor(
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>> =
+    ): Flow<List<MemberWithRepresentative>> =
         withContext(ioDispatcher) {
             cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
         }

@@ -2,6 +2,7 @@ package com.ssafy.data.repository.card
 
 import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
@@ -59,7 +60,7 @@ interface CardRepository {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>>
+    ): Flow<List<MemberWithRepresentative>>
 
     suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 
