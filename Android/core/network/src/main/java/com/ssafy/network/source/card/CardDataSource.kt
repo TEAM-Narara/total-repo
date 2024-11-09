@@ -6,6 +6,8 @@ import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardLabelDTO
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +21,11 @@ interface CardDataSource {
     suspend fun updateCard(
         cardUpdateRequestDto: CardUpdateRequestDto
     ): Flow<Unit>
+
+    suspend fun updateCardMember(
+        boardId: Long,
+        simpleCardMemberDto: SimpleCardMemberDto
+    ): Flow<SimpleCardMemberDto>
 
     suspend fun setCardArchive(cardId: Long): Flow<Unit>
 

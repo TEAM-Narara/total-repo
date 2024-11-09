@@ -6,9 +6,11 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
@@ -38,6 +40,13 @@ interface CardMemberDao {
         WHERE cardId IN (:cardIds) 
     """)
     fun getCardsMemberAlarms(cardIds: List<Long>): Flow<List<CardMemberAlarmEntity>>
+
+    @Query("SELECT * FROM card_member WHERE cardId = :cardId AND memberId = :memberId")
+    fun getCardMember(cardId: Long, memberId: Long): CardMemberEntity?
+
+    // 카드 멤버 단일 조회
+    @Query("SELECT * FROM card_member WHERE cardId = :cardId AND memberId = :memberId")
+    fun getCardMemberFlow(cardId: Long, memberId: Long): Flow<CardMemberEntity?>
 
     // 카드의 담당자들 조회
     @Transaction
@@ -125,7 +134,7 @@ interface CardMemberDao {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>>
+    ): Flow<List<MemberWithRepresentative>>
 
     // 단일 추가
     @Insert(onConflict = OnConflictStrategy.REPLACE)

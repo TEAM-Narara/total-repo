@@ -16,11 +16,13 @@ import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
@@ -74,9 +76,6 @@ class CardRepositoryImpl @Inject constructor(
             )
         }
     }
-    
-    // 카드 멤버는 Board, Workspace 멤버 조인
-    // 담당자 설정이나, watch를 설정하면 cardTable에 생성
 
     override suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
@@ -237,7 +236,7 @@ class CardRepositoryImpl @Inject constructor(
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>> =
+    ): Flow<List<MemberWithRepresentative>> =
         withContext(ioDispatcher) {
             cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
         }
@@ -255,6 +254,40 @@ class CardRepositoryImpl @Inject constructor(
                     isStatus = isStatus)
             ))
         }
+
+    override suspend fun updateCardMember(
+        simpleCardMemberDto: SimpleCardMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val cardMember = cardMemberDao.getCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto.memberId)
+
+        if (cardMember != null) {
+            if (isConnected) {
+                cardDataSource.updateCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto).map { Unit }
+            } else {
+                val result = when (cardMember.isStatus) {
+                    DataStatus.STAY ->
+                        cardMemberDao.updateCardMember(
+                            cardMember.copy(
+                                isStatus = DataStatus.UPDATE,
+                                cardId = simpleCardMemberDto.cardId
+                            )
+                        )
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        cardMemberDao.updateCardMember(
+                            cardMember.copy(
+                                cardId = simpleCardMemberDto.cardId
+                            )
+                        )
+                    DataStatus.DELETE -> {}
+                }
+
+                flowOf(result)
+            }
+        } else {
+            flowOf(Unit)
+        }
+    }
 
     override suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long> =
         withContext(ioDispatcher) {

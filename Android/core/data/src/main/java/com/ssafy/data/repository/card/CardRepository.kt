@@ -2,11 +2,14 @@ package com.ssafy.data.repository.card
 
 import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.member.SimpleCardMemberDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
@@ -57,9 +60,14 @@ interface CardRepository {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberResponseDTO>>
+    ): Flow<List<MemberWithRepresentative>>
 
     suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
+
+    suspend fun updateCardMember(
+        simpleCardMemberDto: SimpleCardMemberDto,
+        isConnected: Boolean
+    ): Flow<Unit>
 
     suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long>
 
