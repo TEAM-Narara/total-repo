@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.ssafy.data.socket.board.model.AddBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.DeleteBoardMemberRequestDto
-import com.ssafy.data.socket.board.model.EditBoardArchiveRequestDto
 import com.ssafy.data.socket.board.model.EditBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.EditBoardWatchRequestDto
 import com.ssafy.database.dao.BoardDao
@@ -61,17 +60,6 @@ class BoardService @Inject constructor(
     suspend fun deleteBoardMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteBoardMemberRequestDto::class.java)
         boardMemberDao.deleteBoardMemberByBoardIdAndMemberId(dto.boardId, dto.memberId)
-    }
-
-    suspend fun editBoardArchive(data: JsonObject) {
-        val dto = gson.fromJson(data, EditBoardArchiveRequestDto::class.java)
-        val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
-        boardDao.updateBoard(
-            before.copy(
-                isClosed = dto.isArchive,
-                isStatus = DataStatus.STAY
-            )
-        )
     }
 
     suspend fun editBoardWatch(data: JsonObject) {

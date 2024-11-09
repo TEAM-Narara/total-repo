@@ -27,7 +27,6 @@ class BoardStomp @Inject constructor(
                     "ADD_BOARD_MEMBER" -> boardService.addBoardMember(it.data)
                     "EDIT_BOARD_MEMBER" -> boardService.editBoardMember(it.data)
                     "DELETE_BOARD_MEMBER" -> boardService.deleteBoardMember(it.data)
-                    "EDIT_BOARD_ARCHIVE" -> boardService.editBoardArchive(it.data)
                     "EDIT_BOARD_WATCH" -> boardService.editBoardWatch(it.data)
                     else -> {}
                 }
