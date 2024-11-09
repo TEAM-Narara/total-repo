@@ -10,6 +10,14 @@ data class SimpleMemberDto(
     val isStatus: DataStatus? = DataStatus.STAY
 )
 
+data class SimpleCardMemberDto(
+    val memberId: Long,
+    val isRepresentative: Boolean,
+
+    @Transient
+    val isStatus: DataStatus? = DataStatus.STAY
+)
+
 data class DetailMemberDto(
     val workspaceMemberId: Long,
     val memberId: Long,
