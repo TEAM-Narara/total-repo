@@ -1,6 +1,7 @@
 package com.narara.superboard.cardmember.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -36,6 +37,8 @@ class CardMemberServiceImplTest {
     @Mock
     private CardHistoryRepository cardHistoryRepository;
 
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @InjectMocks
     private CardMemberServiceImpl cardMemberService;

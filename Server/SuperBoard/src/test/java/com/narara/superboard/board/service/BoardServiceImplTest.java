@@ -10,6 +10,7 @@ import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -95,6 +96,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private WorkspaceOffsetService workspaceOffsetService;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     /**
      * 가상의 객체 주로 단위 테스트에서 의존성을 격리하고 특정 메서드의 동작을 시뮬레이션하는 데 사용됩니다. 실제 로직 실행을 방지, 메서드 호출 검증, 메서드 동작을 제어

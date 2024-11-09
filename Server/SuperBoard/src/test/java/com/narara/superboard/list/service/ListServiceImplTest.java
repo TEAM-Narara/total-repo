@@ -9,6 +9,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -55,6 +56,9 @@ class ListServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private ListServiceImpl listService;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @ParameterizedTest
     @NullAndEmptySource
