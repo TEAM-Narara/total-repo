@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
@@ -90,4 +91,8 @@ interface WorkspaceMemberDao {
 
     @Query("DELETE FROM workspace_member WHERE workspaceId = :workspaceId and memberId = :memberId")
     suspend fun deleteByWorkspaceId(workspaceId: Long, memberId: Long)
+
+    // 로컬 삭제(isStatus: CREATE -> 즉시 삭제)
+    @Delete
+    suspend fun deleteWorkspaceMember(workspaceMember: WorkspaceMemberEntity)
 }

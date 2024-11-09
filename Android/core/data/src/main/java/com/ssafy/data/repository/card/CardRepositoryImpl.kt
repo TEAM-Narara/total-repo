@@ -7,7 +7,11 @@ import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
+import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -44,6 +48,7 @@ class CardRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
     override suspend fun createCard(
+        myMemberId: Long,
         cardRequestDto: CardRequestDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
@@ -51,13 +56,22 @@ class CardRepositoryImpl @Inject constructor(
             // TODO
             cardDataSource.createCard(cardRequestDto).map { 5 }
         } else {
+            val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
+
             flowOf(cardDao.insertCard(
                 CardEntity(
-                    id = negativeIdGenerator.getNextNegativeId(LocalTable.CARD),
+                    id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE)
-            ))
+                    isStatus = DataStatus.CREATE))
+                .also {
+                    createCardMember(
+                        cardId = localCardId,
+                        memberId = myMemberId,
+                        isStatus = DataStatus.CREATE)
+                    createCardWatch(localCardId, isStatus = DataStatus.CREATE)
+                }
+            )
         }
     }
 
@@ -214,6 +228,29 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             cardMemberDao.getCardMembers(cardId)
                 .map { list -> list.map { it.toDTO() } }
+        }
+
+    override suspend fun createCardMember(
+        cardId: Long,
+        memberId: Long,
+        isStatus: DataStatus
+    ): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(cardMemberDao.insertCardMember(
+                CardMemberEntity(
+                    cardId = cardId,
+                    memberId = memberId,
+                    isStatus = isStatus)
+            ))
+        }
+
+    override suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(cardMemberDao.insertCardAlarm(
+                CardMemberAlarmEntity(
+                    cardId = cardId,
+                    isStatus = isStatus)
+            ))
         }
 
     override suspend fun getLocalCreateCardLabels(): List<CardLabelDTO> =

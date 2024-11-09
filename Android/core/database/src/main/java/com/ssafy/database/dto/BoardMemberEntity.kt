@@ -20,7 +20,7 @@ data class BoardMemberEntity(
 @Entity(tableName = "board_member_alarm")
 data class BoardMemberAlarmEntity(
     @PrimaryKey val boardId: Long = 0L,
-    val isAlert: Boolean = false,
+    val isAlert: Boolean = true,
 
     val isStatus: DataStatus = DataStatus.STAY
 )

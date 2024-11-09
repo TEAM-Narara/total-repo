@@ -17,7 +17,7 @@ data class ListMemberEntity(
 @Entity(tableName = "list_member_alarm")
 data class ListMemberAlarmEntity(
     @PrimaryKey val listId: Long = 0L,
-    val isAlert: Boolean = false,
+    val isAlert: Boolean = true,
 
     val isStatus: DataStatus = DataStatus.STAY
 )

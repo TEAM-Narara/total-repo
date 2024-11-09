@@ -11,7 +11,11 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.ReplyDao
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
+import com.ssafy.database.dto.ListMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -51,21 +55,32 @@ class ListRepositoryImpl @Inject constructor(
 ) : ListRepository {
 
     override suspend fun createList(
+        myMemberId: Long,
         createListRequestDto: CreateListRequestDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { -1 }
         } else {
+            val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
+
             flowOf (
                 listDao.insertList(
                     ListEntity(
-                        id = negativeIdGenerator.getNextNegativeId(LocalTable.LIST),
+                        id = localListId,
                         name = createListRequestDto.listName,
                         boardId = createListRequestDto.boardId,
                         isStatus = DataStatus.CREATE
                     )
-                )
+                ).also {
+                    createListMember(
+                        listId = localListId,
+                        memberId = myMemberId,
+                        isStatus = DataStatus.CREATE)
+                    createListWatch(
+                        listId = localListId,
+                        isStatus = DataStatus.CREATE)
+                }
             )
         }
     }
@@ -177,6 +192,20 @@ class ListRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
+    override suspend fun createListMember(
+        listId: Long,
+        memberId: Long,
+        isStatus: DataStatus
+    ): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(listMemberDao.insertListMember(
+                ListMemberEntity(
+                    listId = listId,
+                    memberId = memberId,
+                    isStatus = isStatus)
+            ))
+        }
+
     override suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val member = listMemberDao.getListMember(memberId, listId)
@@ -203,6 +232,15 @@ class ListRepositoryImpl @Inject constructor(
     override suspend fun getListWatchStatus(id: Long): Flow<Boolean?> =
         withContext(ioDispatcher) {
             listMemberDao.getListMemberAlarmFlow(id).map { it?.toDTO()?.isAlert }
+        }
+
+    override suspend fun createListWatch(listId: Long, isStatus: DataStatus): Flow<Long> =
+        withContext(ioDispatcher) {
+            flowOf(listMemberDao.insertListAlarm(
+                ListMemberAlarmEntity(
+                    listId = listId,
+                    isStatus = isStatus)
+            ))
         }
 
     override suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit> =

@@ -9,11 +9,12 @@ import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
+import com.ssafy.model.with.DataStatus
 import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
 
-    suspend fun createBoard(boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
+    suspend fun createBoard(myMemberId: Long, boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun getBoard(boardId: Long): Flow<BoardDTO?>
 
@@ -31,6 +32,8 @@ interface BoardRepository {
 
     suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
+    suspend fun createBoardWatch(boardId: Long, isStatus: DataStatus): Flow<Long>
+
     suspend fun getWatchStatus(id: Long): Flow<Boolean?>
 
     suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
@@ -38,6 +41,8 @@ interface BoardRepository {
     suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?>
 
     suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
+
+    suspend fun createBoardMember(boardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 
     suspend fun deleteBoardMember(
         boardId: Long,

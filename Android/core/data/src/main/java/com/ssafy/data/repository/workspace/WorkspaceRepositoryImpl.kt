@@ -5,7 +5,9 @@ import com.ssafy.data.repository.toEntity
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.WorkspaceDao
 import com.ssafy.database.dao.WorkspaceMemberDao
+import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.WorkspaceEntity
+import com.ssafy.database.dto.WorkspaceMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.board.MemberResponseDTO
@@ -70,6 +72,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
         }
 
     override suspend fun createWorkspace(
+        myMemberId: Long,
         name: String,
         isConnected: Boolean
     ): Flow<Long> =
@@ -77,14 +80,21 @@ class WorkspaceRepositoryImpl @Inject constructor(
             if (isConnected) {
                 workspaceDataSource.createWorkspace(name).map { 5 }
             } else {
+                val localWorkspaceId = negativeIdGenerator.getNextNegativeId(LocalTable.WORKSPACE)
+
                 flowOf(
                     workspaceDao.insertWorkspace(
                         WorkspaceEntity(
-                            id = negativeIdGenerator.getNextNegativeId(LocalTable.WORKSPACE),
+                            id = localWorkspaceId,
                             name = name,
                             authority = Authority.ADMIN,
                             isStatus = DataStatus.CREATE
-                        )
+                        ).also {
+                            createWorkspaceMember(
+                                workspaceId = localWorkspaceId,
+                                memberId = myMemberId,
+                                isStatus = DataStatus.CREATE)
+                        }
                     )
                 )
             }
@@ -164,6 +174,20 @@ class WorkspaceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             workspaceMemberDao.getWorkspacesByMember(memberId)
                 .map { list -> list.map { it.toDTO() } }
+        }
+
+    override suspend fun createWorkspaceMember(
+        workspaceId: Long,
+        memberId: Long,
+        isStatus: DataStatus
+    ): Flow<Long>  =
+        withContext(ioDispatcher) {
+            flowOf(workspaceMemberDao.insertWorkspaceMember(
+                WorkspaceMemberEntity(
+                    workspaceId = workspaceId,
+                    memberId = memberId,
+                    isStatus = isStatus)
+            ))
         }
 
     override suspend fun addWorkspaceMember(
