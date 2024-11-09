@@ -12,6 +12,7 @@ import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -57,15 +58,19 @@ class ListRepositoryImpl @Inject constructor(
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { -1 }
         } else {
+            val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
+
             flowOf (
                 listDao.insertList(
                     ListEntity(
-                        id = negativeIdGenerator.getNextNegativeId(LocalTable.LIST),
+                        id = localListId,
                         name = createListRequestDto.listName,
                         boardId = createListRequestDto.boardId,
                         isStatus = DataStatus.CREATE
                     )
-                )
+                ).also {
+                    listMemberDao.insertListAlarm(ListMemberAlarmEntity(localListId))
+                }
             )
         }
     }

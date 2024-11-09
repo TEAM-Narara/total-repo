@@ -6,6 +6,8 @@ import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
+import com.ssafy.database.dto.BoardMemberAlarmEntity
+import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -43,12 +45,17 @@ class BoardRepositoryImpl @Inject constructor(
             if (isConnected) {
                 boardDataSource.createBoard(boardDTO).map { it.id }
             } else {
-                flowOf(boardDao.insertBoard(
+                val localBoardId = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD)
+
+                flowOf(
+                    boardDao.insertBoard(
                     boardDTO.copy(
-                        id = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD),
-                        isStatus = DataStatus.CREATE
-                    ).toEntity()
-                ))
+                        id = localBoardId,
+                        isStatus = DataStatus.CREATE).toEntity()
+                    ).also {
+                        boardMemberDao.insertBoardAlarm(BoardMemberAlarmEntity(localBoardId))
+                    }
+                )
             }
         }
 

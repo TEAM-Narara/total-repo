@@ -7,7 +7,9 @@ import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
+import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -51,13 +53,18 @@ class CardRepositoryImpl @Inject constructor(
             // TODO
             cardDataSource.createCard(cardRequestDto).map { 5 }
         } else {
+            val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
+
             flowOf(cardDao.insertCard(
                 CardEntity(
-                    id = negativeIdGenerator.getNextNegativeId(LocalTable.CARD),
+                    id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE)
-            ))
+                    isStatus = DataStatus.CREATE))
+                .also {
+                    cardMemberDao.insertCardAlarm(CardMemberAlarmEntity(localCardId))
+                }
+            )
         }
     }
 
