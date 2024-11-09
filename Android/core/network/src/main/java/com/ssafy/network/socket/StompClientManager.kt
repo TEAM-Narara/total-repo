@@ -65,6 +65,7 @@ class StompClientManager @Inject constructor(
             gson.fromJson(it.bodyAsText, clazz)
         }.catch { exception ->
             exception.printStackTrace()
+            sessions.remove(id)
             updateConnectionState(id, ConnectionState.Error(exception))
         }
     }
