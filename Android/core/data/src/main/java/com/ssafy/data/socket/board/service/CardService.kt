@@ -76,6 +76,7 @@ class CardService @Inject constructor(
 
     suspend fun deleteCard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardRequestDto::class.java)
+        // TODO : 이미지 삭제 로직 구현
         cardDao.deleteCardById(dto.cardId)
     }
 

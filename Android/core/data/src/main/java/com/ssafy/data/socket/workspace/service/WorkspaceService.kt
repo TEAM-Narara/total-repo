@@ -51,6 +51,7 @@ class WorkspaceService @Inject constructor(
     suspend fun addMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceMemberDto::class.java)
 
+        // TODO : 이미지 저장 로직 구현
         memberDao.insertMember(
             MemberEntity(
                 id = dto.memberId,
@@ -73,8 +74,8 @@ class WorkspaceService @Inject constructor(
 
     suspend fun deleteMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceMemberRequestDto::class.java)
-        workspaceMemberDao.deleteLocalWorkspaceMember(
-            workspaceId = dto.workspaceId, memberId = dto.memberId)
+        // TODO : 이미지 삭제 로직 구현
+        workspaceMemberDao.deleteWorkspaceMemberById(dto.workspaceMemberId)
     }
 
     suspend fun editMember(data: JsonObject) {
@@ -108,7 +109,7 @@ class WorkspaceService @Inject constructor(
     suspend fun editBoard(data: JsonObject) {
         val dto = gson.fromJson(data, EditWorkspaceBoardRequestDto::class.java)
         val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
-        // TODO : 이미지 저장 로직 구현
+        // TODO : 이미지 저장 및 삭제 로직 구현
         boardDao.updateBoard(
             before.copy(
                 name = dto.boardName,
@@ -123,6 +124,7 @@ class WorkspaceService @Inject constructor(
 
     suspend fun deleteBoard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceBoardRequestDto::class.java)
+        // TODO : 이미지 삭제 로직 구현
         boardDao.deleteBoardByBoardId(dto.boardId)
     }
 
