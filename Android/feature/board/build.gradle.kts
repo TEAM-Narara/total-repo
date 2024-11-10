@@ -42,9 +42,14 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":domain:board"))
     implementation(project(":domain:list"))
+    implementation(project(":domain:member"))
     implementation(project(":domain:card"))
     implementation(project(":domain:workspace"))
     implementation(project(":domain:socket"))
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     // Coil
     implementation(libs.coil.compose)
