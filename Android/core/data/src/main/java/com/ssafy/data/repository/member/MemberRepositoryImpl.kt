@@ -4,10 +4,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
-import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
@@ -17,7 +16,6 @@ import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map

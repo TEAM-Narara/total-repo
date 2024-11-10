@@ -1,4 +1,4 @@
-package com.ssafy.data.repository
+package com.ssafy.database.dto.piece
 
 import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.BoardEntity
