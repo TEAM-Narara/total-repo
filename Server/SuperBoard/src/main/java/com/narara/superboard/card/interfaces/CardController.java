@@ -34,13 +34,13 @@ public class CardController implements CardAPI {
 
     @Override
     @Operation(summary = "카드 생성", description = "")
-    public ResponseEntity<DefaultResponse<CardSimpleResponseDto>> createCard(
+    public ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
             @RequestBody CardCreateRequestDto cardCreateRequestDto) {
 
         Card card = cardService.createCard(member, cardCreateRequestDto);
 
-        CardSimpleResponseDto cardSimpleResponseDto = CardSimpleResponseDto.of(card);
+        CardDetailResponseDto cardSimpleResponseDto = CardDetailResponseDto.from(card);
 
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CARD_CREATE_SUCCESS, cardSimpleResponseDto),
