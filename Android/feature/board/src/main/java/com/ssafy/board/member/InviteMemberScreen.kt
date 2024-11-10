@@ -1,5 +1,6 @@
 package com.ssafy.board.member
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import com.ssafy.designsystem.component.SearchBar
 import com.ssafy.designsystem.component.UserInviteItem
 import com.ssafy.designsystem.component.UserSearchItem
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.member.data.UserData
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.member.Authority
@@ -69,7 +71,7 @@ private fun InviteMemberScreen(
     searchMember: (String) -> Unit,
     boardMembers: List<MemberResponseDTO>?,
     lazyMemberItems: LazyPagingItems<UserData>,
-    onInvite: (Long) -> Unit,
+    onInvite: (UserData) -> Unit,
     changeAuth: (Long, Authority) -> Unit
 ) {
 
@@ -87,43 +89,54 @@ private fun InviteMemberScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(PaddingSmall),
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(PaddingDefault)
+        ) {
+
             if (lazyMemberItems.itemCount == 0 && boardMembers != null) {
-                items(boardMembers.size , key= { boardMembers[it] }){
+                items(boardMembers.size, key = { boardMembers[it].memberId }) {
                     val member = boardMembers[it]
-                    UserInviteItem(
+                    UserSearchItem(
                         nickname = member.memberNickname,
                         email = member.memberEmail,
-                        onInvite = { },
-                        isInvited = true
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = member.memberEmail,
-                            contentDescription = null,
-                            error = rememberVectorPainter(Icons.Default.AccountCircle)
-                        )
-                    }
+                        userAuth = member.authority.name,
+                        onChangeUserAuth = { auth ->
+                            changeAuth(
+                                member.memberId,
+                                Authority.valueOf(auth)
+                            )
+                        },
+                        canChangeAuth = true,
+                        icon = {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = member.memberProfileImgUrl,
+                                contentDescription = null,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle)
+                            )
+                        }
+                    )
                 }
             } else {
                 items(lazyMemberItems.itemCount, key = lazyMemberItems.itemKey { it.memberId }) {
                     lazyMemberItems[it]?.let { user ->
-                        UserSearchItem(
+                        UserInviteItem(
                             nickname = user.nickname,
                             email = user.email,
-                            userAuth = "",
-                            onChangeUserAuth = { auth -> changeAuth(user.memberId, Authority.valueOf(auth)) },
-                            clickAction = { onInvite(user.memberId) },
-                            canChangeAuth = false,
-                            icon = {
-                                AsyncImage(
-                                    modifier = Modifier.fillMaxSize(),
-                                    model = user.profileImgUrl,
-                                    contentDescription = null,
-                                    error = rememberVectorPainter(Icons.Default.AccountCircle)
-                                )
-                            }
-                        )
+                            onInvite = { onInvite(user) },
+                            isInvited = true
+                        ) {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = user.profileImgUrl,
+                                contentDescription = null,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle)
+                            )
+                        }
                     }
                 }
             }
@@ -135,6 +148,6 @@ private fun InviteMemberScreen(
 @Composable
 private fun InviteMemberScreenPreview() {
     InviteMemberScreen(
-       popBack = {}
+        popBack = {}
     )
 }

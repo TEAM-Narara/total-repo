@@ -3,6 +3,7 @@ package com.ssafy.network.api
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -47,5 +48,23 @@ interface BoardAPI {
 
     @GET("api/v1/boards/{boardId}/members")
     suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
+
+    @POST("api/v1/boards/{boardId}/members")
+    suspend fun createBoardMember(
+        @Path("boardId") boardId: Long,
+        @Body memberId: Map<String, Long>
+    ): Response<ApiResponse<MemberResponseDTO>>
+
+    @DELETE("api/v1/boards/{boardId}/members")
+    suspend fun deleteBoardMember(
+        @Path("boardId") boardId: Long,
+        @Body memberId: Map<String, Long>
+    ): Response<ApiResponse<MemberResponseDTO>>
+
+    @PATCH("api/v1/boards/{boardId}/members")
+    suspend fun updateBoardMember(
+        @Path("boardId") boardId: Long,
+        @Body simpleMemberDto: SimpleMemberDto
+    ): Response<ApiResponse<MemberResponseDTO>>
 
 }

@@ -3,7 +3,9 @@ package com.ssafy.board.member
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.ssafy.board.CreateBoardMemberUseCase
 import com.ssafy.board.GetBoardMembersUseCase
+import com.ssafy.board.UpdateBoardMemberUseCase
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
 import com.ssafy.model.member.Authority
@@ -27,6 +29,8 @@ import javax.inject.Inject
 class InviteMemberViewModel @Inject constructor(
     private val getBoardMemberUseCase: GetBoardMembersUseCase,
     private val searchMemberUseCase: SearchMembersUseCase,
+    private val createBoardMemberUseCase: CreateBoardMemberUseCase,
+    private val updateBoardMemberUseCase: UpdateBoardMemberUseCase
 ) : BaseViewModel() {
     private val _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
@@ -55,12 +59,18 @@ class InviteMemberViewModel @Inject constructor(
 
     fun searchParams(input: String) = searchMemberText.update { input }
 
-    fun inviteMember(memberId: Long) {
-
+    fun inviteMember(userData: UserData) = withIO {
+        val boardId = _boardId.value ?: return@withIO
+        withSocketState { isConnected: Boolean ->
+            createBoardMemberUseCase(boardId, userData.memberId, isConnected)
+        }
     }
 
-    fun updateMemberAuth(memberId: Long, auth: Authority) {
-
+    fun updateMemberAuth(memberId: Long, auth: Authority) = withIO {
+        val boardId = _boardId.value ?: return@withIO
+        withSocketState { isConnected: Boolean ->
+            updateBoardMemberUseCase(boardId, memberId, auth, isConnected)
+        }
     }
 
 }

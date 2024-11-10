@@ -2,15 +2,13 @@ package com.ssafy.home.invite
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,13 +24,12 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
-import com.ssafy.designsystem.component.EditableText
+import com.ssafy.designsystem.component.SearchBar
 import com.ssafy.designsystem.component.UserInviteItem
 import com.ssafy.designsystem.component.UserSearchItem
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.Primary
-import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.data.UserData
@@ -83,7 +79,7 @@ private fun InviteWorkspaceScreen(
     popBackToHome: () -> Unit,
     setSearchParams: (String) -> Unit,
     changeAuth: (Long, Authority) -> Unit,
-    onInvite: (Long) -> Unit
+    onInvite: (UserData) -> Unit
 ) {
     val activity = LocalContext.current as? Activity
     activity?.let {
@@ -95,7 +91,17 @@ private fun InviteWorkspaceScreen(
 
     Scaffold(
         containerColor = White,
-        topBar = { InviteTopBar(popBackToHome = popBackToHome) }
+        topBar = {
+            Column {
+                InviteTopBar(onClosePressed = popBackToHome)
+                SearchBar(
+                    modifier = Modifier
+                        .padding(horizontal = PaddingDefault)
+                        .padding(bottom = PaddingDefault),
+                    onTextChanged = setSearchParams
+                )
+            }
+        }
     ) { innerPadding ->
 
         LazyColumn(
@@ -105,60 +111,39 @@ private fun InviteWorkspaceScreen(
                 .padding(PaddingDefault)
         ) {
 
-            item {
-                Text(
-                    text = workspace.workspaceName,
-                    fontSize = TextLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            item {
-                HorizontalDivider()
-            }
-
-            item {
-                EditableText(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = PaddingSmall),
-                    onTextChanged = setSearchParams,
-                    maxTitleLength = Int.MAX_VALUE
-                )
-            }
-
-
-            items(workspace.members.size, key = { workspace.members[it].memberId }) {
-                val member = workspace.members[it]
-                UserInviteItem(
-                    nickname = member.memberNickname,
-                    email = member.memberEmail,
-                    onInvite = { onInvite(member.memberId) },
-                    isInvited = true
-                ) {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxSize(),
-                        model = member.memberProfileImgUrl,
-                        contentDescription = null,
-                        error = rememberVectorPainter(Icons.Default.AccountCircle)
+            if (lazyMemberItems.itemCount == 0) {
+                items(workspace.members.size, key = { workspace.members[it].memberId }) {
+                    val member = workspace.members[it]
+                    UserSearchItem(
+                        nickname = member.memberNickname,
+                        email = member.memberEmail,
+                        userAuth = member.authority.name,
+                        onChangeUserAuth = { auth ->
+                            changeAuth(
+                                member.memberId,
+                                Authority.valueOf(auth)
+                            )
+                        },
+                        canChangeAuth = true,
+                        icon = {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = member.memberProfileImgUrl,
+                                contentDescription = null,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle)
+                            )
+                        }
                     )
                 }
-            }
-
-            item {
-                HorizontalDivider()
-            }
-
-            items(lazyMemberItems.itemCount, key = lazyMemberItems.itemKey { it.memberId }) {
-                lazyMemberItems[it]?.let { user ->
-                    UserSearchItem(
-                        nickname = user.nickname,
-                        email = user.email,
-                        userAuth = "",
-                        onChangeUserAuth = { auth -> changeAuth(user.memberId, Authority.valueOf(auth)) },
-                        clickAction = { onInvite(user.memberId) },
-                        canChangeAuth = false,
-                        icon = {
+            } else {
+                items(lazyMemberItems.itemCount, key = lazyMemberItems.itemKey { it.memberId }) {
+                    lazyMemberItems[it]?.let { user ->
+                        UserInviteItem(
+                            nickname = user.nickname,
+                            email = user.email,
+                            onInvite = { onInvite(user) },
+                            isInvited = true
+                        ) {
                             AsyncImage(
                                 modifier = Modifier.fillMaxSize(),
                                 model = user.profileImgUrl,
@@ -166,7 +151,7 @@ private fun InviteWorkspaceScreen(
                                 error = rememberVectorPainter(Icons.Default.AccountCircle)
                             )
                         }
-                    )
+                    }
                 }
             }
         }

@@ -180,7 +180,7 @@ private fun HomeSettingScreen(
                             AsyncImage(
                                 model = members[index].memberProfileImgUrl,
                                 contentDescription = null,
-                                placeholder = rememberVectorPainter(Icons.Default.AccountCircle),
+                                error = rememberVectorPainter(Icons.Default.AccountCircle),
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .aspectRatio(1f)

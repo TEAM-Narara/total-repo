@@ -7,6 +7,7 @@ import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
+import com.ssafy.member.data.toUser
 import com.ssafy.model.member.Authority
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.AddWorkspaceMemberUseCase
@@ -65,8 +66,9 @@ class InviteWorkspaceViewModel @Inject constructor(
         }
     }
 
-    fun inviteMember(memberId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        addWorkspaceMemberUseCase(workspace.value.workspaceId, memberId).withUiState().collect()
+    fun inviteMember(userData: UserData) = viewModelScope.launch(Dispatchers.IO) {
+        val user = userData.toUser()
+        addWorkspaceMemberUseCase(workspace.value.workspaceId, user).withUiState().collect()
     }
 
 }
