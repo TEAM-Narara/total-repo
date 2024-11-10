@@ -4,10 +4,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
-import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto

@@ -1,14 +1,12 @@
 package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
-import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity

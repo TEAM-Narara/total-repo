@@ -1,11 +1,14 @@
 package com.ssafy.data.repository.board
 
+import android.util.Log
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dto.piece.toEntity
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
-import com.ssafy.database.dao.NegativeIdGenerator
+import com.ssafy.database.dto.piece.bitmaskColumn
+import com.ssafy.database.dto.piece.getBitmaskDto
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
@@ -111,29 +114,27 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.updateBoard(id, updateBoardRequestDto)
                 } else {
-                    val result = when (board.isStatus) {
-                        DataStatus.STAY ->
-                            boardDao.updateBoard(
-                                board.copy(
-                                    name = updateBoardRequestDto.name,
-                                    coverType = updateBoardRequestDto.cover.type.name,
-                                    coverValue = updateBoardRequestDto.cover.value,
-                                    visibility = updateBoardRequestDto.visibility.name,
-                                    isStatus = DataStatus.UPDATE
-                                )
-                            )
+                    val newBoard = board.copy(
+                        name = updateBoardRequestDto.name,
+                        coverType = updateBoardRequestDto.cover.type.name,
+                        coverValue = updateBoardRequestDto.cover.value,
+                        visibility = updateBoardRequestDto.visibility.name)
+                    val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
+                    val updateBoard = getBitmaskDto(newBit, newBoard)
 
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            boardDao.updateBoard(
-                                board.copy(
-                                    name = updateBoardRequestDto.name,
-                                    coverType = updateBoardRequestDto.cover.type.name,
-                                    coverValue = updateBoardRequestDto.cover.value,
-                                    visibility = updateBoardRequestDto.visibility.name,
-                                )
-                            )
+                    Log.d("TAG", "updateBoard1: $newBoard")
+                    Log.d("TAG", "updateBoard2: $newBit")
+                    Log.d("TAG", "updateBoard3: $updateBoard")
 
-                        DataStatus.DELETE -> {}
+                    val result = when(board.isStatus) {
+                        DataStatus.STAY, DataStatus.UPDATE ->
+                            boardDao.updateBoard(newBoard.copy(
+                                columnUpdate = newBit,
+                                isStatus = DataStatus.UPDATE
+                            ))
+                        DataStatus.CREATE  ->
+                            boardDao.updateBoard(newBoard)
+                        DataStatus.DELETE -> { }
                     }
 
                     flowOf(result)
