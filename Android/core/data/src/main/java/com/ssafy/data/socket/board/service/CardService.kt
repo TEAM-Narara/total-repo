@@ -2,6 +2,7 @@ package com.ssafy.data.socket.board.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ssafy.data.image.ImageStorage
 import com.ssafy.data.socket.board.model.card.AddCardLabelRequestDto
 import com.ssafy.data.socket.board.model.card.AddCardMemberRequestDto
 import com.ssafy.data.socket.board.model.card.AddCardRequestDto
@@ -25,11 +26,18 @@ class CardService @Inject constructor(
     private val cardDao: CardDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
+    private val imageStorage: ImageStorage,
     private val gson: Gson
 ) {
     suspend fun addCard(data: JsonObject) {
         val dto = gson.fromJson(data, AddCardRequestDto::class.java)
-        // TODO : 이미지 저장 로직 구현
+
+        val coverValue = if (dto.coverType == "IMAGE") {
+            dto.coverValue?.let { imageStorage.save(it) }
+        } else {
+            dto.coverValue
+        }
+
         cardDao.insertCard(
             CardEntity(
                 id = dto.cardId,
@@ -39,7 +47,7 @@ class CardService @Inject constructor(
                 startAt = dto.startAt,
                 endAt = dto.endAt,
                 coverType = dto.coverType,
-                coverValue = dto.coverValue,
+                coverValue = coverValue,
                 isArchived = dto.isArchived,
             )
         )
@@ -48,7 +56,17 @@ class CardService @Inject constructor(
     suspend fun editCard(data: JsonObject) {
         val dto = gson.fromJson(data, EditCardRequestDto::class.java)
         val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
-        // TODO : 이미지 저장 로직 구현
+
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
+        val coverValue = if (dto.coverType == "IMAGE") {
+            dto.coverValue?.let { imageStorage.save(it) }
+        } else {
+            dto.coverValue
+        }
+
         cardDao.updateCard(
             before.copy(
                 name = dto.name,
@@ -76,7 +94,12 @@ class CardService @Inject constructor(
 
     suspend fun deleteCard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardRequestDto::class.java)
-        // TODO : 이미지 삭제 로직 구현
+
+        val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
         cardDao.deleteCardById(dto.cardId)
     }
 

@@ -6,7 +6,7 @@ data class AddBoardMemberRequestDto(
     val memberId: Long,
     val memberEmail: String,
     val memberName: String,
-    val profileImgUrl: String,
+    val profileImgUrl: String?,
     val authority: String,
     val isDeleted: Boolean
 )
