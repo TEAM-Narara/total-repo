@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,13 +85,25 @@ fun BoardMenuScreen(
             changeBoardName = viewModel::changeBoardName,
             changeWorkspaceName = viewModel::changeWorkspaceName,
             changeWatch = viewModel::changeWatch,
-            changeVisibility = viewModel::changeVisibility
+            changeVisibility = viewModel::changeVisibility,
+            deleteBoard = {
+                viewModel.deleteBoard {
+                    popBack()
+                    popBack()
+                }
+            }
         )
     } ?: LoadingScreen()
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()
-        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it, afterAction = popBack) }
+        is UiState.Error -> uiState.errorMessage?.let {
+            ErrorScreen(
+                errorMessage = it,
+                afterAction = popBack
+            )
+        }
+
         is UiState.Success -> {}
         is UiState.Idle -> {}
     }
@@ -108,7 +121,8 @@ private fun BoardMenuScreen(
     changeBoardName: (String) -> Unit,
     changeWorkspaceName: (String) -> Unit,
     changeWatch: (Boolean) -> Unit,
-    changeVisibility: (Visibility) -> Unit
+    changeVisibility: (Visibility) -> Unit,
+    deleteBoard: () -> Unit
 ) {
     val activity = LocalContext.current as? Activity
     activity?.let {
@@ -141,6 +155,15 @@ private fun BoardMenuScreen(
                 },
                 title = {
                     Text(text = "Board Menu", fontSize = TextXLarge, color = Color.White)
+                },
+                actions = {
+                    IconButton(onClick = deleteBoard) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "삭제",
+                            tint = White
+                        )
+                    }
                 }
             )
         }
