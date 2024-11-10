@@ -120,11 +120,11 @@ class BoardRepositoryImpl @Inject constructor(
                         coverValue = updateBoardRequestDto.cover.value,
                         visibility = updateBoardRequestDto.visibility.name)
                     val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
-                    val updateBoard = getBitmaskDto(newBit, newBoard)
 
                     Log.d("TAG", "updateBoard1: $newBoard")
                     Log.d("TAG", "updateBoard2: $newBit")
-                    Log.d("TAG", "updateBoard3: $updateBoard")
+//                    val updateBoard = getBitmaskDto(newBit, newBoard)
+//                    Log.d("TAG", "updateBoard3: $updateBoard")
 
                     val result = when(board.isStatus) {
                         DataStatus.STAY, DataStatus.UPDATE ->
