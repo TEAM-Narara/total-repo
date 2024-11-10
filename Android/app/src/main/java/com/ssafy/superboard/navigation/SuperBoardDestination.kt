@@ -15,6 +15,7 @@ import com.ssafy.board.boardMenu.BoardMenu
 import com.ssafy.board.boardMenu.SelectBackGround
 import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardMenu.selectBackgroundScreen
+import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
@@ -144,8 +145,8 @@ fun SuperBoardNavHost(
             moveToSelectBackGroundScreen = { cover: Cover? ->
                 navController.navigate(SelectBackGround(cover))
             },
-            moveToInviteMemberScreen = {
-                TODO("Move to invite member screen")
+            moveToInviteMemberScreen = { boardId:Long ->
+                navController.navigate(BoardInviteMember(boardId))
             }
         )
 

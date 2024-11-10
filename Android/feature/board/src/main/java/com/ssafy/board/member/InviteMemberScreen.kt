@@ -1,37 +1,37 @@
 package com.ssafy.board.member
 
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import coil3.compose.AsyncImage
 import com.ssafy.board.member.components.MemberTopAppBar
-import com.ssafy.board.member.data.BoardMemberData
-import com.ssafy.board.member.data.SearchMemberData
-import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.SearchBar
 import com.ssafy.designsystem.component.UserInviteItem
 import com.ssafy.designsystem.component.UserSearchItem
-import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.PaddingDefault
+import com.ssafy.designsystem.values.PaddingSmall
+import com.ssafy.member.data.UserData
+import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.member.Authority
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
 @Composable
 fun InviteMemberScreen(
@@ -40,8 +40,40 @@ fun InviteMemberScreen(
     popBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val boardMemberList by viewModel.boardMemberList.collectAsStateWithLifecycle()
-    val searchMemberList by viewModel.searchMemberList.collectAsStateWithLifecycle()
+    val boardMembers by viewModel.boardMembers.collectAsStateWithLifecycle()
+    val lazyMemberItems = viewModel.searchMember.collectAsLazyPagingItems()
+
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
+    InviteMemberScreen(
+        modifier = modifier,
+        popBack = popBack,
+        searchMember = viewModel::searchParams,
+        boardMembers = boardMembers,
+        lazyMemberItems = lazyMemberItems,
+        onInvite = viewModel::inviteMember,
+        changeAuth = viewModel::updateMemberAuth
+    )
+
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+
+}
+
+@Composable
+private fun InviteMemberScreen(
+    modifier: Modifier = Modifier,
+    popBack: () -> Unit,
+    searchMember: (String) -> Unit,
+    boardMembers: List<MemberResponseDTO>?,
+    lazyMemberItems: LazyPagingItems<UserData>,
+    onInvite: (UserData) -> Unit,
+    changeAuth: (Long, Authority) -> Unit
+) {
 
     Scaffold(
         modifier = modifier,
@@ -49,89 +81,63 @@ fun InviteMemberScreen(
             Column {
                 MemberTopAppBar(onClosePressed = popBack)
                 SearchBar(
-                    modifier = Modifier.padding(horizontal = PaddingDefault).padding(bottom = PaddingDefault),
-                    onTextChanged = viewModel::searchMember
+                    modifier = Modifier
+                        .padding(horizontal = PaddingDefault)
+                        .padding(bottom = PaddingDefault),
+                    onTextChanged = searchMember
                 )
             }
         }
     ) { paddingValues ->
-        boardMemberList?.let {
-            InviteMemberScreen(
-                modifier = Modifier.padding(paddingValues),
-                boardMemberList = it,
-                searchMemberList = searchMemberList,
-                onInvite = viewModel::inviteMember,
-                onAuthUpdate = viewModel::updateMemberAuth
-            )
-        }
-    }
 
-    if (uiState.isLoading) {
-        Box(
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(PaddingSmall),
             modifier = Modifier
-                .fillMaxSize()
-                .background(Gray.copy(alpha = 0.7f))
+                .padding(paddingValues)
+                .padding(PaddingDefault)
         ) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    }
 
-    if (uiState.isError && uiState.errorMessage != null) {
-        Toast.makeText(
-            LocalContext.current,
-            uiState.errorMessage,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-}
-
-@Composable
-fun InviteMemberScreen(
-    modifier: Modifier = Modifier,
-    boardMemberList: List<BoardMemberData>,
-    searchMemberList: List<SearchMemberData>?,
-    onInvite: (Long) -> Unit,
-    onAuthUpdate: (Long, String) -> Unit
-) {
-    Column(modifier.fillMaxSize()) {
-        searchMemberList?.let {
-            if (it.isEmpty()) {
-                Text(
-                    text = "검색 결과 없음",
-                    modifier = Modifier
-                        .padding(PaddingDefault)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+            if (lazyMemberItems.itemCount == 0 && boardMembers != null) {
+                items(boardMembers.size, key = { boardMembers[it].memberId }) {
+                    val member = boardMembers[it]
+                    UserSearchItem(
+                        nickname = member.memberNickname,
+                        email = member.memberEmail,
+                        userAuth = member.authority.name,
+                        onChangeUserAuth = { auth ->
+                            changeAuth(
+                                member.memberId,
+                                Authority.valueOf(auth)
+                            )
+                        },
+                        canChangeAuth = true,
+                        icon = {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = member.memberProfileImgUrl,
+                                contentDescription = null,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle)
+                            )
+                        }
+                    )
+                }
             } else {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(it) { member ->
+                items(lazyMemberItems.itemCount, key = lazyMemberItems.itemKey { it.memberId }) {
+                    lazyMemberItems[it]?.let { user ->
                         UserInviteItem(
-                            nickname = member.nickname,
-                            email = member.email,
-                            onInvite = { onInvite(member.id) },
-                            isInvited = member.isInvited
+                            nickname = user.nickname,
+                            email = user.email,
+                            onInvite = { onInvite(user) },
+                            isInvited = true
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.logo_github),
-                                contentDescription = ""
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = user.profileImgUrl,
+                                contentDescription = null,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle)
                             )
                         }
                     }
-                }
-            }
-        } ?: LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(boardMemberList) { member ->
-                UserSearchItem(
-                    nickname = member.nickname,
-                    email = member.email,
-                    userAuth = member.auth,
-                    onChangeUserAuth = { auth -> onAuthUpdate(member.id, auth) }
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_github),
-                        contentDescription = ""
-                    )
                 }
             }
         }
@@ -142,23 +148,6 @@ fun InviteMemberScreen(
 @Composable
 private fun InviteMemberScreenPreview() {
     InviteMemberScreen(
-        boardMemberList = (1..10L).map {
-            BoardMemberData(
-                it,
-                nickname = "nickname",
-                email = "email",
-                auth = "Admin",
-            )
-        },
-        searchMemberList = (1..2L).map {
-            SearchMemberData(
-                it,
-                nickname = "nickname",
-                email = "email",
-                isInvited = false,
-            )
-        },
-        onInvite = {},
-        onAuthUpdate = { _, _ -> }
+        popBack = {}
     )
 }
