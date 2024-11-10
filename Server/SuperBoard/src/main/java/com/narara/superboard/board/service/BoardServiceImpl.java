@@ -15,6 +15,7 @@ import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.log.CreateBoardInfo;
 import com.narara.superboard.board.interfaces.dto.log.DeleteBoardInfo;
 import com.narara.superboard.board.interfaces.dto.log.UpdateBoardInfo;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.board.service.validator.BoardValidator;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -52,18 +53,21 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
-
     private final BoardRepository boardRepository;
     private final WorkSpaceRepository workspaceRepository;
     private final BoardMemberRepository boardMemberRepository;
-    private final WorkspaceOffsetService workspaceOffsetService;
     private final BoardHistoryRepository boardHistoryRepository;
     private final CardHistoryRepository cardHistoryRepository;
+
+    private final WorkspaceOffsetService workspaceOffsetService;
+    private final BoardOffsetService boardOffsetService;
 
     private final BoardValidator boardValidator;
     private final CoverValidator coverValidator;
@@ -117,7 +121,9 @@ public class BoardServiceImpl implements BoardService {
 
         //보드 추가의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset(); //workspace offset++
-        workspaceOffsetService.saveAddBoardDiff(board);
+
+        workspaceOffsetService.saveAddBoardDiff(board); //워크스페이스 보드 생성 웹소켓 response
+        boardOffsetService.saveAddBoardMemberDiff(boardMemberByAdmin); //보드멤버 생성 웹소켓 response
 
         // Board 생성 로그 기록
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
@@ -127,6 +133,10 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
+<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
+=======
+        //TODO Websocket board 생성 히스토리 생성
+>>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
 
         return saveBoard;
     }
@@ -142,9 +152,10 @@ public class BoardServiceImpl implements BoardService {
         Board board = getBoard(boardId);
         board.deleted();
 
+
         //보드 삭제(닫기)의 경우, workspace 구독 시 정보를 받을 수 있다
         board.getWorkSpace().addOffset();
-        workspaceOffsetService.saveDeleteBoardDiff(board);
+        workspaceOffsetService.saveDeleteBoardDiff(board); // Websocket board 삭제
 
         // Board 삭제 로그 기록
         DeleteBoardInfo deleteBoardInfo = new DeleteBoardInfo(board.getId(), board.getName(),
@@ -155,7 +166,7 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket board 삭제 히스토리 생성
     }
 
     @Override
@@ -182,6 +193,8 @@ public class BoardServiceImpl implements BoardService {
             throw new AccessDeniedException("보드에 대한 권한이 잘못되었습니다.");
         }
 
+        workspaceOffsetService.saveEditBoardDiff(board); //보드 수정 웹소켓 response
+
         // Board 업데이트 로그 기록
         UpdateBoardInfo updateBoardInfo = new UpdateBoardInfo(updatedBoard.getId(), updatedBoard.getName(),
                 updatedBoard.getWorkSpace().getName());
@@ -193,6 +206,7 @@ public class BoardServiceImpl implements BoardService {
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket board 업데이트 히스토리 생성
 
         return updatedBoard;
     }
@@ -209,13 +223,16 @@ public class BoardServiceImpl implements BoardService {
         Board board = getBoard(boardId);
         board.changeArchiveStatus();
 
+        workspaceOffsetService.saveEditBoardArchiveDiff(board);  //Websocket 보드 아카이브 상태 변경
+
         // 아카이브 상태 변경 로그 기록
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(board.getId(), board.getName(),
                 board.getIsArchived());
 
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, 
                 EventData.BOARD, archiveStatusChangeInfo);
+        //TODO Websocket 보드 아카이브 상태 변경 로그 생성
 
         boardHistoryRepository.save(boardHistory);
     }
@@ -301,6 +318,7 @@ public class BoardServiceImpl implements BoardService {
         return activities;
     }
 
+<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
     // 처음부터 페이지 끝까지
     public BoardCombinedLogResponseDto getBoardCombinedLog(Long boardId, Pageable pageable) {
         // Pageable을 활용해 각각의 컬렉션을 가져옴
@@ -390,6 +408,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     // 페이징된 댓글막 딱 가져옴.
+=======
+>>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 
@@ -493,5 +513,4 @@ public class BoardServiceImpl implements BoardService {
         return combinedList.subList(Math.min(offset, combinedList.size()),
                 Math.min(offset + pageSize, combinedList.size()));
     }
-
 }

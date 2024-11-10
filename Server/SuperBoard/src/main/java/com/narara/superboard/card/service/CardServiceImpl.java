@@ -2,6 +2,7 @@ package com.narara.superboard.card.service;
 
 import static com.narara.superboard.card.CardAction.*;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
@@ -36,7 +37,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
@@ -53,6 +56,8 @@ public class CardServiceImpl implements CardService {
     private final CoverValidator coverValidator;
     private final LastOrderValidator lastOrderValidator;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
     public Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) {
         nameValidator.validateCardNameIsEmpty(cardCreateRequestDto);
@@ -65,9 +70,13 @@ public class CardServiceImpl implements CardService {
 
         Card card = Card.createCard(cardCreateRequestDto, list);
 
+
         Card savedCard = cardRepository.save(card);
         CardMember cardMember = CardMember.createCardMember(savedCard, member);
         cardMemberRepository.save(cardMember);
+
+        boardOffsetService.saveAddCard(card); //Websocket 카드 생성
+        boardOffsetService.saveAddCardMember(cardMember); //Websocket 카드 멤버 생성
 
         // 로그 기록 추가
         CreateCardInfo createCardInfo = new CreateCardInfo(list.getId(), list.getName(), savedCard.getId(),
@@ -78,6 +87,7 @@ public class CardServiceImpl implements CardService {
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket 카드 생성 로그 추가
 
         return savedCard;
     }
@@ -94,6 +104,8 @@ public class CardServiceImpl implements CardService {
         checkBoardMember(card, member, DELETE_CARD);
         card.delete();
 
+        boardOffsetService.saveDeleteCard(card); //Websocket 카드 삭제
+
         // 로그 기록 추가
         DeleteCardInfo deleteCardInfo = new DeleteCardInfo(card.getList().getId(), card.getList().getName(),
                 card.getId(), card.getName());
@@ -104,6 +116,7 @@ public class CardServiceImpl implements CardService {
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket 카드 삭제 로그 추가
     }
 
     @Override
@@ -116,6 +129,8 @@ public class CardServiceImpl implements CardService {
         }
         Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
+        boardOffsetService.saveEditCard(updatedCard); //Websocket 카드 업데이트
+
         // 로그 기록 추가
         UpdateCardInfo updateCardInfo = new UpdateCardInfo(updatedCard.getList().getId(),
                 updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
@@ -126,6 +141,7 @@ public class CardServiceImpl implements CardService {
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket 카드 업데이트 로그 추가
 
         return updatedCard;
     }
@@ -151,6 +167,8 @@ public class CardServiceImpl implements CardService {
         checkBoardMember(card, member, ARCHIVE_CARD);
         card.changeArchiveStatus();
 
+        boardOffsetService.saveEditCardArchiveDiff(card); //Websocket 카드 아카이브 상태 변경
+
         // 로그 기록 추가
         ArchiveStatusChangeInfo archiveStatusChangeInfo = new ArchiveStatusChangeInfo(card.getId(), card.getName(),
                 card.getIsArchived());
@@ -161,6 +179,7 @@ public class CardServiceImpl implements CardService {
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);
+        //TODO Websocket 카드 아카이브 상태 변경 로그 추가
     }
 
     @Override

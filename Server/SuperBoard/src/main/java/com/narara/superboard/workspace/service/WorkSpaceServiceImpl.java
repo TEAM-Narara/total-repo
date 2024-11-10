@@ -4,7 +4,6 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
-import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -96,6 +95,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //            }
         }
 
+        //워크스페이스 처음 만든 사람을 Member 추가로 넣기
+        workspaceOffsetService.saveAddMemberDiff(workspaceMemberByAdmin);
+
         // 새로운 멤버를 Kafka Consumer Group에 등록
         // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
@@ -131,9 +133,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return false;
     }
 
-
-
-
 //    public void createTopicIfNotExists(String topicName) {
 //        try {
 //            Map<String, TopicDescription> topics = kafkaAdmin.describeTopics(new String[]{topicName});
@@ -146,7 +145,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //            // 예외 처리 추가 (필요 시 로깅 또는 오류 처리 로직 작성)
 //        }
 //    }
-
 
     @Override
     @Transactional

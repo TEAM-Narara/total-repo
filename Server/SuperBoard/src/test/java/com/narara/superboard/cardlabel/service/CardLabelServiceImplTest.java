@@ -2,6 +2,7 @@ package com.narara.superboard.cardlabel.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardlabel.entity.CardLabel;
@@ -39,6 +40,9 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CardLabelValidator cardLabelValidator;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @Test
     @DisplayName("실패 테스트: Label이 존재하지 않을 때 EntityNotFoundException 발생")

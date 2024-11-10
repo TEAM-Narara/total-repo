@@ -9,7 +9,9 @@ import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ListMemberServiceImpl implements ListMemberService {
@@ -18,6 +20,7 @@ public class ListMemberServiceImpl implements ListMemberService {
     private final MemberRepository memberRepository;
     private final ListMemberRepository listMemberRepository;
 
+    @Transactional
     @Override
     public Boolean setListMemberIsAlert(Member member, Long listId) {
         List list = validateListExists(listId);

@@ -40,6 +40,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             updateCardCover(card, attachment);
         }
 
+        //TODO Websocket 첨부파일 추가
+
         // 첨부 파일 추가 로그 기록
         AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), url, isCover);
 
@@ -48,7 +50,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-
+        //TODO Websocket 첨부파일 추가 로그 기록
 
         return attachment;
     }
@@ -65,6 +67,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         markAttachmentAsDeleted(attachment);
         saveAttachment(attachment);
+        //TODO Websocket 첨부파일 삭제
 
         // 첨부 파일 삭제 로그 기록
         DeleteAttachmentInfo deleteAttachmentInfo = new DeleteAttachmentInfo(
@@ -75,7 +78,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-
+        //TODO Websocket 첨부파일 삭제 로그 추가
     }
 
     @Override
@@ -90,6 +93,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
 
         saveAttachment(attachment);
+        //TODO Websocket 첨부파일 수정
     }
 
     // Helper Methods
@@ -172,5 +176,4 @@ public class AttachmentServiceImpl implements AttachmentService {
             boolean isCover
     ) {
     }
-
 }

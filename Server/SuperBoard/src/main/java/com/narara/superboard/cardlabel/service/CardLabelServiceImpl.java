@@ -1,6 +1,7 @@
 package com.narara.superboard.cardlabel.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardlabel.entity.CardLabel;
@@ -16,8 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
-
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class CardLabelServiceImpl implements CardLabelService {
@@ -28,6 +30,8 @@ public class CardLabelServiceImpl implements CardLabelService {
     private final CardRepository cardRepository;
     private final LabelRepository labelRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
     public CardLabel changeCardLabelIsActivated(Card card, Label label) {
         Optional<CardLabel> cardLabel = cardLabelRepository.findByCardAndLabel(card, label);
@@ -36,7 +40,15 @@ public class CardLabelServiceImpl implements CardLabelService {
             return createCardLabel(card, label);
         }
 
-        return cardLabel.get().changeIsActivated();
+        CardLabel changedIsActivated = cardLabel.get().changeIsActivated();
+
+        if (changedIsActivated.getIsActivated()) {
+            boardOffsetService.saveAddCardLabel(changedIsActivated); //Websocket 카드라벨 추가
+        } else {
+            boardOffsetService.saveDeleteCardLabel(changedIsActivated); //Websocket 카드라벨 삭제
+        }
+
+        return changedIsActivated;
     }
 
     @Override
@@ -48,6 +60,7 @@ public class CardLabelServiceImpl implements CardLabelService {
             throw new EntityAlreadyExistsException("카드의 라벨");
         }
 
+        //TODO Websocket 카드라벨 추가
         return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
     }
 

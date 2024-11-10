@@ -2,6 +2,7 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -66,6 +67,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private CardServiceImpl cardService; // 실제 인스턴스 생성 후 Mock 주입
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @Test
     @DisplayName("카드 생성 성공 테스트")

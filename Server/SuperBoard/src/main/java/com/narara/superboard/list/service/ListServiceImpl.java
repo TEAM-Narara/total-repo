@@ -5,6 +5,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -28,11 +29,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ListServiceImpl implements ListService{
-
     private final BoardService boardService;
 
     private final NameValidator nameValidator;
@@ -42,6 +44,9 @@ public class ListServiceImpl implements ListService{
     private final ListRepository listRepository;
     private final BoardHistoryRepository boardHistoryRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
+    @Transactional
     @Override
     public List createList(Member member, ListCreateRequestDto listCreateRequestDto) {
         nameValidator.validateListNameIsEmpty(listCreateRequestDto);
@@ -52,6 +57,8 @@ public class ListServiceImpl implements ListService{
 
         List list = List.createList(listCreateRequestDto, board);
 
+        boardOffsetService.saveAddListDiff(list); //Websocket 리스트 생성
+
         List savedlist = listRepository.save(list);
         // 리스트 생성 로그 기록
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
@@ -60,11 +67,12 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
-
+        //TODO Websocket 리스트 생성 로그 추가
 
         return savedlist;
     }
 
+    @Transactional
     @Override
     public List updateList(Member member, Long listId, ListUpdateRequestDto listUpdateRequestDto) {
         List list = getList(listId);
@@ -74,6 +82,8 @@ public class ListServiceImpl implements ListService{
 
         list.updateList(listUpdateRequestDto);
 
+        boardOffsetService.saveEditListDiff(list);  //Websocket 리스트 업데이트
+
         // 리스트 업데이트 로그 기록
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
 
@@ -81,6 +91,7 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket 리스트 업데이트 로그 추가
 
         return list;
     }
@@ -91,12 +102,14 @@ public class ListServiceImpl implements ListService{
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
     }
 
+    @Transactional
     @Override
     public List changeListIsArchived(Member member, Long listId) {
         List list = getList(listId);
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
+        boardOffsetService.saveEditListArchiveDiff(list); // Websocket 리스트 아카이브화
 
         // 리스트 아카이브 상태 변경 로그 기록
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
@@ -105,6 +118,7 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
+        //TODO Websocket 리스트 아카이브 로그 생성
 
         return list;
     }
