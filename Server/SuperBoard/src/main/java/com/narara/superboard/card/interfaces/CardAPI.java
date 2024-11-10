@@ -41,7 +41,7 @@ public interface CardAPI {
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId);
 
-    @GetMapping("/{cardId}/activity")
+    @GetMapping("/{cardId}/log")
     @Operation(summary = "카드 로그 조회")
     ResponseEntity<DefaultResponse<List<CardLogDetailResponseDto>>> getCardActivity(@PathVariable Long cardId);
 
