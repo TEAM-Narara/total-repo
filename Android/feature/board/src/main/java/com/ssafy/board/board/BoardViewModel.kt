@@ -86,6 +86,7 @@ class BoardViewModel @Inject constructor(
     fun updateListOrder() {}
     fun updateCardOrder() {}
     fun addList(listName: String) = viewModelScope.launch {
+        if (listName.isEmpty()) return@launch
         withSocketState { isConnected ->
             createListUseCase(
                 createListRequestDto = CreateListRequestDto(
@@ -98,6 +99,7 @@ class BoardViewModel @Inject constructor(
     }
 
     fun addCard(listId: Long, cardName: String) = viewModelScope.launch {
+        if (cardName.isEmpty()) return@launch
         withSocketState { isConnected ->
             createCardUseCase(
                 cardRequestDto = CardRequestDto(

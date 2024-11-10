@@ -192,20 +192,24 @@ private fun BoardScreen(
                             navigateToCardScreen = { id -> navigateToCardScreen(id) },
                             addCard = addCard,
                             addPhoto = addPhoto,
-                            onListChanged = { listId ->
+                            onFocus = { listId ->
                                 scope.launch {
                                     handleLazyListScrollToCenter(
                                         lazyListState = listLazyListState,
                                         dropIndex = listCollection.indexOfFirst { it.id == listId },
                                     )
                                 }
-                            }
+                            },
                         )
                     }
                 }
 
                 item {
-                    AddListButton(addList = addList)
+                    AddListButton(addList = addList) {
+                        scope.launch {
+                            listLazyListState.scrollToItem(listCollection.size)
+                        }
+                    }
                 }
             }
         }
@@ -252,7 +256,7 @@ private fun BoardScreenPreview() {
         onListReordered = {},
         navigateToCardScreen = {},
         addList = {},
-        addCard = {_, _ ->},
+        addCard = { _, _ -> },
         addPhoto = {}
     )
 }

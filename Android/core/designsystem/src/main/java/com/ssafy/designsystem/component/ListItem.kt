@@ -28,17 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
-import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.ListWidth
 import com.ssafy.designsystem.values.PaddingDefault
@@ -46,7 +43,6 @@ import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.TextMedium
-import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.values.White
 
 @Composable
@@ -57,6 +53,7 @@ fun ListItem(
     isWatching: Boolean = false,
     addCard: (String) -> Unit,
     addPhoto: () -> Unit,
+    onFocus: () -> Unit,
     maxTitleLength: Int = 15,
     cardList: @Composable () -> Unit = {},
 ) {
@@ -98,13 +95,17 @@ fun ListItem(
                 cardList()
             }
 
-            AddCardButton(addCard = addCard)
+            AddCardButton(addCard = addCard, onFocus = onFocus)
         }
     }
 }
 
 @Composable
-fun AddCardButton(modifier: Modifier = Modifier, addCard: (String) -> Unit = {}) {
+fun AddCardButton(
+    modifier: Modifier = Modifier,
+    addCard: (String) -> Unit = {},
+    onFocus: () -> Unit = {}
+) {
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
@@ -143,7 +144,9 @@ fun AddCardButton(modifier: Modifier = Modifier, addCard: (String) -> Unit = {})
             EditableText(
                 modifier = Modifier
                     .padding(vertical = PaddingDefault, horizontal = PaddingMedium)
+                    .onFocusChanged { if (it.isFocused) onFocus() }
                     .focusRequester(focusRequester),
+                onTextChanged = { onFocus() },
                 onInputFinished = {
                     isFocused = false
                     addCard(it)
@@ -162,6 +165,7 @@ private fun ListItemPreview() {
         onTitleChange = {},
         addCard = {},
         addPhoto = {},
+        onFocus = {},
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(PaddingMedium)) {
             item { Spacer(modifier = Modifier.height(PaddingXSmall)) }
