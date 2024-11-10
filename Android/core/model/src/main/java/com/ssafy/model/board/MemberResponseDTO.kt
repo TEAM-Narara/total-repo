@@ -9,7 +9,7 @@ data class MemberResponseDTO(
     val isRepresentative: Boolean,
     val memberEmail: String,
     val memberNickname: String,
-    val memberProfileImgUrl: String,
+    val memberProfileImgUrl: String?,
 
     @Transient
     val componentId: Long = 0L,

@@ -10,7 +10,7 @@ data class ReplyWithMemberDTO(
 
     val memberEmail: String = "",
     val memberNickname: String = "",
-    val memberProfileImgUrl: String = "",
+    val memberProfileImgUrl: String? = "",
 
     @Transient
     val isStatus: DataStatus = DataStatus.STAY
