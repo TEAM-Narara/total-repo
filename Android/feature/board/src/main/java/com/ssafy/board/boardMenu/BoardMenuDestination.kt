@@ -20,7 +20,7 @@ data class BoardMenu(
 fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
     moveToSelectBackGroundScreen: (Cover) -> Unit,
-    moveToInviteMemberScreen: () -> Unit
+    moveToInviteMemberScreen: (Long) -> Unit
 ) {
     composable<BoardMenu>(
         mapOf(typeOf<Cover?>() to coverType)
@@ -42,7 +42,7 @@ fun NavGraphBuilder.boardMenuScreen(
                 value = "#FFFFFF"
             ),
             moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
-            moveToInviteMemberScreen = moveToInviteMemberScreen,
+            moveToInviteMemberScreen = { moveToInviteMemberScreen(boardId) },
         )
     }
 }

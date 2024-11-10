@@ -36,10 +36,12 @@ interface BoardDataSource {
 
     suspend fun updateLabel(id: Long, updateLabelRequestDto: UpdateLabelRequestDto): Flow<Unit>
 
-    suspend fun deleteBoardMember(boardId: Long, memberId: Long): Flow<SimpleMemberDto>
+    suspend fun createBoardMember(boardId: Long, memberId: Long): Flow<MemberResponseDTO>
+
+    suspend fun deleteBoardMember(boardId: Long, memberId: Long): Flow<MemberResponseDTO>
 
     suspend fun updateBoardMember(
         boardId: Long,
         simpleMemberDto: SimpleMemberDto
-    ): Flow<SimpleMemberDto>
+    ): Flow<MemberResponseDTO>
 }

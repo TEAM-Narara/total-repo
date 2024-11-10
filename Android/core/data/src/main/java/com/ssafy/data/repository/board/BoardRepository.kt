@@ -42,7 +42,7 @@ interface BoardRepository {
 
     suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>>
 
-    suspend fun createBoardMember(boardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
+    suspend fun createBoardMember(boardId: Long, memberId: Long, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteBoardMember(
         boardId: Long,

@@ -1,6 +1,7 @@
 package com.ssafy.board.boardMenu
 
 import androidx.lifecycle.viewModelScope
+import com.ssafy.board.DeleteBoardUseCase
 import com.ssafy.board.GetBoardMembersUseCase
 import com.ssafy.board.GetBoardUseCase
 import com.ssafy.board.GetBoardWatchStatusUseCase
@@ -39,6 +40,7 @@ class BoardMenuViewModel @Inject constructor(
     private val getBoardMembersUseCase: GetBoardMembersUseCase,
     private val getBoardWatchStatusUseCase: GetBoardWatchStatusUseCase,
     private val toggleBoardWatchUseCase: ToggleBoardWatchUseCase,
+    private val deleteBoardUseCase: DeleteBoardUseCase
 ) : BaseViewModel() {
 
     private val _workspaceId = MutableStateFlow<Long?>(null)
@@ -117,6 +119,14 @@ class BoardMenuViewModel @Inject constructor(
         }
     }
 
+    fun deleteBoard(onSuccess: () -> Unit) = withIO {
+        val boardId = _boardId.value ?: return@withIO
+        withSocketState { isConnected ->
+            deleteBoardUseCase(boardId, isConnected).withUiState().collect {
+                withMain { onSuccess() }
+            }
+        }
+    }
 
     fun setBoardId(id: Long) = _boardId.update { id }
     fun setWorkspaceId(id: Long) = _workspaceId.update { id }

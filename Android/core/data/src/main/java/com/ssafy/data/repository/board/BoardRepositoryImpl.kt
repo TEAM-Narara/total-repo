@@ -43,30 +43,36 @@ class BoardRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
-    override suspend fun createBoard(myMemberId: Long, boardDTO: BoardDTO, isConnected: Boolean): Flow<Long> =
-        withContext(ioDispatcher) {
-            if (isConnected) {
-                boardDataSource.createBoard(boardDTO).map { it.id }
-            } else {
-                val localBoardId = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD)
+    override suspend fun createBoard(
+        myMemberId: Long,
+        boardDTO: BoardDTO,
+        isConnected: Boolean
+    ): Flow<Long> = withContext(ioDispatcher) {
+        if (isConnected) {
+            boardDataSource.createBoard(boardDTO).map { it.id }
+        } else {
+            val localBoardId = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD)
 
-                flowOf(
-                    boardDao.insertBoard(
+            flowOf(
+                boardDao.insertBoard(
                     boardDTO.copy(
                         id = localBoardId,
-                        isStatus = DataStatus.CREATE).toEntity()
-                    ).also {
-                        createBoardMember(
-                            boardId = localBoardId,
-                            memberId = myMemberId,
-                            isStatus = DataStatus.CREATE)
-                        createBoardWatch(
-                            boardId = localBoardId,
-                            isStatus = DataStatus.CREATE)
-                    }
-                )
-            }
+                        isStatus = DataStatus.CREATE
+                    ).toEntity()
+                ).also {
+                    createBoardMember(
+                        boardId = localBoardId,
+                        memberId = myMemberId,
+                        isConnected = false
+                    )
+                    createBoardWatch(
+                        boardId = localBoardId,
+                        isStatus = DataStatus.CREATE
+                    )
+                }
+            )
         }
+    }
 
     override suspend fun getBoard(boardId: Long): Flow<BoardDTO?> =
         withContext(ioDispatcher) {
@@ -77,29 +83,34 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val board = boardDao.getBoard(id)
 
-            if(board != null) {
+            if (board != null) {
                 if (isConnected) {
                     boardDataSource.deleteBoard(id)
                 } else {
-                    val result = when(board.isStatus) {
+                    val result = when (board.isStatus) {
                         DataStatus.CREATE ->
                             boardDao.deleteBoard(board)
+
                         else ->
                             boardDao.updateBoard(board.copy(isStatus = DataStatus.DELETE))
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
 
-    override suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto, isConnected: Boolean): Flow<Unit> =
+    override suspend fun updateBoard(
+        id: Long,
+        updateBoardRequestDto: UpdateBoardRequestDto,
+        isConnected: Boolean
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             val board = boardDao.getBoard(id)
 
-            if(board != null) {
+            if (board != null) {
                 if (isConnected) {
                     boardDataSource.updateBoard(id, updateBoardRequestDto)
                 } else {
@@ -128,7 +139,7 @@ class BoardRepositoryImpl @Inject constructor(
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
@@ -137,26 +148,32 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val board = boardDao.getBoard(id)
 
-            if(board != null) {
+            if (board != null) {
                 if (isConnected) {
                     boardDataSource.setBoardArchive(id)
                 } else {
-                    val result = when(board.isStatus) {
+                    val result = when (board.isStatus) {
                         DataStatus.STAY ->
-                            boardDao.updateBoard(board.copy(
-                                isClosed = !board.isClosed,
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            boardDao.updateBoard(board.copy(
-                                isClosed = !board.isClosed,
-                            ))
-                        DataStatus.DELETE -> { }
+                            boardDao.updateBoard(
+                                board.copy(
+                                    isClosed = !board.isClosed,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            boardDao.updateBoard(
+                                board.copy(
+                                    isClosed = !board.isClosed,
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
@@ -187,11 +204,14 @@ class BoardRepositoryImpl @Inject constructor(
 
     override suspend fun createBoardWatch(boardId: Long, isStatus: DataStatus): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(boardMemberDao.insertBoardAlarm(
-                BoardMemberAlarmEntity(
-                    boardId = boardId,
-                    isStatus = isStatus)
-            ))
+            flowOf(
+                boardMemberDao.insertBoardAlarm(
+                    BoardMemberAlarmEntity(
+                        boardId = boardId,
+                        isStatus = isStatus
+                    )
+                )
+            )
         }
 
     override suspend fun getWatchStatus(id: Long): Flow<Boolean?> =
@@ -203,30 +223,39 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val memberAlarm = boardMemberDao.getBoardMemberAlarm(id)
 
-            if(memberAlarm != null) {
+            if (memberAlarm != null) {
                 if (isConnected) {
                     boardDataSource.toggleWatchBoard(id)
                 } else {
-                    val result = when(memberAlarm.isStatus) {
+                    val result = when (memberAlarm.isStatus) {
                         DataStatus.STAY ->
-                            boardMemberDao.updateBoardMemberAlarm(memberAlarm.copy(
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            boardMemberDao.updateBoardMemberAlarm(memberAlarm.copy(
-                                isAlert = !memberAlarm.isAlert
-                            ))
-                        DataStatus.DELETE -> { }
+                            boardMemberDao.updateBoardMemberAlarm(
+                                memberAlarm.copy(
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            boardMemberDao.updateBoardMemberAlarm(
+                                memberAlarm.copy(
+                                    isAlert = !memberAlarm.isAlert
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
 
-    override suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?> =
+    override suspend fun getBoardMemberMyInfo(
+        boardId: Long,
+        memberId: Long
+    ): Flow<BoardMemberDTO?> =
         withContext(ioDispatcher) {
             boardMemberDao.getBoardMemberFlow(boardId, memberId)
                 .map { it?.toDTO() }
@@ -238,14 +267,25 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
-    override suspend fun createBoardMember(boardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long> =
+    override suspend fun createBoardMember(
+        boardId: Long,
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(boardMemberDao.insertBoardMember(
-                BoardMemberEntity(
-                    boardId = boardId,
-                    memberId = memberId,
-                    isStatus = isStatus)
-            ))
+            if (isConnected) {
+                boardDataSource.createBoardMember(boardId, memberId).map { it.memberId }
+            } else {
+                flowOf(
+                    boardMemberDao.insertBoardMember(
+                        BoardMemberEntity(
+                            boardId = boardId,
+                            memberId = memberId,
+                            isStatus = DataStatus.CREATE
+                        )
+                    )
+                )
+            }
         }
 
     override suspend fun deleteBoardMember(
@@ -261,7 +301,11 @@ class BoardRepositoryImpl @Inject constructor(
                     boardDataSource.deleteBoardMember(boardId, memberId).map { Unit }
                 } else {
                     val result = when (boardMember.isStatus) {
-                        DataStatus.CREATE -> boardMemberDao.deleteLocalBoardMember(boardId, memberId)
+                        DataStatus.CREATE -> boardMemberDao.deleteLocalBoardMember(
+                            boardId,
+                            memberId
+                        )
+
                         else -> boardMemberDao.updateBoardMember(boardMember.copy(isStatus = DataStatus.DELETE))
                     }
 
@@ -323,9 +367,11 @@ class BoardRepositoryImpl @Inject constructor(
                 // TODO
                 boardDataSource.createLabel(labelDTO).map { 5 }
             } else {
-                flowOf(labelDao.insertLabel(
-                    labelDTO.copy(isStatus = DataStatus.CREATE).toEntity()
-                ))
+                flowOf(
+                    labelDao.insertLabel(
+                        labelDTO.copy(isStatus = DataStatus.CREATE).toEntity()
+                    )
+                )
             }
         }
 
@@ -344,20 +390,21 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val label = labelDao.getLabel(id)
 
-            if(label != null) {
+            if (label != null) {
                 if (isConnected) {
                     boardDataSource.deleteLabel(id)
                 } else {
-                    val result = when(label.isStatus) {
+                    val result = when (label.isStatus) {
                         DataStatus.CREATE ->
                             labelDao.deleteLabel(label)
+
                         else ->
                             labelDao.updateLabel(label.copy(isStatus = DataStatus.DELETE))
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
@@ -370,28 +417,34 @@ class BoardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val label = labelDao.getLabel(id)
 
-            if(label != null) {
+            if (label != null) {
                 if (isConnected) {
                     boardDataSource.updateLabel(id, updateLabelRequestDto)
                 } else {
-                    val result = when(label.isStatus) {
+                    val result = when (label.isStatus) {
                         DataStatus.STAY ->
-                            labelDao.updateLabel(label.copy(
-                                name = updateLabelRequestDto.name,
-                                color = updateLabelRequestDto.color,
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            labelDao.updateLabel(label.copy(
-                                name = updateLabelRequestDto.name,
-                                color = updateLabelRequestDto.color
-                            ))
-                        DataStatus.DELETE -> { }
+                            labelDao.updateLabel(
+                                label.copy(
+                                    name = updateLabelRequestDto.name,
+                                    color = updateLabelRequestDto.color,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            labelDao.updateLabel(
+                                label.copy(
+                                    name = updateLabelRequestDto.name,
+                                    color = updateLabelRequestDto.color
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }

@@ -62,15 +62,16 @@ class BoardDataSourceImpl @Inject constructor(private val boardAPI: BoardAPI) : 
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteBoardMember(boardId: Long, memberId: Long): Flow<SimpleMemberDto> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun createBoardMember(boardId: Long, memberId: Long): Flow<MemberResponseDTO> =
+        safeApiCall { boardAPI.createBoardMember(boardId, mapOf("memberId" to memberId)) }.toFlow()
+
+    override suspend fun deleteBoardMember(boardId: Long, memberId: Long): Flow<MemberResponseDTO> =
+        safeApiCall { boardAPI.deleteBoardMember(boardId, mapOf("memberId" to memberId)) }.toFlow()
 
     override suspend fun updateBoardMember(
         boardId: Long,
         simpleMemberDto: SimpleMemberDto
-    ): Flow<SimpleMemberDto> {
-        TODO("Not yet implemented")
-    }
+    ): Flow<MemberResponseDTO> =
+        safeApiCall { boardAPI.updateBoardMember(boardId, simpleMemberDto) }.toFlow()
 
 }

@@ -31,11 +31,24 @@ class MemberRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
+    override suspend fun addMember(user: User): Flow<Long> = withContext(ioDispatcher) {
+        flowOf(
+            memberDao.insertMember(
+                MemberEntity(
+                    id = user.memberId,
+                    email = user.email,
+                    nickname = user.nickname,
+                    profileImageUrl = user.profileImgUrl ?: ""
+                )
+            )
+        )
+    }
+
     override suspend fun getMember(memberId: Long): Flow<User?> =
         withContext(ioDispatcher) {
-        memberDao.getMemberFlow(memberId)
-            .map { it?.toDTO() }
-    }
+            memberDao.getMemberFlow(memberId)
+                .map { it?.toDTO() }
+        }
 
     override suspend fun updateMember(
         memberId: Long,
@@ -45,15 +58,17 @@ class MemberRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val myInfo = memberDao.getMember(memberId)
 
-            if(myInfo != null) {
+            if (myInfo != null) {
                 if (isConnected) {
                     memberDataSource.updateMember(memberUpdateRequestDto)
                 } else {
                     // TODO 서버에 동기화 isStatus
-                    val result = memberDao.updateMember(myInfo.copy(
-                        nickname = memberUpdateRequestDto.nickname,
-                        profileImageUrl = memberUpdateRequestDto.profileImgUrl,
-                    ))
+                    val result = memberDao.updateMember(
+                        myInfo.copy(
+                            nickname = memberUpdateRequestDto.nickname,
+                            profileImageUrl = memberUpdateRequestDto.profileImgUrl,
+                        )
+                    )
 
                     flowOf(result)
                 }
@@ -117,13 +132,14 @@ class MemberRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val memberBackground = getMemberBackground(id)
 
-            if(memberBackground != null) {
+            if (memberBackground != null) {
                 if (isConnected) {
                     memberDataSource.deleteMemberBackground(id)
                 } else {
-                    val result = when(memberBackground.isStatus) {
+                    val result = when (memberBackground.isStatus) {
                         DataStatus.CREATE ->
                             memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
+
                         else ->
                             memberBackgroundDao.updateMemberBackground(id, DataStatus.DELETE.name)
                     }

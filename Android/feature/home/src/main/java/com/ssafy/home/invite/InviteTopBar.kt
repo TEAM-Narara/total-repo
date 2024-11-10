@@ -1,7 +1,8 @@
 package com.ssafy.home.invite
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -9,26 +10,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.ssafy.designsystem.values.Primary
-import com.ssafy.designsystem.values.TextXLarge
+import com.ssafy.designsystem.values.IconMedium
+import com.ssafy.designsystem.values.TextMedium
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InviteTopBar(popBackToHome: () -> Unit) {
+fun InviteTopBar(modifier: Modifier = Modifier, onClosePressed: () -> Unit) {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Primary),
+        modifier = modifier,
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+        title = { Text("맴버 초대", fontSize = TextMedium) },
         navigationIcon = {
-            IconButton(onClick = { popBackToHome() }) {
+            IconButton(onClick = onClosePressed) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "탐색 창",
-                    tint = Color.White
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "",
+                    modifier = Modifier.size(IconMedium)
                 )
             }
         },
-        title = {
-            Text(text = "멤버 초대", fontSize = TextXLarge, color = Color.White)
-        }
     )
 }

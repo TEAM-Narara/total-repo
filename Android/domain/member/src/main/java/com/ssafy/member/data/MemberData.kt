@@ -15,3 +15,10 @@ fun User.toUserData() = UserData(
     nickname = nickname,
     profileImgUrl = profileImgUrl
 )
+
+fun UserData.toUser() = User(
+    memberId = memberId,
+    email = email,
+    nickname = nickname,
+    profileImgUrl = profileImgUrl
+)
