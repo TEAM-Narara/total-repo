@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,13 +21,24 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
+import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.ListWidth
 import com.ssafy.designsystem.values.PaddingDefault
@@ -34,6 +46,7 @@ import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.values.White
 
 @Composable
@@ -42,7 +55,7 @@ fun ListItem(
     title: String,
     onTitleChange: (String) -> Unit,
     isWatching: Boolean = false,
-    addCard: () -> Unit,
+    addCard: (String) -> Unit,
     addPhoto: () -> Unit,
     maxTitleLength: Int = 15,
     cardList: @Composable () -> Unit = {},
@@ -85,24 +98,57 @@ fun ListItem(
                 cardList()
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.clickable { addCard() }) {
-                    Text(
-                        text = "+ Add Card", fontSize = TextMedium,
-                        modifier = Modifier.padding(vertical = PaddingSmall)
-                    )
-                }
+            AddCardButton(addCard = addCard)
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.weight(1f))
+@Composable
+fun AddCardButton(modifier: Modifier = Modifier, addCard: (String) -> Unit = {}) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
-                Box(modifier = Modifier.clickable { addPhoto() }) {
-                    Icon(
-                        imageVector = Icons.Default.AddPhotoAlternate,
-                        contentDescription = "이미지 추가",
-                        modifier = Modifier.padding(PaddingSmall)
-                    )
+    LaunchedEffect(isFocused) {
+        if (isFocused) focusRequester.requestFocus()
+    }
+
+    if (!isFocused) Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.clickable { isFocused = true }) {
+            Text(
+                text = "+ Add Card", fontSize = TextMedium,
+                modifier = Modifier.padding(vertical = PaddingSmall)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(modifier = Modifier.clickable { isFocused = true }) {
+            Icon(
+                imageVector = Icons.Default.AddPhotoAlternate,
+                contentDescription = "이미지 추가",
+                modifier = Modifier.padding(PaddingSmall)
+            )
+        }
+    } else {
+        Card(
+            shape = RoundedCornerShape(CornerMedium),
+            colors = CardDefaults.cardColors(
+                containerColor = White
+            ),
+            modifier = modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = ElevationDefault
+            ),
+        ) {
+            EditableText(
+                modifier = Modifier
+                    .padding(vertical = PaddingDefault, horizontal = PaddingMedium)
+                    .focusRequester(focusRequester),
+                onInputFinished = {
+                    isFocused = false
+                    addCard(it)
                 }
-            }
+            )
         }
     }
 }

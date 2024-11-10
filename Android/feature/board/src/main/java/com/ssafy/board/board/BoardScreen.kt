@@ -124,7 +124,7 @@ private fun BoardScreen(
     onListReordered: () -> Unit,
     navigateToCardScreen: (Long) -> Unit,
     addList: (String) -> Unit,
-    addCard: () -> Unit,
+    addCard: (Long, String) -> Unit,
     addPhoto: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -252,7 +252,7 @@ private fun BoardScreenPreview() {
         onListReordered = {},
         navigateToCardScreen = {},
         addList = {},
-        addCard = {},
+        addCard = {_, _ ->},
         addPhoto = {}
     )
 }

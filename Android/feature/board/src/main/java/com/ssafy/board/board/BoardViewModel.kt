@@ -5,12 +5,14 @@ import com.ssafy.board.GetBoardUseCase
 import com.ssafy.board.UpdateBoardUseCase
 import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.BoardDataMapper
+import com.ssafy.card.CreateCardUseCase
 import com.ssafy.list.CreateListUseCase
 import com.ssafy.list.GetListsInCardsUseCase
 import com.ssafy.list.SetListArchiveUseCase
 import com.ssafy.list.UpdateListUseCase
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCard
@@ -37,11 +39,10 @@ class BoardViewModel @Inject constructor(
     private val createListUseCase: CreateListUseCase,
     private val updatedListUseCase: UpdateListUseCase,
     private val setListArchiveUseCase: SetListArchiveUseCase,
+    private val createCardUseCase: CreateCardUseCase
 ) : BaseViewModel() {
     private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
-
-    private var isConnected = MutableStateFlow(true)
 
     val boardData: StateFlow<BoardData?> = _boardId.filterNotNull().flatMapLatest { boardId ->
         combine(
@@ -59,37 +60,54 @@ class BoardViewModel @Inject constructor(
 
     fun updateBoardName(boardName: String) = viewModelScope.launch {
         boardData.value?.let {
-            updateBoardUseCase(
-                id = _boardId.value ?: return@launch,
-                updateBoardRequestDto = UpdateBoardRequestDto(
-                    name = boardName,
-                    cover = it.cover,
-                    visibility = it.visibility,
-                ),
-                isConnected = isConnected.value
-            )
+            withSocketState { isConnected ->
+                updateBoardUseCase(
+                    id = _boardId.value ?: return@withSocketState,
+                    updateBoardRequestDto = UpdateBoardRequestDto(
+                        name = boardName,
+                        cover = it.cover,
+                        visibility = it.visibility,
+                    ),
+                    isConnected = isConnected
+                )
+            }
         }
     }
 
     fun updateListName(listId: Long, listName: String) = viewModelScope.launch {
-        updatedListUseCase(
-            updateListRequestDto = UpdateListRequestDto(listId, listName),
-            isConnected = false
-        )
+        withSocketState { isConnected ->
+            updatedListUseCase(
+                updateListRequestDto = UpdateListRequestDto(listId, listName),
+                isConnected = isConnected
+            )
+        }
     }
 
     fun updateListOrder() {}
     fun updateCardOrder() {}
     fun addList(listName: String) = viewModelScope.launch {
-        createListUseCase(
-            createListRequestDto = CreateListRequestDto(
-                boardId = _boardId.value ?: return@launch,
-                listName = listName
-            ),
-            isConnected = false
-        )
+        withSocketState { isConnected ->
+            createListUseCase(
+                createListRequestDto = CreateListRequestDto(
+                    boardId = _boardId.value ?: return@withSocketState,
+                    listName = listName
+                ),
+                isConnected = isConnected
+            )
+        }
     }
 
-    fun addCard() {}
+    fun addCard(listId: Long, cardName: String) = viewModelScope.launch {
+        withSocketState { isConnected ->
+            createCardUseCase(
+                cardRequestDto = CardRequestDto(
+                    listId = listId,
+                    cardName = cardName
+                ),
+                isConnected = isConnected,
+            )
+        }
+    }
+
     fun addPhoto() {}
 }

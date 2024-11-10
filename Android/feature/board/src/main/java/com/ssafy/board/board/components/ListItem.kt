@@ -36,7 +36,7 @@ fun ListItem(
     onTitleChange: (String) -> Unit = {},
     onCardReordered: () -> Unit = {},
     navigateToCardScreen: (Long) -> Unit = {},
-    addCard: () -> Unit = {},
+    addCard: (Long, String) -> Unit = {_, _ -> },
     addPhoto: () -> Unit = {},
     onListChanged: (Long) -> Unit = {},
 ) {
@@ -50,7 +50,7 @@ fun ListItem(
         modifier = modifier,
         title = listData.name,
         onTitleChange = onTitleChange,
-        addCard = addCard,
+        addCard = { cardName -> addCard(listData.id, cardName) },
         addPhoto = addPhoto,
         isWatching = listData.isWatching,
     ) {
