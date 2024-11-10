@@ -46,8 +46,8 @@ public class ResponseMessage {
     public static final String BOARD_FETCH_SUCCESS = "보드 조회 성공";
     public static final String BOARD_MEMBER_UPDATE_SUCCESS = "사용자의 보드 설정 업데이트 성공";
     public static final String BOARD_ARCHIVED_FETCH_SUCCESS = "아카이브된 보드 목록 조회 성공";
-    public static final String BOARD_ACTIVITY_FETCH_SUCCESS = "아카이브된 보드 목록 조회 성공";
     public static final String BOARD_ARCHIVE_STATUS_CHANGED = "보드 아카이브 상태 변경 성공";
+    public static final String BOARD_ACTIVITY_FETCH_SUCCESS = "보드 액티비티 목록 조회 성공";
     public static final String BOARD_LOG_FETCH_SUCCESS = "보드 로그 목록 조회 성공";
 
     // 보드 멤버 관련 상수

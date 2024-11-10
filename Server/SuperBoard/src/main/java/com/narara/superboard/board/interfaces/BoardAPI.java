@@ -1,14 +1,11 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
-import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -64,16 +61,12 @@ public interface BoardAPI {
     @Operation(summary = "보드 아카이브 상태 변경")
     ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
 
-    @GetMapping("/{boardId}/log")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "보드 로그만 조회")
-    ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(@PathVariable Long boardId);
-
+    @GetMapping("{boardId}/log")
+    @Operation(summary = "보드의 모든 로그 목록 조회", description = "보드의 모든 로그 목록 조회")
+    ResponseEntity<DefaultResponse<List<BoardLogDetailResponseDto>>> getBoardLog(Long boardId);
 
     @GetMapping("/{boardId}/activity")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "보드 액태비티(댓글+로그) 조회", description = "보드의 활동 및 댓글을 최신순으로 정렬하여 반환합니다.")
-    ResponseEntity<DefaultResponse<List<BoardCombinedLogResponseDto>>> getBoardCombinedLog(
+    ResponseEntity<DefaultResponse<BoardActivityPageableResponseDto>> getBoardActivity(
             @PathVariable Long boardId,
             @RequestParam int page,
             @RequestParam int size

@@ -1,7 +1,9 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
-import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardCombinedLogResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.*;
 
 import com.narara.superboard.member.entity.Member;
@@ -33,9 +35,11 @@ public interface BoardService {
 
     MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword);
 
-    List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId);
 
-    List<BoardActivityDetailResponseDto> getBoardActivity(Long boardId, Pageable pageable);
+    List<BoardLogDetailResponseDto> getAllLog(Long boardId);
 
-    List<BoardCombinedLogResponseDto> getBoardCombinedLog(Long boardId, Pageable pageable);
+    BoardCombinedLogResponseDto getBoardCombinedLog(Long boardId, Pageable pageable);
+
+    BoardActivityPageableResponseDto getBoardActivity(Long boardId, Pageable pageable);
+
 }

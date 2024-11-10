@@ -2,9 +2,10 @@ package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
-import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,13 +108,6 @@ public class BoardController implements BoardAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVE_STATUS_CHANGED), HttpStatus.OK);
     }
 
-    @Override
-    @Operation(summary = "보드의 액티비티 목록 조회", description = "보드의 액티비티 목록 조회")
-    public ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(Long boardId) {
-        List<BoardActivityDetailResponseDto> boardActivity = boardService.getBoardActivity(boardId);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_LOG_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
-    }
-
     @GetMapping
     @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다. keyword가 null이면 전체조회")
     public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false) String keyword) {
@@ -122,20 +117,28 @@ public class BoardController implements BoardAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, myBoardList), HttpStatus.OK);
     }
 
+    @Override
+    @Operation(summary = "보드의 모든 로그 조회", description = "보드의 모든 로그 조회")
+    public ResponseEntity<DefaultResponse<List<BoardLogDetailResponseDto>>> getBoardLog(Long boardId) {
+        List<BoardLogDetailResponseDto> boardActivity = boardService.getAllLog(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_LOG_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
+    }
 
+    @Operation(summary = "보드 액태비티(댓글+로그) 조회", description = "보드의 활동 및 댓글을 최신순으로 정렬하여 반환합니다.")
     @Parameters({
             @Parameter(name = "page", description = "조회할 페이지 번호 (1부터 시작)", example = "1", schema = @Schema(defaultValue = "1")),
             @Parameter(name = "size", description = "페이지당 항목 수", example = "10", schema = @Schema(defaultValue = "10"))
     })
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Override
-    public ResponseEntity<DefaultResponse<List<BoardCombinedLogResponseDto>>> getBoardCombinedLog(
+    public ResponseEntity<DefaultResponse<BoardActivityPageableResponseDto>> getBoardActivity(
             @PathVariable Long boardId,
             @RequestParam int page, @RequestParam int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        List<BoardCombinedLogResponseDto> combinedLogs = boardService.getBoardCombinedLog(boardId, pageable);
+        Pageable pageable = PageRequest.of(page-1, size);
+        BoardActivityPageableResponseDto boardActivity = boardService.getBoardActivity(boardId, pageable);
 
         return ResponseEntity.ok(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, combinedLogs)
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity)
         );
     }
 }

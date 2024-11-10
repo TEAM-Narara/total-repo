@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface BoardHistoryRepository extends MongoRepository<BoardHistory, String> {
-    Page<BoardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId);
+    List<BoardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId);
     Page<BoardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId, Pageable pageable);
 }
 
