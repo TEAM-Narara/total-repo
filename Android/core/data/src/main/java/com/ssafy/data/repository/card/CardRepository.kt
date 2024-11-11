@@ -11,12 +11,14 @@ import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
+import com.ssafy.model.with.BoardInMyRepresentativeCard
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.ListInCard
 import kotlinx.coroutines.flow.Flow
 
 interface CardRepository {
@@ -101,4 +103,6 @@ interface CardRepository {
     suspend fun createAttachment(attachment: AttachmentDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteAttachment(id: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun getLocalScreenMyRepresentativeCard(memberId: Long): Flow<List<BoardInMyRepresentativeCard>>
 }

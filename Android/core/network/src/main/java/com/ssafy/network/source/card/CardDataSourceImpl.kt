@@ -22,8 +22,9 @@ class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : Car
         safeApiCall { cardAPI.deleteCard(cardId) }.toFlow()
 
     override suspend fun updateCard(
+        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
-    ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardUpdateRequestDto.cardId, cardUpdateRequestDto) }.toFlow()
+    ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, cardUpdateRequestDto) }.toFlow()
 
     override suspend fun updateCardMember(
         boardId: Long,
