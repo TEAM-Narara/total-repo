@@ -23,4 +23,17 @@ public interface ListAPI {
 
     @GetMapping("/{boardId}/archived")
     ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getArchivedList(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
+
+    @PatchMapping("/{listId}/move/top")
+    ResponseEntity<DefaultResponse<Void>> moveListToTop(@PathVariable Long listId);
+
+    @PatchMapping("/{listId}/move/bottom")
+    ResponseEntity<DefaultResponse<Void>> moveListToBottom(@PathVariable Long listId);
+
+    @PatchMapping("/{listId}/move/between")
+    ResponseEntity<DefaultResponse<Void>> moveListBetween(
+            @PathVariable Long listId,
+            @RequestParam Long previousListId,
+            @RequestParam Long nextListId
+    );
 }
