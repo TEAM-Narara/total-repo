@@ -59,27 +59,26 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.resetUiState()
-        viewModel.getHomeInfo()
-    }
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
 
-    HomeScreen(
-        workSpaceList = homeData.workspaceList,
-        user = homeData.user,
-        selectedWorkspace = homeData.selectedWorkSpace,
-        moveToBoardScreen = moveToBoardScreen,
-        moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(homeData.workspaceList) },
-        moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
-        moveToSettingScreen = { moveToSettingScreen(homeData.selectedWorkSpace.workspaceId) },
-        moveToMyCardScreen = moveToMyCardScreen,
-        moveToUpdateProfile = moveToUpdateProfile,
-        moveToSearchScreen = moveToSearchScreen,
-        moveToAlarmScreen = moveToAlarmScreen,
-        moveToJoinedBoard = { /*TODO 가입한 보드 화면으로 이동 */ },
-        addNewWorkSpace = viewModel::createWorkSpace,
-        chaneSelectedWorkSpace = viewModel::changeSelectedWorkSpace
-    )
+    homeData?.let { data ->
+        HomeScreen(
+            user = data.user,
+            workSpaceList = data.workspaceList,
+            selectedWorkspace = data.selectedWorkSpace,
+            moveToBoardScreen = moveToBoardScreen,
+            moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(data.workspaceList) },
+            moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
+            moveToSettingScreen = { moveToSettingScreen(data.selectedWorkSpace.workspaceId) },
+            moveToMyCardScreen = moveToMyCardScreen,
+            moveToUpdateProfile = moveToUpdateProfile,
+            moveToSearchScreen = moveToSearchScreen,
+            moveToAlarmScreen = moveToAlarmScreen,
+            moveToJoinedBoard = { /*TODO 가입한 보드 화면으로 이동 */ },
+            addNewWorkSpace = viewModel::createWorkspace,
+            chaneSelectedWorkSpace = viewModel::updateSelectedWorkspace
+        )
+    } ?: LoadingScreen()
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()

@@ -37,6 +37,7 @@ class GetHomeInfoUseCase @Inject constructor(
                 workspaceList.firstOrNull()
             } else {
                 workspaceList.singleOrNull { it.workspaceId == workspaceId }
+                    ?: workspaceList.firstOrNull()
             }
 
             val selectedWorkspaceFlow =
@@ -63,22 +64,4 @@ class GetHomeInfoUseCase @Inject constructor(
         }
     }
 
-    suspend operator fun invoke(homeData: HomeData, workspaceId: Long): Flow<HomeData?> {
-        workspaceStomp.connect(workspaceId)
-
-        return combine(
-            workspaceRepository.getWorkspace(workspaceId),
-            boardRepository.getBoardsByWorkspace(workspaceId)
-        ) { workspace, boardList ->
-            workspace?.let {
-                homeData.copy(
-                    selectedWorkSpace = SelectedWorkSpace(
-                        workspaceId = workspace.workspaceId,
-                        workspaceName = workspace.name,
-                        boards = boardList
-                    )
-                )
-            }
-        }
-    }
 }

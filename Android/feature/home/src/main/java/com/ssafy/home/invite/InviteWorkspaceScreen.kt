@@ -3,16 +3,21 @@ package com.ssafy.home.invite
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -27,11 +32,15 @@ import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.SearchBar
 import com.ssafy.designsystem.component.UserInviteItem
 import com.ssafy.designsystem.component.UserSearchItem
+import com.ssafy.designsystem.dialog.BaseDialog
+import com.ssafy.designsystem.dialog.rememberDialogState
+import com.ssafy.designsystem.values.IconXXLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.DetailWorkspaceData
+import com.ssafy.home.data.MemberData
 import com.ssafy.member.data.UserData
 import com.ssafy.model.member.Authority
 import com.ssafy.ui.uistate.ErrorScreen
@@ -60,7 +69,8 @@ fun InviteWorkspaceScreen(
         popBackToHome = popBackToHome,
         setSearchParams = viewModel::setSearchParams,
         changeAuth = viewModel::changeAuth,
-        onInvite = viewModel::inviteMember
+        onInvite = viewModel::inviteMember,
+        deleteMember = viewModel::deleteMember
     )
 
     when (uiState) {
@@ -79,8 +89,10 @@ private fun InviteWorkspaceScreen(
     popBackToHome: () -> Unit,
     setSearchParams: (String) -> Unit,
     changeAuth: (Long, Authority) -> Unit,
+    deleteMember: (MemberData, () -> Unit) -> Unit,
     onInvite: (UserData) -> Unit
 ) {
+    val userDialogState = rememberDialogState<MemberData>()
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {
@@ -132,6 +144,8 @@ private fun InviteWorkspaceScreen(
                                 contentDescription = null,
                                 error = rememberVectorPainter(Icons.Default.AccountCircle)
                             )
+                        }, clickAction = {
+                            userDialogState.show(member)
                         }
                     )
                 }
@@ -155,6 +169,29 @@ private fun InviteWorkspaceScreen(
                 }
             }
         }
+    }
+
+    userDialogState.parameter?.let { member: MemberData ->
+        BaseDialog(
+            dialogState = userDialogState,
+            title = member.memberNickname,
+            confirmText = "멤버 삭제",
+            onConfirm = { deleteMember(member) { userDialogState.dismiss() } },
+            content = {
+                Column {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(IconXXLarge)
+                            .clip(CircleShape),
+                        model = member.memberProfileImgUrl,
+                        contentDescription = "프로필 이미지",
+                        error = rememberVectorPainter(Icons.Default.AccountCircle)
+                    )
+                    Spacer(modifier = Modifier.padding(PaddingDefault))
+                    Text(text = member.memberEmail)
+                }
+            }
+        )
     }
 
 }

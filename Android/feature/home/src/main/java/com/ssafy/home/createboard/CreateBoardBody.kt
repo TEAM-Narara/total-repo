@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.DropDownText
 import com.ssafy.designsystem.component.EditText
@@ -119,6 +120,7 @@ fun CreateBoardBody(
                     AsyncImage(
                         model = boardData.cover.value,
                         contentDescription = "Image",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(BackgroundMini)
                             .clickable { moveToSelectBackgroundScreen(boardData.cover) }

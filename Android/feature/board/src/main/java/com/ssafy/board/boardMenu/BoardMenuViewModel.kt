@@ -58,8 +58,8 @@ class BoardMenuViewModel @Inject constructor(
                 // TODO 히스토리 데이터도 가져와야 합니다.
                 // HistoryData 클래스가 존재합니다. 참고하세요
             ) { workspace: WorkSpaceDTO?, board: BoardDTO?, members: List<MemberResponseDTO>, watchStatus: Boolean? ->
-                if (workspace != null && board != null && watchStatus != null) {
-                    BoardMenuData(workspace, board, members, watchStatus)
+                if (workspace != null && board != null) {
+                    BoardMenuData(workspace, board, members, watchStatus ?: false)
                 } else {
                     null.also { _uiState.emit(UiState.Error(ERROR)) }
                 }

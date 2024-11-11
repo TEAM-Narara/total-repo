@@ -14,12 +14,11 @@ import kotlin.reflect.typeOf
 data class BoardMenu(
     val boardId: Long,
     val workspaceId: Long,
-    val cover: Cover? = null
 )
 
 fun NavGraphBuilder.boardMenuScreen(
     popBack: () -> Unit,
-    moveToSelectBackGroundScreen: (Cover) -> Unit,
+    moveToSelectBackGroundScreen: (Cover, Long) -> Unit,
     moveToInviteMemberScreen: (Long) -> Unit
 ) {
     composable<BoardMenu>(
@@ -28,7 +27,6 @@ fun NavGraphBuilder.boardMenuScreen(
         val boardSearch: BoardMenu = backStackEntry.toRoute()
         val boardId = boardSearch.boardId
         val workspaceId = boardSearch.workspaceId
-        val background = boardSearch.cover
         val viewModel: BoardMenuViewModel = hiltViewModel<BoardMenuViewModel>().apply {
             setBoardId(boardId)
             setWorkspaceId(workspaceId)
@@ -37,11 +35,7 @@ fun NavGraphBuilder.boardMenuScreen(
         BoardMenuScreen(
             viewModel = viewModel,
             popBack = popBack,
-            cover = background ?: Cover(
-                type = CoverType.COLOR,
-                value = "#FFFFFF"
-            ),
-            moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
+            moveToSelectBackGroundScreen = { moveToSelectBackGroundScreen(it, boardId) },
             moveToInviteMemberScreen = { moveToInviteMemberScreen(boardId) },
         )
     }

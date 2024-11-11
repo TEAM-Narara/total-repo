@@ -4,7 +4,8 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,11 +16,11 @@ class ImageStorage @Inject constructor(
     private val s3ImageUtil: S3ImageUtil,
 ) {
 
-    suspend fun saveAll(key: String?, onDoAction: suspend (String?) -> Unit) =
-        withContext(ioDispatcher) {
+    suspend fun saveAll(key: String?, onDoAction: suspend (String?) -> Unit) = coroutineScope {
+        launch(ioDispatcher) {
             if (key.isNullOrBlank()) {
                 onDoAction(null)
-                return@withContext
+                return@launch
             }
 
             listOf(
@@ -29,8 +30,14 @@ class ImageStorage @Inject constructor(
                 onDoAction(deferred.await())
             }
         }
+    }
 
-    private fun save(key: String): String = s3ImageUtil.downloadFile(key)
+    private fun save(key: String): String = runCatching {
+        s3ImageUtil.downloadFile(key)
+    }.fold(
+        onSuccess = { it },
+        onFailure = { "" }
+    )
 
     fun get(path: String): File? = File(path).takeIf { it.exists() && it.isFile }
 
