@@ -222,8 +222,6 @@ class BoardRepositoryImpl @Inject constructor(
     // 워치 변환은 서버에서만 가능
     override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
-            println(id)
-
             boardDataSource.toggleWatchBoard(id)
             val isAlert = boardDataSource.getWatchStatus(id).first()
             val boardMemberAlarmEntity = BoardMemberAlarmEntity(
