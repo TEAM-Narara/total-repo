@@ -37,9 +37,11 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 현재 사용자가 카드에 접근할 수 있는 권한이 있는지 확인
         cardService.checkBoardMember(targetCard, member, MOVE_CARD);
 
-        // 이동할 대상 리스트 조회
-        List targetList = listRepository.findById(targetListId)
-                .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+        // targetListId가 0L이면 현재 카드의 리스트를 사용
+        List targetList = (targetListId == 0L) ? targetCard.getList() :
+                listRepository.findById(targetListId)
+                        .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+
         // 대상 리스트에서 가장 위에 위치한 카드 조회
         Optional<Card> topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList);
 
@@ -63,12 +65,15 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 현재 사용자가 카드에 접근할 수 있는 권한이 있는지 확인
         cardService.checkBoardMember(targetCard, member, MOVE_CARD);
 
-        // 이동할 대상 리스트 조회
-        List targetList = listRepository.findById(targetListId)
-                .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+        // targetListId가 0L이면 현재 카드의 리스트를 사용
+        List targetList = (targetListId == 0L) ? targetCard.getList() :
+                listRepository.findById(targetListId)
+                        .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+
 
         // 대상 리스트에서 가장 아래에 위치한 카드 조회
         Optional<Card> bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList);
+        System.out.println(bottomCard);
         if (bottomCard.isPresent() && targetCard.getMyOrder().equals(bottomCard.get().getMyOrder())) {
             return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
         }
@@ -104,7 +109,7 @@ public class CardMoveServiceImpl implements CardMoveService {
         cardRepository.save(targetCard);
 
         // 단일 카드 이동 결과 반환
-        return new CardMoveResult.SingleCardMove(orderInfoList.getFirst());
+        return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
     }
 
     @Override
@@ -150,7 +155,7 @@ public class CardMoveServiceImpl implements CardMoveService {
         targetCard.moveToListWithOrder(previousCard.getList(), orderInfoList.getFirst().myOrder());
         cardRepository.save(targetCard);
 
-        return new CardMoveResult.SingleCardMove(orderInfoList.getFirst());
+        return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
     }
 
     private long generateUniqueOrder(long baseOrder) {
@@ -170,6 +175,7 @@ public class CardMoveServiceImpl implements CardMoveService {
             }
 
             if (!isOrderConflict(List, newOrder)) {
+                System.out.println(newOrder);
                 return java.util.List.of(new CardMoveResponseDto(List.getId(), newOrder));
             } else {
                 long randomOffset = ThreadLocalRandom.current().nextLong(50, 150);
