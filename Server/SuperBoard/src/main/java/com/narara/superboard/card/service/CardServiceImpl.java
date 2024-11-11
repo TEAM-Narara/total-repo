@@ -70,7 +70,6 @@ public class CardServiceImpl implements CardService {
 
         Card card = Card.createCard(cardCreateRequestDto, list);
 
-
         Card savedCard = cardRepository.save(card);
         CardMember cardMember = CardMember.createCardMember(savedCard, member);
         cardMemberRepository.save(cardMember);
@@ -124,9 +123,9 @@ public class CardServiceImpl implements CardService {
         Card card = getCard(cardId);
         checkBoardMember(card, member, EDIT_CARD);
 
-        if (cardUpdateRequestDto.cover() != null) {
-            coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
-        }
+        //cover 검증
+        coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
+
         Card updatedCard = card.updateCard(cardUpdateRequestDto);
 
         boardOffsetService.saveEditCard(updatedCard); //Websocket 카드 업데이트

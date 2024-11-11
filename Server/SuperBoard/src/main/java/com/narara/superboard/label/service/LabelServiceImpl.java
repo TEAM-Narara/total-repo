@@ -52,9 +52,10 @@ public class LabelServiceImpl implements LabelService {
         colorValidator.validateLabelColor(updateLabelRequestDto);
 
         Label label = getLabel(labelId);
-        boardOffsetService.saveEditLabel(label); //Websocket 라벨 업데이트
+        Label savedLabel = label.updateLabel(updateLabelRequestDto);
+        boardOffsetService.saveEditLabel(savedLabel); //Websocket 라벨 업데이트
 
-        return label.updateLabel(updateLabelRequestDto);
+        return savedLabel;
     }
 
     @Transactional

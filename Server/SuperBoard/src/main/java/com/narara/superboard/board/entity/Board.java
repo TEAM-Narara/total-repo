@@ -6,6 +6,7 @@ import com.narara.superboard.board.interfaces.dto.BoardUpdateRequestDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import jakarta.persistence.*;
@@ -15,11 +16,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -97,30 +100,37 @@ public class Board extends BaseTimeEntity implements Identifiable {
     }
 
     public Board updateBoardByAdmin(BoardUpdateRequestDto boardUpdateRequestDto) {
-        if (boardUpdateRequestDto.cover() != null) {
-            this.cover = new HashMap<>();
-            this.cover.put("type", boardUpdateRequestDto.cover().type());
-            this.cover.put("value", boardUpdateRequestDto.cover().value());
-        }
-        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
-            this.name = boardUpdateRequestDto.name();
-        }
-        if (!(boardUpdateRequestDto.visibility() == null || boardUpdateRequestDto.visibility().isEmpty() || boardUpdateRequestDto.visibility().isBlank())) {
-            this.visibility = Visibility.valueOf(boardUpdateRequestDto.visibility());
-        }
+        updateCover(boardUpdateRequestDto.cover());
+        updateName(boardUpdateRequestDto.name());
+        updateVisibility(boardUpdateRequestDto.visibility());
+
         return this;
     }
 
-    public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
-        if (boardUpdateRequestDto.cover() != null) {
-            this.cover = new HashMap<>();
-            this.cover.put("type", boardUpdateRequestDto.cover().type());
-            this.cover.put("value", boardUpdateRequestDto.cover().value());
+    private void updateVisibility(String visibility) {
+        if (!((visibility == null || visibility.isEmpty() || visibility.isBlank()))) {
+            this.visibility = Visibility.valueOf(visibility);
         }
+    }
 
-        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
-            this.name = boardUpdateRequestDto.name();
+    private void updateName(String name) {
+        if (!(name == null || name.isEmpty() || name.isBlank())) {
+            this.name = name;
         }
+    }
+
+    private void updateCover(CoverDto cover) {
+        if (cover != null) {
+            this.cover = new HashMap<>();
+            this.cover.put("type", cover.type());
+            this.cover.put("value", cover.value());
+        }
+    }
+
+    public Board updateBoardByMember(BoardUpdateRequestDto boardUpdateRequestDto) {
+        updateCover(boardUpdateRequestDto.cover());
+        updateName(boardUpdateRequestDto.name());
+
         return this;
     }
 

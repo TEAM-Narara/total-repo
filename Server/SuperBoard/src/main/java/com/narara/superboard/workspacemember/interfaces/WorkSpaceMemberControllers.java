@@ -58,7 +58,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 권한 수정")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
     @PatchMapping("/{workspaceId}/members")
-    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(requestDto.memberId(), workspaceId, requestDto.authority());
 
         return ResponseEntity.ok(
