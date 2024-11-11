@@ -133,10 +133,7 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
-=======
         //TODO Websocket board 생성 히스토리 생성
->>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
 
         return saveBoard;
     }
@@ -318,7 +315,6 @@ public class BoardServiceImpl implements BoardService {
         return activities;
     }
 
-<<<<<<< Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
     // 처음부터 페이지 끝까지
     public BoardCombinedLogResponseDto getBoardCombinedLog(Long boardId, Pageable pageable) {
         // Pageable을 활용해 각각의 컬렉션을 가져옴
@@ -408,8 +404,6 @@ public class BoardServiceImpl implements BoardService {
     }
 
     // 페이징된 댓글막 딱 가져옴.
-=======
->>>>>>> Server/SuperBoard/src/main/java/com/narara/superboard/board/service/BoardServiceImpl.java
     @Override
     public PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable) {
 
