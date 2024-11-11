@@ -5,6 +5,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
+import com.ssafy.home.data.MemberData
 import com.ssafy.member.SearchMembersUseCase
 import com.ssafy.member.data.UserData
 import com.ssafy.member.data.toUser
@@ -12,6 +13,7 @@ import com.ssafy.model.member.Authority
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.AddWorkspaceMemberUseCase
 import com.ssafy.workspace.ChangeWorkspaceMemberUseCase
+import com.ssafy.workspace.DeleteWorkspaceMemberUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +36,7 @@ class InviteWorkspaceViewModel @Inject constructor(
     private val searchMemberUseCase: SearchMembersUseCase,
     private val addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
     private val changeWorkspaceMemberUseCase: ChangeWorkspaceMemberUseCase,
+    private val deleteWorkspaceMemberUseCase: DeleteWorkspaceMemberUseCase
 ) : BaseViewModel() {
 
     private val _workspace = MutableStateFlow(DetailWorkspaceData(-1, "", emptyList()))
@@ -72,6 +75,16 @@ class InviteWorkspaceViewModel @Inject constructor(
     fun inviteMember(userData: UserData) = viewModelScope.launch(Dispatchers.IO) {
         val user = userData.toUser()
         addWorkspaceMemberUseCase(workspace.value.workspaceId, user).withUiState().collect()
+    }
+
+    fun deleteMember(memberData: MemberData, onSuccess: () -> Unit) = withIO {
+        withSocketState { isConnected: Boolean ->
+            deleteWorkspaceMemberUseCase(
+                workspace.value.workspaceId,
+                memberData.memberId,
+                isConnected
+            ).withUiState().collect { withMain { onSuccess() } }
+        }
     }
 
 }

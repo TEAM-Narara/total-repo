@@ -45,7 +45,9 @@ class WorkspaceDataSourceImpl @Inject constructor(
         workspaceId: Long,
         memberId: Long
     ): Flow<DetailMemberDto> =
-        safeApiCall { workspaceAPI.deleteWorkspaceMember(workspaceId, memberId) }.toFlow()
+        safeApiCall {
+            workspaceAPI.deleteWorkspaceMember(workspaceId, mapOf("memberId" to memberId))
+        }.toFlow()
 
     override suspend fun updateWorkspaceMember(
         workspaceId: Long,
