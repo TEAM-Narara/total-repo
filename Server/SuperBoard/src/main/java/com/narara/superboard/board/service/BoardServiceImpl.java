@@ -157,10 +157,10 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
-        boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
+//        boardValidator.validateVisibilityIsPresent(boardUpdateRequestDto);
         boardValidator.validateVisibilityIsValid(boardUpdateRequestDto);
         boardValidator.validateBackgroundIsValid(boardUpdateRequestDto);
-        coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover());
+        coverValidator.validateCoverTypeIsValid(boardUpdateRequestDto.cover()); //TODO 중복인 것 같은데 빼기
         BoardMember boardMember = boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)
                 .orElseThrow(() -> new AccessDeniedException("보드에 대한 권한이 없습니다"));
 

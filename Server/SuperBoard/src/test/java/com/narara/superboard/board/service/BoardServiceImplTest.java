@@ -53,6 +53,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
+import javax.swing.text.html.Option;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -220,7 +222,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // Mocking: 검증 로직을 모킹
         doNothing().when(boardValidator).validateNameIsPresent(requestDto);
         doNothing().when(boardValidator).validateVisibilityIsValid(requestDto);
-        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
+//        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
 
         // Mocking: workspaceRepository와 boardRepository의 반환값 설정
         when(workspaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(workspace));
@@ -236,7 +238,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         verify(boardRepository, times(1)).save(any(Board.class));
         verify(boardValidator, times(1)).validateNameIsPresent(requestDto);
         verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
-        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+//        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
         verify(boardMemberRepository, times(1)).save(any(BoardMember.class));
     }
 
@@ -277,7 +279,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(1L, board1.getId());
         verify(boardValidator).validateNameIsPresent(requestDto);
         verify(boardValidator).validateVisibilityIsValid(requestDto);
-        verify(boardValidator).validateVisibilityIsPresent(requestDto);
+//        verify(boardValidator).validateVisibilityIsPresent(requestDto);
         verify(boardRepository).save(any(Board.class));
         verify(boardMemberRepository).save(any(BoardMember.class));
     }
@@ -353,31 +355,50 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
     }
 
     @ParameterizedTest
-    @DisplayName("[ADMIN] 보드 수정 시 가시성이 존재하지 않으면 NotFoundException 발생 테스트")
+    @DisplayName("[ADMIN] 보드 수정 시 가시성이 존재하지 않아도 괜찮아 테스트")
     @CsvSource({
-            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', ''",  // 가시성이 빈 값인 경우
-            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}', 'null'"  // 가시성이 null인 경우
+            "'Board Name', '{\"type\":\"COLOR\",\"value\":\"#ffffff\"}'"  // 가시성이 null인 경우
     })
-    void testUpdateBoard_VisibilityEmptyValue(String name, String backgroundJson, String visibility) {
+    void testUpdateBoard_VisibilityEmptyValue(String name, String backgroundJson) {
+        String visibility = null;
+
         // given
         Long boardId = 1L;
+        Board board = Board.createBoard(
+                new BoardCreateRequestDto(1L, "workspace", "WORKSPACE", null, false),
+                new WorkSpace(1L, "asdf", 1L)
+        );
         Map<String, Object> background = backgroundJson.isEmpty() ? null : Map.of("type", "COLOR", "value", "#ffffff");
 
         // 요청 DTO 생성
         BoardUpdateRequestDto requestDto = new BoardUpdateRequestDto(name,
                 new CoverDto((String) background.get("type"), (String) background.get("value")), visibility);
 
-        // Mocking: validateVisibilityIsPresent 호출 시 예외 발생 설정
-        doThrow(new NotFoundException("Board", "visibility")).when(boardValidator)
-                .validateVisibilityIsPresent(requestDto);
+        Member member = new Member(1L, "asdf", "asdf");
+        BoardMember boardMember1 = new BoardMember(
+                member, Authority.ADMIN
+        );
+
+//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, boardMember.getId()))
+//                .thenReturn(Optional.of(boardMember1));
 
         // when & then: 가시성 값이 없을 때 예외가 발생하는지 확인
         Long memberId = 1L;
-//        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(Optional.of(new BoardMember(1L, null, null, Authority.ADMIN, true)));
-        assertThrows(NotFoundException.class, () -> boardService.updateBoard(memberId, boardId, requestDto));
+        when(boardMemberRepository.findFirstByBoard_IdAndMember_Id(boardId, memberId)).thenReturn(
+                Optional.of(boardMember1)
+        );
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId))
+                .thenReturn(Optional.of(board));
+        when(memberRepository.findByIdAndIsDeletedFalse(memberId))
+                .thenReturn(Optional.of(member));
+        assertDoesNotThrow(() -> {
+            Board updatedBoard = boardService.updateBoard(memberId, boardId, requestDto);
+
+            assertEquals(updatedBoard.getVisibility().name(), "WORKSPACE");
+        });
 
         // 검증: 가시성 검증이 호출되었는지 확인
-        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+        verify(boardValidator, times(1)).validateBackgroundIsValid(requestDto);
     }
 
     @ParameterizedTest
@@ -405,7 +426,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
                 () -> boardService.updateBoard(memberId, boardId, requestDto));
 
         // 검증: 가시성 검증이 호출되었는지 확인
-        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
+//        verify(boardValidator, times(1)).validateVisibilityIsPresent(requestDto);
         verify(boardValidator, times(1)).validateVisibilityIsValid(requestDto);
     }
 
@@ -487,7 +508,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(mockBoard.getName()).thenReturn(name);
 
         // Validator 메서드 호출 시 아무 일도 하지 않도록 설정
-        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
+//        doNothing().when(boardValidator).validateVisibilityIsPresent(requestDto);
         doNothing().when(boardValidator).validateVisibilityIsValid(requestDto);
 
         // 커버가 있을 때만 커버 타입 검증하도록 설정
@@ -508,7 +529,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
         // then
         assertEquals(mockBoard, updatedBoard);  // 업데이트된 보드가 mockBoard여야 함
-        verify(boardValidator).validateVisibilityIsPresent(requestDto);
+//        verify(boardValidator).validateVisibilityIsPresent(requestDto);
         verify(boardValidator).validateVisibilityIsValid(requestDto);
 
         // 커버가 존재하는 경우에만 커버 검증 호출 확인
@@ -716,10 +737,10 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         when(boardHistoryRepository.save(any(BoardHistory.class))).thenReturn(mockBoardHistory);
 
         // when
-        boardService.updateBoard(memberId, boardId, dto);
+        Board updatedBoard = boardService.updateBoard(memberId, boardId, dto);
 
         // then
-        verify(boardValidator).validateVisibilityIsPresent(dto);
+//        verify(boardValidator).validateVisibilityIsPresent(dto);
         verify(boardValidator).validateVisibilityIsValid(dto);
         verify(board).updateBoardByMember(dto);
         verify(board, never()).updateBoardByAdmin(dto);  // ADMIN 업데이트는 호출되지 않음
@@ -727,7 +748,6 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         // boardHistoryRepository의 save가 호출되었는지 확인
         verify(boardHistoryRepository, times(1)).save(any(BoardHistory.class));
     }
-
 
     @Test
     @DisplayName("ADMIN 권한으로 보드 업데이트 테스트")
@@ -766,7 +786,7 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
         Board updatedBoard = boardService.updateBoard(memberId, boardId, dto);
 
         // then
-        verify(boardValidator).validateVisibilityIsPresent(dto);
+//        verify(boardValidator).validateVisibilityIsPresent(dto);
         verify(boardValidator).validateVisibilityIsValid(dto);
         verify(board).updateBoardByAdmin(dto);
         verify(board, never()).updateBoardByMember(dto);  // MEMBER 업데이트는 호출되지 않음
