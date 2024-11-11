@@ -44,27 +44,31 @@ public class CardMoveServiceImpl implements CardMoveService {
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
 
-        // 대상 리스트에서 가장 위에 위치한 카드 조회
-        Optional<Card> topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList);
+        Card topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList)
+                .orElseGet(() -> {
+                    // targetList가 비어 있는 경우 삭제 처리
+                    listRepository.delete(targetList);
+                    log.warn("targetList 비어 있어 삭제되었습니다 - listId: {}", targetList.getId());
+                    return null; // null 반환
+                });
 
-        // 처음과 같은 상황이면 그대로 반환
-        if (topCard.isPresent() && targetCard.getMyOrder().equals(topCard.get().getMyOrder()) && targetList.getId().equals(targetCard.getList().getId())) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+        if (topCard == null) {
+            return new CardMoveResult.DeletedCardMove(targetList.getId());
         }
 
-        // 맨 위로 이동하기 위한 기준 순서값 설정 (비율을 사용하여 순서 계산)
-//        long baseOrder = topCard.map(card -> Math.round(card.getMyOrder() * MOVE_TOP_ORDER_RATIO))
-//                .orElse(DEFAULT_TOP_ORDER);
+        // 처음과 같은 상황이면 그대로 반환
+        if (targetCard.getMyOrder().equals(topCard.getMyOrder())
+                && targetList.getId().equals(targetCard.getList().getId())) {
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+        }
 
-        long baseOrder = topCard.map(card -> {
-            long maxLimit = Math.round(card.getMyOrder() * MOVE_TOP_ORDER_RATIO);
-            long calculatedOrder = Math.max(card.getMyOrder() - LARGE_INCREMENT, maxLimit);
-            log.info("기준 순서 값 계산 - topListOrder: {}, calculatedOrder: {}", card.getMyOrder(), calculatedOrder);
-            return calculatedOrder;
-        }).orElse(DEFAULT_TOP_ORDER);
+        // baseOrder 계산
+        long baseOrder = Math.max(topCard.getMyOrder() - LARGE_INCREMENT,
+                Math.round(topCard.getMyOrder() * MOVE_TOP_ORDER_RATIO));
+        log.info("기준 순서 값 계산 - topListOrder: {}, calculatedOrder: {}", topCard.getMyOrder(), baseOrder);
 
-
-        return getCardMoveResult(targetCard, 0, targetList, baseOrder);
+        return getCardMoveResult(targetCard, 0, targetList, baseOrder, null, topCard.getMyOrder());
     }
 
     @Override
@@ -81,21 +85,35 @@ public class CardMoveServiceImpl implements CardMoveService {
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
 
-
         // 대상 리스트에서 가장 아래에 위치한 카드 조회
-        Optional<Card> bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList);
-        System.out.println(bottomCard);
-        if (bottomCard.isPresent() && targetCard.getMyOrder().equals(bottomCard.get().getMyOrder())&& targetList.getId().equals(targetCard.getList().getId())) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+        Card bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList)
+                .orElseGet(() -> {
+                    // targetList가 비어 있는 경우 삭제 처리
+                    listRepository.delete(targetList);
+                    log.warn("targetList가 비어 있어 삭제되었습니다 - listId: {}", targetList.getId());
+                    return null; // null 반환
+                });
+
+        if (bottomCard == null) {
+            return new CardMoveResult.DeletedCardMove(targetList.getId());
+        }
+
+
+        if (targetCard.getMyOrder().equals(bottomCard.getMyOrder())
+                && targetList.getId().equals(targetCard.getList().getId())) {
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
         }
 
         // 맨 아래로 이동하기 위한 기준 순서값 설정 (비율을 사용하여 순서 계산)
-        long baseOrder = bottomCard.map(lastCard -> {
-            long minLimit = lastCard.getMyOrder() + Math.round((Long.MAX_VALUE - lastCard.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO);
-            return Math.min(lastCard.getMyOrder() + LARGE_INCREMENT, minLimit);
-        }).orElse(DEFAULT_TOP_ORDER);
+        long baseOrder = Math.min(
+                bottomCard.getMyOrder() + LARGE_INCREMENT,
+                bottomCard.getMyOrder() + Math.round((Long.MAX_VALUE - bottomCard.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO)
+        );
 
-        return getCardMoveResult(targetCard, -1, targetList, baseOrder);
+        log.info("기준 순서 값 계산 - bottomListOrder: {}, baseOrder: {}", bottomCard.getMyOrder(), baseOrder);
+
+        return getCardMoveResult(targetCard, -1, targetList, baseOrder, bottomCard.getMyOrder(), null);
     }
 
     /**
@@ -106,9 +124,13 @@ public class CardMoveServiceImpl implements CardMoveService {
      * @param baseOrder  새롭게 설정할 순서값의 기준
      * @return 카드 이동 결과 객체 (단일 이동 또는 재배치가 필요한 경우 전체 카드 정보)
      */
-    private CardMoveResult getCardMoveResult(Card targetCard, int targetIndex, List targetList, long baseOrder) {
+    private CardMoveResult getCardMoveResult(
+            Card targetCard, int targetIndex, List targetList,
+            long baseOrder, Long prevOrder, Long nextOrder) {
         // 고유한 순서값 생성 및 재배치 체크
-        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetCard, targetIndex, targetList, baseOrder);
+        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetCard, targetIndex, targetList,
+                baseOrder, prevOrder, nextOrder);
 
         // 여러 카드를 재배치해야 하는 경우 재배치 결과 반환
         if (orderInfoList.size() > 1) {
@@ -120,20 +142,23 @@ public class CardMoveServiceImpl implements CardMoveService {
         cardRepository.save(targetCard);
 
         // 단일 카드 이동 결과 반환
-        return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+        return new CardMoveResult.SingleCardMove(
+                new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
     }
 
     @Override
     @Transactional
     public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
-        log.info("moveCardBetween 메서드 시작 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId, nextCardId);
+        log.info("moveCardBetween 메서드 시작 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId,
+                nextCardId);
 
         // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 카드의 순서 값으로 반환
         if (cardId.equals(previousCardId) || cardId.equals(nextCardId) || previousCardId.equals(nextCardId)) {
             Card targetCard = cardRepository.findById(cardId)
                     .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
             log.info("같은 ID 감지 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId, nextCardId);
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), targetCard.getMyOrder()));
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), targetCard.getMyOrder()));
         }
 
         Card targetCard = cardRepository.findById(cardId)
@@ -163,7 +188,9 @@ public class CardMoveServiceImpl implements CardMoveService {
                 .indexOf(previousCard) + 1;
 
         // 고유한 순서값 생성 후 재배치 필요 여부 체크
-        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetCard, targetIndex, previousCard.getList(), baseOrder);
+        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetCard, targetIndex, previousCard.getList(),
+                baseOrder, prevOrder, nextOrder);
 
         // 여러 카드 재배치가 필요한 경우 재배치 결과 반환
         if (orderInfoList.size() > 1) {
@@ -174,19 +201,37 @@ public class CardMoveServiceImpl implements CardMoveService {
         targetCard.moveToListWithOrder(previousCard.getList(), orderInfoList.getFirst().myOrder());
         cardRepository.save(targetCard);
 
-        return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), targetCard.getMyOrder()));
+        return new CardMoveResult.SingleCardMove(
+                new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), targetCard.getMyOrder()));
     }
 
-    private long generateUniqueOrder(long baseOrder) {
-        long gap = LARGE_INCREMENT / 100;
-        long offset = System.nanoTime() % gap;
+    private long generateUniqueOrder(long baseOrder, long maxOffset) {
+        // 0부터 maxOffset까지의 범위에서 랜덤 offset 값을 생성
+        long offset = ThreadLocalRandom.current().nextLong(0, maxOffset);
         return baseOrder + offset;
     }
 
-    private java.util.List<CardMoveResponseDto> generateUniqueOrderWithRetry(Card targetCard, int targetIndex, List list, long baseOrder) {
-        int maxAttempts = 2;
+    private java.util.List<CardMoveResponseDto> generateUniqueOrderWithRetry(
+            Card targetCard, int targetIndex,
+            List list, long baseOrder,
+            Long prevOrder, Long nextOrder) {
+        int maxAttempts = 1;
         int attempt = 0;
-        long newOrder = generateUniqueOrder(baseOrder);
+        long maxOffset = 100;
+
+        // 맨 위로 이동할 경우: offset이 기존 최상위 order보다 크지 않도록 제한
+        if (prevOrder == null && nextOrder != null) {
+            maxOffset = Math.min(maxOffset, nextOrder - baseOrder - 1);
+        }
+        // 두 리스트 사이에 배치할 경우: offset이 두 리스트의 중간값을 넘지 않도록 제한
+        else if (prevOrder != null && nextOrder != null) {
+            maxOffset = Math.min(maxOffset, (nextOrder - prevOrder) / 2);
+        }
+        if (maxOffset < 1) {
+            maxOffset = 1;
+        }
+
+        long newOrder = generateUniqueOrder(baseOrder, maxOffset);
 
         while (attempt < maxAttempts) {
             if (newOrder <= 0 || newOrder >= Long.MAX_VALUE) {
@@ -194,29 +239,19 @@ public class CardMoveServiceImpl implements CardMoveService {
             }
 
             if (!isOrderConflict(list, newOrder)) {
-                System.out.println(newOrder);
-                return java.util.List.of(new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), newOrder));
+                return java.util.List.of(
+                        new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), newOrder));
             } else {
-                // 랜덤 오프셋을 통해 순서 값 충돌을 방지하고, 여러 번의 시도를 통해 고유한 순서 값을 생성
-                // 1. 50과 150 사이의 난수를 생성하여 `randomOffset`에 할당
-                //    - 이 값은 `newOrder`에 더해져 기존 순서 값과의 충돌을 방지하는 역할을 합니다.
-                //    - ThreadLocalRandom.current().nextLong(50, 150)은 50 이상 150 미만의 임의의 값을 생성합니다.
-                // 2. 시도 횟수(`attempt`)에 따라 고유 순서 값을 다르게 적용
-                //    - 시도가 진행될 때마다 `(attempt + 1) * 100L`를 계산하여 `baseOrder`에 추가
-                //    - `attempt + 1`은 시도 횟수에 따라 증가하므로 매번 고유한 값을 보장할 수 있습니다.
-                // 3. 최종적으로 `newOrder`는 `baseOrder + (attempt + 1) * 100L + randomOffset` 형태로 계산
-                //    - 충돌이 발생해도 시도 횟수에 따라 순서 값이 바뀌면서 고유한 순서를 찾을 가능성이 높아집니다.
-
-                long randomOffset = ThreadLocalRandom.current().nextLong(50, 150);
-                newOrder = baseOrder + (attempt + 1) * 100L + randomOffset;
+                long randomOffset = ThreadLocalRandom.current().nextLong(0, maxOffset);
+                newOrder = baseOrder + randomOffset;
                 attempt++;
             }
         }
         return cardReorderService.reorderAllCardOrders(list, targetCard, targetIndex);
     }
 
-    private boolean isOrderConflict(List List, long order) {
-        return cardRepository.existsByListAndMyOrder(List, order);
+    private boolean isOrderConflict(List list, long order) {
+        return cardRepository.existsByListAndMyOrder(list, order);
     }
 
     private void validateCardsInSameList(Card previousCard, Card nextCard) {
