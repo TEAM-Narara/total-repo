@@ -86,8 +86,8 @@ class CardViewModel @Inject constructor(
         }
         withSocketState { isConnected ->
             updateCardUseCase(
+                cardId = card.cardId,
                 cardUpdateRequestDto = CardUpdateRequestDto(
-                    cardId = card.cardId,
                     name = card.editableTitle,
                     description = card.content,
                     startAt = card.startDate,
@@ -103,8 +103,8 @@ class CardViewModel @Inject constructor(
         val card = cardDTO.value ?: return@launch
         withSocketState { isConnected ->
             updateCardUseCase(
+                cardId = card.cardId,
                 cardUpdateRequestDto = CardUpdateRequestDto(
-                    cardId = card.cardId,
                     name = card.title,
                     description = card.editableContent,
                     startAt = card.startDate,
@@ -178,8 +178,8 @@ class CardViewModel @Inject constructor(
         val card = cardDTO.value ?: return@launch
         withSocketState { isConnected ->
             updateCardUseCase(
+                cardId = card.cardId,
                 cardUpdateRequestDto = CardUpdateRequestDto(
-                    cardId = card.cardId,
                     name = card.title,
                     description = card.editableContent,
                     startAt = periodData.startDate,

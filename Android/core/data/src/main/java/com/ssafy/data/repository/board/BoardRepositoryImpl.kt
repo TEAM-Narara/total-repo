@@ -8,7 +8,6 @@ import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dto.piece.bitmaskColumn
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
-import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
