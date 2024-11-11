@@ -93,6 +93,7 @@ public class ListController implements ListAPI {
     }
 
     @Override
+    @Operation(summary = "보드 내의 리스트 조회")
     public ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getListsByBoardId(@PathVariable Long boardId) {
         java.util.List<ListSimpleResponseDto> lists = listService.getListsByBoardId(boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_FETCH_SUCCESS, lists), HttpStatus.OK);

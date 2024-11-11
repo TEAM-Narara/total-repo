@@ -182,6 +182,7 @@ public class CardController implements CardAPI {
 
 
     @Override
+    @Operation(summary = "리스트 내의 카드 조회")
     public ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(@PathVariable Long listId) {
         List<CardSimpleResponseDto> cards = cardService.getCardsByListId(listId);
         return new ResponseEntity<>(
