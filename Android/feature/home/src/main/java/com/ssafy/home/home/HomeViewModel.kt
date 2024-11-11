@@ -37,8 +37,11 @@ class HomeViewModel @Inject constructor(
             selectedWorkspaceId,
             socketState,
         ) { workspaceId, isConnected ->
-            if (isConnected != ConnectionState.Connected) null
-            else getHomeInfoUseCase(true, workspaceId)
+            when (isConnected) {
+                ConnectionState.Connected -> getHomeInfoUseCase(true, workspaceId)
+                ConnectionState.Disconnected -> getHomeInfoUseCase(false, workspaceId)
+                else -> null
+            }
         }.filterNotNull()
             .flatMapLatest { homeDataFlow: Flow<HomeData> -> homeDataFlow }
             .stateIn(
