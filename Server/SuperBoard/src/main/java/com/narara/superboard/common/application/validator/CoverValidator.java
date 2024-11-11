@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class CoverValidator {
 
     public void validateCoverTypeIsValid(CoverDto cover) {
-        // 1. coverTypeValue가 null인 경우 예외 발생
+        // 1. coverTypeValue가 null인 경우 예외 발생 x (아예 변경하지 말아주세요)
         if (cover == null) {
             return;
         }
