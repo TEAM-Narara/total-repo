@@ -1,17 +1,17 @@
 package com.ssafy.data.repository.board
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dto.piece.toEntity
-import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
-import com.ssafy.database.dto.bitmask.bitmaskColumn
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -25,6 +25,7 @@ import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.board.BoardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -117,18 +118,23 @@ class BoardRepositoryImpl @Inject constructor(
                         name = updateBoardRequestDto.name,
                         coverType = updateBoardRequestDto.cover.type.name,
                         coverValue = updateBoardRequestDto.cover.value,
-                        visibility = updateBoardRequestDto.visibility.name)
+                        visibility = updateBoardRequestDto.visibility.name
+                    )
                     val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
 
-                    val result = when(board.isStatus) {
+                    val result = when (board.isStatus) {
                         DataStatus.STAY, DataStatus.UPDATE ->
-                            boardDao.updateBoard(newBoard.copy(
-                                columnUpdate = newBit,
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE  ->
+                            boardDao.updateBoard(
+                                newBoard.copy(
+                                    columnUpdate = newBit,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE ->
                             boardDao.updateBoard(newBoard)
-                        DataStatus.DELETE -> { }
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
@@ -213,37 +219,20 @@ class BoardRepositoryImpl @Inject constructor(
             boardMemberDao.getBoardMemberAlarmFlow(id).map { it?.toDTO()?.isAlert }
         }
 
+    // 워치 변환은 서버에서만 가능
     override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
-            val memberAlarm = boardMemberDao.getBoardMemberAlarm(id)
+            println(id)
 
-            if (memberAlarm != null) {
-                if (isConnected) {
-                    boardDataSource.toggleWatchBoard(id)
-                } else {
-                    val result = when (memberAlarm.isStatus) {
-                        DataStatus.STAY ->
-                            boardMemberDao.updateBoardMemberAlarm(
-                                memberAlarm.copy(
-                                    isStatus = DataStatus.UPDATE
-                                )
-                            )
-
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            boardMemberDao.updateBoardMemberAlarm(
-                                memberAlarm.copy(
-                                    isAlert = !memberAlarm.isAlert
-                                )
-                            )
-
-                        DataStatus.DELETE -> {}
-                    }
-
-                    flowOf(result)
-                }
-            } else {
-                flowOf(Unit)
-            }
+            boardDataSource.toggleWatchBoard(id)
+            val isAlert = boardDataSource.getWatchStatus(id).first()
+            val boardMemberAlarmEntity = BoardMemberAlarmEntity(
+                boardId = id,
+                isStatus = DataStatus.STAY,
+                isAlert = isAlert
+            )
+            boardMemberDao.insertBoardAlarm(boardMemberAlarmEntity)
+            flowOf()
         }
 
     override suspend fun getBoardMemberMyInfo(
