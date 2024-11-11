@@ -77,7 +77,8 @@ class BoardViewModel @Inject constructor(
     fun updateListName(listId: Long, listName: String) = viewModelScope.launch {
         withSocketState { isConnected ->
             updatedListUseCase(
-                updateListRequestDto = UpdateListRequestDto(listId, listName),
+                listId,
+                updateListRequestDto = UpdateListRequestDto(listName),
                 isConnected = isConnected
             )
         }

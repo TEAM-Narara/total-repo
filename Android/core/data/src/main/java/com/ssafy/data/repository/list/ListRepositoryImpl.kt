@@ -11,8 +11,6 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.ReplyDao
-import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity
@@ -95,7 +93,7 @@ class ListRepositoryImpl @Inject constructor(
 
         if (list != null) {
             if (isConnected) {
-                listDataSource.updateList(updateListRequestDto)
+                listDataSource.updateList(listId, updateListRequestDto)
             } else {
                 // 변경 사항 확인하고 비트마스킹
                 val newList = list.copy(name = updateListRequestDto.listName)
