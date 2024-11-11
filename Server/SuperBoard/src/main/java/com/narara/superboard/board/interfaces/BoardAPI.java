@@ -1,7 +1,8 @@
 package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.interfaces.dto.*;
-import com.narara.superboard.common.interfaces.log.BoardActivityDetailResponseDto;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,9 +61,14 @@ public interface BoardAPI {
     @Operation(summary = "보드 아카이브 상태 변경")
     ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
 
-    @GetMapping("/{boardId}/activity")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
-    @Operation(summary = "보드 액티비티(로그) 조회")
-    ResponseEntity<DefaultResponse<List<BoardActivityDetailResponseDto>>> getBoardActivity(@PathVariable Long boardId);
+    @GetMapping("{boardId}/log")
+    @Operation(summary = "보드의 모든 로그 목록 조회", description = "보드의 모든 로그 목록 조회")
+    ResponseEntity<DefaultResponse<List<BoardLogDetailResponseDto>>> getBoardLog(Long boardId);
 
+    @GetMapping("/{boardId}/activity")
+    ResponseEntity<DefaultResponse<BoardActivityPageableResponseDto>> getBoardActivity(
+            @PathVariable Long boardId,
+            @RequestParam int page,
+            @RequestParam int size
+    );
 }
