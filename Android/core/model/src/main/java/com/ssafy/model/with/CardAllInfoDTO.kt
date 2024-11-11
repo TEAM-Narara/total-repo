@@ -14,7 +14,6 @@ data class CardAllInfoDTO(
     val isArchived: Boolean = false,
 
     @Transient val isStatus: DataStatus = DataStatus.STAY,
-    @Transient val columnUpdate: Long = 0L,
 
     val cardLabels: List<CardLabelDTO>,
     val cardMembers: List<CardMemberDTO>,
