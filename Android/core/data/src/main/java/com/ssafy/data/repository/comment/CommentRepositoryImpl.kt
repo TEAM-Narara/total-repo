@@ -1,7 +1,7 @@
 package com.ssafy.data.repository.comment
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toDto
+import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ReplyEntity

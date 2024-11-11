@@ -28,6 +28,7 @@ class BaseStompManager @Inject constructor(
                     StompResponse::class.java
                 ) { headers ->
                     // TODO : offset 체크 로직 구현
+                    // TODO : ack 타이밍 고민 필요
                     val ackMessage = AckMessage(
                         offset = headers["offset"]?.toLong() ?: 0, // throw Exception("offset이 존재하지 않습니다."),
                         topic = topic.split("/").joinToString("-"),

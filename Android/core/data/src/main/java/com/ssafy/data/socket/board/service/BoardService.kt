@@ -2,6 +2,7 @@ package com.ssafy.data.socket.board.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ssafy.data.image.ImageStorage
 import com.ssafy.data.socket.board.model.board.AddBoardLabelRequestDto
 import com.ssafy.data.socket.board.model.board.AddBoardMemberRequestDto
 import com.ssafy.data.socket.board.model.board.DeleteBoardLabelRequestDto
@@ -26,18 +27,22 @@ class BoardService @Inject constructor(
     private val memberDao: MemberDao,
     private val boardMemberDao: BoardMemberDao,
     private val labelDao: LabelDao,
+    private val imageStorage: ImageStorage,
     private val gson: Gson
 ) {
     suspend fun addBoardMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddBoardMemberRequestDto::class.java)
-        memberDao.insertMember(
-            MemberEntity(
-                id = dto.memberId,
-                email = dto.memberEmail,
-                nickname = dto.memberName,
-                profileImageUrl = dto.profileImgUrl,
+
+        memberDao.getMember(dto.memberId)?.let {
+            memberDao.insertMember(
+                MemberEntity(
+                    id = dto.memberId,
+                    nickname = dto.memberName,
+                    email = dto.memberEmail,
+                    profileImageUrl = dto.profileImgUrl?.let { imageStorage.save(it) },
+                )
             )
-        )
+        }
 
         boardMemberDao.insertBoardMember(
             BoardMemberEntity(
@@ -96,6 +101,8 @@ class BoardService @Inject constructor(
             before.copy(
                 name = dto.name,
                 color = dto.color,
+                isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }

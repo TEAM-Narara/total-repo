@@ -1,7 +1,7 @@
 package com.ssafy.data.repository.workspace
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.toEntity
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.WorkspaceDao
 import com.ssafy.database.dao.WorkspaceMemberDao

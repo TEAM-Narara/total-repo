@@ -124,19 +124,19 @@ private fun BoardScreen(
     onListReordered: () -> Unit,
     navigateToCardScreen: (Long) -> Unit,
     addList: (String) -> Unit,
-    addCard: () -> Unit,
+    addCard: (Long, String) -> Unit,
     addPhoto: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
     val listDndState = rememberReorderState<ListData>(dragAfterLongPress = true)
-    var listCollection by remember { mutableStateOf(boardData.listCollection) }
+    var listCollection by remember(boardData.listCollection) { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
     val cardDndState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
     val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
         boardData.listCollection.forEach { listData ->
-            this[listData.id] = remember {
+            this[listData.id] = remember(listData) {
                 mutableStateOf(listData.cardCollection.map {
                     it.toReorderCardData(listData.id)
                 })
@@ -150,7 +150,7 @@ private fun BoardScreen(
             LazyRow(
                 state = listLazyListState,
                 horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
-                modifier = modifier.padding(vertical = PaddingDefault),
+                modifier = modifier.fillMaxSize().padding(vertical = PaddingDefault),
                 contentPadding = PaddingValues(horizontal = PaddingDefault)
             ) {
                 items(listCollection, key = { it.id }) { listData ->
@@ -192,20 +192,24 @@ private fun BoardScreen(
                             navigateToCardScreen = { id -> navigateToCardScreen(id) },
                             addCard = addCard,
                             addPhoto = addPhoto,
-                            onListChanged = { listId ->
+                            onFocus = { listId ->
                                 scope.launch {
                                     handleLazyListScrollToCenter(
                                         lazyListState = listLazyListState,
                                         dropIndex = listCollection.indexOfFirst { it.id == listId },
                                     )
                                 }
-                            }
+                            },
                         )
                     }
                 }
 
                 item {
-                    AddListButton(addList = addList)
+                    AddListButton(addList = addList) {
+                        scope.launch {
+                            listLazyListState.scrollToItem(listCollection.size)
+                        }
+                    }
                 }
             }
         }
@@ -252,7 +256,7 @@ private fun BoardScreenPreview() {
         onListReordered = {},
         navigateToCardScreen = {},
         addList = {},
-        addCard = {},
+        addCard = { _, _ -> },
         addPhoto = {}
     )
 }

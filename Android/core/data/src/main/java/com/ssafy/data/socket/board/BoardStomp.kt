@@ -2,6 +2,7 @@ package com.ssafy.data.socket.board
 
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.socket.BaseStompManager
+import com.ssafy.data.socket.board.service.AttachmentService
 import com.ssafy.data.socket.board.service.BoardService
 import com.ssafy.data.socket.board.service.CardService
 import com.ssafy.data.socket.board.service.ListService
@@ -21,6 +22,7 @@ class BoardStomp @Inject constructor(
     private val listService: ListService,
     private val cardService: CardService,
     private val replyService: ReplyService,
+    private val attachmentService: AttachmentService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private var _job: Job? = null
@@ -51,6 +53,9 @@ class BoardStomp @Inject constructor(
                     "ADD_REPLY" -> replyService.addReply(it.data)
                     "EDIT_REPLY" -> replyService.editReply(it.data)
                     "DELETE_REPLY" -> replyService.deleteReply(it.data)
+                    "ADD_CARD_ATTACHMENT" -> attachmentService.addCardAttachment(it.data)
+                    "DELETE_CARD_ATTACHMENT" -> attachmentService.deleteCardAttachment(it.data)
+                    "EDIT_CARD_ATTACHMENT_COVER" -> attachmentService.editCardAttachmentCover(it.data)
                     else -> {}
                 }
             }
