@@ -28,7 +28,6 @@ public class ListMoveServiceImpl implements ListMoveService {
     private final ListReorderService listReorderService; // ListReorderService 주입
     private final ListService listService; // ListReorderService 주입
 
-
     @Override
     @Transactional
     public ListMoveResult moveListToTop(Member member, Long listId) {
@@ -60,7 +59,7 @@ public class ListMoveServiceImpl implements ListMoveService {
         }).orElse(DEFAULT_TOP_ORDER);
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(board, baseOrder);
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, 0, board, baseOrder);
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         if (orderInfoList.size() > 1) {
@@ -81,8 +80,6 @@ public class ListMoveServiceImpl implements ListMoveService {
     @Override
     @Transactional
     public ListMoveResult moveListToBottom(Member member, Long listId) {
-        log.info("moveListToBottom 메서드 시작 - listId: {}", listId);
-
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
         log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
@@ -110,7 +107,7 @@ public class ListMoveServiceImpl implements ListMoveService {
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
         // 고유한 newOrder 값을 재시도로 생성 및 재배치 체크
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(board, baseOrder);
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, -1, board, baseOrder);
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         // 재배치가 필요한 경우 전체 리스트 반환
@@ -163,7 +160,10 @@ public class ListMoveServiceImpl implements ListMoveService {
                 : (prevOrder + nextOrder) / HALF_DIVIDER;
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList.getBoard(), baseOrder);
+        int targetIndex = listRepository.findAllByBoardOrderByMyOrderAsc(targetList.getBoard())
+                .indexOf(previousList) + 1;
+
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, targetIndex, previousList.getBoard(), baseOrder);
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         if (orderInfoList.size() > 1) {
@@ -180,7 +180,6 @@ public class ListMoveServiceImpl implements ListMoveService {
 
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
-    // 고유성 보장을 위해 임의 간격 조정 로직 추가
     private long generateUniqueOrder(long baseOrder) {
         long gap = LARGE_INCREMENT / 100; // LARGE_INCREMENT의 1%를 기본 간격으로 사용
         long offset = System.nanoTime() % gap;
@@ -190,25 +189,26 @@ public class ListMoveServiceImpl implements ListMoveService {
     }
 
 
-    private java.util.List<ListMoveResponseDto> generateUniqueOrderWithRetry(Board board, long baseOrder) {
+    private java.util.List<ListMoveResponseDto> generateUniqueOrderWithRetry(List targetList, int targetIndex, Board board, long baseOrder) {
         int maxAttempts = 3;
         int attempt = 0;
         long newOrder = generateUniqueOrder(baseOrder);
 
         while (attempt < maxAttempts) {
             if (newOrder <= 0 || newOrder >= Long.MAX_VALUE) {
-                return listReorderService.reorderAllListOrders(board);
+                return listReorderService.reorderAllListOrders(board, targetList, targetIndex);
             }
 
             if (!isOrderConflict(board, newOrder)) {
-                return java.util.List.of(new ListMoveResponseDto(board.getId(), newOrder));
+                // 변경된 값만 반환,
+                return java.util.List.of(new ListMoveResponseDto(targetList.getId(), newOrder));
             } else {
                 long randomOffset = ThreadLocalRandom.current().nextLong(50, 150);
                 newOrder = baseOrder + (attempt + 1) * 100L + randomOffset;
                 attempt++;
             }
         }
-        return listReorderService.reorderAllListOrders(board);
+        return listReorderService.reorderAllListOrders(board, targetList, targetIndex);
     }
 
     // 리스트 순서 중복 확인 메서드
