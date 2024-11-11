@@ -55,14 +55,19 @@ class StompClientManager @Inject constructor(
         id: String,
         topic: String,
         clazz: Class<T>,
-        ack: suspend (headers: MutableMap<String, String>) -> Unit = {}
-    ): Flow<T> {
+    ): Flow<StompResponse<T>> {
         Log.d("TAG", "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
+            Log.d("TAG", "offset: ${it.headers["offset"]?.toLong()}")
             Log.d("TAG", "data: ${it.bodyAsText}")
-            ack(it.headers)
-            gson.fromJson(it.bodyAsText, clazz)
+            val data = gson.fromJson(it.bodyAsText, clazz)
+
+            StompResponse(
+                offset = it.headers["offset"]?.toLong() ?: throw Exception("offset이 존재하지 않습니다."),
+                partition = it.headers["partition"]?.toLong() ?: 0,
+                data = data
+            )
         }.catch { exception ->
             exception.printStackTrace()
             sessions.remove(id)
@@ -80,6 +85,7 @@ class StompClientManager @Inject constructor(
     }
 
     suspend fun <T> send(id: String, url: String, body: T) {
+        Log.d("TAG", "send($url): ${gson.toJson(body)}")
         sessions[id]?.sendText(url, gson.toJson(body))
     }
 }
