@@ -59,6 +59,8 @@ public class KafkaEventListenerService {
             log.info("이미 등록된 리스너가 있습니다 - 엔티티 타입: {}, ID: {}, 회원 ID: {}", entityType, primaryId, memberId);
             container = activeListeners.get(listenerKey);
 
+            // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
+            fetchMissedMessages(container, topic, memberId, "/topic/" + entityType + "/" + primaryId + "/member/" + memberId);
         } else {
             // Kafka Listener 컨테이너 팩토리 설정
             ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -76,9 +78,6 @@ public class KafkaEventListenerService {
             log.info("새로운 리스너를 등록했습니다 - 엔티티 타입: {}, ID: {}, 회원 ID: {}", entityType, primaryId, memberId);
             activeListeners.put(listenerKey, container);
         }
-
-        // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
-        fetchMissedMessages(container, topic, memberId, "/topic/" + entityType + "/" + primaryId + "/member/" + memberId);
     }
 
     /**
