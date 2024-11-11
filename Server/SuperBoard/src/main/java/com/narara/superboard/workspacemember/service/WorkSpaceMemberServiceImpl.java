@@ -39,8 +39,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
-    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
-        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId);
+    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId) {
+        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workspaceId);
 
         List<MemberResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
 
@@ -67,15 +67,17 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         List<WorkSpaceResponseDto> workSpaceResponseDtoList = new ArrayList<>();
 
         for (WorkSpaceMember workSpaceMember : workSpaceMemberList) {
-            WorkSpace workSpace = workSpaceMember.getWorkSpace();
-            WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
-                    .workSpaceId(workSpace.getId())
-                    .name(workSpace.getName())
-                    .build();
+            if (!workSpaceMember.getWorkSpace().getIsDeleted()) {
+                WorkSpace workSpace = workSpaceMember.getWorkSpace();
+                WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
+                        .workspaceId(workSpace.getId())
+                        .name(workSpace.getName())
+                        .authority(workSpaceMember.getAuthority())
+                        .build();
+                workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
 
-            workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
-
-            workSpaceResponseDtoList.add(workSpaceResponseDto);
+                workSpaceResponseDtoList.add(workSpaceResponseDto);
+            }
         }
 
         return WorkSpaceListResponseDto.builder()

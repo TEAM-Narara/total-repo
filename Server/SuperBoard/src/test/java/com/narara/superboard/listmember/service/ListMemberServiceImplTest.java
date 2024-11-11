@@ -65,6 +65,7 @@ class ListMemberServiceImplTest {
         when(listRepository.existsById(listId)).thenReturn(true);
         when(listMemberRepository.findByListIdAndMember(listId, member))
                 .thenReturn(Optional.of(existingListMember));
+        when(listMemberRepository.save(any())).thenReturn(existingListMember);
 
         listMemberService.setListMemberIsAlert(member, listId);
 
@@ -79,6 +80,7 @@ class ListMemberServiceImplTest {
     void testSetListMemberWatch_ListExistsAndMemberDoesNotExist() {
         Long listId = list.getId();
         Long memberId = member.getId();
+        ListMember existingListMember = new ListMember(member, list, true);
 
         // 리스트가 존재한다고 설정
         when(listRepository.existsById(listId)).thenReturn(true);
@@ -89,6 +91,7 @@ class ListMemberServiceImplTest {
 
         // listMember가 존재하지 않는 경우
         when(listMemberRepository.findByListIdAndMember(listId, member)).thenReturn(Optional.empty());
+        when(listMemberRepository.save(any())).thenReturn(existingListMember);
 
         // 메서드 호출
         listMemberService.setListMemberIsAlert(member, listId);

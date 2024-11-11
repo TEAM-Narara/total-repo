@@ -26,7 +26,8 @@ public class ListMember {
 
     @Column(name = "is_alert", nullable = false, columnDefinition = "boolean default false")
     @Setter
-    private boolean isAlert;
+    @Builder.Default
+    private boolean isAlert = false;
 
     public ListMember(Member member, List list, boolean isAlert) {
         this.member = member;

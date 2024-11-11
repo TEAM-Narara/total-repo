@@ -46,8 +46,9 @@ public class ResponseMessage {
     public static final String BOARD_FETCH_SUCCESS = "보드 조회 성공";
     public static final String BOARD_MEMBER_UPDATE_SUCCESS = "사용자의 보드 설정 업데이트 성공";
     public static final String BOARD_ARCHIVED_FETCH_SUCCESS = "아카이브된 보드 목록 조회 성공";
-    public static final String BOARD_ACTIVITY_FETCH_SUCCESS = "아카이브된 보드 목록 조회 성공";
     public static final String BOARD_ARCHIVE_STATUS_CHANGED = "보드 아카이브 상태 변경 성공";
+    public static final String BOARD_ACTIVITY_FETCH_SUCCESS = "보드 액티비티 목록 조회 성공";
+    public static final String BOARD_LOG_FETCH_SUCCESS = "보드 로그 목록 조회 성공";
 
     // 보드 멤버 관련 상수
     public static final String BOARD_MEMBER_CREATE_SUCCESS = "보드 멤버 생성 성공";
@@ -71,8 +72,9 @@ public class ResponseMessage {
     public static final String CARD_DELETE_SUCCESS = "카드 삭제 성공";
     public static final String CARD_MOVE_SUCCESS = "카드 이동 성공";
     public static final String ARCHIVED_CARD_LIST_SUCCESS = "아카이브된 카드 목록 조회 성공";
-    public static final String CARD_ACTIVITY_FETCH_SUCCESS = "카드 액티비티 목록 조회 성공";
+    public static final String CARD_LOG_FETCH_SUCCESS = "카드 로그 목록 조회 성공";
     public static final String CARD_ARCHIVE_STATUS_CHANGE_SUCCESS = "카드 아카이브 상태 변경 성공";
+    public static final String CARD_ACTIVITY_FETCH_SUCCESS = "카드 로그 최신순 조회 성공";
 
     // 댓글 관련 상수
     public static final String REPLY_CREATE_SUCCESS = "댓글 생성 성공";
@@ -92,7 +94,7 @@ public class ResponseMessage {
     // 카드 멤버 관련 상수
     public static final String CARD_MEMBER_ALERT_STATUS_FETCH_SUCCESS = "카드 멤버 알림 상태 조회 성공";
     public static final String CARD_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "카드 멤버 알림 상태 업데이트 성공";
-    public static final String CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS = "카드 멤버 대표자 설정 성공";
+    public static final String CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS = "카드 멤버 담당자 설정 성공";
 
     // 라벨 관련 상수
     public static final String LABEL_CREATE_SUCCESS = "라벨 생성 성공";
@@ -103,6 +105,7 @@ public class ResponseMessage {
 
     // 리스트 멤버 관련 상수
     public static final String LIST_MEMBER_ALERT_STATUS_UPDATE_SUCCESS = "리스트 멤버 알림 상태 업데이트 성공";
+    public static final String LIST_MEMBER_ALERT_FETCH_SUCCESS = "리스트 멤버 알림 상태 조회 성공";
 
     // 회원 배경 관련 상수
     public static final String MEMBER_BACKGROUND_ADD_SUCCESS = "회원 배경 추가 성공";

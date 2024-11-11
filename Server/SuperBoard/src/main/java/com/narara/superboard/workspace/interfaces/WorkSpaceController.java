@@ -71,7 +71,7 @@ public class WorkSpaceController implements WorkSpaceAPI {
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_UPDATE_SUCCESS, workspaceCreateData));
     }
 
-    @Operation(summary = "나의 워크스페이스 리스트 조회")
+    @Operation(summary = "나의 워크스페이스 리스트 조회", hidden = true)
     @GetMapping
     public ResponseEntity<DefaultResponse<List<WorkSpaceResponseDto>>> getWorkspaceListByMember() {
         Long memberId = authenticationFacade.getAuthenticatedUser().getUserId();

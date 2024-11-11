@@ -7,7 +7,7 @@ import lombok.Builder;
 
 @Builder
 public record WorkSpaceDetailResponseDto(
-        Long workSpaceId,
+        Long workspaceId,
         String name,
         List<BoardDetailResponseDto> boardList,
         MemberCollectionResponseDto workspaceMemberList

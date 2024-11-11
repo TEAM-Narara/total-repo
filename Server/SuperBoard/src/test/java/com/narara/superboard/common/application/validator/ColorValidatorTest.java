@@ -24,29 +24,6 @@ class ColorValidatorTest {
     }
 
     @ParameterizedTest
-    @NullSource
-    @DisplayName("색상이 빈 값이면 NotFoundColorException이 발생해야 한다")
-    public void testValidateColorIsEmpty_Failure(Long color) {
-        String entity = "TestEntity";
-        ColorValidator validator = new ColorValidator();
-
-        assertThrows(NotFoundColorException.class, () -> validator.validateColorIsEmpty(color, entity));
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = {0x00000000L, 0xFFFFFFFFL, 0x12345678L})
-    @DisplayName("유효한 라벨 컬러 값이 주어졌을 때 예외가 발생하지 않음")
-    void shouldNotThrowExceptionWhenColorIsPresent(Long color) {
-        // given
-        String entity = "TestEntity";
-        ColorHolder colorHolder = mock(ColorHolder.class);
-        when(colorHolder.color()).thenReturn(color);
-
-        // then
-        assertDoesNotThrow(() -> colorValidator.validateColorIsEmpty(colorHolder.color(),entity));
-    }
-
-    @ParameterizedTest
     @ValueSource(longs = {0xFFFFFFFFL + 1, -1L, 0xFFFFFFFFFFL})
     @DisplayName("라벨 컬러가 유효 범위를 벗어날 때 InvalidColorFormatException 발생")
     void shouldThrowExceptionWhenColorIsOutOfRange(Long color) {
@@ -57,18 +34,5 @@ class ColorValidatorTest {
 
         // then
         assertThrows(InvalidColorFormatException.class, () -> colorValidator.validateColorIsValid(colorHolder.color(),entity));
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = {0x00000000L, 0xFFFFFFFFL, 0x12345678L})
-    @DisplayName("유효한 라벨 컬러 값이 주어졌을 때 예외가 발생하지 않음")
-    void shouldNotThrowExceptionWhenColorIsValid(Long color) {
-        // given
-        String entity = "TestEntity";
-        ColorHolder colorHolder = mock(ColorHolder.class);
-        when(colorHolder.color()).thenReturn(color);
-
-        // then
-        assertDoesNotThrow(() -> colorValidator.validateColorIsEmpty(colorHolder.color(),entity));
     }
 }

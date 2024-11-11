@@ -4,7 +4,6 @@ import com.narara.superboard.board.interfaces.dto.BoardDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
-import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -96,6 +95,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //            }
         }
 
+        //워크스페이스 처음 만든 사람을 Member 추가로 넣기
+        workspaceOffsetService.saveAddMemberDiff(workspaceMemberByAdmin);
+
         // 새로운 멤버를 Kafka Consumer Group에 등록
         // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
@@ -131,9 +133,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return false;
     }
 
-
-
-
 //    public void createTopicIfNotExists(String topicName) {
 //        try {
 //            Map<String, TopicDescription> topics = kafkaAdmin.describeTopics(new String[]{topicName});
@@ -147,34 +146,33 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //        }
 //    }
 
-
     @Override
     @Transactional
-    public void deleteWorkSpace(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public void deleteWorkSpace(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
         workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override
-    public WorkSpace getWorkSpace(Long workSpaceId) {
-        return workSpaceRepository.findByIdAndIsDeletedFalse(workSpaceId)
-                .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));
+    public WorkSpace getWorkSpace(Long workspaceId) {
+        return workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
+                .orElseThrow(() -> new NotFoundEntityException(workspaceId, "WorkSpace"));
     }
 
     @Override
-    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
 
         List<BoardDetailResponseDto> boardCollectionResponseDto =
-                boardService.getBoardCollectionResponseDto(workSpaceId);
+                boardService.getBoardCollectionResponseDto(workspaceId);
 
         MemberCollectionResponseDto workspaceMemberCollectionResponseDto =
-                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId);
 
         WorkSpaceDetailResponseDto workspaceDetailResponseDto = WorkSpaceDetailResponseDto.builder()
-                .workSpaceId(workSpace.getId())
+                .workspaceId(workSpace.getId())
                 .name(workSpace.getName())
                 .boardList(boardCollectionResponseDto)
                 .workspaceMemberList(workspaceMemberCollectionResponseDto)

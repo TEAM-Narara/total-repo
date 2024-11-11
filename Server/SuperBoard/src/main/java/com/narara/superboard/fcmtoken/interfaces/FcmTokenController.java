@@ -52,7 +52,7 @@ public class FcmTokenController implements FcmTokenAPI {
     public ResponseEntity<DefaultResponse<Void>> deleteFcmToken(
             @AuthenticationPrincipal Member member) {
 
-        fcmTokenService.deleteFcmToken(member);
+        fcmTokenService.deleteFcmTokenByMember(member);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.FCM_TOKEN_DELETE_SUCCESS),
                 HttpStatus.OK

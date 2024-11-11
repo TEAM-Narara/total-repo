@@ -2,7 +2,8 @@ package com.narara.superboard.card.interfaces;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
-import com.narara.superboard.card.interfaces.dto.log.CardActivityDetailResponseDto;
+import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
+import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
@@ -13,12 +14,16 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,13 +39,13 @@ public class CardController implements CardAPI {
 
     @Override
     @Operation(summary = "카드 생성", description = "")
-    public ResponseEntity<DefaultResponse<CardSimpleResponseDto>> createCard(
+    public ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
             @RequestBody CardCreateRequestDto cardCreateRequestDto) {
 
         Card card = cardService.createCard(member, cardCreateRequestDto);
 
-        CardSimpleResponseDto cardSimpleResponseDto = CardSimpleResponseDto.of(card);
+        CardDetailResponseDto cardSimpleResponseDto = CardDetailResponseDto.from(card);
 
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CARD_CREATE_SUCCESS, cardSimpleResponseDto),
@@ -114,8 +119,26 @@ public class CardController implements CardAPI {
 
     @Override
     @Operation(summary = "카드의 액티비티 목록 조회", description = "카드의 액티비티 목록 조회")
-    public ResponseEntity<DefaultResponse<List<CardActivityDetailResponseDto>>> getCardActivity(Long cardId) {
-        List<CardActivityDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
+    public ResponseEntity<DefaultResponse<List<CardLogDetailResponseDto>>> getCardActivity(Long cardId) {
+        List<CardLogDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, cardActivity), HttpStatus.OK);
+    }
+
+    @Parameters({
+            @Parameter(name = "page", description = "조회할 페이지 번호 (1부터 시작)", example = "1", schema = @Schema(defaultValue = "1")),
+            @Parameter(name = "size", description = "페이지당 항목 수", example = "10", schema = @Schema(defaultValue = "10"))
+    })
+    @Override
+    public ResponseEntity<DefaultResponse<CardCombinedActivityResponseDto>> getCardCombinedLog(
+            @PathVariable Long cardId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        CardCombinedActivityResponseDto combinedLogs = cardService.getCardCombinedLog(cardId, pageable);
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, combinedLogs)
+        );
     }
 }

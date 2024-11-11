@@ -82,7 +82,8 @@ class ReplyServiceImplTest extends IntegrationTest {
                 savedWorkSpace.getId(),
                 "보드 이름",
                 "WORKSPACE",
-                new CoverDto((String)background.get("type"), (String)background.get("value"))
+                new CoverDto((String)background.get("type"), (String)background.get("value")),
+                false
         );
         Board board = Board.createBoard(boardRequest, savedWorkSpace);
         boardRepository.save(board);

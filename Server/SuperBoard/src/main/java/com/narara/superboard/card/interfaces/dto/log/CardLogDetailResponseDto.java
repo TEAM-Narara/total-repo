@@ -5,7 +5,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.document.Who;
 
-public record CardActivityDetailResponseDto<T>(
+public record CardLogDetailResponseDto<T>(
         Who who,
         Long when,
         CardWhereDto where,
@@ -13,10 +13,10 @@ public record CardActivityDetailResponseDto<T>(
         EventData eventData,
         T target
 ) {
-    public static <T> CardActivityDetailResponseDto<T> createActivityDetailResponseDto(
+    public static <T> CardLogDetailResponseDto<T> createLogDetailResponseDto(
             CardHistory<T> cardHistory
     ) {
-        return new CardActivityDetailResponseDto<>(
+        return new CardLogDetailResponseDto<>(
                 cardHistory.getWho(),
                 cardHistory.getWhen(),
                 new CardWhereDto(cardHistory.getWhere().cardId(), cardHistory.getWhere().cardName()),

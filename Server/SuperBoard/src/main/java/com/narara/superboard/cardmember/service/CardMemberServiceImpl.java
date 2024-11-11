@@ -1,5 +1,6 @@
 package com.narara.superboard.cardmember.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final MemberRepository memberRepository;
     private final CardRepository cardRepository;
     private final CardHistoryRepository cardHistoryRepository;
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     public boolean getCardMemberIsAlert(Member member, Long cardId) {
@@ -38,40 +39,55 @@ public class CardMemberServiceImpl implements CardMemberService {
     }
 
     @Override
-    public void setCardMemberIsAlert(Member member, Long cardId) {
+    public Boolean setCardMemberIsAlert(Member member, Long cardId) {
         Card card = validateCardExists(cardId);
 
-        cardMemberRepository.findByCardIdAndMember(cardId, member)
-                .ifPresentOrElse(
-                        this::toggleAlertAndSave,
-                        () -> addNewCardMember(member, card)
-                );
+        return cardMemberRepository.findByCardIdAndMember(cardId, member)
+                .map(cardMember -> {
+                    toggleAlertAndSave(cardMember);
+                    return cardMember.isAlert(); // 현재 알림 여부 반환
+                })
+                .orElseGet(() -> {
+                    addNewCardMember(member, card);
+                    return true; // 새로운 CardMember 추가 시 알림이 활성화됨
+                });
     }
 
+
     @Override
-    public void setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
+    public Boolean setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
         Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
 
-        cardMemberRepository.findByCardIdAndMemberId(
+        return cardMemberRepository.findByCardIdAndMemberId(
                         updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
-                .ifPresentOrElse(
-                        cardMember -> {
-                            toggleRepresentativeAndSave(cardMember);
+                .map(cardMember -> {
+                    toggleRepresentativeAndSave(cardMember);
 
-                            // 로그 기록 추가
-                            RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
-                                    member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
+                    if (cardMember.isRepresentative()) { // Websocket 카드멤버 추가
+                        boardOffsetService.saveAddCardMember(cardMember);
+                    } else {
+                        boardOffsetService.saveDeleteCardMember(cardMember);
+                    }
 
-                            CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
-                                    member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
-                                    EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
+                    // 로그 기록 추가
+                    RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
+                            member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
-                            cardHistoryRepository.save(cardHistory);
-                        },
-                        () -> addNewRepresentativeCardMemberWithLog(member, card)
-                );
+                    CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
+                            member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                            EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
+
+                    cardHistoryRepository.save(cardHistory);
+
+                    return cardMember.isRepresentative(); // 현재 대표자 여부 반환
+                })
+                .orElseGet(() -> {
+                    addNewRepresentativeCardMemberWithLog(member, card);
+                    return true; // 새로운 대표자 추가 시 대표자로 설정됨
+                });
     }
+
 
     // CardMember 대표 멤버 추가와 로그 저장을 함께 수행
     private void addNewRepresentativeCardMemberWithLog(Member member, Card card) {
@@ -81,7 +97,7 @@ public class CardMemberServiceImpl implements CardMemberService {
         RepresentativeStatusChangeInfo newRepCardMemberInfo = new RepresentativeStatusChangeInfo(
                 member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
-        CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
