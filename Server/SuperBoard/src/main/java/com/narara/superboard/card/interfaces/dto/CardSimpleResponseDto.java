@@ -7,13 +7,15 @@ import lombok.Builder;
 public record CardSimpleResponseDto(
         Long cardId,
         Long listId,
-        String name
+        String name,
+        Long myOrder
 ) {
     public static CardSimpleResponseDto of(Card card){
         return CardSimpleResponseDto.builder()
                 .cardId(card.getId())
                 .listId(card.getList().getId())
                 .name(card.getName())
+                .myOrder(card.getMyOrder())
                 .build();
     }
 }
