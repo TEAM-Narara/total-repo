@@ -35,9 +35,10 @@ public class LabelServiceImpl implements LabelService {
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         Label label = Label.createLabel(board, createLabelRequestDto);
-        boardOffsetService.saveAddLabel(label); // Websocket 라벨 추가
+        Label savedLabel = labelRepository.save(label);
+        boardOffsetService.saveAddLabel(savedLabel); // Websocket 라벨 추가
 
-        return labelRepository.save(label);
+        return savedLabel;
     }
 
     @Override
