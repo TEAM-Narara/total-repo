@@ -203,6 +203,16 @@ public class ListMoveServiceImpl implements ListMoveService {
                 // 변경된 값만 반환,
                 return java.util.List.of(new ListMoveResponseDto(targetList.getId(), newOrder));
             } else {
+                // 랜덤 오프셋을 통해 순서 값 충돌을 방지하고, 여러 번의 시도를 통해 고유한 순서 값을 생성
+                // 1. 50과 150 사이의 난수를 생성하여 `randomOffset`에 할당
+                //    - 이 값은 `newOrder`에 더해져 기존 순서 값과의 충돌을 방지하는 역할을 합니다.
+                //    - ThreadLocalRandom.current().nextLong(50, 150)은 50 이상 150 미만의 임의의 값을 생성합니다.
+                // 2. 시도 횟수(`attempt`)에 따라 고유 순서 값을 다르게 적용
+                //    - 시도가 진행될 때마다 `(attempt + 1) * 100L`를 계산하여 `baseOrder`에 추가
+                //    - `attempt + 1`은 시도 횟수에 따라 증가하므로 매번 고유한 값을 보장할 수 있습니다.
+                // 3. 최종적으로 `newOrder`는 `baseOrder + (attempt + 1) * 100L + randomOffset` 형태로 계산
+                //    - 충돌이 발생해도 시도 횟수에 따라 순서 값이 바뀌면서 고유한 순서를 찾을 가능성이 높아집니다.
+
                 long randomOffset = ThreadLocalRandom.current().nextLong(50, 150);
                 newOrder = baseOrder + (attempt + 1) * 100L + randomOffset;
                 attempt++;
