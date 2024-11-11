@@ -86,7 +86,6 @@ public class CardServiceImpl implements CardService {
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 카드 생성 로그 추가
 
         return savedCard;
     }
@@ -115,7 +114,6 @@ public class CardServiceImpl implements CardService {
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 카드 삭제 로그 추가
     }
 
     @Override
@@ -140,7 +138,6 @@ public class CardServiceImpl implements CardService {
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 카드 업데이트 로그 추가
 
         return updatedCard;
     }
@@ -178,7 +175,6 @@ public class CardServiceImpl implements CardService {
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 카드 아카이브 상태 변경 로그 추가
     }
 
     @Override

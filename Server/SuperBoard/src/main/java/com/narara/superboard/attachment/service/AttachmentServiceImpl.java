@@ -53,7 +53,6 @@ public class AttachmentServiceImpl implements AttachmentService {
                 EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 첨부파일 추가 로그 기록
 
         return attachment;
     }
@@ -82,7 +81,6 @@ public class AttachmentServiceImpl implements AttachmentService {
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket 첨부파일 삭제 로그 추가
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 
-import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -124,7 +123,6 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     public void updateWatchStatus(Long boardId, Member member) {
         BoardMember boardMember = getBoardMember(boardId, member);
         boardMember.changeIsAlert();
-        //TODO 보드 멤버 알림 설정 수정 (프론트와 협의 필요. 오프라인모드에서 안되게 할건가?)
     }
 
     @Override
@@ -153,7 +151,6 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket 보드멤버 추가 로그 생성
 
         return newBoardMember;
     }
@@ -199,7 +196,6 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket 보드멤버 삭제 로그 추가
 
         return boardMember;
     }

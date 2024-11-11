@@ -41,7 +41,6 @@ public class CardMemberServiceImpl implements CardMemberService {
     @Override
     public Boolean setCardMemberIsAlert(Member member, Long cardId) {
         Card card = validateCardExists(cardId);
-        //TODO Websocket 카드멤버 alert 변경
 
         return cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .map(cardMember -> {
@@ -80,8 +79,6 @@ public class CardMemberServiceImpl implements CardMemberService {
                             EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
                     cardHistoryRepository.save(cardHistory);
-
-                    //TODO Websocket 카드멤버 로그 추가
 
                     return cardMember.isRepresentative(); // 현재 대표자 여부 반환
                 })

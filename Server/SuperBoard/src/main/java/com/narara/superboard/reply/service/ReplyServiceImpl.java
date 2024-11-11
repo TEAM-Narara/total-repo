@@ -69,7 +69,6 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket reply 생성 히스토리 추가
 
         return savedReply;
     }
@@ -106,7 +105,6 @@ public class ReplyServiceImpl implements ReplyService{
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
-        //TODO Websocket reply update 히스토리
 
         // 댓글 내용 업데이트
         return reply;
@@ -122,7 +120,6 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 로그 기록
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
-        //TODO Websocket reply 삭제 로그
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
