@@ -132,10 +132,11 @@ class WorkspaceService @Inject constructor(
             before.copy(
                 name = dto.boardName,
                 coverType = dto.coverType,
-                coverValue = dto.coverValue,
+                coverValue = coverValue,
                 visibility = dto.visibility,
                 isClosed = dto.isClosed,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
@@ -156,7 +157,9 @@ class WorkspaceService @Inject constructor(
         val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
         boardDao.updateBoard(
             before.copy(
-                isClosed = dto.isArchive
+                isClosed = dto.isArchive,
+                isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }

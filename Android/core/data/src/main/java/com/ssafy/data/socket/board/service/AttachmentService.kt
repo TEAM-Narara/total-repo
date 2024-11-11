@@ -8,6 +8,7 @@ import com.ssafy.data.socket.board.model.attachment.DeleteCardAttachmentRequestD
 import com.ssafy.data.socket.board.model.attachment.EditCardAttachmentCoverRequestDto
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dto.AttachmentEntity
+import com.ssafy.model.with.DataStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,7 +46,8 @@ class AttachmentService @Inject constructor(
         val before = attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
         attachmentDao.updateAttachment(
             before.copy(
-                isCover = dto.isCover
+                isCover = dto.isCover,
+                isStatus = DataStatus.STAY,
             )
         )
     }

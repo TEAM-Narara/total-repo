@@ -74,9 +74,10 @@ class CardService @Inject constructor(
                 startAt = dto.startAt,
                 endAt = dto.endAt,
                 coverType = dto.coverType,
-                coverValue = dto.coverValue,
+                coverValue = coverValue,
                 isArchived = dto.isArchived,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
@@ -88,6 +89,7 @@ class CardService @Inject constructor(
             before.copy(
                 isArchived = dto.isArchived,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
