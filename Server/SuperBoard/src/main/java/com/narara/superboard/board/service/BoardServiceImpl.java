@@ -133,7 +133,6 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket board 생성 히스토리 생성
 
         return saveBoard;
     }
@@ -163,7 +162,6 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket board 삭제 히스토리 생성
     }
 
     @Override
@@ -203,7 +201,6 @@ public class BoardServiceImpl implements BoardService {
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket board 업데이트 히스토리 생성
 
         return updatedBoard;
     }
@@ -229,7 +226,6 @@ public class BoardServiceImpl implements BoardService {
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, 
                 EventData.BOARD, archiveStatusChangeInfo);
-        //TODO Websocket 보드 아카이브 상태 변경 로그 생성
 
         boardHistoryRepository.save(boardHistory);
     }

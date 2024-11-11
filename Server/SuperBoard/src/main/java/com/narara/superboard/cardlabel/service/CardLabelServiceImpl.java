@@ -60,8 +60,10 @@ public class CardLabelServiceImpl implements CardLabelService {
             throw new EntityAlreadyExistsException("카드의 라벨");
         }
 
-        //TODO Websocket 카드라벨 추가
-        return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
+        CardLabel savedCardLabel = cardLabelRepository.save(CardLabel.createCardLabel(card, label)); //Websocket 카드라벨 추가
+        boardOffsetService.saveAddCardLabel(savedCardLabel);
+
+        return savedCardLabel;
     }
 
     @Override
