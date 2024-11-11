@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.narara.superboard.list.ListAction.MOVE_LIST;
+import static com.narara.superboard.common.constant.MoveConst.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +26,6 @@ public class ListMoveServiceImpl implements ListMoveService {
     private final ListReorderService listReorderService; // ListReorderService 주입
     private final ListService listService; // ListReorderService 주입
 
-    private static final long DEFAULT_TOP_ORDER = 3_000_000_000_000_000_000L; // 아무 것도 없는 상황에서 처음 수.
-    private static final double MOVE_TOP_ORDER_RATIO = 2.0 / 3.0;
-    private static final double MOVE_BOTTOM_ORDER_RATIO = 1.0 / 3.0;
-    private static final long LARGE_INCREMENT = 100_000_000_000_000_000L;     // log 2 ≈ 39.86
-
-    // log 2 ≈ 36.54
-    private static final long MAX_INSERTION_DISTANCE_FOR_FIXED_GAP = 10_000_000_000_000_000L; // 두 리스트 사이 간격이 클 경우 고정 간격
-    private static final long HALF_DIVIDER = 2; // 중간값 계산 시 사용
 
     @Override
     @Transactional

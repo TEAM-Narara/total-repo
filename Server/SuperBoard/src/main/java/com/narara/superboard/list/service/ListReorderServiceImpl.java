@@ -10,13 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+import static com.narara.superboard.common.constant.MoveConst.*;
+
 @Service
 @RequiredArgsConstructor
 public class ListReorderServiceImpl implements ListReorderService {
-
-    // 9223 개 생성 가능. / 최대 54번까지 중간값을 삽입가능
-    private static final long DEFAULT_TOP_ORDER = 3_000_000_000_000_000_000L;
-    private static final long REORDER_GAP = 100_000_000_000_000_000L;
 
     private final ListRepository listRepository;
 
