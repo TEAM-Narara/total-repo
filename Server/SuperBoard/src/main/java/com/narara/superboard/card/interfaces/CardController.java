@@ -190,7 +190,7 @@ public class CardController implements CardAPI {
                     DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result),
                     HttpStatus.GONE);
         }
-
+        // FIXME: 반환 값과 응답 값이 로컬 서버에서 다른 경우 수정해야함.
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result),
                 HttpStatus.OK);
