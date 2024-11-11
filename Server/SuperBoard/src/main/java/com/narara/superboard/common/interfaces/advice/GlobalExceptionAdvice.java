@@ -81,7 +81,7 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleIllegalArgumentException(TokenException ex) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token-Invalid", "");
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, "유효하지 않은 JWT 토큰 때문에 예외가 발생했습니다. \n" + ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AlreadyRegisteredLoginException.class)

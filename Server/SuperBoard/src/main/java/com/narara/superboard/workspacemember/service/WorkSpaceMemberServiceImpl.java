@@ -67,15 +67,17 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         List<WorkSpaceResponseDto> workSpaceResponseDtoList = new ArrayList<>();
 
         for (WorkSpaceMember workSpaceMember : workSpaceMemberList) {
-            WorkSpace workSpace = workSpaceMember.getWorkSpace();
-            WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
-                    .workspaceId(workSpace.getId())
-                    .name(workSpace.getName())
-                    .build();
+            if (!workSpaceMember.getWorkSpace().getIsDeleted()) {
+                WorkSpace workSpace = workSpaceMember.getWorkSpace();
+                WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
+                        .workspaceId(workSpace.getId())
+                        .name(workSpace.getName())
+                        .authority(workSpaceMember.getAuthority())
+                        .build();
+                workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
 
-            workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
-
-            workSpaceResponseDtoList.add(workSpaceResponseDto);
+                workSpaceResponseDtoList.add(workSpaceResponseDto);
+            }
         }
 
         return WorkSpaceListResponseDto.builder()
