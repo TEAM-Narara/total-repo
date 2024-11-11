@@ -37,11 +37,15 @@ import com.ssafy.model.card.CommentDTO
 
 @Composable
 fun CardBottomBar(
+    isTitleFocus: Boolean,
+    setTitleFocus: (Boolean) -> Unit,
     isContentFocus: Boolean,
     setContentFocus: (Boolean) -> Unit,
     focusedComment: CommentDTO?,
     setFocusedComment: (CommentDTO?) -> Unit,
+    saveCardTitle: () -> Unit,
     saveCardContent: () -> Unit,
+    resetCardTitle: () -> Unit,
     resetCardContent: () -> Unit,
     saveCommitContent: () -> Unit,
     resetCommitContent: () -> Unit,
@@ -54,15 +58,17 @@ fun CardBottomBar(
             .navigationBarsPadding()
             .background(color = White)
     ) {
-        if (isContentFocus || focusedComment != null) {
+        if (isTitleFocus || isContentFocus || focusedComment != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(onClick = {
-
-                    if (isContentFocus) {
+                    if (isTitleFocus) {
+                        saveCardTitle()
+                        setTitleFocus(false)
+                    } else if (isContentFocus) {
                         saveCardContent()
                         setContentFocus(false)
                     } else {
@@ -79,8 +85,10 @@ fun CardBottomBar(
                 }
 
                 IconButton(onClick = {
-
-                    if (isContentFocus) {
+                    if(isTitleFocus) {
+                        resetCardTitle()
+                        setTitleFocus(false)
+                    } else if (isContentFocus) {
                         resetCardContent()
                         setContentFocus(false)
                     } else {

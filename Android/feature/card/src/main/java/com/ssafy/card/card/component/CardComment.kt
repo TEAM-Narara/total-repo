@@ -54,7 +54,7 @@ fun LazyListScope.cardComment(
                 )
             },
             nickname = comment.nickname,
-            date = comment.date,
+            date = comment.createDate,
             content = comment.content,
             setContent = { content -> setCommitContent(comment, content)},
             isFocus = comment == focusedComment,

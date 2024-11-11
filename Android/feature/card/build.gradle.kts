@@ -41,6 +41,9 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":domain:socket"))
+    implementation(project(":domain:card"))
+    implementation(project(":domain:member"))
+    implementation(project(":domain:comment"))
 
     // Markdown
     implementation(libs.compose.markdown)

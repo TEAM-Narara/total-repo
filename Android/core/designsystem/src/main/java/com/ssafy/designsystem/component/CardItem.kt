@@ -93,7 +93,10 @@ fun CardItem(
                     )
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(PaddingSmall)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(PaddingSmall),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 if (startTime != null && endTime != null) {
                     IconText(
                         icon = Icons.Default.AccessTime,

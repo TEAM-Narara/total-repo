@@ -28,10 +28,10 @@ fun formatRangeTimeStamp(start: Long, end: Long): String {
         Locale.getDefault()
     )
     val endFormatter = DateTimeFormatter.ofPattern(
-        if(startDate.year != endDate.year || startDate.month != endDate.month || startDate.dayOfMonth != endDate.dayOfMonth) " ~ " else "" +
-        if (startDate.year != endDate.year) "y년 " else "" +
-        if (startDate.month != endDate.month) "M월 " else "" +
-        if (startDate.dayOfMonth != endDate.dayOfMonth) "d일" else "",
+        (if(startDate.year != endDate.year || startDate.month != endDate.month || startDate.dayOfMonth != endDate.dayOfMonth) " ~ " else "") +
+        (if (startDate.year != endDate.year) "y년 " else "") +
+        (if (startDate.month != endDate.month) "M월 " else "") +
+        (if (startDate.dayOfMonth != endDate.dayOfMonth) "d일" else ""),
         Locale.getDefault()
     )
     return "${startFormatter.format(startDate)}${endFormatter.format(endDate)}"

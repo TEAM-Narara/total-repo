@@ -1,15 +1,13 @@
 package com.ssafy.data.repository.card
 
-import com.ssafy.database.dto.AttachmentEntity
-import com.ssafy.database.dto.with.CardWithListAndBoardName
-import com.ssafy.database.dto.with.MemberWithRepresentative
+import com.ssafy.model.with.CardWithListAndBoardNameDTO
+import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
-import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
@@ -40,7 +38,7 @@ interface CardRepository {
 
     suspend fun getCard(id: Long): Flow<CardResponseDto?>
 
-    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
+    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardNameDTO?>
 
     suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>>
 
@@ -60,7 +58,7 @@ interface CardRepository {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberWithRepresentative>>
+    ): Flow<List<MemberWithRepresentativeDTO>>
 
     suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 

@@ -17,8 +17,8 @@ fun NavGraphBuilder.cardScreen(
         val card: Card = backStackEntry.toRoute()
         val id = card.id
         val viewModel: CardViewModel = hiltViewModel()
-        viewModel.getCardDetail(id)
-        viewModel.setUserId()
+
+        viewModel.setCardId(id)
 
         CardScreen(
             popBackToBoardScreen = popBackToBoardScreen,

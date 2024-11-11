@@ -24,10 +24,11 @@ import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.IconXLarge
 import com.ssafy.designsystem.values.PaddingSmall
+import com.ssafy.model.board.MemberResponseDTO
 
 fun LazyListScope.cardMemberInfo(
     modifier: Modifier = Modifier,
-    members: List<String>,
+    members: List<MemberResponseDTO>,
     showCardMembers: () -> Unit
 ) {
     item {
@@ -57,7 +58,7 @@ fun LazyListScope.cardMemberInfo(
                             .aspectRatio(1f)
                     ) {
                         AsyncImage(
-                            model = members[index],
+                            model = members[index].memberProfileImgUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxWidth()
