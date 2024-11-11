@@ -17,6 +17,7 @@ import com.narara.superboard.list.ListAction;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.list.interfaces.dto.info.ArchiveListInfo;
 import com.narara.superboard.list.interfaces.dto.info.CreateListInfo;
@@ -146,5 +147,16 @@ public class ListServiceImpl implements ListService{
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<ListSimpleResponseDto> getListsByBoardId(Long boardId) {
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
+
+        return listRepository.findByBoardAndIsDeletedFalseOrderByMyOrderAsc(board).stream()
+                .map(ListSimpleResponseDto::of)
+                .toList();
     }
 }

@@ -53,7 +53,7 @@ public class ListController implements ListAPI {
     public ResponseEntity<DefaultResponse<ListSimpleResponseDto>> changeListIsArchived(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
         List list = listService.changeListIsArchived(member, listId);
         ListSimpleResponseDto responseDto = ListSimpleResponseDto.of(list);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_ARCHIVE_CHANGE_SUCCESS, responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_ARCHIVE_FETCH_SUCCESS, responseDto), HttpStatus.OK);
     }
 
     @Override
@@ -90,5 +90,11 @@ public class ListController implements ListAPI {
     ) {
         ListMoveResult result = listMoveService.moveListBetween(member, listId, previousListId, nextListId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getListsByBoardId(@PathVariable Long boardId) {
+        java.util.List<ListSimpleResponseDto> lists = listService.getListsByBoardId(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_FETCH_SUCCESS, lists), HttpStatus.OK);
     }
 }

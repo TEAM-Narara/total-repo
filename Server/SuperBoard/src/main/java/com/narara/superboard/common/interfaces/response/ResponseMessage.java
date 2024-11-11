@@ -61,7 +61,8 @@ public class ResponseMessage {
     // 리스트 관련 상수
     public static final String LIST_CREATE_SUCCESS = "리스트 생성 성공";
     public static final String LIST_UPDATE_SUCCESS = "리스트 수정 성공";
-    public static final String LIST_ARCHIVE_CHANGE_SUCCESS = "아카이브된 리스트 목록 조회 성공";
+    public static final String LIST_ARCHIVE_FETCH_SUCCESS = "아카이브된 리스트 목록 조회 성공";
+    public static final String LIST_FETCH_SUCCESS = "리스트 목록 조회 성공";
     public static final String LIST_GET_ARCHIVED_SUCCESS = "리스트 아카이브 상태 변경 성공";
     public static final String MOVE_LIST_TOP_SUCCESS = "리스트가 맨 위로 이동했습니다.";
     public static final String MOVE_LIST_BOTTOM_SUCCESS = "리스트가 맨 아래로 이동했습니다.";
