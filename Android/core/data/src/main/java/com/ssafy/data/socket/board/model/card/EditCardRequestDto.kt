@@ -8,7 +8,7 @@ data class EditCardRequestDto(
     val startAt: Long?,
     val endAt: Long?,
     val coverType: String,
-    val coverValue: String?,
+    val coverValue: String,
     val isDeleted: Boolean,
     val isArchived: Boolean
 )
