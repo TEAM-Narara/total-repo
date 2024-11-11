@@ -243,7 +243,6 @@ public class WorkspaceOffsetService {
         data.put(VISIBILITY_COLUMN, board.getVisibility().name());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_BOARD.name(),
@@ -263,7 +262,6 @@ public class WorkspaceOffsetService {
         data.put(IS_ARCHIVE_COLUMN, board.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_ARCHIVE_BOARD.name(),

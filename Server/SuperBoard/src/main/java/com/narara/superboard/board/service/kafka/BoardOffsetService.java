@@ -42,7 +42,6 @@ public class BoardOffsetService {
         data.put("isDeleted", boardMember.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 boardMember.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_BOARD_MEMBER.name(),
@@ -66,7 +65,6 @@ public class BoardOffsetService {
         data.put("isDeleted", boardMember.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 boardMember.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_BOARD_MEMBER.name(),
@@ -90,7 +88,6 @@ public class BoardOffsetService {
         data.put("isDeleted", boardMember.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 boardMember.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_BOARD_MEMBER.name(),
@@ -112,7 +109,6 @@ public class BoardOffsetService {
         data.put("isDeleted", list.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 list.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_LIST.name(),
@@ -134,7 +130,6 @@ public class BoardOffsetService {
         data.put("isDeleted", list.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 list.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_LIST_ARCHIVE.name(),
@@ -156,7 +151,6 @@ public class BoardOffsetService {
         data.put("isDeleted", list.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 list.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_LIST.name(),
@@ -183,7 +177,6 @@ public class BoardOffsetService {
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_CARD.name(),
@@ -210,7 +203,6 @@ public class BoardOffsetService {
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_CARD.name(),
@@ -237,7 +229,6 @@ public class BoardOffsetService {
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ARCHIVE_CARD.name(),
@@ -258,7 +249,6 @@ public class BoardOffsetService {
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_CARD.name(),
@@ -280,7 +270,6 @@ public class BoardOffsetService {
         data.put("isAlert", cardMember.isAlert());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_CARD_MEMBER.name(),
@@ -302,7 +291,6 @@ public class BoardOffsetService {
         data.put("isAlert", cardMember.isAlert());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_CARD_MEMBER.name(),
@@ -324,7 +312,6 @@ public class BoardOffsetService {
         data.put("isAlert", cardMember.isAlert());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_CARD_MEMBER.name(),
@@ -349,7 +336,6 @@ public class BoardOffsetService {
         data.put("updatedAt", reply.getUpdatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_REPLY.name(),
@@ -370,7 +356,6 @@ public class BoardOffsetService {
         data.put("isDeleted", reply.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_REPLY.name(),
@@ -395,7 +380,6 @@ public class BoardOffsetService {
         data.put("updatedAt", reply.getUpdatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_REPLY.name(),
@@ -415,7 +399,6 @@ public class BoardOffsetService {
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 card.getUpdatedAt(),
                 BOARD,
                 BoardAction.ARCHIVE_CARD.name(),
@@ -436,7 +419,6 @@ public class BoardOffsetService {
         data.put("color", label.getColor());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 label.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_BOARD_LABEL.name(),
@@ -457,7 +439,6 @@ public class BoardOffsetService {
         data.put("color", label.getColor());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 label.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_BOARD_LABEL.name(),
@@ -476,7 +457,6 @@ public class BoardOffsetService {
         data.put("boardId", board.getId());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 label.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_BOARD_LABEL.name(),
@@ -498,7 +478,6 @@ public class BoardOffsetService {
         data.put("isActivated", label.getName());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 label.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_CARD_LABEL.name(),
@@ -520,7 +499,6 @@ public class BoardOffsetService {
         data.put("isActivated", label.getName());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 label.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_CARD_LABEL.name(),
@@ -544,7 +522,6 @@ public class BoardOffsetService {
         data.put("createdAt", attachment.getCreatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 attachment.getUpdatedAt(),
                 BOARD,
                 BoardAction.ADD_CARD_ATTACHMENT.name(),
@@ -568,7 +545,6 @@ public class BoardOffsetService {
         data.put("createdAt", attachment.getCreatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 attachment.getUpdatedAt(),
                 BOARD,
                 BoardAction.DELETE_CARD_ATTACHMENT.name(),
@@ -592,7 +568,6 @@ public class BoardOffsetService {
         data.put("createdAt", attachment.getCreatedAt());
 
         DiffInfo diffInfo = new DiffInfo(
-                1L, //offset 임시값
                 attachment.getUpdatedAt(),
                 BOARD,
                 BoardAction.EDIT_CARD_ATTACHMENT_COVER.name(),
