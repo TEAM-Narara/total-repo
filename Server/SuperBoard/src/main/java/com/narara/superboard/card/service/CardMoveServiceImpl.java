@@ -27,109 +27,10 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardReorderService cardReorderService; // CardReorderService 주입
     private final CardService cardService; // CardService 주입
 
-    @Override
-    @Transactional
-    public CardMoveResult moveCardToTop(com.narara.superboard.member.entity.Member member, Long cardId) {
-        Card targetCard = cardRepository.findById(cardId)
-                .orElseThrow(() -> new com.narara.superboard.common.exception.NotFoundEntityException(cardId, "카드"));
-        cardService.checkBoardMember(targetCard, member, MOVE_CARD);
-
-        List list = targetCard.getList();
-        Optional<Card> topCard = cardRepository.findFirstByListOrderByMyOrderAsc(list);
-
-        if (topCard.isPresent() && targetCard.getMyOrder().equals(topCard.get().getMyOrder())) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
-        }
-
-        long baseOrder = topCard.map(card -> Math.round(card.getMyOrder() * MOVE_TOP_ORDER_RATIO))
-                .orElse(DEFAULT_TOP_ORDER);
-
-        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(list, baseOrder);
-
-        if (orderInfoList.size() > 1) {
-            return new CardMoveResult.ReorderedCardMove(orderInfoList);
-        }
-
-        targetCard.setMyOrder(orderInfoList.getFirst().myOrder());
-        if (topCard.isEmpty()) {
-            list.setLastCardOrder(orderInfoList.getFirst().myOrder());
-        }
-
-        return new CardMoveResult.SingleCardMove(orderInfoList.getFirst());
-    }
 
     @Override
     @Transactional
-    public CardMoveResult moveCardToBottom(Member member, Long cardId) {
-        Card targetCard = cardRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
-        cardService.checkBoardMember(targetCard, member, MOVE_CARD);
-
-        List List = targetCard.getList();
-        Optional<Card> bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(List);
-
-        if (bottomCard.isPresent() && targetCard.getMyOrder().equals(bottomCard.get().getMyOrder())) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
-        }
-
-        long baseOrder = bottomCard.map(lastCard -> {
-            long maxLimit = lastCard.getMyOrder() + Math.round((Long.MAX_VALUE - lastCard.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO);
-            return Math.min(lastCard.getMyOrder() + LARGE_INCREMENT, maxLimit);
-        }).orElse(DEFAULT_TOP_ORDER);
-
-        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(List, baseOrder);
-
-        if (orderInfoList.size() > 1) {
-            return new CardMoveResult.ReorderedCardMove(orderInfoList);
-        }
-
-        targetCard.setMyOrder(orderInfoList.getFirst().myOrder());
-        List.setLastCardOrder(orderInfoList.getFirst().myOrder());
-
-        return new CardMoveResult.SingleCardMove(orderInfoList.getFirst());
-    }
-
-    @Override
-    @Transactional
-    public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
-        Card targetCard = cardRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
-        cardService.checkBoardMember(targetCard, member, MOVE_CARD);
-
-        Card previousCard = cardRepository.findById(previousCardId)
-                .orElseThrow(() -> new NotFoundEntityException(previousCardId, "이전 카드"));
-        Card nextCard = cardRepository.findById(nextCardId)
-                .orElseThrow(() -> new NotFoundEntityException(nextCardId, "다음 카드"));
-
-        validateCardsInSameList(previousCard, nextCard);
-
-        long prevOrder = previousCard.getMyOrder();
-        long nextOrder = nextCard.getMyOrder();
-        long gap = nextOrder - prevOrder;
-
-        if (targetCard.getMyOrder() > prevOrder && targetCard.getMyOrder() < nextOrder) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
-        }
-
-        long baseOrder = (gap > MAX_INSERTION_DISTANCE_FOR_FIXED_GAP)
-                ? prevOrder + MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
-                : (prevOrder + nextOrder) / HALF_DIVIDER;
-
-        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetCard.getList(), baseOrder);
-
-        if (orderInfoList.size() > 1) {
-            return new CardMoveResult.ReorderedCardMove(orderInfoList);
-        }
-
-        targetCard.setMyOrder(orderInfoList.getFirst().myOrder());
-        cardRepository.save(targetCard);
-
-        return new CardMoveResult.SingleCardMove(orderInfoList.getFirst());
-    }
-
-    @Override
-    @Transactional
-    public CardMoveResult moveCardToOtherListTop(Member member, Long cardId, Long targetListId) {
+    public CardMoveResult moveCardToTop(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
@@ -142,6 +43,10 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 대상 리스트에서 가장 위에 위치한 카드 조회
         Optional<Card> topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList);
 
+        if (topCard.isPresent() && targetCard.getMyOrder().equals(topCard.get().getMyOrder())) {
+            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
+        }
+
         // 맨 위로 이동하기 위한 기준 순서값 설정 (비율을 사용하여 순서 계산)
         long baseOrder = topCard.map(card -> Math.round(card.getMyOrder() * MOVE_TOP_ORDER_RATIO))
                 .orElse(DEFAULT_TOP_ORDER);
@@ -151,7 +56,7 @@ public class CardMoveServiceImpl implements CardMoveService {
 
     @Override
     @Transactional
-    public CardMoveResult moveCardToOtherListBottom(Member member, Long cardId, Long targetListId) {
+    public CardMoveResult moveCardToBottom(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
@@ -161,8 +66,12 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 이동할 대상 리스트 조회
         List targetList = listRepository.findById(targetListId)
                 .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+
         // 대상 리스트에서 가장 아래에 위치한 카드 조회
         Optional<Card> bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList);
+        if (bottomCard.isPresent() && targetCard.getMyOrder().equals(bottomCard.get().getMyOrder())) {
+            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
+        }
 
         // 맨 아래로 이동하기 위한 기준 순서값 설정 (비율을 사용하여 순서 계산)
         long baseOrder = bottomCard.map(lastCard -> {
@@ -178,7 +87,7 @@ public class CardMoveServiceImpl implements CardMoveService {
      *
      * @param targetCard 이동할 카드
      * @param targetList 이동할 대상 리스트
-     * @param baseOrder 새롭게 설정할 순서값의 기준
+     * @param baseOrder  새롭게 설정할 순서값의 기준
      * @return 카드 이동 결과 객체 (단일 이동 또는 재배치가 필요한 경우 전체 카드 정보)
      */
     private CardMoveResult getCardMoveResult(Card targetCard, List targetList, long baseOrder) {
@@ -200,7 +109,7 @@ public class CardMoveServiceImpl implements CardMoveService {
 
     @Override
     @Transactional
-    public CardMoveResult moveCardBetweenInAnotherList(Member member, Long cardId, Long previousCardId, Long nextCardId) {
+    public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
@@ -219,6 +128,10 @@ public class CardMoveServiceImpl implements CardMoveService {
         long prevOrder = previousCard.getMyOrder();
         long nextOrder = nextCard.getMyOrder();
         long gap = nextOrder - prevOrder;
+
+        if (targetCard.getMyOrder() > prevOrder && targetCard.getMyOrder() < nextOrder) {
+            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
+        }
 
         // 간격이 클 경우 고정된 간격값을 적용하고, 작을 경우 중간값 사용
         long baseOrder = (gap > MAX_INSERTION_DISTANCE_FOR_FIXED_GAP)

@@ -147,71 +147,36 @@ public class CardController implements CardAPI {
     }
 
     @Override
+    @Operation(summary = "다른 리스트의 맨 위로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 위로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTop(
-            @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId) {
+            @Parameter(description = "현재 사용자 정보", required = true) Member member,
+            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
+            @Parameter(description = "이동할 리스트의 ID", required = true) @PathVariable Long targetListId) {
 
-        CardMoveResult result = cardMoveService.moveCardToTop(member, cardId);
-        return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
-                , HttpStatus.OK);
+        CardMoveResult result = cardMoveService.moveCardToTop(member, cardId, targetListId);
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 
     @Override
+    @Operation(summary = "다른 리스트의 맨 아래로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 아래로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottom(
-            @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId) {
+            @Parameter(description = "현재 사용자 정보", required = true) Member member,
+            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
+            @Parameter(description = "이동할 리스트의 ID", required = true) @PathVariable Long targetListId) {
 
-        CardMoveResult result = cardMoveService.moveCardToBottom(member, cardId);
-        return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
-                , HttpStatus.OK);
+        CardMoveResult result = cardMoveService.moveCardToBottom(member, cardId, targetListId);
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 
     @Override
+    @Operation(summary = "다른 리스트의 카드들 사이로 이동", description = "특정 카드를 지정된 이동할 리스트의 두 카드 사이에 위치시킵니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetween(
-            @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId,
-            @RequestParam Long previousCardId,
-            @RequestParam Long nextCardId) {
-
-        CardMoveResult result = cardMoveService.moveCardBetween(member, cardId, previousCardId, nextCardId);
-        return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
-                , HttpStatus.OK);
-    }
-
-    @Override
-    @Operation(summary = "다른 리스트의 맨 위로 카드 이동", description = "특정 카드를 지정된 다른 리스트의 맨 위로 이동합니다.")
-    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTopInAnotherList(
-            @Parameter(description = "현재 사용자 정보", required = true) Member member,
-            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
-            @Parameter(description = "타겟 리스트의 ID", required = true) @PathVariable Long targetListId) {
-
-        CardMoveResult result = cardMoveService.moveCardToOtherListTop(member, cardId, targetListId);
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
-    }
-
-    @Override
-    @Operation(summary = "다른 리스트의 맨 아래로 카드 이동", description = "특정 카드를 지정된 다른 리스트의 맨 아래로 이동합니다.")
-    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottomInAnotherList(
-            @Parameter(description = "현재 사용자 정보", required = true) Member member,
-            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
-            @Parameter(description = "타겟 리스트의 ID", required = true) @PathVariable Long targetListId) {
-
-        CardMoveResult result = cardMoveService.moveCardToOtherListBottom(member, cardId, targetListId);
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
-    }
-
-    @Override
-    @Operation(summary = "다른 리스트의 카드들 사이로 이동", description = "특정 카드를 지정된 다른 리스트의 두 카드 사이에 위치시킵니다.")
-    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetweenInAnotherList(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
             @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
             @Parameter(description = "이전 카드의 ID", required = true) @RequestParam Long previousCardId,
             @Parameter(description = "다음 카드의 ID", required = true) @RequestParam Long nextCardId) {
 
-        CardMoveResult result = cardMoveService.moveCardBetweenInAnotherList(member, cardId, previousCardId, nextCardId);
+        CardMoveResult result = cardMoveService.moveCardBetween(member, cardId, previousCardId, nextCardId);
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 
