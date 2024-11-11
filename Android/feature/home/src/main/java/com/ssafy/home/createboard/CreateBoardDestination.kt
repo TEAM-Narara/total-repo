@@ -24,7 +24,7 @@ fun NavGraphBuilder.createBoardScreen(
         val createBoard: CreateBoard = backStackEntry.toRoute()
         val cover = createBoard.cover ?: Cover(
             CoverType.COLOR,
-            backgroundColorList.last().toColorString()
+            backgroundColorList[2].toColorString()
         )
 
         CreateBoardScreen(
