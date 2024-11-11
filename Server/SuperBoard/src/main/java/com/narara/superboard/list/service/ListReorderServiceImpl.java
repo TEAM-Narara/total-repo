@@ -33,6 +33,8 @@ public class ListReorderServiceImpl implements ListReorderService {
         }
 
         listRepository.saveAll(lists);
+        board.setLastListOrder(newOrder);
+
         return orderInfoList;
     }
 }
