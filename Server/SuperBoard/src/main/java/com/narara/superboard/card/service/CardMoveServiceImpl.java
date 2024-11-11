@@ -56,6 +56,15 @@ public class CardMoveServiceImpl implements CardMoveService {
             return new CardMoveResult.DeletedCardMove(targetList.getId());
         }
 
+        if (topCard.getMyOrder() < 1) {
+            // 의도적으로 재시도 로직 실행
+            java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                    targetCard, 0, targetList,
+                    -1000, null, topCard.getMyOrder());
+
+            return new CardMoveResult.ReorderedCardMove(orderInfoList);
+        }
+
         // 처음과 같은 상황이면 그대로 반환
         if (targetCard.getMyOrder().equals(topCard.getMyOrder())
                 && targetList.getId().equals(targetCard.getList().getId())) {
@@ -68,7 +77,21 @@ public class CardMoveServiceImpl implements CardMoveService {
                 Math.round(topCard.getMyOrder() * MOVE_TOP_ORDER_RATIO));
         log.info("기준 순서 값 계산 - topListOrder: {}, calculatedOrder: {}", topCard.getMyOrder(), baseOrder);
 
-        return getCardMoveResult(targetCard, 0, targetList, baseOrder, null, topCard.getMyOrder());
+        java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetCard, 0, targetList,
+                baseOrder, null, topCard.getMyOrder());
+
+        // 여러 카드를 재배치해야 하는 경우 재배치 결과 반환
+        if (orderInfoList.size() > 1) {
+            return new CardMoveResult.ReorderedCardMove(orderInfoList);
+        }
+
+        // 카드의 새로운 리스트와 순서 설정 후 저장
+        targetCard.moveToListWithOrder(targetList, orderInfoList.getFirst().myOrder());
+
+        // 단일 카드 이동 결과 반환
+        return new CardMoveResult.SingleCardMove(
+                new CardMoveResponseDto(targetCard.getId(), targetList.getId(), orderInfoList.getFirst().myOrder()));
     }
 
     @Override
@@ -98,6 +121,14 @@ public class CardMoveServiceImpl implements CardMoveService {
             return new CardMoveResult.DeletedCardMove(targetList.getId());
         }
 
+        if (bottomCard.getMyOrder() >= 9223372036854775807L) {
+            // 의도적으로 재시도 로직 실행
+            java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                    targetCard, -1, targetList,
+                    -1000, bottomCard.getMyOrder(), null);
+
+            return new CardMoveResult.ReorderedCardMove(orderInfoList);
+        }
 
         if (targetCard.getMyOrder().equals(bottomCard.getMyOrder())
                 && targetList.getId().equals(targetCard.getList().getId())) {
@@ -108,29 +139,15 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 맨 아래로 이동하기 위한 기준 순서값 설정 (비율을 사용하여 순서 계산)
         long baseOrder = Math.min(
                 bottomCard.getMyOrder() + LARGE_INCREMENT,
-                bottomCard.getMyOrder() + Math.round((Long.MAX_VALUE - bottomCard.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO)
+                bottomCard.getMyOrder() + Math.round(
+                        (Long.MAX_VALUE - bottomCard.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO)
         );
 
         log.info("기준 순서 값 계산 - bottomListOrder: {}, baseOrder: {}", bottomCard.getMyOrder(), baseOrder);
 
-        return getCardMoveResult(targetCard, -1, targetList, baseOrder, bottomCard.getMyOrder(), null);
-    }
-
-    /**
-     * 카드 이동 결과를 반환하는 메서드
-     *
-     * @param targetCard 이동할 카드
-     * @param targetList 이동할 대상 리스트
-     * @param baseOrder  새롭게 설정할 순서값의 기준
-     * @return 카드 이동 결과 객체 (단일 이동 또는 재배치가 필요한 경우 전체 카드 정보)
-     */
-    private CardMoveResult getCardMoveResult(
-            Card targetCard, int targetIndex, List targetList,
-            long baseOrder, Long prevOrder, Long nextOrder) {
-        // 고유한 순서값 생성 및 재배치 체크
         java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
-                targetCard, targetIndex, targetList,
-                baseOrder, prevOrder, nextOrder);
+                targetCard, -1, targetList,
+                baseOrder, bottomCard.getMyOrder(), null);
 
         // 여러 카드를 재배치해야 하는 경우 재배치 결과 반환
         if (orderInfoList.size() > 1) {
@@ -139,11 +156,11 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         // 카드의 새로운 리스트와 순서 설정 후 저장
         targetCard.moveToListWithOrder(targetList, orderInfoList.getFirst().myOrder());
-        cardRepository.save(targetCard);
-
+        targetList.setLastCardOrder(orderInfoList.getFirst().myOrder());
+        System.out.println(orderInfoList.getFirst().myOrder());
         // 단일 카드 이동 결과 반환
         return new CardMoveResult.SingleCardMove(
-                new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+                new CardMoveResponseDto(targetCard.getId(), targetList.getId(), orderInfoList.getFirst().myOrder()));
     }
 
     @Override
@@ -186,7 +203,6 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         int targetIndex = cardRepository.findAllByListOrderByMyOrderAsc(previousCard.getList())
                 .indexOf(previousCard) + 1;
-
         // 고유한 순서값 생성 후 재배치 필요 여부 체크
         java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetCard, targetIndex, previousCard.getList(),
@@ -202,7 +218,7 @@ public class CardMoveServiceImpl implements CardMoveService {
         cardRepository.save(targetCard);
 
         return new CardMoveResult.SingleCardMove(
-                new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), targetCard.getMyOrder()));
+                new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), orderInfoList.getFirst().myOrder()));
     }
 
     private long generateUniqueOrder(long baseOrder, long maxOffset) {
