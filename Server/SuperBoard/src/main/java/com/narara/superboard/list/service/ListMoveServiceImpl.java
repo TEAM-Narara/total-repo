@@ -98,8 +98,8 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         // 현재 보드에서 가장 큰 순서 값을 가져오고, 없으면 기본값 사용
         long baseOrder = bottomList.map(lastList -> {
-            long maxLimit = lastList.getMyOrder() + Math.round((Long.MAX_VALUE - lastList.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO);
-            long calculatedOrder = Math.min(lastList.getMyOrder() + LARGE_INCREMENT, maxLimit);
+            long minLimit = lastList.getMyOrder() + Math.round((Long.MAX_VALUE - lastList.getMyOrder()) * MOVE_BOTTOM_ORDER_RATIO);
+            long calculatedOrder = Math.min(lastList.getMyOrder() + LARGE_INCREMENT, minLimit);
             log.info("순서 값 계산 - lastListOrder: {}, calculatedOrder: {}", lastList.getMyOrder(), calculatedOrder);
             return calculatedOrder;
         }).orElse(DEFAULT_TOP_ORDER);
@@ -190,7 +190,7 @@ public class ListMoveServiceImpl implements ListMoveService {
 
 
     private java.util.List<ListMoveResponseDto> generateUniqueOrderWithRetry(List targetList, int targetIndex, Board board, long baseOrder) {
-        int maxAttempts = 3;
+        int maxAttempts = 2;
         int attempt = 0;
         long newOrder = generateUniqueOrder(baseOrder);
 
