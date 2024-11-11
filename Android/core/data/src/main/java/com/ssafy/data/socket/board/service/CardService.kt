@@ -33,7 +33,7 @@ class CardService @Inject constructor(
         val dto = gson.fromJson(data, AddCardRequestDto::class.java)
 
         val coverValue = if (dto.coverType == "IMAGE") {
-            dto.coverValue?.let { imageStorage.save(it) }
+            imageStorage.save(dto.coverValue)
         } else {
             dto.coverValue
         }
@@ -62,7 +62,7 @@ class CardService @Inject constructor(
         }
 
         val coverValue = if (dto.coverType == "IMAGE") {
-            dto.coverValue?.let { imageStorage.save(it) }
+            imageStorage.save(dto.coverValue)
         } else {
             dto.coverValue
         }

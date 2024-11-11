@@ -36,9 +36,9 @@ fun ListItem(
     onTitleChange: (String) -> Unit = {},
     onCardReordered: () -> Unit = {},
     navigateToCardScreen: (Long) -> Unit = {},
-    addCard: () -> Unit = {},
+    addCard: (Long, String) -> Unit = { _, _ -> },
     addPhoto: () -> Unit = {},
-    onListChanged: (Long) -> Unit = {},
+    onFocus: (Long) -> Unit = {},
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
@@ -50,9 +50,10 @@ fun ListItem(
         modifier = modifier,
         title = listData.name,
         onTitleChange = onTitleChange,
-        addCard = addCard,
+        addCard = { cardName -> addCard(listData.id, cardName) },
         addPhoto = addPhoto,
         isWatching = listData.isWatching,
+        onFocus = { onFocus(listData.id) }
     ) {
         LazyColumn(
             state = cardLazyListState,
@@ -75,7 +76,7 @@ fun ListItem(
                                     it.value = it.value.toMutableList().apply {
                                         remove(state.data)
                                     }
-                                    onListChanged(listData.id)
+                                    onFocus(listData.id)
                                 }
                             }
 

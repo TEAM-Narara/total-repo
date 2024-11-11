@@ -4,11 +4,11 @@ data class AddCardRequestDto(
     val cardId: Long,
     val listId: Long,
     val name: String,
-    val description: String,
+    val description: String?,
     val startAt: Long?,
     val endAt: Long?,
     val coverType: String,
-    val coverValue: String?,
+    val coverValue: String,
     val isDeleted: Boolean,
     val isArchived: Boolean
 )
