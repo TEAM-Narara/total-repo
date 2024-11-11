@@ -17,6 +17,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
+import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
+
 @Entity
 @Getter
 @Builder
@@ -72,6 +74,9 @@ public class Card extends BaseTimeEntity implements Identifiable {
     private java.util.List<CardMember> cardMemberList;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
+        long cardListOrder = list.getLastCardOrder() + LARGE_INCREMENT;
+        list.setLastCardOrder(cardListOrder);
+
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
@@ -79,8 +84,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
                     put("type", "NONE");
                     put("value", "NONE");
                 }}) //default cover 지정
-                .myOrder(list.getLastCardOrder() + 1)
-                .myOrder(0L)
+                .myOrder(cardListOrder)
                 .isDeleted(false)
                 .isArchived(false)
                 .build();
