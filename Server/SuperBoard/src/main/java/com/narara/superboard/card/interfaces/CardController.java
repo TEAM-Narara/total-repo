@@ -127,7 +127,9 @@ public class CardController implements CardAPI {
     @Operation(summary = "카드의 액티비티 목록 조회", description = "카드의 액티비티 목록 조회")
     public ResponseEntity<DefaultResponse<List<CardLogDetailResponseDto>>> getCardActivity(Long cardId) {
         List<CardLogDetailResponseDto> cardActivity = cardService.getCardActivity(cardId);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, cardActivity), HttpStatus.OK);
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, cardActivity),
+                HttpStatus.OK);
     }
 
     @Parameters({
@@ -161,12 +163,13 @@ public class CardController implements CardAPI {
         if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
             String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
             log.warn(message);
-            return ResponseEntity.status(HttpStatus.GONE) // GONE(410) 상태 코드 사용
-                    .body(DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result));
+            return new ResponseEntity<>(
+                    DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result),
+                    HttpStatus.GONE);
         }
-
-        // 결과가 정상적인 이동인 경우
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result),
+                HttpStatus.OK);
     }
 
 
@@ -183,11 +186,14 @@ public class CardController implements CardAPI {
         if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
             String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
             log.warn(message);
-            return ResponseEntity.status(HttpStatus.GONE) // GONE(410) 상태 코드 사용
-                    .body(DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result));
+            return new ResponseEntity<>(
+                    DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result),
+                    HttpStatus.GONE);
         }
 
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result),
+                HttpStatus.OK);
     }
 
     @Override
