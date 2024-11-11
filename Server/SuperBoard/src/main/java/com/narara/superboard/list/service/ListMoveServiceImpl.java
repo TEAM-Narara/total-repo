@@ -132,6 +132,14 @@ public class ListMoveServiceImpl implements ListMoveService {
     public ListMoveResult moveListBetween(Member member, Long listId, Long previousListId, Long nextListId) {
         log.info("moveListBetween 메서드 시작 - listId: {}, previousListId: {}, nextListId: {}", listId, previousListId, nextListId);
 
+        // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 리스트의 순서 값으로 반환
+        if (listId.equals(previousListId) || listId.equals(nextListId) || previousListId.equals(nextListId)) {
+            List targetList = listRepository.findById(listId)
+                    .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
+            log.info("같은 ID 감지 - listId: {}, previousListId: {}, nextListId: {}", listId, previousListId, nextListId);
+            return new ListMoveResult.SingleListMove(new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
+        }
+
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
         log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());

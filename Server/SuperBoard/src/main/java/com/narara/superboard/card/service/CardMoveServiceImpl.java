@@ -9,6 +9,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static com.narara.superboard.card.CardAction.MOVE_CARD;
 import static com.narara.superboard.common.constant.MoveConst.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardMoveServiceImpl implements CardMoveService {
@@ -115,7 +117,16 @@ public class CardMoveServiceImpl implements CardMoveService {
     @Override
     @Transactional
     public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
-        // 이동할 카드 조회
+        log.info("moveCardBetween 메서드 시작 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId, nextCardId);
+
+        // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 카드의 순서 값으로 반환
+        if (cardId.equals(previousCardId) || cardId.equals(nextCardId) || previousCardId.equals(nextCardId)) {
+            Card targetCard = cardRepository.findById(cardId)
+                    .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
+            log.info("같은 ID 감지 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId, nextCardId);
+            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
+        }
+
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
         cardService.checkBoardMember(targetCard, member, MOVE_CARD);
