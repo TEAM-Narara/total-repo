@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -41,6 +42,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
     @Column(name = "visibility", nullable = false, length = 50)
     private Visibility visibility;  // 가시성 (WORKSPACE, PRIVATE)
 
+    @Setter
     @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 0")
     private Long lastListOrder;  // 보드 내 마지막 리스트 순서
 
@@ -51,6 +53,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    // TODO: 사용하는지 체크
     @Column(name = "list_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long listOrderVersion;  // 버전
 

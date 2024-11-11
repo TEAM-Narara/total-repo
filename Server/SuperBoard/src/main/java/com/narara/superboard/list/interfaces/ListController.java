@@ -7,6 +7,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
+import com.narara.superboard.list.service.ListMoveService;
 import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "6. 리스트")
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ListController implements ListAPI {
 
     private final ListService listService;
+    private final ListMoveService listMoveService;
 
     @Override
     @Operation(summary = "리스트 생성", description = "새로운 리스트를 생성합니다.")
@@ -60,5 +63,30 @@ public class ListController implements ListAPI {
                 .map(ListSimpleResponseDto::of)
                 .toList();
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_GET_ARCHIVED_SUCCESS, responseDtos), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "리스트를 맨 위로 이동", description = "지정된 리스트를 보드의 맨 위로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<Void>> moveListToTop(@PathVariable Long listId) {
+        listMoveService.moveListToTop(listId);
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_TOP_SUCCESS));
+    }
+
+    @Override
+    @Operation(summary = "리스트를 맨 아래로 이동", description = "지정된 리스트를 보드의 맨 아래로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<Void>> moveListToBottom(@PathVariable Long listId) {
+        listMoveService.moveListToBottom(listId);
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BOTTOM_SUCCESS));
+    }
+
+    @Override
+    @Operation(summary = "리스트를 특정 위치(다른 리스트 사이)로 이동", description = "지정된 리스트를 두 리스트 사이의 위치로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<Void>> moveListBetween(
+            @PathVariable Long listId,
+            @RequestParam Long previousListId,
+            @RequestParam Long nextListId
+    ) {
+        listMoveService.moveListBetween(listId, previousListId, nextListId);
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS));
     }
 }
