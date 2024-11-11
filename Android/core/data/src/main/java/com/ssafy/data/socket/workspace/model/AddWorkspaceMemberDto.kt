@@ -7,6 +7,6 @@ data class AddWorkspaceMemberDto(
     val memberName: String,
     val authority: String,
     val memberEmail: String,
-    val profileImgUrl: String,
+    val profileImgUrl: String?,
     val isDeleted: Boolean
 )

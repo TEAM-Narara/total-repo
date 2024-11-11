@@ -5,7 +5,7 @@ data class EditWorkspaceBoardRequestDto(
     val boardId: Long,
     val boardName: String,
     val coverType: String,
-    val coverValue: String,
+    val coverValue: String?,
     val visibility: String,
     val isClosed: Boolean
 )
