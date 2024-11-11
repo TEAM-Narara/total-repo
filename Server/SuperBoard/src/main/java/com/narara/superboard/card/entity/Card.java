@@ -158,10 +158,10 @@ public class Card extends BaseTimeEntity implements Identifiable {
             return;
         }
 
-        //blank면 에러
-        if (updateName.isBlank()) {
-            throw new IllegalArgumentException("name이 공백이면 안됩니다");
-        }
+//        //blank면 에러?
+//        if (updateName.isBlank()) {
+//            throw new IllegalArgumentException("name이 공백이면 안됩니다");
+//        }
 
         this.name = updateName;
     }
