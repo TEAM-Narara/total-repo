@@ -2,11 +2,8 @@ package com.ssafy.database.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.ssafy.database.dto.piece.BitPosition
 import com.ssafy.model.with.DataStatus
-
-@Target(AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class BitPosition(val position: Int)
 
 @Entity(tableName = "board")
 data class BoardEntity(

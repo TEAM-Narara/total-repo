@@ -101,6 +101,8 @@ class BoardService @Inject constructor(
             before.copy(
                 name = dto.name,
                 color = dto.color,
+                isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
