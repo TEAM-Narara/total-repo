@@ -66,4 +66,7 @@ public interface CardAPI {
             @PathVariable Long cardId,
             @RequestParam Long previousCardId,
             @RequestParam Long nextCardId);
+
+    @GetMapping("/{listId}/cards")
+    ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(@PathVariable Long listId);
 }

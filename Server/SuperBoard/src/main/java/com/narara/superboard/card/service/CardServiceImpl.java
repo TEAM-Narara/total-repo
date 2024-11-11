@@ -8,6 +8,7 @@ import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.card.interfaces.dto.CardSimpleResponseDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
@@ -222,6 +223,17 @@ public class CardServiceImpl implements CardService {
                 mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(), pageable.getPageSize());
 
         return new CardCombinedActivityResponseDto(combinedLogs, totalPages, totalElements);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<CardSimpleResponseDto> getCardsByListId(Long listId) {
+        List list = listRepository.findById(listId)
+                .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
+
+        return cardRepository.findByListAndIsDeletedFalseOrderByMyOrderAsc(list).stream()
+                .map(CardSimpleResponseDto::of)
+                .toList();
     }
 
     private static java.util.List<CardCombinedActivityDto> mergeAndLimitSortedList(

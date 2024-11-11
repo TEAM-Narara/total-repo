@@ -180,4 +180,11 @@ public class CardController implements CardAPI {
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
                 , HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(@PathVariable Long listId) {
+        List<CardSimpleResponseDto> cards = cardService.getCardsByListId(listId);
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_DELETE_SUCCESS, cards)
+                , HttpStatus.OK);    }
 }
