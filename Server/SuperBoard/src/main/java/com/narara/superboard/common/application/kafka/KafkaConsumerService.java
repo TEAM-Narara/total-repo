@@ -86,17 +86,19 @@ public class KafkaConsumerService {
             factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 
             container = factory.createContainer(topic);
-            container.setupMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
-                processRecord(record, acknowledgment, entityType, primaryId, memberId);
-            });
 
             // TODO : 컨슈머 그룹 생성할떄, topicMemberOffset 생성하기
             System.out.println("topicMemberOffset 생성하기");
             TopicMemberOffset topicMemberOffset = TopicMemberOffset.builder()
-                            .topic(topic).memberId(memberId).build();
+                    .topic(topic).memberId(memberId).build();
             topicMemberOffsetRepository.save(topicMemberOffset);
+
+            container.setupMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
+                processRecord(record, acknowledgment, entityType, primaryId, memberId);
+            });
+
             container.start();
-            System.out.println("11111");
+            // System.out.println("11111");
             activeListeners.put(listenerKey, container);
 
         }
