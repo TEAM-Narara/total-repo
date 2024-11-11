@@ -108,7 +108,7 @@ fun SuperBoardNavHost(
 
         settingScreen(
             backHomeScreen = {
-                navController.navigate(Home) { popUpAll(navController) }
+                navController.popBackStack()
             },
             moveToInviteWorkspace = { workspaceId: Long ->
                 navController.navigate(InviteWorkspace(workspaceId))
