@@ -57,9 +57,8 @@ public class ListServiceImpl implements ListService{
 
         List list = List.createList(listCreateRequestDto, board);
 
-        boardOffsetService.saveAddListDiff(list); //Websocket 리스트 생성
-
         List savedlist = listRepository.save(list);
+        boardOffsetService.saveAddListDiff(savedlist); //Websocket 리스트 생성
         // 리스트 생성 로그 기록
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 

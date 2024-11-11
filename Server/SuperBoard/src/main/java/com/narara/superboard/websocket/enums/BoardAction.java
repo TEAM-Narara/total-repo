@@ -38,5 +38,10 @@ public enum BoardAction {
     //Reply
     ADD_REPLY,
     DELETE_REPLY,
-    EDIT_REPLY
+    EDIT_REPLY,
+
+    //Attachment
+    ADD_CARD_ATTACHMENT,
+    DELETE_CARD_ATTACHMENT,
+    EDIT_CARD_ATTACHMENT_COVER //첨부파일 커버 상태 변경
 }
