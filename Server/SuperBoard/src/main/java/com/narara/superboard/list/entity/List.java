@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -54,11 +56,15 @@ public class List extends BaseTimeEntity implements Identifiable {
     @Column(name = "card_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long cardOrderVersion;  // 버전
 
+
     public static List createList(ListCreateRequestDto listCreateRequestDto, Board board) {
+        long lastListOrder = board.getLastListOrder() + LARGE_INCREMENT;
+        board.setLastListOrder(lastListOrder);
+
         return List.builder()
                 .name(listCreateRequestDto.listName())
                 .board(board)
-                .myOrder(board.getLastListOrder() +1)
+                .myOrder(lastListOrder)
                 .lastCardOrder(0L)
                 .isArchived(false)
                 .isDeleted(false)
