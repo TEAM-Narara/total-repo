@@ -61,7 +61,14 @@ class MemberRepositoryImpl @Inject constructor(
 
             if (myInfo != null) {
                 if (isConnected) {
-                    memberDataSource.updateMember(memberUpdateRequestDto)
+                    memberDataSource.updateMember(memberId, memberUpdateRequestDto).also {
+                        memberDao.updateMember(
+                            myInfo.copy(
+                                nickname = memberUpdateRequestDto.nickname,
+                                profileImageUrl = memberUpdateRequestDto.profileImgUrl,
+                            )
+                        )
+                    }
                 } else {
                     // TODO 서버에 동기화 isStatus
                     val result = memberDao.updateMember(

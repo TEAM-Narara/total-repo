@@ -21,6 +21,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "BASE_URL", properties.getProperty("baseUrl"))
+        buildConfigField("String", "ACCESS_KEY", properties.getProperty("s3AccessKey"))
+        buildConfigField("String", "SECRET_KEY", properties.getProperty("s3SecretKey"))
     }
 
     buildTypes {
@@ -63,6 +65,10 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
 
     api (libs.androidx.room.runtime)
+
+    // S3
+    implementation(libs.aws.android.sdk.mobile.client)
+    implementation(libs.aws.android.sdk.s3)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

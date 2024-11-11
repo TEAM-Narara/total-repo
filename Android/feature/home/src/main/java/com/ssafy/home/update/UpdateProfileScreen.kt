@@ -1,6 +1,7 @@
 package com.ssafy.home.update
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,9 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.EditText
 import com.ssafy.designsystem.component.FilledButton
@@ -41,18 +48,56 @@ import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.PaddingXSemiLarge
 import com.ssafy.designsystem.values.TextMedium
+import com.ssafy.model.user.User
+import com.ssafy.ui.launcher.rememberLauncherForSaveImage
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateProfileScreen(
     modifier: Modifier = Modifier,
-    title: String = "프로필 수정",
+    viewModel: UpdateViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
 ) {
-    val (name, onValueChanged) = remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
 
-    val url =
-        "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z"
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.getUser()
+    }
+
+    user?.let {
+        UpdateProfileScreen(
+            modifier = modifier,
+            user = it,
+            onBackPressed = onBackPressed,
+            onChange = viewModel::change,
+            onChangeFile = viewModel::changeProfileImage
+        )
+    } ?: LoadingScreen()
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UpdateProfileScreen(
+    modifier: Modifier = Modifier,
+    user: User,
+    title: String = "프로필 수정",
+    onBackPressed: () -> Unit,
+    onChange: (String) -> Unit,
+    onChangeFile: (String) -> Unit,
+) {
+    val (name, onValueChanged) = remember(user.nickname) { mutableStateOf(user.nickname) }
+    val imageLauncher = rememberLauncherForSaveImage(onChangeFile)
 
     Scaffold(modifier = modifier,
         topBar = {
@@ -90,10 +135,11 @@ fun UpdateProfileScreen(
                         .aspectRatio(1f)
                 ) {
                     AsyncImage(
-                        model = url,
+                        model = user.profileImgUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        error = rememberVectorPainter(Icons.Default.AccountCircle),
                     )
                 }
                 Box(
@@ -114,10 +160,11 @@ fun UpdateProfileScreen(
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = "Camera",
+                            tint = Color.Black,
                             modifier = Modifier
                                 .size(IconMedium)
-                                .align(Alignment.Center),
-                            tint = Color.Black
+                                .align(Alignment.Center)
+                                .clickable { imageLauncher.launch("image/*") }
                         )
                     }
                 }
@@ -125,9 +172,9 @@ fun UpdateProfileScreen(
             EditText(
                 title = "닉네임",
                 text = name,
-                onTextChange = { onValueChanged(it) },
+                onTextChange = onValueChanged,
             )
-            FilledButton(text = "수정하기", onClick = { /*TODO*/ })
+            FilledButton(text = "수정하기", onClick = { onChange(name) })
         }
     }
 }
