@@ -2,6 +2,7 @@ package com.ssafy.network.util
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.amazonaws.HttpMethod
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
@@ -32,7 +33,32 @@ class S3ImageUtil @Inject constructor(
             if (!exists()) mkdirs()
         }
 
-    suspend fun uploadFile(
+    suspend fun uploadS3Image(url: String, key: String, isDelete: Boolean = false) {
+        val file = File(url)
+
+        if (file.exists()) {
+            val bitmap = BitmapFactory.decodeFile(file.path)
+            val resizedBitmap = rescaleBitmap(bitmap)
+            val rescaledFile = bitmapToFile(resizedBitmap)
+            val rescaledKey = "${key}-${MINI}"
+
+            uploadFile(
+                key = rescaledKey,
+                file = rescaledFile,
+                isImage = true
+            )
+
+            uploadFile(
+                key = key,
+                file = file,
+                isImage = true
+            )
+
+            if (isDelete) file.delete()
+        }
+    }
+
+    private suspend fun uploadFile(
         key: String,
         file: File,
         isImage: Boolean,
@@ -59,7 +85,7 @@ class S3ImageUtil @Inject constructor(
     }
 
 
-    fun rescaleBitmap(bitmap: Bitmap): Bitmap {
+    private fun rescaleBitmap(bitmap: Bitmap): Bitmap {
         val targetSize = 2 * 1024 * 1024
         val currentSize = bitmap.width * bitmap.height * 4
         if (currentSize <= targetSize) return bitmap
@@ -80,7 +106,7 @@ class S3ImageUtil @Inject constructor(
         }
     }
 
-    fun bitmapToFile(bitmap: Bitmap): File {
+    private fun bitmapToFile(bitmap: Bitmap): File {
         val file = File(
             imageDirectory,
             "profile_${System.currentTimeMillis()}.jpg"

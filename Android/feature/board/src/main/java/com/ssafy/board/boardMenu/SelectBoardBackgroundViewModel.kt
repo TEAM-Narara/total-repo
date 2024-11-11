@@ -9,6 +9,7 @@ import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,7 +37,7 @@ class SelectBoardBackgroundViewModel @Inject constructor(
         withSocketState { isConnected: Boolean ->
             imagePathList.value.forEach {
                 val imageCover = Cover(CoverType.IMAGE, it)
-                createMemberBackgroundUseCase(imageCover, isConnected)
+                createMemberBackgroundUseCase(imageCover, isConnected).withUiState().collect()
             }
 
             if (boardId != null) {

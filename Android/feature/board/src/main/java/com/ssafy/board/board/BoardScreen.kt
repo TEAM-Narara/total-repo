@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -103,6 +104,7 @@ fun BoardScreen(
                     CoverType.IMAGE -> {
                         AsyncImage(
                             model = it.cover.value,
+                            contentScale = ContentScale.Crop,
                             contentDescription = "Board Cover",
                             modifier = Modifier.fillMaxSize()
                         )

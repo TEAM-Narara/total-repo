@@ -1,6 +1,5 @@
 package com.ssafy.network.source.member
 
-import android.graphics.BitmapFactory
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberBackgroundDto
 import com.ssafy.model.member.MemberUpdateRequestDto
@@ -12,7 +11,6 @@ import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
 import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
@@ -31,7 +29,7 @@ class MemberDataSourceImpl @Inject constructor(
         val key = "${memberId}/profile"
 
         memberUpdateRequestDto.profileImgUrl?.let { url ->
-            uploadS3Image(url, key)
+            s3ImageUtil.uploadS3Image(url, key)
         }
 
         val newMemberRequestDto = if (!memberUpdateRequestDto.profileImgUrl.isNullOrBlank()) {
@@ -60,7 +58,7 @@ class MemberDataSourceImpl @Inject constructor(
     ): Flow<MemberBackgroundDto> {
         val key = "${memberId}/background/${UUID.randomUUID()}"
         if (background.imgPath.isNotBlank()) {
-            uploadS3Image(background.imgPath, key)
+            s3ImageUtil.uploadS3Image(background.imgPath, key)
         }
         return safeApiCall { memberAPI.createMemberBackground(memberId, key) }.toFlow()
     }
@@ -69,26 +67,4 @@ class MemberDataSourceImpl @Inject constructor(
         return safeApiCall { memberAPI.deleteMemberBackground(memberId, backgroundId) }.toFlow()
     }
 
-    private suspend fun uploadS3Image(url: String, key: String) {
-        val file = File(url)
-
-        if (file.exists()) {
-            val bitmap = BitmapFactory.decodeFile(file.path)
-            val resizedBitmap = s3ImageUtil.rescaleBitmap(bitmap)
-            val rescaledFile = s3ImageUtil.bitmapToFile(resizedBitmap)
-            val rescaledKey = "${key}-${S3ImageUtil.MINI}"
-
-            s3ImageUtil.uploadFile(
-                key = rescaledKey,
-                file = rescaledFile,
-                isImage = true
-            )
-
-            s3ImageUtil.uploadFile(
-                key = key,
-                file = file,
-                isImage = true
-            )
-        }
-    }
 }
