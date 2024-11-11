@@ -8,10 +8,11 @@ import javax.inject.Inject
 class UpdateListUseCase @Inject constructor(private val listRepository: ListRepository) {
 
     suspend operator fun invoke(
+        listId: Long,
         updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> {
-        return listRepository.updateList(updateListRequestDto, isConnected)
+        return listRepository.updateList(listId, updateListRequestDto, isConnected)
     }
 
 }

@@ -138,6 +138,7 @@ fun getNullColumnList(bitmask: Long, listEntity: ListEntity): UpdateListBitmaskD
     return updateList
 }
 
+// TODO 사용
 fun getNullColumnListOrder(bitmask: Long, listEntity: ListEntity): UpdateListOrderBitmaskDTO {
     val listOrder = listEntity.toBitOrderDto()
 
@@ -163,6 +164,7 @@ fun getNullColumnCard(bitmask: Long, cardEntity: CardEntity): UpdateCardBitmaskD
     return updateCard
 }
 
+// TODO 사용
 fun getNullColumnCardToListId(bitmask: Long, cardEntity: CardEntity): UpdateCardListIdBitmaskDTO {
     val cardToListId = cardEntity.toListIdBitDto()
 
@@ -171,6 +173,7 @@ fun getNullColumnCardToListId(bitmask: Long, cardEntity: CardEntity): UpdateCard
     return updateCardToListId
 }
 
+// TODO 사용
 fun getNullColumnCardOrder(bitmask: Long, cardEntity: CardEntity): UpdateCardOrderBitmaskDTO {
     val cardOrder = cardEntity.toOrderBitDto()
 

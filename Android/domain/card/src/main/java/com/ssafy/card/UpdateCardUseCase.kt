@@ -10,10 +10,11 @@ class UpdateCardUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
+        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> {
-        return cardRepository.updateCard(cardUpdateRequestDto, isConnected)
+        return cardRepository.updateCard(cardId, cardUpdateRequestDto, isConnected)
     }
 
 }

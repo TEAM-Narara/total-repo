@@ -20,6 +20,7 @@ interface ListRepository {
     ): Flow<Long>
 
     suspend fun updateList(
+        listId: Long,
         updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit>

@@ -14,7 +14,6 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.database.dto.bitmask.getNullColumnBoard
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
@@ -121,8 +120,6 @@ class BoardRepositoryImpl @Inject constructor(
                         visibility = updateBoardRequestDto.visibility.name)
                     val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
 
-                    val nextBoard = getNullColumnBoard(newBit, newBoard)
-
                     val result = when(board.isStatus) {
                         DataStatus.STAY, DataStatus.UPDATE ->
                             boardDao.updateBoard(newBoard.copy(
@@ -149,21 +146,21 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.setBoardArchive(id)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
+                    val newBoard = board.copy(isClosed = !board.isClosed)
+                    val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
+
                     val result = when (board.isStatus) {
-                        DataStatus.STAY ->
+                        DataStatus.STAY, DataStatus.UPDATE ->
                             boardDao.updateBoard(
-                                board.copy(
-                                    isClosed = !board.isClosed,
+                                newBoard.copy(
+                                    columnUpdate = newBit,
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
 
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            boardDao.updateBoard(
-                                board.copy(
-                                    isClosed = !board.isClosed,
-                                )
-                            )
+                        DataStatus.CREATE ->
+                            boardDao.updateBoard(newBoard)
 
                         DataStatus.DELETE -> {}
                     }
@@ -418,23 +415,24 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.updateLabel(id, updateLabelRequestDto)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
+                    val newLabel = label.copy(
+                        name = updateLabelRequestDto.name,
+                        color = updateLabelRequestDto.color
+                    )
+                    val newBit = bitmaskColumn(label.columnUpdate, label, newLabel)
+
                     val result = when (label.isStatus) {
-                        DataStatus.STAY ->
+                        DataStatus.STAY, DataStatus.UPDATE ->
                             labelDao.updateLabel(
-                                label.copy(
-                                    name = updateLabelRequestDto.name,
-                                    color = updateLabelRequestDto.color,
+                                newLabel.copy(
+                                    columnUpdate = newBit,
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
 
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            labelDao.updateLabel(
-                                label.copy(
-                                    name = updateLabelRequestDto.name,
-                                    color = updateLabelRequestDto.color
-                                )
-                            )
+                        DataStatus.CREATE ->
+                            labelDao.updateLabel(newLabel)
 
                         DataStatus.DELETE -> {}
                     }
