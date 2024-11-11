@@ -25,8 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +35,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.getContrastingTextColor
 import com.ssafy.designsystem.values.IconMedium
@@ -46,25 +48,59 @@ import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.backgroundColorList
 import com.ssafy.designsystem.values.toColor
+import com.ssafy.designsystem.values.toColorString
 import com.ssafy.model.background.Cover
 import com.ssafy.model.with.CoverType
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectBoardBackgroundScreen(
+    onBackPressed: (Cover?) -> Unit,
+    viewModel: SelectBoardBackgroundViewModel = hiltViewModel(),
+    selectedCover: Cover?,
+    boardId: Long?
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val imagePathList by viewModel.imagePathList.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.resetUiState()
+        viewModel.loadMemberBackgrounds()
+    }
+
+    SelectBoardBackgroundScreen(
+        onBackPressed = { onBackPressed(selectedCover) },
+        selectedCover = selectedCover,
+        imagePathList = imagePathList,
+        addImagePath = viewModel::addImagePath,
+        onCoverSelected = { viewModel.coverSelect(boardId, it, onBackPressed) }
+    )
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectBoardBackgroundScreen(
     onBackPressed: () -> Unit,
     selectedCover: Cover?,
+    imagePathList: List<String>,
+    addImagePath: (String) -> Unit,
+    onCoverSelected: (Cover) -> Unit
 ) {
+    val attachmentLauncher = rememberLauncherForSaveImage(addImagePath)
 
-    val localImages = remember { mutableStateListOf<String>() }
-
-    val attachmentLauncher = rememberLauncherForSaveImage { path ->
-        localImages.add(path)
-    }
     Scaffold(modifier = Modifier.background(Color.White),
         topBar = {
             TopAppBar(
@@ -103,7 +139,8 @@ fun SelectBoardBackgroundScreen(
                             .padding(PaddingTwo, PaddingTwo)
                             .background(color = color, shape = RoundedCornerShape(PaddingSmall))
                             .clickable {
-                                // TODO: Viewmodel에 색상 바꿔줘.
+                                val cover = Cover(CoverType.COLOR, color.toColorString())
+                                onCoverSelected(cover)
                             }
                             .then(
                                 if (isSameColor(selectedCover, color)) {
@@ -152,14 +189,15 @@ fun SelectBoardBackgroundScreen(
                         )
                     }
                 }
-                items(localImages.size) {
-                    val image = localImages[it]
+                items(imagePathList.size) {
+                    val image = imagePathList[it]
                     Box(
                         modifier = Modifier
                             .size(120.dp)
                             .padding(PaddingTwo, PaddingTwo)
                             .clickable {
-                                // TODO: Viewmodel에 selectedBackground 이미지 url 바꿔줘.
+                                val cover = Cover(CoverType.IMAGE, image)
+                                onCoverSelected(cover)
                             }
                             .then(
                                 if (isSameImage(selectedCover, image)) Modifier.border(
@@ -222,6 +260,6 @@ private fun isSameImage(selectedCover: Cover?, image: String): Boolean {
 @Composable
 fun GreetingPreview2() {
     SelectBoardBackgroundScreen(
-        {}, selectedCover = null
+        {}, selectedCover = null, listOf(), {}, {}
     )
 }

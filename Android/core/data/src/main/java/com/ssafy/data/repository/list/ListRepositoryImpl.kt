@@ -11,8 +11,6 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
 import com.ssafy.database.dao.ReplyDao
-import com.ssafy.database.dto.BoardMemberAlarmEntity
-import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity

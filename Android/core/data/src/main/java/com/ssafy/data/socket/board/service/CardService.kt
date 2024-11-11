@@ -2,6 +2,7 @@ package com.ssafy.data.socket.board.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ssafy.data.image.ImageStorage
 import com.ssafy.data.socket.board.model.card.AddCardLabelRequestDto
 import com.ssafy.data.socket.board.model.card.AddCardMemberRequestDto
 import com.ssafy.data.socket.board.model.card.AddCardRequestDto
@@ -25,42 +26,67 @@ class CardService @Inject constructor(
     private val cardDao: CardDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
+    private val imageStorage: ImageStorage,
     private val gson: Gson
 ) {
     suspend fun addCard(data: JsonObject) {
         val dto = gson.fromJson(data, AddCardRequestDto::class.java)
-        // TODO : 이미지 저장 로직 구현
-        cardDao.insertCard(
-            CardEntity(
-                id = dto.cardId,
-                listId = dto.listId,
-                name = dto.name,
-                description = dto.description,
-                startAt = dto.startAt,
-                endAt = dto.endAt,
-                coverType = dto.coverType,
-                coverValue = dto.coverValue,
-                isArchived = dto.isArchived,
+        val insertCard: suspend (String) -> Unit = { coverValue ->
+            cardDao.insertCard(
+                CardEntity(
+                    id = dto.cardId,
+                    listId = dto.listId,
+                    name = dto.name,
+                    description = dto.description,
+                    startAt = dto.startAt,
+                    endAt = dto.endAt,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    isArchived = dto.isArchived,
+                )
             )
-        )
+        }
+
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(key = dto.coverValue) { path ->
+                insertCard(path ?: "")
+            }
+        } else {
+            insertCard(dto.coverValue)
+        }
     }
 
     suspend fun editCard(data: JsonObject) {
         val dto = gson.fromJson(data, EditCardRequestDto::class.java)
         val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
-        // TODO : 이미지 저장 로직 구현
-        cardDao.updateCard(
-            before.copy(
-                name = dto.name,
-                description = dto.description,
-                startAt = dto.startAt,
-                endAt = dto.endAt,
-                coverType = dto.coverType,
-                coverValue = dto.coverValue,
-                isArchived = dto.isArchived,
-                isStatus = DataStatus.STAY,
+
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
+        val updateCard: suspend (String) -> Unit = { coverValue ->
+            cardDao.updateCard(
+                before.copy(
+                    name = dto.name,
+                    description = dto.description,
+                    startAt = dto.startAt,
+                    endAt = dto.endAt,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    isArchived = dto.isArchived,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                )
             )
-        )
+        }
+
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                updateCard(path ?: "")
+            }
+        } else {
+            updateCard(dto.coverValue)
+        }
     }
 
     suspend fun archiveCard(data: JsonObject) {
@@ -70,12 +96,19 @@ class CardService @Inject constructor(
             before.copy(
                 isArchived = dto.isArchived,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
 
     suspend fun deleteCard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardRequestDto::class.java)
+
+        val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
         cardDao.deleteCardById(dto.cardId)
     }
 

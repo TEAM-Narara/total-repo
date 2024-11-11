@@ -9,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -16,7 +17,7 @@ import retrofit2.http.Query
 
 interface WorkspaceAPI {
 
-    @GET("api/v1/workspaces")
+    @GET("/api/v1/member/workspaces")
     suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")
@@ -40,10 +41,10 @@ interface WorkspaceAPI {
         @Body simpleMemberDto: SimpleMemberDto
     ): Response<ApiResponse<DetailMemberDto>>
 
-    @DELETE("api/v1/{workspaceId}/members")
+    @HTTP(method = "DELETE", path = "api/v1/{workspaceId}/members", hasBody = true)
     suspend fun deleteWorkspaceMember(
         @Path("workspaceId") workspaceId: Long,
-        @Body memberId: Long
+        @Body memberId: Map<String, Long>
     ): Response<ApiResponse<DetailMemberDto>>
 
     @PATCH("api/v1/{workspaceId}/members")

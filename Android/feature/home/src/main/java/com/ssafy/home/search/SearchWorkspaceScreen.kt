@@ -45,7 +45,6 @@ import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.PaddingZero
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.Transparent
-import com.ssafy.designsystem.values.Yellow
 import java.util.Date
 
 @Composable
@@ -115,7 +114,6 @@ fun SearchWorkspaceScreen(
                 BoardItem(
                     title = "Board $it",
                     onBoardClick = { },
-                    containerColor = Yellow,
                     onMenuClick = { /*TODO*/ },
                     modifier = Modifier.width(BoardWidth)
                 )

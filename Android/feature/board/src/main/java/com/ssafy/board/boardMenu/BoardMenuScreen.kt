@@ -66,7 +66,6 @@ fun BoardMenuScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardMenuViewModel = hiltViewModel(),
     popBack: () -> Unit,
-    cover: Cover,
     moveToSelectBackGroundScreen: (Cover) -> Unit,
     moveToInviteMemberScreen: () -> Unit
 ) {
@@ -81,7 +80,7 @@ fun BoardMenuScreen(
             backHome = popBack,
             moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
             moveToInviteMemberScreen = moveToInviteMemberScreen,
-            cover = cover,
+            cover = boardMenuData.boardDto.cover,
             changeBoardName = viewModel::changeBoardName,
             changeWorkspaceName = viewModel::changeWorkspaceName,
             changeWatch = viewModel::changeWatch,
@@ -305,9 +304,5 @@ fun GreetingPreview() {
         popBack = {},
         moveToSelectBackGroundScreen = {},
         moveToInviteMemberScreen = {},
-        cover = Cover(
-            type = CoverType.COLOR,
-            value = "#FFFFFF"
-        )
     )
 }

@@ -36,6 +36,7 @@ class ListService @Inject constructor(
             before.copy(
                 isArchived = dto.isArchived,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
@@ -49,6 +50,7 @@ class ListService @Inject constructor(
                 myOrder = dto.myOrder,
                 isArchived = dto.isArchived,
                 isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }

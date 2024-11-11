@@ -2,6 +2,7 @@ package com.ssafy.data.socket.workspace.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.ssafy.data.image.ImageStorage
 import com.ssafy.data.socket.workspace.model.AddWorkspaceBoardRequestDto
 import com.ssafy.data.socket.workspace.model.AddWorkspaceMemberDto
 import com.ssafy.data.socket.workspace.model.DeleteWorkSpaceRequestDto
@@ -29,6 +30,7 @@ class WorkspaceService @Inject constructor(
     private val workspaceMemberDao: WorkspaceMemberDao,
     private val memberDao: MemberDao,
     private val boardDao: BoardDao,
+    private val imageStorage: ImageStorage,
     private val gson: Gson
 ) {
     suspend fun deleteWorkSpace(data: JsonObject) {
@@ -51,14 +53,17 @@ class WorkspaceService @Inject constructor(
     suspend fun addMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceMemberDto::class.java)
 
-        memberDao.insertMember(
-            MemberEntity(
-                id = dto.memberId,
-                nickname = dto.memberName,
-                email = dto.memberEmail,
-                profileImageUrl = dto.profileImgUrl,
-            )
-        )
+        memberDao.getMember(dto.memberId)?.let {
+            imageStorage.saveAll(dto.profileImgUrl) { path ->
+                val memberEntity = MemberEntity(
+                    id = dto.memberId,
+                    nickname = dto.memberName,
+                    email = dto.memberEmail,
+                    profileImageUrl = path,
+                )
+                memberDao.insertMember(memberEntity)
+            }
+        }
 
         workspaceMemberDao.insertWorkspaceMember(
             WorkspaceMemberEntity(
@@ -73,8 +78,7 @@ class WorkspaceService @Inject constructor(
 
     suspend fun deleteMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceMemberRequestDto::class.java)
-        workspaceMemberDao.deleteLocalWorkspaceMember(
-            workspaceId = dto.workspaceId, memberId = dto.memberId)
+        workspaceMemberDao.deleteWorkspaceMemberById(dto.workspaceMemberId)
     }
 
     suspend fun editMember(data: JsonObject) {
@@ -91,38 +95,69 @@ class WorkspaceService @Inject constructor(
 
     suspend fun addBoard(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceBoardRequestDto::class.java)
-        // TODO : 이미지 저장 로직 구현
-        boardDao.insertBoard(
-            BoardEntity(
-                id = dto.boardId,
-                workspaceId = dto.workspaceId,
-                name = dto.boardName,
-                coverType = dto.coverType,
-                coverValue = dto.coverValue,
-                visibility = dto.visibility,
-                isClosed = dto.isClosed,
+
+        val insertBoard: suspend (String?) -> Unit = { coverValue ->
+            boardDao.insertBoard(
+                BoardEntity(
+                    id = dto.boardId,
+                    workspaceId = dto.workspaceId,
+                    name = dto.boardName,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    visibility = dto.visibility,
+                    isClosed = dto.isClosed,
+                )
             )
-        )
+        }
+
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                insertBoard(path)
+            }
+        } else {
+            insertBoard(dto.coverValue)
+        }
     }
 
     suspend fun editBoard(data: JsonObject) {
         val dto = gson.fromJson(data, EditWorkspaceBoardRequestDto::class.java)
         val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
-        // TODO : 이미지 저장 로직 구현
-        boardDao.updateBoard(
-            before.copy(
-                name = dto.boardName,
-                coverType = dto.coverType,
-                coverValue = dto.coverValue,
-                visibility = dto.visibility,
-                isClosed = dto.isClosed,
-                isStatus = DataStatus.STAY,
+
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
+        val updateBoard: suspend (String?) -> Unit = { coverValue ->
+            boardDao.updateBoard(
+                before.copy(
+                    name = dto.boardName,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    visibility = dto.visibility,
+                    isClosed = dto.isClosed,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                )
             )
-        )
+        }
+
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                updateBoard(path)
+            }
+        } else {
+            updateBoard(dto.coverValue)
+        }
     }
 
     suspend fun deleteBoard(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteWorkspaceBoardRequestDto::class.java)
+        val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
+
+        if (before.coverType == "IMAGE") {
+            before.coverValue?.let { imageStorage.delete(it) }
+        }
+
         boardDao.deleteBoardByBoardId(dto.boardId)
     }
 
@@ -131,7 +166,9 @@ class WorkspaceService @Inject constructor(
         val before = boardDao.getBoard(dto.boardId) ?: throw Exception("존재하지 않는 보드입니다.")
         boardDao.updateBoard(
             before.copy(
-                isClosed = dto.isArchive
+                isClosed = dto.isArchive,
+                isStatus = DataStatus.STAY,
+                columnUpdate = 0,
             )
         )
     }
