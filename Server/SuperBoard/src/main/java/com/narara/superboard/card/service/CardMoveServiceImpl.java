@@ -134,10 +134,6 @@ public class CardMoveServiceImpl implements CardMoveService {
         long nextOrder = nextCard.getMyOrder();
         long gap = nextOrder - prevOrder;
 
-        if (targetCard.getMyOrder() > prevOrder && targetCard.getMyOrder() < nextOrder) {
-            return new CardMoveResult.SingleCardMove(new CardMoveResponseDto(targetCard.getId(), targetCard.getMyOrder()));
-        }
-
         // 간격이 클 경우 고정된 간격값을 적용하고, 작을 경우 중간값 사용
         long baseOrder = (gap > MAX_INSERTION_DISTANCE_FOR_FIXED_GAP)
                 ? prevOrder + MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
