@@ -190,7 +190,7 @@ public class CardMoveServiceImpl implements CardMoveService {
                 attempt++;
             }
         }
-        throw new RuntimeException("최대 " + maxAttempts + "번의 시도 후에도 고유한 순서 값을 설정할 수 없습니다.");
+        return cardReorderService.reorderAllCardOrders(List);
     }
 
     private boolean isOrderConflict(List List, long order) {

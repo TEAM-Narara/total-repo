@@ -208,7 +208,7 @@ public class ListMoveServiceImpl implements ListMoveService {
                 attempt++;
             }
         }
-        throw new RuntimeException("최대 " + maxAttempts + "번의 시도 후에도 고유한 순서 값을 설정할 수 없습니다.");
+        return listReorderService.reorderAllListOrders(board);
     }
 
     // 리스트 순서 중복 확인 메서드
