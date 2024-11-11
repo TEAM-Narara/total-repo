@@ -130,37 +130,45 @@ class MemberRepositoryImpl @Inject constructor(
         }
 
     override suspend fun createMemberBackground(
+        memberId: Long,
         background: CoverDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            memberDataSource.createMemberBackground(background)
+            memberDataSource.createMemberBackground(memberId, background)
+                .map { it.memberBackgroundId }
         } else {
             flowOf(memberBackgroundDao.insertMemberBackground(background.toEntity()))
         }
     }
 
-    override suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit> =
-        withContext(ioDispatcher) {
-            val memberBackground = getMemberBackground(id)
+    override suspend fun deleteMemberBackground(
+        memberId: Long,
+        backgroundId: Long,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val memberBackground = getMemberBackground(backgroundId)
 
-            if (memberBackground != null) {
-                if (isConnected) {
-                    memberDataSource.deleteMemberBackground(id)
-                } else {
-                    val result = when (memberBackground.isStatus) {
-                        DataStatus.CREATE ->
-                            memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
-
-                        else ->
-                            memberBackgroundDao.updateMemberBackground(id, DataStatus.DELETE.name)
-                    }
-
-                    flowOf(result)
-                }
+        if (memberBackground != null) {
+            if (isConnected) {
+                memberDataSource.deleteMemberBackground(memberId, backgroundId)
             } else {
-                flowOf(Unit)
+                val result = when (memberBackground.isStatus) {
+                    DataStatus.CREATE ->
+                        memberBackgroundDao.deleteMemberBackground(memberBackground.toEntity())
+
+                    else ->
+                        memberBackgroundDao.updateMemberBackground(
+                            backgroundId,
+                            DataStatus.DELETE.name
+                        )
+                }
+
+                flowOf(result)
             }
+        } else {
+            flowOf(Unit)
         }
+    }
 
 }

@@ -2,6 +2,7 @@ package com.ssafy.network.source.member
 
 import android.graphics.BitmapFactory
 import com.ssafy.model.background.CoverDto
+import com.ssafy.model.member.MemberBackgroundDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.member.SearchMemberResponse
@@ -12,6 +13,7 @@ import com.ssafy.network.source.toFlow
 import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.flow.Flow
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
@@ -29,26 +31,7 @@ class MemberDataSourceImpl @Inject constructor(
         val key = "${memberId}/profile"
 
         memberUpdateRequestDto.profileImgUrl?.let { url ->
-            val file = File(url)
-
-            if (file.exists()) {
-                val bitmap = BitmapFactory.decodeFile(file.path)
-                val resizedBitmap = s3ImageUtil.rescaleBitmap(bitmap)
-                val rescaledFile = s3ImageUtil.bitmapToFile(resizedBitmap)
-                val rescaledKey = "${key}-${S3ImageUtil.MINI}"
-
-                s3ImageUtil.uploadFile(
-                    key = rescaledKey,
-                    file = rescaledFile,
-                    isImage = true
-                )
-
-                s3ImageUtil.uploadFile(
-                    key = key,
-                    file = file,
-                    isImage = true
-                )
-            }
+            uploadS3Image(url, key)
         }
 
         val newMemberRequestDto = if (!memberUpdateRequestDto.profileImgUrl.isNullOrBlank()) {
@@ -71,12 +54,41 @@ class MemberDataSourceImpl @Inject constructor(
     ): Flow<SearchMemberResponse> =
         safeApiCall { memberAPI.searchMembers(keyword, pageDto) }.toFlow()
 
-    override suspend fun createMemberBackground(background: CoverDto): Flow<Long> {
-        TODO("Not yet implemented")
+    override suspend fun createMemberBackground(
+        memberId: Long,
+        background: CoverDto
+    ): Flow<MemberBackgroundDto> {
+        val key = "${memberId}/background/${UUID.randomUUID()}"
+        if (background.imgPath.isNotBlank()) {
+            uploadS3Image(background.imgPath, key)
+        }
+        return safeApiCall { memberAPI.createMemberBackground(memberId, key) }.toFlow()
     }
 
-    override suspend fun deleteMemberBackground(id: Long): Flow<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun deleteMemberBackground(memberId: Long, backgroundId: Long): Flow<Unit> {
+        return safeApiCall { memberAPI.deleteMemberBackground(memberId, backgroundId) }.toFlow()
     }
 
+    private suspend fun uploadS3Image(url: String, key: String) {
+        val file = File(url)
+
+        if (file.exists()) {
+            val bitmap = BitmapFactory.decodeFile(file.path)
+            val resizedBitmap = s3ImageUtil.rescaleBitmap(bitmap)
+            val rescaledFile = s3ImageUtil.bitmapToFile(resizedBitmap)
+            val rescaledKey = "${key}-${S3ImageUtil.MINI}"
+
+            s3ImageUtil.uploadFile(
+                key = rescaledKey,
+                file = rescaledFile,
+                isImage = true
+            )
+
+            s3ImageUtil.uploadFile(
+                key = key,
+                file = file,
+                isImage = true
+            )
+        }
+    }
 }

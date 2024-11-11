@@ -8,7 +8,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
-import com.ssafy.splash.StartDirection
 import com.ssafy.board.board.Board
 import com.ssafy.board.board.boardScreen
 import com.ssafy.board.boardMenu.BoardMenu
@@ -19,7 +18,6 @@ import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
 import com.ssafy.board.search.BoardSearch
 import com.ssafy.board.search.boardSearchScreen
-import com.ssafy.board.updateboard.updateBoardScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.card.label.Label
@@ -48,7 +46,9 @@ import com.ssafy.model.background.Cover
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
+import com.ssafy.splash.StartDirection
 import com.ssafy.superboard.MainViewModel
+import com.ssafy.ui.safetype.coverType
 import com.ssafy.ui.uistate.ErrorScreen
 
 @Composable
@@ -133,24 +133,31 @@ fun SuperBoardNavHost(
             popBackToHome = navController::popBackStack
         )
 
-        updateBoardScreen(
-            popBackToHome = navController::popBackStack,
-            moveToSelectBackgroundScreen = { cover: Cover? ->
-                navController.navigate(SelectBackGround(cover))
-            }
-        )
+        // TODO : 현재는 보드 설정 화면에서 기능을 모두 수행합니다.
+//        updateBoardScreen(
+//            popBackToHome = navController::popBackStack,
+//            moveToSelectBackgroundScreen = { cover: Cover? ->
+//                navController.navigate(SelectBackGround(cover))
+//            }
+//        )
 
         boardMenuScreen(
             popBack = { navController.popBackStack() },
-            moveToSelectBackGroundScreen = { cover: Cover? ->
-                navController.navigate(SelectBackGround(cover))
+            moveToSelectBackGroundScreen = { cover: Cover?, boardId: Long? ->
+                navController.navigate(SelectBackGround(cover, boardId))
             },
-            moveToInviteMemberScreen = { boardId:Long ->
+            moveToInviteMemberScreen = { boardId: Long ->
                 navController.navigate(BoardInviteMember(boardId))
             }
         )
 
-        selectBackgroundScreen(popBack = { navController.popBackStack() })
+        selectBackgroundScreen(
+            popBack = { newCover: Cover? ->
+                val jsonCover = coverType.serializeAsValue(newCover)
+                navController.previousBackStackEntry?.savedStateHandle?.set(Cover.KEY, jsonCover)
+                navController.popBackStack()
+            }
+        )
 
         updateProfileScreen(backHomeScreen = { navController.popBackStack() })
 

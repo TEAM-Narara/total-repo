@@ -32,7 +32,15 @@ interface MemberRepository {
 
     suspend fun getAllMemberBackgrounds(): Flow<List<CoverDto>>
 
-    suspend fun createMemberBackground(background: CoverDto, isConnected: Boolean): Flow<Long>
+    suspend fun createMemberBackground(
+        memberId: Long,
+        background: CoverDto,
+        isConnected: Boolean
+    ): Flow<Long>
 
-    suspend fun deleteMemberBackground(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun deleteMemberBackground(
+        memberId: Long,
+        backgroundId: Long,
+        isConnected: Boolean
+    ): Flow<Unit>
 }

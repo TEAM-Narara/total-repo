@@ -9,9 +9,12 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-data class SelectBackGround(val cover: Cover? = null)
+data class SelectBackGround(
+    val cover: Cover? = null,
+    val boardId: Long? = null
+)
 
-fun NavGraphBuilder.selectBackgroundScreen(popBack: () -> Unit) {
+fun NavGraphBuilder.selectBackgroundScreen(popBack: (Cover?) -> Unit) {
     composable<SelectBackGround>(
         mapOf(typeOf<Cover?>() to coverType)
     ) { backStackEntry ->
@@ -19,7 +22,8 @@ fun NavGraphBuilder.selectBackgroundScreen(popBack: () -> Unit) {
 
         SelectBoardBackgroundScreen(
             onBackPressed = popBack,
-            selectedCover = selectBackground.cover
+            selectedCover = selectBackground.cover,
+            boardId = selectBackground.boardId
         )
     }
 }

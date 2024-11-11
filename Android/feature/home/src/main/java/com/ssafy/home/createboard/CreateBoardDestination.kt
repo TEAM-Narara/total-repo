@@ -21,11 +21,14 @@ fun NavGraphBuilder.createBoardScreen(
     composable<CreateBoard>(
         mapOf(typeOf<Cover?>() to coverType)
     ) { backStackEntry ->
+        val savedStateHandle = backStackEntry.savedStateHandle.get<String>(Cover.KEY)
         val createBoard: CreateBoard = backStackEntry.toRoute()
-        val cover = createBoard.cover ?: Cover(
-            CoverType.COLOR,
-            backgroundColorList[2].toColorString()
-        )
+        val defaultCover = Cover(CoverType.COLOR, backgroundColorList[2].toColorString())
+        val cover = createBoard.cover ?: if (savedStateHandle != null) {
+            coverType.parseValue(savedStateHandle) ?: defaultCover
+        } else {
+            defaultCover
+        }
 
         CreateBoardScreen(
             cover = cover,
