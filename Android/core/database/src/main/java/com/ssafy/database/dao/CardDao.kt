@@ -33,6 +33,16 @@ interface CardDao {
     """)
     fun getCardFlow(cardId: Long): Flow<CardEntity?>
 
+    // 카드들의 리스트ID 조회
+    @Query("""
+        SELECT * 
+        FROM card 
+        WHERE id IN (:cardIds) 
+            And isStatus != 'DELETE' 
+            And isArchived = 0
+    """)
+    fun getCardsToList(cardIds: List<Long>): Flow<List<CardEntity>>
+
     // 리스트 내에 카드들 조회
     @Query("""
         SELECT * 

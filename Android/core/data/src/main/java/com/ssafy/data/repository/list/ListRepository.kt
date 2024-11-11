@@ -54,4 +54,10 @@ interface ListRepository {
     suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmDTO>
 
     suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>>
+
+    suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
+                                                 keyword: String,
+                                                 memberIds: List<Long>,
+                                                 dateValue: List<Long>,
+                                                 cardLabelIds: List<Long>): Flow<List<ListInCard>>
 }

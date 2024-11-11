@@ -32,9 +32,7 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
-import com.ssafy.model.with.CardThumbnail
 import com.ssafy.model.with.DataStatus
-import com.ssafy.model.with.ListInCard
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -491,21 +489,20 @@ class CardRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLocalScreenMyRepresentativeCard(memberId: Long): Flow<List<BoardInMyRepresentativeCard>> {
-        return cardMemberDao.getRepresentativeCardMember(memberId).flatMapLatest { cardIds ->
-            if (cardIds.isEmpty()) {
+        return cardMemberDao.getRepresentativeCardMember(memberId).flatMapLatest { representativeCardIds ->
+            if (representativeCardIds.isEmpty()) {
                 flowOf(emptyList())
             } else {
-                cardDao.getCardsByIds(cardIds).flatMapLatest { cards ->
+                cardDao.getCardsToList(representativeCardIds).flatMapLatest { cards ->
                     val listIds = cards.map { it.listId }.distinct()
 
-                    listDao.getListsByIds(listIds).flatMapLatest { lists ->
+                    listDao.getAllListsToBoard(listIds).flatMapLatest { lists ->
                         val listIdToBoardId = lists.associate { it.id to it.boardId }
                         val boardIds = lists.map { it.boardId }.distinct()
 
-                        boardDao.getBoardsByIds(boardIds).flatMapLatest { boards ->
+                        boardDao.getAllBoards(boardIds).flatMapLatest { boards ->
                             val boardIdToBoard = boards.associateBy { it.id }
 
-                            // 추가 데이터 가져오기 (댓글 수, 카드 라벨 등)
                             val cardIds = cards.map { it.id }
 
                             combine(
@@ -531,13 +528,11 @@ class CardRepositoryImpl @Inject constructor(
                                     )
                                 }
 
-                                // 카드를 boardId로 그룹화
                                 val boardIdToCards = cardThumbnails.groupBy { thumbnail ->
                                     val listId = thumbnail.listId
                                     listIdToBoardId[listId] ?: -1L
                                 }
 
-                                // 최종 결과 생성
                                 boardIdToCards.mapNotNull { (boardId, thumbnails) ->
                                     val board = boardIdToBoard[boardId]
                                     if (board != null) {
@@ -552,9 +547,7 @@ class CardRepositoryImpl @Inject constructor(
                                             isStatus = board.isStatus,
                                             cards = thumbnails
                                         )
-                                    } else {
-                                        null
-                                    }
+                                    } else { null }
                                 }
                             }
                         }
