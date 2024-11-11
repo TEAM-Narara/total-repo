@@ -21,12 +21,16 @@ import kotlin.coroutines.resume
 import kotlin.math.sqrt
 
 @Singleton
-class ImageUtil @Inject constructor(
+class S3ImageUtil @Inject constructor(
     @ApplicationContext private val context: Context,
     private val transferUtility: TransferUtility,
     private val s3Client: AmazonS3Client
 ) {
     private val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+    val imageDirectory: File
+        get() = File(context.filesDir, "images").apply {
+            if (!exists()) mkdirs()
+        }
 
     suspend fun uploadFile(
         key: String,
@@ -78,7 +82,7 @@ class ImageUtil @Inject constructor(
 
     fun bitmapToFile(bitmap: Bitmap): File {
         val file = File(
-            context.cacheDir,
+            imageDirectory,
             "profile_${System.currentTimeMillis()}.jpg"
         )
 
@@ -92,7 +96,6 @@ class ImageUtil @Inject constructor(
 
 
     fun downloadFile(key: String): String {
-        val internalDir = context.filesDir
         val date = Date().apply {
             time += 1000 * 3600
         }
@@ -102,7 +105,7 @@ class ImageUtil @Inject constructor(
             .withExpiration(date)
 
         val url = s3Client.generatePresignedUrl(generatedUrlRequest).toString()
-        val file = File(internalDir, key.split("/").last())
+        val file = File(imageDirectory, key.split("/").last())
 
         URL(url).openStream().use { input ->
             FileOutputStream(file).use { output ->
@@ -115,5 +118,6 @@ class ImageUtil @Inject constructor(
 
     companion object {
         const val BUCKET_NAME = "superboard-bucket"
+        const val MINI = "mini"
     }
 }

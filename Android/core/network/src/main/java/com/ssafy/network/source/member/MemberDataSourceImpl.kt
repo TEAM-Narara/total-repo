@@ -9,14 +9,14 @@ import com.ssafy.model.user.User
 import com.ssafy.network.api.MemberAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
-import com.ssafy.network.util.ImageUtil
+import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 import javax.inject.Inject
 
 class MemberDataSourceImpl @Inject constructor(
     private val memberAPI: MemberAPI,
-    private val imageUtil: ImageUtil
+    private val s3ImageUtil: S3ImageUtil
 ) : MemberDataSource {
 
     override suspend fun getMembers(): Flow<User> =
@@ -27,27 +27,31 @@ class MemberDataSourceImpl @Inject constructor(
         memberUpdateRequestDto: MemberUpdateRequestDto
     ): Flow<Unit> {
         val key = "${memberId}/profile"
-        val file = File(memberUpdateRequestDto.profileImgUrl)
 
-        if (file.exists()) {
-            val bitmap = BitmapFactory.decodeFile(file.path)
-            val resizedBitmap = imageUtil.rescaleBitmap(bitmap)
-            val rescaledFile = imageUtil.bitmapToFile(resizedBitmap)
+        memberUpdateRequestDto.profileImgUrl?.let { url ->
+            val file = File(url)
 
-            imageUtil.uploadFile(
-                key = "${key}-mini",
-                file = rescaledFile,
-                isImage = true
-            )
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.path)
+                val resizedBitmap = s3ImageUtil.rescaleBitmap(bitmap)
+                val rescaledFile = s3ImageUtil.bitmapToFile(resizedBitmap)
+                val rescaledKey = "${key}-${S3ImageUtil.MINI}"
 
-            imageUtil.uploadFile(
-                key = key,
-                file = file,
-                isImage = true
-            )
+                s3ImageUtil.uploadFile(
+                    key = rescaledKey,
+                    file = rescaledFile,
+                    isImage = true
+                )
+
+                s3ImageUtil.uploadFile(
+                    key = key,
+                    file = file,
+                    isImage = true
+                )
+            }
         }
 
-        val newMemberRequestDto = if (memberUpdateRequestDto.profileImgUrl.isNotBlank()) {
+        val newMemberRequestDto = if (!memberUpdateRequestDto.profileImgUrl.isNullOrBlank()) {
             memberUpdateRequestDto.copy(profileImgUrl = key)
         } else {
             memberUpdateRequestDto
@@ -56,7 +60,7 @@ class MemberDataSourceImpl @Inject constructor(
         return safeApiCall {
             memberAPI.updateMember(
                 newMemberRequestDto.nickname,
-                newMemberRequestDto.profileImgUrl
+                newMemberRequestDto.profileImgUrl ?: ""
             )
         }.toFlow()
     }

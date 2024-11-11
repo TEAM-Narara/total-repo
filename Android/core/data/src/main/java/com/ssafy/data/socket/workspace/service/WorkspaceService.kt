@@ -54,14 +54,15 @@ class WorkspaceService @Inject constructor(
         val dto = gson.fromJson(data, AddWorkspaceMemberDto::class.java)
 
         memberDao.getMember(dto.memberId)?.let {
-            memberDao.insertMember(
-                MemberEntity(
+            imageStorage.saveAll(dto.profileImgUrl) { path ->
+                val memberEntity = MemberEntity(
                     id = dto.memberId,
                     nickname = dto.memberName,
                     email = dto.memberEmail,
-                    profileImageUrl = dto.profileImgUrl?.let { imageStorage.save(it) },
+                    profileImageUrl = path,
                 )
-            )
+                memberDao.insertMember(memberEntity)
+            }
         }
 
         workspaceMemberDao.insertWorkspaceMember(
@@ -95,23 +96,27 @@ class WorkspaceService @Inject constructor(
     suspend fun addBoard(data: JsonObject) {
         val dto = gson.fromJson(data, AddWorkspaceBoardRequestDto::class.java)
 
-        val coverValue = if (dto.coverType == "IMAGE") {
-            dto.coverValue?.let { imageStorage.save(it) }
-        } else {
-            dto.coverValue
+        val insertBoard: suspend (String?) -> Unit = { coverValue ->
+            boardDao.insertBoard(
+                BoardEntity(
+                    id = dto.boardId,
+                    workspaceId = dto.workspaceId,
+                    name = dto.boardName,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    visibility = dto.visibility,
+                    isClosed = dto.isClosed,
+                )
+            )
         }
 
-        boardDao.insertBoard(
-            BoardEntity(
-                id = dto.boardId,
-                workspaceId = dto.workspaceId,
-                name = dto.boardName,
-                coverType = dto.coverType,
-                coverValue = coverValue,
-                visibility = dto.visibility,
-                isClosed = dto.isClosed,
-            )
-        )
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                insertBoard(path)
+            }
+        } else {
+            insertBoard(dto.coverValue)
+        }
     }
 
     suspend fun editBoard(data: JsonObject) {
@@ -122,23 +127,27 @@ class WorkspaceService @Inject constructor(
             before.coverValue?.let { imageStorage.delete(it) }
         }
 
-        val coverValue = if (dto.coverType == "IMAGE") {
-            dto.coverValue?.let { imageStorage.save(it) }
-        } else {
-            dto.coverValue
+        val updateBoard: suspend (String?) -> Unit = { coverValue ->
+            boardDao.updateBoard(
+                before.copy(
+                    name = dto.boardName,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    visibility = dto.visibility,
+                    isClosed = dto.isClosed,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                )
+            )
         }
 
-        boardDao.updateBoard(
-            before.copy(
-                name = dto.boardName,
-                coverType = dto.coverType,
-                coverValue = coverValue,
-                visibility = dto.visibility,
-                isClosed = dto.isClosed,
-                isStatus = DataStatus.STAY,
-                columnUpdate = 0,
-            )
-        )
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                updateBoard(path)
+            }
+        } else {
+            updateBoard(dto.coverValue)
+        }
     }
 
     suspend fun deleteBoard(data: JsonObject) {

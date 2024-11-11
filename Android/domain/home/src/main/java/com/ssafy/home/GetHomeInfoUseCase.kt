@@ -1,6 +1,7 @@
 package com.ssafy.home
 
 import com.ssafy.data.repository.board.BoardRepository
+import com.ssafy.data.repository.member.MemberRepository
 import com.ssafy.data.repository.workspace.WorkspaceRepository
 import com.ssafy.data.socket.workspace.WorkspaceStomp
 import com.ssafy.datastore.DataStoreRepository
@@ -19,14 +20,19 @@ class GetHomeInfoUseCase @Inject constructor(
     private val workspaceRepository: WorkspaceRepository,
     private val boardRepository: BoardRepository,
     private val workspaceStomp: WorkspaceStomp,
+    private val memberRepository: MemberRepository,
 ) {
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend operator fun invoke(isConnected: Boolean, workspaceId: Long?): Flow<HomeData> {
         val user = dataStoreRepository.getUser()
 
-        return workspaceRepository.getWorkspaceList(isConnected).flatMapLatest { workspaceList ->
+        return combine(
+            memberRepository.getMember(user.memberId),
+            workspaceRepository.getWorkspaceList(isConnected)
+        ) { member, workspaceList ->
+            member to workspaceList
+        }.flatMapLatest { (member, workspaceList) ->
             val selectedWorkSpace = if (workspaceId == null) {
                 workspaceList.firstOrNull()
             } else {
@@ -35,23 +41,25 @@ class GetHomeInfoUseCase @Inject constructor(
 
             val selectedWorkspaceFlow =
                 selectedWorkSpace?.let { workspace ->
-                    boardRepository.getBoardsByWorkspace(workspace.workspaceId).map { boardList ->
-                        SelectedWorkSpace(
-                            workspaceId = workspace.workspaceId,
-                            workspaceName = workspace.name,
-                            boards = boardList
-                        )
-                    }
+                    boardRepository.getBoardsByWorkspace(workspace.workspaceId)
+                        .map { boardList ->
+                            SelectedWorkSpace(
+                                workspaceId = workspace.workspaceId,
+                                workspaceName = workspace.name,
+                                boards = boardList
+                            )
+                        }
                 } ?: flowOf(SelectedWorkSpace())
 
             selectedWorkspaceFlow.map { selectedWorkspace ->
                 workspaceStomp.connect(selectedWorkspace.workspaceId)
                 HomeData(
-                    user = user,
+                    user = member ?: user,
                     workspaceList = workspaceList,
                     selectedWorkSpace = selectedWorkspace
                 )
             }
+
         }
     }
 

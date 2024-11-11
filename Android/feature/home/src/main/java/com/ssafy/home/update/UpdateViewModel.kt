@@ -43,7 +43,7 @@ class UpdateViewModel @Inject constructor(
         )
 
         withSocketState { isConnected ->
-            updateMemberUseCase(memberDto, isConnected).safeCollect()
+                updateMemberUseCase(memberDto, isConnected).safeCollect()
         }
     }
 }

@@ -4,11 +4,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dto.piece.toEntity
+import com.ssafy.data.image.ImageStorage
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
 import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.piece.toDTO
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.background.CoverDto
 import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.user.User
@@ -29,20 +30,23 @@ class MemberRepositoryImpl @Inject constructor(
     private val memberDataSource: MemberDataSource,
     private val memberDao: MemberDao,
     private val memberBackgroundDao: MemberBackgroundDao,
+    private val imageStorage: ImageStorage,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
     override suspend fun addMember(user: User): Flow<Long> = withContext(ioDispatcher) {
-        flowOf(
+        val userId = user.memberId
+        imageStorage.saveAll(user.profileImgUrl) { path ->
             memberDao.insertMember(
                 MemberEntity(
                     id = user.memberId,
                     email = user.email,
                     nickname = user.nickname,
-                    profileImageUrl = user.profileImgUrl ?: ""
+                    profileImageUrl = path
                 )
             )
-        )
+        }
+        flowOf(userId)
     }
 
     override suspend fun getMember(memberId: Long): Flow<User?> =

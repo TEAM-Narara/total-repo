@@ -34,14 +34,16 @@ class BoardService @Inject constructor(
         val dto = gson.fromJson(data, AddBoardMemberRequestDto::class.java)
 
         memberDao.getMember(dto.memberId)?.let {
-            memberDao.insertMember(
-                MemberEntity(
-                    id = dto.memberId,
-                    nickname = dto.memberName,
-                    email = dto.memberEmail,
-                    profileImageUrl = dto.profileImgUrl?.let { imageStorage.save(it) },
+            imageStorage.saveAll(key = dto.profileImgUrl) { path ->
+                memberDao.insertMember(
+                    MemberEntity(
+                        id = dto.memberId,
+                        nickname = dto.memberName,
+                        email = dto.memberEmail,
+                        profileImageUrl = path,
+                    )
                 )
-            )
+            }
         }
 
         boardMemberDao.insertBoardMember(

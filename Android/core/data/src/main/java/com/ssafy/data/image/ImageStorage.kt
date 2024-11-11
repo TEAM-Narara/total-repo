@@ -1,53 +1,44 @@
 package com.ssafy.data.image
 
-import android.content.Context
 import com.ssafy.data.di.IoDispatcher
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ImageStorage @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val context: Context
+    private val s3ImageUtil: S3ImageUtil,
 ) {
-    private val imageDirectory: File
-        get() = File(context.filesDir, "images").apply {
-            if (!exists()) mkdirs()
-        }
 
-    suspend fun save(
-        imageUrl: String,
-        fileName: String = "IMG_${getTimeStamp()}.jpg"
-    ): String = withContext(ioDispatcher) {
-        val file = File(imageDirectory, fileName)
+    suspend fun saveAll(key: String?, onDoAction: suspend (String?) -> Unit) =
+        withContext(ioDispatcher) {
+            if (key.isNullOrBlank()) {
+                onDoAction(null)
+                return@withContext
+            }
 
-        URL(imageUrl).openStream().use { input ->
-            FileOutputStream(file).use { output ->
-                input.copyTo(output)
+            listOf(
+                async { save("${key}-${S3ImageUtil.MINI}") },
+                async { save(key) }
+            ).forEach { deferred ->
+                onDoAction(deferred.await())
             }
         }
 
-        file.absolutePath
-    }
+    private fun save(key: String): String = s3ImageUtil.downloadFile(key)
 
     fun get(path: String): File? = File(path).takeIf { it.exists() && it.isFile }
 
-    fun getAll(): List<File> = imageDirectory.listFiles()?.filter { it.isFile } ?: emptyList()
+    fun getAll(): List<File> =
+        s3ImageUtil.imageDirectory.listFiles()?.filter { it.isFile } ?: emptyList()
 
     fun delete(path: String): Boolean = File(path).delete()
 
-    fun deleteAllImages(): Boolean = imageDirectory.deleteRecursively()
+    fun deleteAllImages(): Boolean = s3ImageUtil.imageDirectory.deleteRecursively()
 
-    private fun getTimeStamp(): String {
-        return SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    }
 }

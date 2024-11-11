@@ -21,20 +21,23 @@ class AttachmentService @Inject constructor(
     suspend fun addCardAttachment(data: JsonObject) {
         val dto = gson.fromJson(data, AddCardAttachmentRequestDto::class.java)
 
-        attachmentDao.insertAttachment(
-            AttachmentEntity(
-                id = dto.attachmentId,
-                cardId = dto.cardId,
-                url = imageStorage.save(dto.imgURL),
-                type = dto.type,
-                isCover = dto.isCover,
+        imageStorage.saveAll(key = dto.imgURL) { path ->
+            attachmentDao.insertAttachment(
+                AttachmentEntity(
+                    id = dto.attachmentId,
+                    cardId = dto.cardId,
+                    url = path ?: "",
+                    type = dto.type,
+                    isCover = dto.isCover,
+                )
             )
-        )
+        }
     }
 
     suspend fun deleteCardAttachment(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardAttachmentRequestDto::class.java)
-        val before = attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
+        val before =
+            attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
 
         imageStorage.delete(before.url)
 
@@ -43,7 +46,8 @@ class AttachmentService @Inject constructor(
 
     suspend fun editCardAttachmentCover(data: JsonObject) {
         val dto = gson.fromJson(data, EditCardAttachmentCoverRequestDto::class.java)
-        val before = attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
+        val before =
+            attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
         attachmentDao.updateAttachment(
             before.copy(
                 isCover = dto.isCover,
