@@ -153,15 +153,10 @@ public class Card extends BaseTimeEntity implements Identifiable {
     }
 
     private void updateName(String updateName) {
-        //null로 보내면 수정 x
-        if (updateName == null) {
+        //null로 보내거나 빈 값이면 수정 x
+        if (updateName == null || updateName.isBlank() || updateName.isEmpty()) {
             return;
         }
-
-//        //blank면 에러?
-//        if (updateName.isBlank()) {
-//            throw new IllegalArgumentException("name이 공백이면 안됩니다");
-//        }
 
         this.name = updateName;
     }
