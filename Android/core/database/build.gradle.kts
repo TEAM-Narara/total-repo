@@ -55,5 +55,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson)
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
 }

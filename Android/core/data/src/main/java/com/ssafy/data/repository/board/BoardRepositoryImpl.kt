@@ -1,14 +1,12 @@
 package com.ssafy.data.repository.board
 
-import android.util.Log
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
-import com.ssafy.database.dto.piece.bitmaskColumn
-import com.ssafy.database.dto.piece.getBitmaskDto
+import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
@@ -16,6 +14,7 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.database.dto.bitmask.getNullColumnBoard
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
@@ -114,6 +113,7 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.updateBoard(id, updateBoardRequestDto)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
                     val newBoard = board.copy(
                         name = updateBoardRequestDto.name,
                         coverType = updateBoardRequestDto.cover.type.name,
@@ -121,10 +121,7 @@ class BoardRepositoryImpl @Inject constructor(
                         visibility = updateBoardRequestDto.visibility.name)
                     val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
 
-                    Log.d("TAG", "updateBoard1: $newBoard")
-                    Log.d("TAG", "updateBoard2: $newBit")
-//                    val updateBoard = getBitmaskDto(newBit, newBoard)
-//                    Log.d("TAG", "updateBoard3: $updateBoard")
+                    val nextBoard = getNullColumnBoard(newBit, newBoard)
 
                     val result = when(board.isStatus) {
                         DataStatus.STAY, DataStatus.UPDATE ->

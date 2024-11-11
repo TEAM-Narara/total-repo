@@ -1,5 +1,15 @@
-package com.ssafy.database.dto.piece
+package com.ssafy.database.dto.bitmask
 
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.piece.toArchiveBitDto
+import com.ssafy.database.dto.piece.toBitArchiveDto
+import com.ssafy.database.dto.piece.toBitDto
+import com.ssafy.database.dto.piece.toBitOrderDto
+import com.ssafy.database.dto.piece.toListIdBitDto
+import com.ssafy.database.dto.piece.toOrderBitDto
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
@@ -9,6 +19,8 @@ import kotlin.reflect.full.memberProperties
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class BitPosition(val position: Int)
+
+// TODO 특정 컬럼의 비트가 켜져있는지 확인
 
 // 바뀐 컬럼 비트 켜기
 fun <T : Any> bitmaskColumn(prevBit: Long, dto1: T, dto2: T): Long {
@@ -96,4 +108,90 @@ fun <T : Any> getBitmaskDto(columnUpdate: Long, dto: T): T {
     val newDto = copyFunction.callBy(args) as T
 
     return newDto
+}
+
+// 변경 정보를 가진 비트, 기존 정보를 가진 Entity를 매개변수로 받는다
+
+// BOARD
+fun getNullColumnBoard(bitmask: Long, boardEntity: BoardEntity): UpdateBoardBitmaskDTO {
+    val board = boardEntity.toBitDto()
+
+    val updateBoard = getBitmaskDto(bitmask, board)
+
+    return updateBoard
+}
+
+fun getNullColumnBoardArchive(bitmask: Long, boardEntity: BoardEntity): UpdateBoardArchiveBitmaskDTO {
+    val boardArchive = boardEntity.toBitArchiveDto()
+
+    val updateBoardArchive = getBitmaskDto(bitmask, boardArchive)
+
+    return updateBoardArchive
+}
+
+// LIST
+fun getNullColumnList(bitmask: Long, listEntity: ListEntity): UpdateListBitmaskDTO {
+    val list = listEntity.toBitDto()
+
+    val updateList = getBitmaskDto(bitmask, list)
+
+    return updateList
+}
+
+fun getNullColumnListOrder(bitmask: Long, listEntity: ListEntity): UpdateListOrderBitmaskDTO {
+    val listOrder = listEntity.toBitOrderDto()
+
+    val updateListOrder = getBitmaskDto(bitmask, listOrder)
+
+    return updateListOrder
+}
+
+fun getNullColumnListArchive(bitmask: Long, listEntity: ListEntity): UpdateListArchiveBitmaskDTO {
+    val listArchive = listEntity.toBitArchiveDto()
+
+    val updateListArchive = getBitmaskDto(bitmask, listArchive)
+
+    return updateListArchive
+}
+
+// CARD
+fun getNullColumnCard(bitmask: Long, cardEntity: CardEntity): UpdateCardBitmaskDTO {
+    val card = cardEntity.toBitDto()
+
+    val updateCard = getBitmaskDto(bitmask, card)
+
+    return updateCard
+}
+
+fun getNullColumnCardToListId(bitmask: Long, cardEntity: CardEntity): UpdateCardListIdBitmaskDTO {
+    val cardToListId = cardEntity.toListIdBitDto()
+
+    val updateCardToListId = getBitmaskDto(bitmask, cardToListId)
+
+    return updateCardToListId
+}
+
+fun getNullColumnCardOrder(bitmask: Long, cardEntity: CardEntity): UpdateCardOrderBitmaskDTO {
+    val cardOrder = cardEntity.toOrderBitDto()
+
+    val updateCardOrder = getBitmaskDto(bitmask, cardOrder)
+
+    return updateCardOrder
+}
+
+fun getNullColumnCardArchive(bitmask: Long, cardEntity: CardEntity): UpdateCardArchiveBitmaskDTO {
+    val cardArchive = cardEntity.toArchiveBitDto()
+
+    val updateCardArchive = getBitmaskDto(bitmask, cardArchive)
+
+    return updateCardArchive
+}
+
+// LABEL
+fun getNullColumnLabel(bitmask: Long, labelEntity: LabelEntity): UpdateLabelBitmaskDTO {
+    val label = labelEntity.toBitDto()
+
+    val updateLabel = getBitmaskDto(bitmask, label)
+
+    return updateLabel
 }

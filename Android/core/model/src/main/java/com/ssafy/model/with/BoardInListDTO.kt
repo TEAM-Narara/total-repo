@@ -12,7 +12,6 @@ data class BoardInListDTO(
     val isClosed: Boolean,
 
     @Transient val isStatus: DataStatus = DataStatus.STAY,
-    @Transient val columnUpdate: Long = 0L,
 
     val lists: List<ListInCardsDTO>,
     val labels: List<LabelDTO> = emptyList(),
