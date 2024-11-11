@@ -2,6 +2,7 @@ package com.narara.superboard.list.interfaces;
 
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.member.entity.Member;
@@ -25,13 +26,14 @@ public interface ListAPI {
     ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getArchivedList(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
 
     @PatchMapping("/{listId}/move/top")
-    ResponseEntity<DefaultResponse<Void>> moveListToTop(@PathVariable Long listId);
+    ResponseEntity<DefaultResponse<ListMoveResult>> moveListToTop(@AuthenticationPrincipal Member member, @PathVariable Long listId);
 
     @PatchMapping("/{listId}/move/bottom")
-    ResponseEntity<DefaultResponse<Void>> moveListToBottom(@PathVariable Long listId);
+    ResponseEntity<DefaultResponse<ListMoveResult>> moveListToBottom(@AuthenticationPrincipal Member member, @PathVariable Long listId);
 
     @PatchMapping("/{listId}/move/between")
-    ResponseEntity<DefaultResponse<Void>> moveListBetween(
+    ResponseEntity<DefaultResponse<ListMoveResult>> moveListBetween(
+            @AuthenticationPrincipal Member member,
             @PathVariable Long listId,
             @RequestParam Long previousListId,
             @RequestParam Long nextListId

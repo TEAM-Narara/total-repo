@@ -13,4 +13,8 @@ public interface ListRepository extends JpaRepository<List, Long> {
 
     Optional<List> findFirstByBoardOrderByMyOrderAsc(Board board);
     Optional<List> findFirstByBoardOrderByMyOrderDesc(Board board);
+
+    Boolean existsByBoardAndMyOrder(Board board, Long myOrder);
+
+    java.util.List<List> findAllByBoardOrderByMyOrderAsc(Board board);
 }

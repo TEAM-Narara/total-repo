@@ -19,7 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "list")
+@Table(name = "list", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"board_id", "myOrder"})
+})
 public class List extends BaseTimeEntity implements Identifiable {
 
     @Id

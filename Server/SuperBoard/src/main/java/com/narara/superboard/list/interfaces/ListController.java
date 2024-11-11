@@ -5,6 +5,7 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.list.service.ListMoveService;
@@ -67,26 +68,27 @@ public class ListController implements ListAPI {
 
     @Override
     @Operation(summary = "리스트를 맨 위로 이동", description = "지정된 리스트를 보드의 맨 위로 이동시킵니다.")
-    public ResponseEntity<DefaultResponse<Void>> moveListToTop(@PathVariable Long listId) {
-        listMoveService.moveListToTop(listId);
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_TOP_SUCCESS));
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToTop(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
+        ListMoveResult result = listMoveService.moveListToTop(member, listId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_TOP_SUCCESS, result), HttpStatus.OK);
     }
 
     @Override
     @Operation(summary = "리스트를 맨 아래로 이동", description = "지정된 리스트를 보드의 맨 아래로 이동시킵니다.")
-    public ResponseEntity<DefaultResponse<Void>> moveListToBottom(@PathVariable Long listId) {
-        listMoveService.moveListToBottom(listId);
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BOTTOM_SUCCESS));
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToBottom(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
+        ListMoveResult result = listMoveService.moveListToBottom(member, listId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BOTTOM_SUCCESS, result), HttpStatus.OK);
     }
 
     @Override
     @Operation(summary = "리스트를 특정 위치(다른 리스트 사이)로 이동", description = "지정된 리스트를 두 리스트 사이의 위치로 이동시킵니다.")
-    public ResponseEntity<DefaultResponse<Void>> moveListBetween(
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListBetween(
+            @AuthenticationPrincipal Member member,
             @PathVariable Long listId,
             @RequestParam Long previousListId,
             @RequestParam Long nextListId
     ) {
-        listMoveService.moveListBetween(listId, previousListId, nextListId);
-        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS));
+        ListMoveResult result = listMoveService.moveListBetween(member, listId, previousListId, nextListId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
     }
 }
