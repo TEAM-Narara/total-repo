@@ -26,6 +26,14 @@ interface CardLabelDao {
     @Query("""
         SELECT * 
         FROM card_label 
+        WHERE cardId = :cardId and labelId = :labelId
+    """)
+    fun getCardLabelByCardIdAndLabelId(cardId: Long, labelId: Long): CardLabelEntity?
+
+    // 카드 라벨 단일 조회
+    @Query("""
+        SELECT * 
+        FROM card_label 
         WHERE id = :id
     """)
     fun getLabelFlow(id: Long): Flow<CardLabelEntity?>
@@ -47,7 +55,7 @@ interface CardLabelDao {
             label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
-        WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE'
+        WHERE card_label.cardId = :cardId AND card_label.isStatus != 'DELETE' AND card_label.isActivated
     """)
     fun getAllCardLabelsInCard(cardId: Long): Flow<List<CardLabelWithLabelInfo>>
 
@@ -68,7 +76,7 @@ interface CardLabelDao {
             label.columnUpdate as label_columnUpdate
         FROM card_label
         INNER JOIN label ON label.id = card_label.labelId
-        WHERE card_label.cardId IN (:cardIds) AND card_label.isStatus != 'DELETE'
+        WHERE card_label.cardId IN (:cardIds) AND card_label.isStatus != 'DELETE' AND card_label.isActivated
     """)
     fun getAllCardLabelsInCards(cardIds: List<Long>): Flow<List<CardLabelWithLabelInfo>>
 

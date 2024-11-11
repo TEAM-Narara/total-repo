@@ -193,10 +193,10 @@ fun BoardMemberAlarmEntity.toDTO(): BoardMemberAlarmDTO {
 // LABEL
 fun LabelEntity.toDTO(): LabelDTO {
     return LabelDTO(
-        id = this.id,
+        labelId = this.id,
         boardId = this.boardId,
-        name = this.name,
-        color = this.color,
+        labelName = this.name,
+        labelColor = this.color,
         isStatus = this.isStatus
     )
 }
@@ -377,7 +377,7 @@ fun CardMemberAlarmEntity.toDTO(): CardMemberAlarmDTO {
 
 fun CardLabelEntity.toDTO(): CardLabelDTO {
     return CardLabelDTO(
-        id = this.id,
+        cardLabelId = this.id,
         labelId = this.labelId,
         cardId = this.cardId,
         isActivated = this.isActivated,

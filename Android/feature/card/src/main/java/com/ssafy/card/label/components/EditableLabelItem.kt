@@ -61,7 +61,7 @@ fun EditableLabelItem(
     onEditLabel: () -> Unit,
     onDeleteLabel: () -> Unit,
 ) {
-    var isSelected by remember { mutableStateOf(selected) }
+    var isSelected by remember(selected) { mutableStateOf(selected) }
 
     Row(
         modifier = modifier,
@@ -78,7 +78,7 @@ fun EditableLabelItem(
                 )
                 .clickable {
                     isSelected = !isSelected
-                    onLabelClicked(!isSelected)
+                    onLabelClicked(isSelected)
                 }
                 .padding(PaddingSmall),
         ) {

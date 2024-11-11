@@ -18,11 +18,11 @@ class GetLabelListWithCardLabelUseCase @Inject constructor(
         ) { labels, cardLabels ->
             labels.map { label ->
                 LabelWithCardLabelDTO(
-                    labelId = label.id,
+                    labelId = label.labelId,
                     boardId = label.boardId,
-                    labelName = label.name,
-                    labelColor = label.color,
-                    isActivated = cardLabels.firstOrNull { it.labelId == label.id }?.isActivated ?: false
+                    labelName = label.labelName,
+                    labelColor = label.labelColor,
+                    isActivated = cardLabels.firstOrNull { it.labelId == label.labelId }?.isActivated ?: false
                 )
             }
         }

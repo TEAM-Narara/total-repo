@@ -8,6 +8,7 @@ import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.piece.LocalTable
@@ -16,10 +17,11 @@ import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.label.CreateCardLabelRequestDto
+import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
@@ -343,42 +345,48 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDto() } }
         }
 
+    override suspend fun getCardLabel(cardId: Long, labelId: Long): CardLabelDTO? = withContext(ioDispatcher) {
+        cardLabelDao.getCardLabelByCardIdAndLabelId(cardId, labelId)?.toDTO()
+    }
+
     override suspend fun createCardLabel(
-        cardLabel: CardLabelDTO,
+        createCardLabelRequestDto: CreateCardLabelRequestDto,
         isConnected: Boolean
     ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                // TODO
-                cardDataSource.createCardLabel(cardLabel).map { 5 }
+                cardDataSource.createCardLabel(createCardLabelRequestDto).map { it.cardLabelId }
             } else {
                 flowOf(
                     cardLabelDao.insertCardLabel(
-                        cardLabel.copy(isStatus = DataStatus.CREATE).toEntity()
+                        CardLabelEntity(
+                            labelId = createCardLabelRequestDto.labelId,
+                            cardId = createCardLabelRequestDto.cardId,
+                        )
                     )
                 )
             }
         }
 
     override suspend fun updateCardLabel(
-        id: Long,
-        cardLabelUpdateDto: CardLabelUpdateDto,
+        updateCardLabelActivateRequestDto: UpdateCardLabelActivateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> =
         withContext(ioDispatcher) {
-            val cardLabel = cardLabelDao.getCardLabel(id)
+            val cardLabel = cardLabelDao.getCardLabelByCardIdAndLabelId(
+                updateCardLabelActivateRequestDto.cardId,
+                updateCardLabelActivateRequestDto.labelId
+            )
 
             if (cardLabel != null) {
                 if (isConnected) {
-                    cardDataSource.updateCardLabel(id, cardLabelUpdateDto)
+                    cardDataSource.updateCardLabel(updateCardLabelActivateRequestDto).map { Unit }
                 } else {
                     val result = when (cardLabel.isStatus) {
                         DataStatus.STAY ->
                             cardLabelDao.updateCardLabel(
                                 cardLabel.copy(
-                                    labelId = cardLabelUpdateDto.labelId,
-                                    cardId = cardLabelUpdateDto.cardId,
-                                    isActivated = cardLabelUpdateDto.isActivated,
+                                    isActivated = !cardLabel.isActivated,
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
@@ -386,9 +394,7 @@ class CardRepositoryImpl @Inject constructor(
                         DataStatus.CREATE, DataStatus.UPDATE ->
                             cardLabelDao.updateCardLabel(
                                 cardLabel.copy(
-                                    labelId = cardLabelUpdateDto.labelId,
-                                    cardId = cardLabelUpdateDto.cardId,
-                                    isActivated = cardLabelUpdateDto.isActivated,
+                                    isActivated = !cardLabel.isActivated,
                                 )
                             )
 

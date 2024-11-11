@@ -128,13 +128,19 @@ class CardService @Inject constructor(
                 id = dto.cardLabelId,
                 labelId = dto.labelId,
                 cardId = dto.cardId,
-                isActivated = dto.isActivated
             )
         )
     }
 
     suspend fun deleteCardLabel(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardLabelRequestDto::class.java)
-        cardLabelDao.deleteCardLabelById(dto.cardLabelId)
+        val before = cardLabelDao.getCardLabelByCardIdAndLabelId(dto.cardId, dto.labelId)
+            ?: throw Exception("존재하지 않는 카드 라벨 입니다.")
+        cardLabelDao.updateCardLabel(
+            before.copy(
+                isActivated = false,
+                isStatus = DataStatus.STAY,
+            )
+        )
     }
 }

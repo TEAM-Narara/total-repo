@@ -1,17 +1,17 @@
 package com.ssafy.board
 
 import com.ssafy.data.repository.board.BoardRepository
-import com.ssafy.model.label.CreateLabelRequestDto
+import com.ssafy.model.label.UpdateLabelRequestDto
 import javax.inject.Inject
 
-class CreateLabelUseCase @Inject constructor(
+class UpdateLabelUseCase @Inject constructor(
     val boardRepository: BoardRepository
 ) {
     suspend operator fun invoke(
         boardId: Long,
-        createLabelRequestDto: CreateLabelRequestDto,
+        updateLabelRequestDto: UpdateLabelRequestDto,
         isConnected: Boolean
     ) {
-        boardRepository.createLabel(boardId, createLabelRequestDto, isConnected)
+        boardRepository.updateLabel(boardId, updateLabelRequestDto, isConnected)
     }
 }

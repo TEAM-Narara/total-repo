@@ -1,14 +1,16 @@
 package com.ssafy.card.label
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.viewModelScope
 import com.ssafy.board.CreateLabelUseCase
+import com.ssafy.board.DeleteLabelUseCase
+import com.ssafy.board.UpdateLabelUseCase
 import com.ssafy.card.GetLabelListWithCardLabelUseCase
+import com.ssafy.card.UpdateCardLabelUseCase
 import com.ssafy.card.label.data.LabelData
 import com.ssafy.card.label.data.toLabelData
-import com.ssafy.designsystem.values.backgroundColorList
-import com.ssafy.model.label.LabelDTO
+import com.ssafy.model.label.CreateLabelRequestDto
+import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +19,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,12 +30,17 @@ import javax.inject.Inject
 class LabelViewModel @Inject constructor(
     getLabelListWithCardLabelUseCase: GetLabelListWithCardLabelUseCase,
     private val createLabelUseCase: CreateLabelUseCase,
+    private val updateLabelUseCase: UpdateLabelUseCase,
+    private val deleteLabelUseCase: DeleteLabelUseCase,
+    private val updateCardLabelUseCase: UpdateCardLabelUseCase,
 ) : BaseViewModel() {
+    private var boardId: Long = 110L
+
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
 
     val labelList: StateFlow<List<LabelData>?> = _cardId.filterNotNull().flatMapLatest { cardId ->
-        getLabelListWithCardLabelUseCase(boardId = 0, cardId = cardId).map { labels ->
+        getLabelListWithCardLabelUseCase(boardId = boardId, cardId = cardId).map { labels ->
             labels?.map { it.toLabelData() }
         }
     }.stateIn(
@@ -44,9 +50,43 @@ class LabelViewModel @Inject constructor(
     )
 
     fun createLabel(color: Color, description: String) = viewModelScope.launch {
-//        createLabelUseCase()
+        withSocketState { isConnected ->
+            createLabelUseCase(
+                boardId = boardId,
+                createLabelRequestDto = CreateLabelRequestDto(
+                    color = color.toLong(),
+                    name = description
+                ),
+                isConnected = isConnected
+            )
+        }
     }
-    fun updateLabel(id: Long, color: Color, description: String) {}
-    fun deleteLabel(id: Long) {}
-    fun selectLabel(id: Long, isSelected: Boolean) {}
+
+    private fun Color.toLong() = (value shr 32).toLong()
+
+    fun updateLabel(id: Long, color: Color, description: String) = viewModelScope.launch {
+        withSocketState { isConnected ->
+            updateLabelUseCase(
+                boardId = id,
+                updateLabelRequestDto = UpdateLabelRequestDto(
+                    color = color.toLong(),
+                    name = description,
+                ),
+                isConnected = isConnected,
+            )
+        }
+    }
+
+    fun deleteLabel(id: Long) = viewModelScope.launch {
+        withSocketState { isConnected ->
+            deleteLabelUseCase(id, isConnected)
+        }
+    }
+
+    fun selectLabel(id: Long, isSelected: Boolean) = viewModelScope.launch {
+        val cardId = _cardId.value ?: return@launch
+        withSocketState { isConnected ->
+            updateCardLabelUseCase(cardId = cardId, labelId = id, isActivated = isSelected, isConnected = isConnected)
+        }
+    }
 }

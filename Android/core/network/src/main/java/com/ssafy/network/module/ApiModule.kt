@@ -3,8 +3,10 @@ package com.ssafy.network.module
 import com.ssafy.network.api.AuthAPI
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.api.CardAPI
+import com.ssafy.network.api.CardLabelAPI
 import com.ssafy.network.api.CommentAPI
 import com.ssafy.network.api.GitHubAPI
+import com.ssafy.network.api.LabelAPI
 import com.ssafy.network.api.ListAPI
 import com.ssafy.network.api.MemberAPI
 import com.ssafy.network.api.UserAPI
@@ -56,5 +58,13 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideListAPI(@UserRetrofit retrofit: Retrofit): ListAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideLabelAPI(@UserRetrofit retrofit: Retrofit): LabelAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideCardLabelAPI(@UserRetrofit retrofit: Retrofit): CardLabelAPI = retrofit.create()
 
 }
