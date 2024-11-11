@@ -16,10 +16,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -42,16 +42,18 @@ class InviteWorkspaceViewModel @Inject constructor(
     private val searchParams = MutableStateFlow("")
 
     @OptIn(FlowPreview::class)
-    val searchMember: Flow<PagingData<UserData>> = searchParams.debounce(300)
-        .flatMapLatest { memberData ->
-            if (memberData.length < 3) {
+    val searchMember = combine(
+        searchParams.debounce(300),
+        workspace
+    ) { search, workspaceData -> search to workspaceData }
+        .flatMapLatest { (search, workspaceData) ->
+            if (search.length < 3) {
                 flowOf(PagingData.empty())
             } else {
-                val workspaceMembers = workspace.value.members.map { it.memberId }
-                searchMemberUseCase(memberData, workspaceMembers)
+                val workspaceMembers = workspaceData.members.map { it.memberId }
+                searchMemberUseCase(search, workspaceMembers)
             }
         }.cachedIn(viewModelScope)
-
 
     fun getWorkspace(workspaceId: Long) = viewModelScope.launch {
         getWorkspaceUseCase(workspaceId).safeCollect { it?.let { _workspace.emit(it) } }
@@ -62,7 +64,8 @@ class InviteWorkspaceViewModel @Inject constructor(
     fun changeAuth(memberId: Long, auth: Authority) = viewModelScope.launch(Dispatchers.IO) {
         val workspaceId = workspace.value.workspaceId
         withSocketState { isConnected ->
-            changeWorkspaceMemberUseCase(workspaceId, memberId, auth, isConnected).withUiState().collect()
+            changeWorkspaceMemberUseCase(workspaceId, memberId, auth, isConnected).withUiState()
+                .collect()
         }
     }
 
