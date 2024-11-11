@@ -7,6 +7,7 @@ import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.image.ImageStorage
 import com.ssafy.database.dao.MemberBackgroundDao
 import com.ssafy.database.dao.MemberDao
+import com.ssafy.database.dto.MemberBackgroundEntity
 import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toEntity
@@ -18,6 +19,7 @@ import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -123,11 +125,31 @@ class MemberRepositoryImpl @Inject constructor(
                 ?.toDTO()
         }
 
-    override suspend fun getAllMemberBackgrounds(): Flow<List<CoverDto>> =
-        withContext(ioDispatcher) {
-            memberBackgroundDao.getAllMemberBackgrounds()
-                .map { entities -> entities.map { it.toDTO() } }
+    override suspend fun getAllMemberBackgrounds(
+        memberId: Long,
+        isConnected: Boolean
+    ): Flow<List<CoverDto>> = withContext(ioDispatcher) {
+        if (isConnected) {
+            val prevBackgrounds = memberBackgroundDao.getAllMemberBackgrounds().firstOrNull()
+            val memberBackgrounds = memberDataSource.getAllBackgrounds(memberId).firstOrNull()
+            memberBackgrounds?.let { backgroundList ->
+                backgroundList.map { background ->
+                    if (prevBackgrounds?.find { it.id == background.memberBackgroundId } == null) {
+                        imageStorage.saveAll(background.imgUrl) { path ->
+                            val backgroundEntity = MemberBackgroundEntity(
+                                id = background.memberBackgroundId,
+                                url = path ?: "",
+                            )
+                            memberBackgroundDao.insertMemberBackgrounds(listOf(backgroundEntity))
+                        }
+                    }
+                }
+            }
         }
+
+        memberBackgroundDao.getAllMemberBackgrounds()
+            .map { entities -> entities.map { it.toDTO() } }
+    }
 
     override suspend fun createMemberBackground(
         memberId: Long,

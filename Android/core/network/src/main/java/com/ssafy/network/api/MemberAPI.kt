@@ -30,6 +30,11 @@ interface MemberAPI {
         @Query("pageable") pageDto: PageDto
     ): Response<ApiResponse<SearchMemberResponse>>
 
+    @GET("api/v1/member-background/{memberId}")
+    suspend fun getAllBackgrounds(
+        @Path("memberId") memberId: Long
+    ): Response<ApiResponse<List<MemberBackgroundDto>>>
+
     @POST("api/v1/member-background")
     suspend fun createMemberBackground(
         @Query("memberId") memberId: Long,

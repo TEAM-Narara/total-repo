@@ -32,7 +32,12 @@ class ImageStorage @Inject constructor(
         }
     }
 
-    private fun save(key: String): String = s3ImageUtil.downloadFile(key)
+    private fun save(key: String): String = runCatching {
+        s3ImageUtil.downloadFile(key)
+    }.fold(
+        onSuccess = { it },
+        onFailure = { "" }
+    )
 
     fun get(path: String): File? = File(path).takeIf { it.exists() && it.isFile }
 

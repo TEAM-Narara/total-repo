@@ -52,6 +52,9 @@ class MemberDataSourceImpl @Inject constructor(
     ): Flow<SearchMemberResponse> =
         safeApiCall { memberAPI.searchMembers(keyword, pageDto) }.toFlow()
 
+    override suspend fun getAllBackgrounds(memberId: Long): Flow<List<MemberBackgroundDto>> =
+        safeApiCall { memberAPI.getAllBackgrounds(memberId) }.toFlow()
+
     override suspend fun createMemberBackground(
         memberId: Long,
         background: CoverDto

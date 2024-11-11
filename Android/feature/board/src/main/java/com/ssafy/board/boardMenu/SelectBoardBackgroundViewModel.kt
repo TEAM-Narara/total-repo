@@ -23,9 +23,11 @@ class SelectBoardBackgroundViewModel @Inject constructor(
     val imagePathList = _imagePathList.asStateFlow()
 
     fun loadMemberBackgrounds() = withIO {
-        getMemberBackgroundUseCase().safeCollect { coverList ->
-            val imagePathList = coverList.filter { it.type == CoverType.IMAGE }.map { it.value }
-            _imagePathList.emit(imagePathList)
+        withSocketState { isConnected: Boolean ->
+            getMemberBackgroundUseCase(isConnected).safeCollect { coverList ->
+                val imagePathList = coverList.filter { it.type == CoverType.IMAGE }.map { it.value }
+                _imagePathList.emit(imagePathList)
+            }
         }
     }
 
@@ -37,7 +39,7 @@ class SelectBoardBackgroundViewModel @Inject constructor(
         withSocketState { isConnected: Boolean ->
             imagePathList.value.forEach {
                 val imageCover = Cover(CoverType.IMAGE, it)
-                createMemberBackgroundUseCase(imageCover, isConnected).withUiState().collect()
+                createMemberBackgroundUseCase(imageCover, isConnected)
             }
 
             if (boardId != null) {

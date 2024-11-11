@@ -5,6 +5,7 @@ import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.background.Cover
 import com.ssafy.model.background.toCoverDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class CreateMemberBackgroundUseCase @Inject constructor(
@@ -15,6 +16,12 @@ class CreateMemberBackgroundUseCase @Inject constructor(
     suspend operator fun invoke(cover: Cover, isConnected: Boolean): Flow<Long> {
         val memberId = dataStoreRepository.getUser().memberId
         val coverDto = cover.toCoverDto()
-        return memberRepository.createMemberBackground(memberId, coverDto, isConnected)
+        val prevBackground = memberRepository.getMemberBackground(coverDto.id)
+
+        return if (prevBackground != null) {
+            memberRepository.createMemberBackground(memberId, coverDto, isConnected)
+        }else{
+            flowOf(coverDto.id)
+        }
     }
 }

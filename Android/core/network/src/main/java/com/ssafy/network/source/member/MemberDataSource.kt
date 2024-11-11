@@ -19,6 +19,8 @@ interface MemberDataSource {
 
     suspend fun searchMembers(keyword: String, pageDto: PageDto): Flow<SearchMemberResponse>
 
+    suspend fun getAllBackgrounds(memberId: Long): Flow<List<MemberBackgroundDto>>
+
     suspend fun createMemberBackground(
         memberId: Long,
         background: CoverDto
