@@ -21,6 +21,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
+import static com.narara.superboard.common.constant.MoveConst.DEFAULT_TOP_ORDER;
+
 @Entity
 @Getter
 @Builder
@@ -93,7 +95,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
-                .lastListOrder(0L)
+                .lastListOrder(DEFAULT_TOP_ORDER)
                 .isArchived(boardCreateRequestDto.isClosed())
                 .listOrderVersion(0L)
                 .build();

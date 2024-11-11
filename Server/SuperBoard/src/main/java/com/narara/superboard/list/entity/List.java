@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.narara.superboard.common.constant.MoveConst.DEFAULT_TOP_ORDER;
 import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
 
 @Getter
@@ -65,7 +66,7 @@ public class List extends BaseTimeEntity implements Identifiable {
                 .name(listCreateRequestDto.listName())
                 .board(board)
                 .myOrder(lastListOrder)
-                .lastCardOrder(0L)
+                .lastCardOrder(DEFAULT_TOP_ORDER)
                 .isArchived(false)
                 .isDeleted(false)
                 .cardOrderVersion(0L)
