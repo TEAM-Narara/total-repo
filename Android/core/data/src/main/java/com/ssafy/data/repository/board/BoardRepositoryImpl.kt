@@ -1,6 +1,5 @@
 package com.ssafy.data.repository.board
 
-import android.util.Log
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dao.NegativeIdGenerator
@@ -115,17 +114,13 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.updateBoard(id, updateBoardRequestDto)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
                     val newBoard = board.copy(
                         name = updateBoardRequestDto.name,
                         coverType = updateBoardRequestDto.cover.type.name,
                         coverValue = updateBoardRequestDto.cover.value,
                         visibility = updateBoardRequestDto.visibility.name)
                     val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
-
-                    Log.d("TAG", "updateBoard1: $newBoard")
-                    Log.d("TAG", "updateBoard2: $newBit")
-//                    val updateBoard = getBitmaskDto(newBit, newBoard)
-//                    Log.d("TAG", "updateBoard3: $updateBoard")
 
                     val result = when(board.isStatus) {
                         DataStatus.STAY, DataStatus.UPDATE ->
@@ -153,21 +148,21 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.setBoardArchive(id)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
+                    val newBoard = board.copy(isClosed = !board.isClosed)
+                    val newBit = bitmaskColumn(board.columnUpdate, board, newBoard)
+
                     val result = when (board.isStatus) {
-                        DataStatus.STAY ->
+                        DataStatus.STAY, DataStatus.UPDATE ->
                             boardDao.updateBoard(
-                                board.copy(
-                                    isClosed = !board.isClosed,
+                                newBoard.copy(
+                                    columnUpdate = newBit,
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
 
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            boardDao.updateBoard(
-                                board.copy(
-                                    isClosed = !board.isClosed,
-                                )
-                            )
+                        DataStatus.CREATE ->
+                            boardDao.updateBoard(newBoard)
 
                         DataStatus.DELETE -> {}
                     }
@@ -426,23 +421,24 @@ class BoardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     boardDataSource.updateLabel(id, updateLabelRequestDto).map { Unit }
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
+                    val newLabel = label.copy(
+                        name = updateLabelRequestDto.name,
+                        color = updateLabelRequestDto.color
+                    )
+                    val newBit = bitmaskColumn(label.columnUpdate, label, newLabel)
+
                     val result = when (label.isStatus) {
-                        DataStatus.STAY ->
+                        DataStatus.STAY, DataStatus.UPDATE ->
                             labelDao.updateLabel(
-                                label.copy(
-                                    name = updateLabelRequestDto.name,
-                                    color = updateLabelRequestDto.color,
+                                newLabel.copy(
+                                    columnUpdate = newBit,
                                     isStatus = DataStatus.UPDATE
                                 )
                             )
 
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            labelDao.updateLabel(
-                                label.copy(
-                                    name = updateLabelRequestDto.name,
-                                    color = updateLabelRequestDto.color
-                                )
-                            )
+                        DataStatus.CREATE ->
+                            labelDao.updateLabel(newLabel)
 
                         DataStatus.DELETE -> {}
                     }

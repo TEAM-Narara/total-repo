@@ -3,6 +3,7 @@ package com.ssafy.home.setting
 import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
+import com.ssafy.ui.uistate.UiState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.DeleteWorkspaceUseCase
 import com.ssafy.workspace.UpdateWorkspaceUseCase
@@ -44,8 +45,12 @@ class HomeSettingViewModel @Inject constructor(
         workspaceId: Long,
         name: String
     ) = viewModelScope.launch(Dispatchers.IO) {
-        withSocketState { isConnected ->
-            updateWorkspaceUseCase(workspaceId, name, isConnected).safeCollect()
+        if (name.isBlank()) {
+            _uiState.emit(UiState.Error("공백은 입력할 수 없습니다."))
+        } else {
+            withSocketState { isConnected ->
+                updateWorkspaceUseCase(workspaceId, name, isConnected).safeCollect()
+            }
         }
     }
 

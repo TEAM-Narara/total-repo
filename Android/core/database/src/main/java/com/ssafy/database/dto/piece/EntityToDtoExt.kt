@@ -17,6 +17,18 @@ import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.WorkspaceEntity
 import com.ssafy.database.dto.WorkspaceMemberEntity
+import com.ssafy.database.dto.bitmask.CardCoverBitmask
+import com.ssafy.database.dto.bitmask.CoverBitmask
+import com.ssafy.database.dto.bitmask.UpdateBoardArchiveBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateCardArchiveBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateCardBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateCardListIdBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateCardOrderBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateLabelBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateListArchiveBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateListBitmaskDTO
+import com.ssafy.database.dto.bitmask.UpdateListOrderBitmaskDTO
 import com.ssafy.database.dto.with.BoardInList
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import com.ssafy.database.dto.with.CardAllInfo
@@ -61,6 +73,7 @@ import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
+import kotlin.concurrent.thread
 
 // Member
 fun MemberEntity.toDTO(): User {
@@ -140,6 +153,24 @@ fun BoardEntity.toDto(): BoardDTO {
     )
 }
 
+// BOARD
+fun BoardEntity.toBitDto(): UpdateBoardBitmaskDTO {
+    return UpdateBoardBitmaskDTO(
+        name = this.name,
+        cover = CoverBitmask(
+            type = coverType?.let { CoverType.valueOf(it) },
+            value = coverValue
+        ),
+        visibility = Visibility.valueOf(visibility)
+    )
+}
+
+fun BoardEntity.toBitArchiveDto(): UpdateBoardArchiveBitmaskDTO {
+    return UpdateBoardArchiveBitmaskDTO(
+        isClosed = this.isClosed
+    )
+}
+
 fun BoardInList.toDTO(): BoardInListDTO {
     return BoardInListDTO(
         id = this.board.id,
@@ -150,7 +181,6 @@ fun BoardInList.toDTO(): BoardInListDTO {
         visibility = this.board.visibility,
         isClosed = this.board.isClosed,
         isStatus = this.board.isStatus,
-        columnUpdate = this.board.columnUpdate,
         lists = this.lists.map { it.toDTO() },
         labels = this.labels.map { it.toDTO() },
         boardMembers = this.boardMembers.map { it.toDTO() },
@@ -201,6 +231,15 @@ fun LabelEntity.toDTO(): LabelDTO {
     )
 }
 
+fun LabelEntity.toBitDto(): UpdateLabelBitmaskDTO {
+    return UpdateLabelBitmaskDTO(
+        name = this.name,
+        color = this.color
+    )
+}
+
+// LIST
+
 fun ListEntity.toDto(): ListResponseDto {
     return ListResponseDto(
         boardId = this.boardId,
@@ -209,6 +248,24 @@ fun ListEntity.toDto(): ListResponseDto {
         isArchived = this.isArchived,
         listId = this.id,
         myOrder = this.myOrder
+    )
+}
+
+fun ListEntity.toBitDto(): UpdateListBitmaskDTO {
+    return UpdateListBitmaskDTO(
+        name = this.name,
+    )
+}
+
+fun ListEntity.toBitOrderDto(): UpdateListOrderBitmaskDTO {
+    return UpdateListOrderBitmaskDTO(
+        myOrder = this.myOrder,
+    )
+}
+
+fun ListEntity.toBitArchiveDto(): UpdateListArchiveBitmaskDTO {
+    return UpdateListArchiveBitmaskDTO(
+        isArchived = this.isArchived,
     )
 }
 
@@ -232,7 +289,6 @@ fun ListInCards.toDTO(): ListInCardsDTO {
         myOrder = this.list.myOrder,
         isArchived = this.list.isArchived,
         isStatus = this.list.isStatus,
-        columnUpdate = this.list.columnUpdate,
         cards = this.cards.map { it.toDTO() },
         listMembers = this.listMembers.map { it.toDTO() },
         listMemberAlarm = this.listMemberAlarm?.isAlert ?: false
@@ -290,6 +346,37 @@ fun CardEntity.toDto(): CardResponseDto {
     )
 }
 
+fun CardEntity.toBitDto(): UpdateCardBitmaskDTO {
+    return UpdateCardBitmaskDTO(
+        name = this.name,
+        description = this.description,
+        startAt = this.startAt,
+        endAt = this.endAt,
+        cover = CardCoverBitmask(
+            type = coverType?.let { CoverType.valueOf(it) },
+            value = coverValue
+        )
+    )
+}
+
+fun CardEntity.toListIdBitDto(): UpdateCardListIdBitmaskDTO {
+    return UpdateCardListIdBitmaskDTO(
+        listId = this.listId
+    )
+}
+
+fun CardEntity.toOrderBitDto(): UpdateCardOrderBitmaskDTO {
+    return UpdateCardOrderBitmaskDTO(
+        myOrder = this.myOrder
+    )
+}
+
+fun CardEntity.toArchiveBitDto(): UpdateCardArchiveBitmaskDTO {
+    return UpdateCardArchiveBitmaskDTO(
+        isArchived = this.isArchived
+    )
+}
+
 fun CardEntity.toDTO(
     replyCount: Int = 0,
     isWatch: Boolean = false,
@@ -332,7 +419,6 @@ fun CardAllInfo.toDTO(): CardAllInfoDTO {
         myOrder = this.card.myOrder,
         isArchived = this.card.isArchived,
         isStatus = this.card.isStatus,
-        columnUpdate = this.card.columnUpdate,
         cardLabels = this.cardLabels.map { it.toDTO() },
         cardMembers = this.cardMembers.map { it.toDTO() },
         cardMemberAlarm = this.cardMemberAlarm?.isAlert ?: false,

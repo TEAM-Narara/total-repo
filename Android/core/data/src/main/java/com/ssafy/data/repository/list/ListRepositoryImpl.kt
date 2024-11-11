@@ -16,6 +16,7 @@ import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -86,30 +87,32 @@ class ListRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateList(
+        listId: Long,
         updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val list = listDao.getList(updateListRequestDto.listId)
+        val list = listDao.getList(listId)
 
         if (list != null) {
             if (isConnected) {
                 listDataSource.updateList(updateListRequestDto)
             } else {
+                // 변경 사항 확인하고 비트마스킹
+                val newList = list.copy(name = updateListRequestDto.listName)
+                val newBit = bitmaskColumn(list.columnUpdate, list, newList)
+
                 val result = when (list.isStatus) {
-                    DataStatus.STAY ->
+                    DataStatus.STAY, DataStatus.UPDATE ->
                         listDao.updateList(
                             list.copy(
                                 name = updateListRequestDto.listName,
-                                isStatus = DataStatus.UPDATE
+                                isStatus = DataStatus.UPDATE,
+                                columnUpdate = newBit
                             )
                         )
 
-                    DataStatus.CREATE, DataStatus.UPDATE ->
-                        listDao.updateList(
-                            list.copy(
-                                name = updateListRequestDto.listName
-                            )
-                        )
+                    DataStatus.CREATE ->
+                        listDao.updateList(newList)
 
                     DataStatus.DELETE -> {}
                 }
@@ -147,12 +150,23 @@ class ListRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     listDataSource.setListArchive(listId)
                 } else {
-                    val result = when (list.isStatus) {
-                        DataStatus.CREATE ->
-                            listDao.deleteList(list)
+                    // 변경 사항 확인하고 비트마스킹
+                    val newList = list.copy(isArchived = !list.isArchived)
+                    val newBit = bitmaskColumn(list.columnUpdate, list, newList)
 
-                        else ->
-                            listDao.updateList(list.copy(isArchived = !list.isArchived))
+                    val result = when (list.isStatus) {
+                        DataStatus.STAY, DataStatus.UPDATE ->
+                            listDao.updateList(
+                                newList.copy(
+                                    columnUpdate = newBit,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE ->
+                            listDao.updateList(newList)
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)

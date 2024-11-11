@@ -11,6 +11,7 @@ import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -101,40 +102,38 @@ class CardRepositoryImpl @Inject constructor(
         }
 
     override suspend fun updateCard(
+        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val card = cardDao.getCard(cardUpdateRequestDto.cardId)
+        val card = cardDao.getCard(cardId)
 
         if (card != null) {
             if (isConnected) {
                 cardDataSource.updateCard(cardUpdateRequestDto)
             } else {
+                // 변경 사항 확인하고 비트마스킹
+                val newCard = card.copy(
+                    name = card.name,
+                    description = card.description,
+                    startAt = card.startAt,
+                    endAt = card.endAt,
+                    coverType = card.coverType,
+                    coverValue = card.coverValue
+                )
+                val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
+
                 val result = when (card.isStatus) {
-                    DataStatus.STAY ->
+                    DataStatus.STAY, DataStatus.UPDATE ->
                         cardDao.updateCard(
-                            card.copy(
-                                name = cardUpdateRequestDto.name,
-                                description = cardUpdateRequestDto.description,
-                                startAt = cardUpdateRequestDto.startAt,
-                                endAt = cardUpdateRequestDto.endAt,
-                                coverType = cardUpdateRequestDto.cover.type.name,
-                                coverValue = cardUpdateRequestDto.cover.value,
+                            newCard.copy(
+                                columnUpdate = newBit,
                                 isStatus = DataStatus.UPDATE
                             )
                         )
 
-                    DataStatus.CREATE, DataStatus.UPDATE ->
-                        cardDao.updateCard(
-                            card.copy(
-                                name = cardUpdateRequestDto.name,
-                                description = cardUpdateRequestDto.description,
-                                startAt = cardUpdateRequestDto.startAt,
-                                endAt = cardUpdateRequestDto.endAt,
-                                coverType = cardUpdateRequestDto.cover.type.name,
-                                coverValue = cardUpdateRequestDto.cover.value
-                            )
-                        )
+                    DataStatus.CREATE ->
+                        cardDao.updateCard(newCard)
 
                     DataStatus.DELETE -> {}
                 }
@@ -153,9 +152,23 @@ class CardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     cardDataSource.setCardArchive(cardId)
                 } else {
+                    // 변경 사항 확인하고 비트마스킹
+                    val newCard = card.copy(isArchived = !card.isArchived)
+                    val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
+
                     val result = when (card.isStatus) {
-                        DataStatus.CREATE -> cardDao.deleteCard(card)
-                        else -> cardDao.updateCard(card.copy(isArchived = !card.isArchived))
+                        DataStatus.STAY, DataStatus.UPDATE ->
+                            cardDao.updateCard(
+                                newCard.copy(
+                                    columnUpdate = newBit,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE ->
+                            cardDao.updateCard(newCard)
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)

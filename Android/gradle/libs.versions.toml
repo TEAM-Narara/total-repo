@@ -13,6 +13,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesCore = "1.9.0"
 kotlinxSerializationJson = "1.7.3"
+kotlinxSerializationJsonVersion = "1.5.1"
 krossbowStompCore = "5.1.0"
 krossbowWebsocketOkhttp = "5.1.0"
 lifecycleRuntimeKtx = "2.8.6"
@@ -38,6 +39,8 @@ datastorePreferences = "1.1.1"
 uiToolingPreview = "1.7.4"
 exifinterface = "1.3.7"
 pagingRuntime = "3.3.2"
+awsAndroidSdkMobileClient = "2.73.0"
+
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -91,6 +94,8 @@ ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", versio
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingRuntime" }
+aws-android-sdk-mobile-client = { module = "com.amazonaws:aws-android-sdk-mobile-client", version.ref = "awsAndroidSdkMobileClient" }
+aws-android-sdk-s3 = { module = "com.amazonaws:aws-android-sdk-s3", version.ref = "awsAndroidSdkMobileClient" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

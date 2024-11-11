@@ -25,6 +25,7 @@ interface CardRepository {
     suspend fun deleteCard(cardId: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun updateCard(
+        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit>

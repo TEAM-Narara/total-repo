@@ -8,7 +8,6 @@ data class ListInCardsDTO(
     val isArchived: Boolean,
 
     @Transient val isStatus: DataStatus = DataStatus.CREATE,
-    @Transient val columnUpdate: Long = 0L,
 
     val cards: List<CardAllInfoDTO>,
     val listMembers: List<ListMemberDTO>,

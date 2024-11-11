@@ -31,26 +31,29 @@ class CardService @Inject constructor(
 ) {
     suspend fun addCard(data: JsonObject) {
         val dto = gson.fromJson(data, AddCardRequestDto::class.java)
-
-        val coverValue = if (dto.coverType == "IMAGE") {
-            imageStorage.save(dto.coverValue)
-        } else {
-            dto.coverValue
+        val insertCard: suspend (String) -> Unit = { coverValue ->
+            cardDao.insertCard(
+                CardEntity(
+                    id = dto.cardId,
+                    listId = dto.listId,
+                    name = dto.name,
+                    description = dto.description,
+                    startAt = dto.startAt,
+                    endAt = dto.endAt,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    isArchived = dto.isArchived,
+                )
+            )
         }
 
-        cardDao.insertCard(
-            CardEntity(
-                id = dto.cardId,
-                listId = dto.listId,
-                name = dto.name,
-                description = dto.description,
-                startAt = dto.startAt,
-                endAt = dto.endAt,
-                coverType = dto.coverType,
-                coverValue = coverValue,
-                isArchived = dto.isArchived,
-            )
-        )
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(key = dto.coverValue) { path ->
+                insertCard(path ?: "")
+            }
+        } else {
+            insertCard(dto.coverValue)
+        }
     }
 
     suspend fun editCard(data: JsonObject) {
@@ -61,25 +64,29 @@ class CardService @Inject constructor(
             before.coverValue?.let { imageStorage.delete(it) }
         }
 
-        val coverValue = if (dto.coverType == "IMAGE") {
-            imageStorage.save(dto.coverValue)
-        } else {
-            dto.coverValue
+        val updateCard: suspend (String) -> Unit = { coverValue ->
+            cardDao.updateCard(
+                before.copy(
+                    name = dto.name,
+                    description = dto.description,
+                    startAt = dto.startAt,
+                    endAt = dto.endAt,
+                    coverType = dto.coverType,
+                    coverValue = coverValue,
+                    isArchived = dto.isArchived,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                )
+            )
         }
 
-        cardDao.updateCard(
-            before.copy(
-                name = dto.name,
-                description = dto.description,
-                startAt = dto.startAt,
-                endAt = dto.endAt,
-                coverType = dto.coverType,
-                coverValue = coverValue,
-                isArchived = dto.isArchived,
-                isStatus = DataStatus.STAY,
-                columnUpdate = 0,
-            )
-        )
+        if (dto.coverType == "IMAGE") {
+            imageStorage.saveAll(dto.coverValue) { path ->
+                updateCard(path ?: "")
+            }
+        } else {
+            updateCard(dto.coverValue)
+        }
     }
 
     suspend fun archiveCard(data: JsonObject) {
