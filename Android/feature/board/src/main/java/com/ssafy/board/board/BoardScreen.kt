@@ -130,13 +130,13 @@ private fun BoardScreen(
     val scope = rememberCoroutineScope()
 
     val listDndState = rememberReorderState<ListData>(dragAfterLongPress = true)
-    var listCollection by remember { mutableStateOf(boardData.listCollection) }
+    var listCollection by remember(boardData.listCollection) { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
     val cardDndState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
     val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
         boardData.listCollection.forEach { listData ->
-            this[listData.id] = remember {
+            this[listData.id] = remember(listData) {
                 mutableStateOf(listData.cardCollection.map {
                     it.toReorderCardData(listData.id)
                 })
@@ -150,7 +150,7 @@ private fun BoardScreen(
             LazyRow(
                 state = listLazyListState,
                 horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
-                modifier = modifier.padding(vertical = PaddingDefault),
+                modifier = modifier.fillMaxSize().padding(vertical = PaddingDefault),
                 contentPadding = PaddingValues(horizontal = PaddingDefault)
             ) {
                 items(listCollection, key = { it.id }) { listData ->
