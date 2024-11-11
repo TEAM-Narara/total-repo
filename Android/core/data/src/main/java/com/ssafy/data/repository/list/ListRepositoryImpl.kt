@@ -354,22 +354,40 @@ class ListRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
-                                                          keyword: String,
+                                                          includeNoRepresentative: Int,
+                                                          memberIdsEmpty: Int,
                                                           memberIds: List<Long>,
-                                                          dateValue: List<Long>,
-                                                          cardLabelIds: List<Long>): Flow<List<ListInCard>> {
+                                                          noLimitDate: Int,
+                                                          expireDate: Int,
+                                                          deadlineDateType: Int,
+                                                          includeNoLabel: Int,
+                                                          labelIdsEmpty: Int,
+                                                          cardLabelIds: List<Long>,
+                                                          keyword: String): Flow<List<ListInCard>> {
         return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
             val listIds = lists.map { it.id }
 
             combine(
                 listMemberDao.getListsMemberAlarms(listIds),
-                cardDao.getAllCardsInLists(listIds).flatMapLatest { cards ->
+                // 담당자 없음, 담당자 종류
+                // 날짜 제한 없음, 기한 만료, {선택 안함(0), 내일 내(1), 일주일 내(2), 한달 내(3)}
+                // 라벨 없음, 라벨 종류
+                // 키워드
+                cardDao.getAllCardsInListsFilter(
+                    listIds,
+                    includeNoRepresentative,
+                    memberIdsEmpty,
+                    memberIds,
+                    noLimitDate,
+                    expireDate,
+                    deadlineDateType,
+                    includeNoLabel,
+                    labelIdsEmpty,
+                    cardLabelIds,
+                    keyword
+                    ).flatMapLatest { cards ->
                     val cardIds = cards.map { it.id }
 
-                    // TODO 여기서 할까.. SQL로 할까..
-                    // 담당자 없음, 담당자 종류
-                    // 날짜 제한 없음, 기한 만료, 내일 내, 일주일 내, 한달 내
-                    // 라벨 없음, 라벨 종류
                     combine(
                         replyDao.getReplyCounts(cardIds),
                         cardMemberDao.getCardRepresentativesInCards(cardIds),

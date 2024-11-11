@@ -65,6 +65,70 @@ interface CardDao {
     """)
     fun getAllCardsInLists(listIds: List<Long>): Flow<List<CardEntity>>
 
+    // 리스트들 내에 카드들 조회
+    @Query("""
+        SELECT c.*
+            FROM card c
+            LEFT JOIN card_member cm ON c.id = cm.cardId AND cm.isStatus != 'DELETE' AND isRepresentative = 1
+            LEFT JOIN card_label cl ON c.id = cl.cardId AND cl.isStatus != 'DELETE'
+            WHERE c.listId IN (:listIds)
+              AND c.isStatus != 'DELETE'
+              AND c.isArchived = 0
+              -- 담당자
+              AND (
+                (:includeNoRepresentative = 0 AND :memberIdsEmpty = 1) OR
+                    (
+                        (:includeNoRepresentative = 1 AND cm.cardId IS NULL) OR
+                        (cm.memberId IN (:memberIds))
+                    )
+              )
+              -- 라벨
+              AND (
+                (:includeNoLabel = 0 AND :labelIdsEmpty = 1) OR
+                    (
+                        (:includeNoLabel = 1 AND cl.cardId IS NULL) OR
+                        (cl.labelId IN (:labelIds))
+                    )
+              )
+              -- 날짜
+              AND (
+                -- 아무 것도 선택하지 않은 경우, 모든 카드를 포함
+                (
+                    :noLimitDate = 0 AND
+                    :expireDate = 0 AND
+                    :deadlineDateType = 0
+                ) OR
+                
+                -- 날짜 제한 없음이 선택된 경우, 모든 카드를 포함
+                (:noLimitDate = 1) OR
+                
+                -- 날짜 제한 없음이 선택되지 않은 경우
+                (
+                    (:expireDate = 1 AND DATE(c.endAt / 1000, 'unixepoch', 'localtime') < DATE('now', 'localtime')) OR
+                    (
+                        (:deadlineDateType = 1 AND DATE(c.endAt / 1000, 'unixepoch', 'localtime') BETWEEN DATE('now', 'localtime') AND DATE('now', 'localtime', '+1 day')) OR
+                        (:deadlineDateType = 2 AND DATE(c.endAt / 1000, 'unixepoch', 'localtime') BETWEEN DATE('now', 'localtime') AND DATE('now', 'localtime', '+7 day')) OR
+                        (:deadlineDateType = 3 AND DATE(c.endAt / 1000, 'unixepoch', 'localtime') BETWEEN DATE('now', 'localtime') AND DATE('now', 'localtime', '+30 day'))
+                    )
+                )
+            )
+              AND (:keyword IS NULL OR c.name LIKE '%' || :keyword || '%')
+            ORDER BY c.myOrder
+    """)
+    fun getAllCardsInListsFilter(
+        listIds: List<Long>,
+        includeNoRepresentative: Int,
+        memberIdsEmpty: Int,
+        memberIds: List<Long>,
+        noLimitDate: Int,
+        expireDate: Int,
+        deadlineDateType: Int,
+        includeNoLabel: Int,
+        labelIdsEmpty: Int,
+        labelIds: List<Long>,
+        keyword: String?
+    ): Flow<List<CardEntity>>
+
     // 아카이브에서 볼 것
     @Query("""
         SELECT * 

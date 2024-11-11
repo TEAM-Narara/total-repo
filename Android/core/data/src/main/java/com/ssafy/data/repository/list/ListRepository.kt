@@ -56,8 +56,14 @@ interface ListRepository {
     suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>>
 
     suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
-                                                 keyword: String,
+                                                 includeNoRepresentative: Int,
+                                                 memberIdsEmpty: Int,
                                                  memberIds: List<Long>,
-                                                 dateValue: List<Long>,
-                                                 cardLabelIds: List<Long>): Flow<List<ListInCard>>
+                                                 noLimitDate: Int,
+                                                 expireDate: Int,
+                                                 deadlineDateType: Int,
+                                                 includeNoLabel: Int,
+                                                 labelIdsEmpty: Int,
+                                                 cardLabelIds: List<Long>,
+                                                 keyword: String): Flow<List<ListInCard>>
 }
