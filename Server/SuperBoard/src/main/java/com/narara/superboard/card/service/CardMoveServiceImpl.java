@@ -44,6 +44,8 @@ public class CardMoveServiceImpl implements CardMoveService {
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
 
+        // TODO: 아무것도 없는 리스트에 이동시, 아래 로직에서 그 리스트가 삭제되는 경우 해야함.
+
         Card topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList)
                 .orElseGet(() -> {
                     // targetList가 비어 있는 경우 삭제 처리
@@ -107,6 +109,8 @@ public class CardMoveServiceImpl implements CardMoveService {
         List targetList = (targetListId == 0L) ? targetCard.getList() :
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
+
+        // TODO: 아무것도 없는 리스트에 이동시, 아래 로직에서 그 리스트가 삭제되는 경우 해야함.
 
         // 대상 리스트에서 가장 아래에 위치한 카드 조회
         Card bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList)
