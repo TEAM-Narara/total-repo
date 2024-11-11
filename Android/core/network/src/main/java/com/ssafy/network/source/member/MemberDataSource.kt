@@ -11,7 +11,10 @@ interface MemberDataSource {
 
     suspend fun getMembers(): Flow<User>
 
-    suspend fun updateMember(memberUpdateRequestDto: MemberUpdateRequestDto): Flow<Unit>
+    suspend fun updateMember(
+        memberId: Long,
+        memberUpdateRequestDto: MemberUpdateRequestDto
+    ): Flow<Unit>
 
     suspend fun searchMembers(keyword: String, pageDto: PageDto): Flow<SearchMemberResponse>
 

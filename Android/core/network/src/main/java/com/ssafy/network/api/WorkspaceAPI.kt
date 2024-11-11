@@ -16,7 +16,7 @@ import retrofit2.http.Query
 
 interface WorkspaceAPI {
 
-    @GET("api/v1/workspaces")
+    @GET("/api/v1/member/workspaces")
     suspend fun getWorkspaces(): Response<ApiResponse<List<WorkSpaceDTO>>>
 
     @POST("api/v1/workspaces")

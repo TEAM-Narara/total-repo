@@ -1,6 +1,5 @@
 package com.ssafy.network.api
 
-import com.ssafy.model.member.MemberUpdateRequestDto
 import com.ssafy.model.member.PageDto
 import com.ssafy.model.member.SearchMemberResponse
 import com.ssafy.model.user.User
@@ -16,7 +15,10 @@ interface MemberAPI {
     suspend fun getMembers(): Response<ApiResponse<User>>
 
     @PATCH("api/v1/members")
-    suspend fun updateMember(@Query("memberUpdateRequestDto") memberUpdateRequestDto: MemberUpdateRequestDto): Response<ApiResponse<Unit>>
+    suspend fun updateMember(
+        @Query("nickname") nickname: String,
+        @Query("profileImgUrl") profileImgUrl: String
+    ): Response<ApiResponse<Unit>>
 
     @GET("api/v1/members/search")
     suspend fun searchMembers(
