@@ -17,6 +17,7 @@ interface CardDataSource {
     suspend fun deleteCard(cardId: Long): Flow<Unit>
 
     suspend fun updateCard(
+        cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
     ): Flow<Unit>
 

@@ -5,6 +5,7 @@ coil = "2.6.0"
 coilCompose = "3.0.0-rc01"
 composeDnd = "0.3.0"
 composeMarkdown = "0.3.1"
+coreSplashscreen = "1.0.1"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
@@ -13,7 +14,6 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesCore = "1.9.0"
 kotlinxSerializationJson = "1.7.3"
-kotlinxSerializationJsonVersion = "1.5.1"
 krossbowStompCore = "5.1.0"
 krossbowWebsocketOkhttp = "5.1.0"
 lifecycleRuntimeKtx = "2.8.6"
@@ -45,6 +45,7 @@ awsAndroidSdkMobileClient = "2.73.0"
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialIconsExtended" }

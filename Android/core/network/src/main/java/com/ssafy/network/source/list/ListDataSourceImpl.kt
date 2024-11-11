@@ -14,8 +14,11 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.createList(createListRequestDto) }.toFlow()
 
-    override suspend fun updateList(updateListRequestDto: UpdateListRequestDto): Flow<Unit> =
-        safeApiCall { listAPI.updateList(updateListRequestDto.listId, updateListRequestDto) }.toFlow()
+    override suspend fun updateList(
+        listId: Long,
+        updateListRequestDto: UpdateListRequestDto
+    ): Flow<Unit> =
+        safeApiCall { listAPI.updateList(listId, updateListRequestDto) }.toFlow()
 
     override suspend fun deleteList(listId: Long): Flow<Unit> {
         TODO("Not yet implemented")

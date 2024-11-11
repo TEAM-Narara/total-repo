@@ -7,20 +7,33 @@ import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
+import com.ssafy.model.with.CoverType
 import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.api.LabelAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
+import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(
     private val boardAPI: BoardAPI,
-    private val labelAPI: LabelAPI
+    private val labelAPI: LabelAPI,
+    private val s3ImageUtil: S3ImageUtil
 ) : BoardDataSource {
 
-    override suspend fun createBoard(boardDTO: BoardDTO): Flow<BoardDTO> =
-        safeApiCall { boardAPI.createBoard(boardDTO) }.toFlow()
+    override suspend fun createBoard(boardDTO: BoardDTO): Flow<BoardDTO> {
+        val coverValue = if (boardDTO.cover.type == CoverType.IMAGE) {
+            val key = "${boardDTO.id}/cover"
+            s3ImageUtil.uploadS3Image(boardDTO.cover.value, key)
+            key
+        } else {
+            boardDTO.cover.value
+        }
+
+        val newBoardDTO = boardDTO.copy(cover = boardDTO.cover.copy(value = coverValue))
+        return safeApiCall { boardAPI.createBoard(newBoardDTO) }.toFlow()
+    }
 
     override suspend fun getBoard(id: Long): Flow<BoardDTO> =
         safeApiCall { boardAPI.getBoard(id) }.toFlow() // TODO : Socket으로 바꾸기
@@ -31,8 +44,19 @@ class BoardDataSourceImpl @Inject constructor(
     override suspend fun updateBoard(
         id: Long,
         updateBoardRequestDto: UpdateBoardRequestDto
-    ): Flow<Unit> =
-        safeApiCall { boardAPI.updateBoard(id, updateBoardRequestDto) }.toFlow()
+    ): Flow<Unit> {
+        val coverValue = if (updateBoardRequestDto.cover.type == CoverType.IMAGE) {
+            val key = "${id}/cover"
+            s3ImageUtil.uploadS3Image(updateBoardRequestDto.cover.value, key)
+            key
+        } else {
+            updateBoardRequestDto.cover.value
+        }
+
+        val newUpdateBoardRequestDto =
+            updateBoardRequestDto.copy(cover = updateBoardRequestDto.cover.copy(value = coverValue))
+        return safeApiCall { boardAPI.updateBoard(id, newUpdateBoardRequestDto) }.toFlow()
+    }
 
     override suspend fun setBoardArchive(boardId: Long): Flow<Unit> =
         safeApiCall { boardAPI.setBoardArchive(boardId) }.toFlow()

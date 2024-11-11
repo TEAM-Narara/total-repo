@@ -24,7 +24,11 @@ data class Cover(
     val id: Long = 0,
     @Transient
     val isStatus: DataStatus = DataStatus.STAY
-)
+) {
+    companion object {
+        const val KEY = "cover"
+    }
+}
 
 fun CoverDto.toCover() = Cover(
     id = id,
@@ -34,17 +38,17 @@ fun CoverDto.toCover() = Cover(
         else -> CoverType.NONE
     },
     value = when {
-        color != 0L -> color.toString()
+        color != 0L -> "#${color.toString(16).padStart(8, '0')}"
         imgPath.isNotEmpty() -> imgPath
         else -> ""
     },
     isStatus = isStatus
 )
 
-fun Cover.CoverDto() = CoverDto(
+fun Cover.toCoverDto() = CoverDto(
     id = id,
     color = when (type) {
-        CoverType.COLOR -> value.toLong()
+        CoverType.COLOR -> value.removePrefix("#").toLong(16)
         else -> 0L
     },
     imgPath = when (type) {

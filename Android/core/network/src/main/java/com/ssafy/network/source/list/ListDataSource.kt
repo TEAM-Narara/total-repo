@@ -9,7 +9,7 @@ interface ListDataSource {
 
     suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit>
 
-    suspend fun updateList(updateListRequestDto: UpdateListRequestDto): Flow<Unit>
+    suspend fun updateList(listId: Long, updateListRequestDto: UpdateListRequestDto): Flow<Unit>
 
     suspend fun deleteList(listId: Long): Flow<Unit>
 

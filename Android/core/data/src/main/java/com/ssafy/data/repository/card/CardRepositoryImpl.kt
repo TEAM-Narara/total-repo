@@ -110,7 +110,7 @@ class CardRepositoryImpl @Inject constructor(
 
         if (card != null) {
             if (isConnected) {
-                cardDataSource.updateCard(cardUpdateRequestDto)
+                cardDataSource.updateCard(cardId, cardUpdateRequestDto)
             } else {
                 // 변경 사항 확인하고 비트마스킹
                 val newCard = card.copy(

@@ -18,8 +18,12 @@ class WorkspaceStomp @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private var _job: Job? = null
+    private var _workspaceId: Long? = null
 
     fun connect(workspaceId: Long) {
+        if(_workspaceId == workspaceId) return
+
+        _workspaceId = workspaceId
         disconnect()
         _job = CoroutineScope(ioDispatcher).launch {
             stomp.subscribe("workspace/$workspaceId").stateIn(this).collect {
