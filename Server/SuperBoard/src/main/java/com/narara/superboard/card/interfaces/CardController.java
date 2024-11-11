@@ -1,5 +1,7 @@
 package com.narara.superboard.card.interfaces;
 
+import static org.apache.kafka.common.requests.DeleteAclsResponse.log;
+
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
@@ -154,8 +156,19 @@ public class CardController implements CardAPI {
             @Parameter(description = "이동할 리스트의 ID", required = true) @PathVariable Long targetListId) {
 
         CardMoveResult result = cardMoveService.moveCardToTop(member, cardId, targetListId);
+
+        // 결과가 DeletedCardMove인 경우
+        if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
+            String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
+            log.warn(message);
+            return ResponseEntity.status(HttpStatus.GONE) // GONE(410) 상태 코드 사용
+                    .body(DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result));
+        }
+
+        // 결과가 정상적인 이동인 경우
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
+
 
     @Override
     @Operation(summary = "다른 리스트의 맨 아래로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 아래로 이동합니다.")
@@ -165,6 +178,15 @@ public class CardController implements CardAPI {
             @Parameter(description = "이동할 리스트의 ID", required = true) @PathVariable Long targetListId) {
 
         CardMoveResult result = cardMoveService.moveCardToBottom(member, cardId, targetListId);
+
+        // 결과가 DeletedCardMove인 경우
+        if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
+            String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
+            log.warn(message);
+            return ResponseEntity.status(HttpStatus.GONE) // GONE(410) 상태 코드 사용
+                    .body(DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result));
+        }
+
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 

@@ -67,6 +67,7 @@ public class ResponseMessage {
     public static final String MOVE_LIST_TOP_SUCCESS = "리스트가 맨 위로 이동했습니다.";
     public static final String MOVE_LIST_BOTTOM_SUCCESS = "리스트가 맨 아래로 이동했습니다.";
     public static final String MOVE_LIST_BETWEEN_SUCCESS = "리스트가 지정된 위치로 이동했습니다.";
+    public static final String DELETE_LIST_BY_EMPTY = "리스트가 비어 있어 삭제되었습니다";
 
     // 카드 관련 상수
     public static final String CARD_CREATE_SUCCESS = "카드 생성 성공";
