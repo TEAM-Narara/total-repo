@@ -30,6 +30,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Setter(value = AccessLevel.PRIVATE)
     @JoinColumn(name = "list_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private List list;
@@ -115,6 +116,11 @@ public class Card extends BaseTimeEntity implements Identifiable {
 
     public void changeArchiveStatus() {
         this.isArchived = !isArchived;
+    }
+
+    public void moveToListWithOrder(List targetList, long newOrder) {
+        this.setMyOrder(newOrder);
+        this.setList(targetList);
     }
 }
 

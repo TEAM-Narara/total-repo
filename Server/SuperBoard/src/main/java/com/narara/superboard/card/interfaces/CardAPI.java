@@ -67,6 +67,27 @@ public interface CardAPI {
             @RequestParam Long previousCardId,
             @RequestParam Long nextCardId);
 
+    @PatchMapping("/{cardId}/move/otherList/top")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTopInAnotherList(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId,
+            @RequestParam Long targetListId);
+
+    @PatchMapping("/{cardId}/move/otherList/bottom")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottomInAnotherList(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId,
+            @RequestParam Long targetListId);
+
+    @PatchMapping("/{cardId}/move/otherList/between")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetweenInAnotherList(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId,
+            @RequestParam Long previousCardId,
+            @RequestParam Long nextCardId
+    );
+
     @GetMapping("/{listId}/cards")
-    ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(@PathVariable Long listId);
+    ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(
+            @PathVariable Long listId);
 }

@@ -10,4 +10,10 @@ public interface CardMoveService {
 
     CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId);
 
+    // 다른 리스트에 이동 메서드 추가
+    CardMoveResult moveCardToOtherListTop(Member member, Long cardId, Long targetListId);
+
+    CardMoveResult moveCardToOtherListBottom(Member member, Long cardId, Long targetListId);
+
+    CardMoveResult moveCardBetweenInAnotherList(Member member, Long cardId, Long previousCardId, Long nextCardId);
 }
