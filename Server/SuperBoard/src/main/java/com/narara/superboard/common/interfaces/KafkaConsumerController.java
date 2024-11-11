@@ -1,6 +1,7 @@
 package com.narara.superboard.common.interfaces;
 
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.application.kafka.KafkaEventListenerService;
 import com.narara.superboard.common.interfaces.dto.AckMessage;
 import com.narara.superboard.common.interfaces.dto.OffsetKey;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class KafkaConsumerController {
-    private final KafkaConsumerService kafkaConsumerService; // Kafka 서비스 의존성 주입
+    private final KafkaEventListenerService kafkaEventListenerService;
 
     /**
      * 클라이언트에서 ack를 수신하여 해당 메시지의 오프셋을 커밋
@@ -33,6 +34,6 @@ public class KafkaConsumerController {
         log.info("Received ack for topic: {}, partition: {}, offset: {}, groupId: {}",
                 ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
 
-        kafkaConsumerService.processAcknowledgment(offsetKey);
+        kafkaEventListenerService.processAcknowledgment(offsetKey);
     }
 }

@@ -19,4 +19,8 @@ public interface RedisService {
     void removeAckFromQueue(String topic, String groupId, long offset);
     // 대기 큐에서 첫 오프셋 ACK를 삭제
     void removeFirstAck(String topic, String groupId);
+
+    // Redis에서 lastOffset 조회 및 설정
+    Long getLastAcknowledgedOffset(String topic, String groupId);
+    void setLastAcknowledgedOffset(String topic, String groupId, Long offset);
 }

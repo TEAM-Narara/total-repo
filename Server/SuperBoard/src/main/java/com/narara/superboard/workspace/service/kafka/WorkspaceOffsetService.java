@@ -3,6 +3,7 @@ package com.narara.superboard.workspace.service.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
@@ -90,12 +91,13 @@ public class WorkspaceOffsetService {
      */
     public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
         WorkSpace workspace = workspaceMember.getWorkSpace();
+        Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_NAME_COLUMN, workspace.getId());
-        data.put(AUTHORITY_COLUMN, workspace.getName());
+        data.put(MEMBER_ID_COLUMN, member.getId());
+        data.put(MEMBER_NAME_COLUMN, member.getNickname());
+        data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
@@ -138,11 +140,12 @@ public class WorkspaceOffsetService {
      */
     public void saveEditMemberDiff(WorkSpaceMember workspaceMember) {
         WorkSpace workspace = workspaceMember.getWorkSpace();
+        Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
-        data.put(AUTHORITY_COLUMN, workspace.getName());
+        data.put(MEMBER_ID_COLUMN, member.getId());
+        data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),

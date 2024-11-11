@@ -125,4 +125,24 @@ public class RedisServiceImpl implements RedisService {
         String key = "ackQueue:" + topic + ":" + groupId;
         redisTemplate.opsForZSet().removeRange(key, 0, 0);
     }
+
+    @Override
+    public Long getLastAcknowledgedOffset(String topic, String groupId) {
+        String key = "lastOffset:" + topic + ":" + groupId;
+        String value = redisTemplate.opsForValue().get(key);
+
+        if (value == null) {
+            // 값이 없으면 Redis에 -1 저장하고 반환
+            setLastAcknowledgedOffset(topic, groupId, -1L);
+            return -1L;
+        }
+
+        return Long.parseLong(value);
+    }
+
+    @Override
+    public void setLastAcknowledgedOffset(String topic, String groupId, Long offset) {
+        String key = "lastOffset:" + topic + ":" + groupId;
+        redisTemplate.opsForValue().set(key, String.valueOf(offset));
+    }
 }
