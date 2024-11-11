@@ -4,12 +4,14 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
+import com.narara.superboard.card.service.CardMoveService;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ import java.util.List;
 public class CardController implements CardAPI {
 
     private final CardService cardService;
+    private final CardMoveService cardMoveService;
+
     private final CoverHandler coverHandler;
 
     @Override
@@ -140,5 +144,40 @@ public class CardController implements CardAPI {
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ACTIVITY_FETCH_SUCCESS, combinedLogs)
         );
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTop(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId) {
+
+        CardMoveResult result = cardMoveService.moveCardToTop(member, cardId);
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
+                , HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottom(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId) {
+
+        CardMoveResult result = cardMoveService.moveCardToBottom(member, cardId);
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
+                , HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetween(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId,
+            @RequestParam Long previousCardId,
+            @RequestParam Long nextCardId) {
+
+        CardMoveResult result = cardMoveService.moveCardBetween(member, cardId, previousCardId, nextCardId);
+        return new ResponseEntity<>(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result)
+                , HttpStatus.OK);
     }
 }

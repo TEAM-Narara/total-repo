@@ -51,6 +51,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Setter
     private Map<String, Object> cover;
 
+    @Setter
     @Column(name = "my_order", nullable = false, columnDefinition = "bigint default 0")
     private Long myOrder;
 

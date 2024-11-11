@@ -52,4 +52,18 @@ public interface CardAPI {
             @PathVariable Long cardId,
             @RequestParam int page,
             @RequestParam int size);
+
+
+    @PatchMapping("/{cardId}/move/top")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTop(@AuthenticationPrincipal Member member, @PathVariable Long cardId);
+
+    @PatchMapping("/{cardId}/move/bottom")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottom(@AuthenticationPrincipal Member member, @PathVariable Long cardId);
+
+    @PatchMapping("/{cardId}/move/between")
+    ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetween(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long cardId,
+            @RequestParam Long previousCardId,
+            @RequestParam Long nextCardId);
 }

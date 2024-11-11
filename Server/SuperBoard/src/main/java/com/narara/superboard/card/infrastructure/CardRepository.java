@@ -19,4 +19,12 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     java.util.List<Card> findAllByList(List list);
 
     Optional<Card> findByIdAndIsDeletedFalse(Long cardId);
+
+    Optional<Card> findFirstByListOrderByMyOrderAsc(List list);
+
+    Optional<Card> findFirstByListOrderByMyOrderDesc(List list);
+
+    boolean existsByListAndMyOrder(List list, long order);
+
+    java.util.List<Card> findAllByListOrderByMyOrderAsc(List list);
 }
