@@ -5,6 +5,7 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveCollectionRequest;
 import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
@@ -89,6 +90,16 @@ public class ListController implements ListAPI {
             @RequestParam Long nextListId
     ) {
         ListMoveResult result = listMoveService.moveListBetween(member, listId, previousListId, nextListId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
+    @Override
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
+            @AuthenticationPrincipal Member member,
+            @RequestBody ListMoveCollectionRequest listMoveCollectionRequest
+    ) {
+        ListMoveResult result = listMoveService.moveListVersion2(member, listMoveCollectionRequest);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
     }
 

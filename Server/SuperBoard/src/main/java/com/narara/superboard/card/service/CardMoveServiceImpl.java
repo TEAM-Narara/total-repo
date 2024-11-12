@@ -2,13 +2,12 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
+import com.narara.superboard.card.interfaces.dto.CardMoveCollectionRequest;
 import com.narara.superboard.card.interfaces.dto.CardMoveResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardMoveResult;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
-import com.narara.superboard.list.interfaces.dto.ListMoveResponseDto;
-import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -238,6 +237,12 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         return new CardMoveResult.SingleCardMove(
                 new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), orderInfoList.getFirst().myOrder()));
+    }
+
+    @Override
+    public CardMoveResult moveCardVersion2(Member member, Long listId,
+                                           CardMoveCollectionRequest cardMoveCollectionRequest) {
+        return null;
     }
 
     private long generateUniqueOrder(long baseOrder, long maxOffset) {

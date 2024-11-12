@@ -26,10 +26,13 @@ import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
         @UniqueConstraint(columnNames = {"board_id", "myOrder"})
 })
 public class List extends BaseTimeEntity implements Identifiable {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "list_seq_gen")
+//    @SequenceGenerator(name = "list_seq_gen", sequenceName = "list_sequence", initialValue = 1, allocationSize = 1)
+//    private Long id;  // 기본키
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "list_seq_gen")
-    @SequenceGenerator(name = "list_seq_gen", sequenceName = "list_sequence", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 기본키
 
     @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
