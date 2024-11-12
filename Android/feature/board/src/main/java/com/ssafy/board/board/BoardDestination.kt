@@ -20,7 +20,7 @@ fun NavGraphBuilder.boardScreen(
     navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (Long, Long) -> Unit,
-    navigateToCardScreen: (Long) -> Unit
+    navigateToCardScreen: (Long, Long) -> Unit
 ) {
     composable<Board>(
         mapOf(typeOf<SearchParameters>() to SearchParametersType)
@@ -36,7 +36,7 @@ fun NavGraphBuilder.boardScreen(
             navigateToFilterScreen = navigateToFilterScreen,
             navigateToNotificationScreen = navigateToNotificationScreen,
             navigateToBoardMenuScreen = navigateToBoardMenuScreen,
-            navigateToCardScreen = { cardId -> navigateToCardScreen(cardId) }
+            navigateToCardScreen = { cardId -> navigateToCardScreen(board.boardId, cardId) }
         )
     }
 }

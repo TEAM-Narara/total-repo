@@ -1,9 +1,16 @@
 package com.ssafy.card.card
 
 import androidx.lifecycle.viewModelScope
+import com.ssafy.card.CreateAttachmentUseCase
+import com.ssafy.card.DeleteAttachmentUseCase
 import com.ssafy.card.DeleteCardUseCase
+import com.ssafy.card.GetCardMemberUseCase
 import com.ssafy.card.GetCardsUseCase
+import com.ssafy.card.SetCardArchiveUseCase
+import com.ssafy.card.SetCardRepresentativeUseCase
+import com.ssafy.card.UpdateAttachmentToCoverUseCase
 import com.ssafy.card.UpdateCardUseCase
+import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.comment.CreateCommentUseCase
 import com.ssafy.comment.DeleteCommentUseCase
@@ -35,9 +42,15 @@ class CardViewModel @Inject constructor(
     private val getCardUseCase: GetCardsUseCase,
     private val updateCardUseCase: UpdateCardUseCase,
     private val deleteCardUseCase: DeleteCardUseCase,
+    private val setCardArchiveUseCase: SetCardArchiveUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
     private val updateCommentUseCase: UpdateCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
+    private val createAttachmentUseCase: CreateAttachmentUseCase,
+    private val deleteAttachmentUseCase: DeleteAttachmentUseCase,
+    private val updateAttachmentToCoverUseCase: UpdateAttachmentToCoverUseCase,
+    private val getCardMemberUseCase: GetCardMemberUseCase,
+    private val setCardRepresentativeUseCase: SetCardRepresentativeUseCase,
 ) : BaseViewModel() {
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
@@ -58,16 +71,38 @@ class CardViewModel @Inject constructor(
         initialValue = null,
     )
 
+    val careMemberList = _cardId.filterNotNull().flatMapLatest { cardId ->
+        getCardMemberUseCase(cardId).map {
+            it.map {
+                ManagerData(
+                    id = it.memberId,
+                    nickname = it.memberNickname,
+                    email = it.memberEmail,
+                    profileUrl = it.memberProfileImgUrl,
+                    isManager = it.isRepresentative
+                )
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
+
     fun moveToArchive(popBack: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { /* 카드 데이터를 아카이브로 이동 */ }
-            .onSuccess { popBack() }
-            .onFailure { /* 실패 처리 */ }
+        val cardId = _cardId.value ?: return@launch
+        withSocketState { isConnected ->
+            setCardArchiveUseCase(cardId, isConnected)
+            launch(Dispatchers.Main) { popBack() }
+        }
     }
 
     fun moveToDelete(popBack: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { /* 카드 데이터를 삭제 */ }
-            .onSuccess { popBack() }
-            .onFailure { /* 실패 처리 */ }
+        val cardId = _cardId.value ?: return@launch
+        withSocketState { isConnected ->
+            deleteCardUseCase(cardId, isConnected)
+            launch(Dispatchers.Main) { popBack() }
+        }
     }
 
     fun setCardTitle(title: String) {
@@ -146,8 +181,23 @@ class CardViewModel @Inject constructor(
         // TODO : card watch 정보 수정 usecase 연결
     }
 
-    fun addAttachment(filePath: String) {
-        // TODO : 이미지를 S3나 앱 폴더에 저장하고, _cardDTO에 이미지 경로를 추가
+    fun addAttachment(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
+        val cardId = _cardId.value ?: return@launch
+        withSocketState { isConnected ->
+            createAttachmentUseCase(cardId, filePath, isConnected)
+        }
+    }
+
+    fun updateAttachmentToCover(id: Long) = viewModelScope.launch(Dispatchers.IO) {
+        withSocketState { isConnected ->
+            updateAttachmentToCoverUseCase(id, isConnected)
+        }
+    }
+
+    fun deleteAttachment(id: Long) = viewModelScope.launch(Dispatchers.IO) {
+        withSocketState { isConnected ->
+            deleteAttachmentUseCase(id, isConnected)
+        }
     }
 
     fun deleteComment(comment: CommentDTO) = viewModelScope.launch(Dispatchers.IO) {
@@ -172,9 +222,12 @@ class CardViewModel @Inject constructor(
         }
     }
 
-    fun toggleIsManager(id: Long, isManager: Boolean) {}
+    fun toggleIsManager(id: Long, isManager: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        val cardId = _cardId.value ?: return@launch
+        setCardRepresentativeUseCase(cardId, id)
+    }
 
-    fun updatePeriod(periodData: PeriodData) = viewModelScope.launch {
+    fun updatePeriod(periodData: PeriodData) = viewModelScope.launch(Dispatchers.IO) {
         val card = cardDTO.value ?: return@launch
         withSocketState { isConnected ->
             updateCardUseCase(

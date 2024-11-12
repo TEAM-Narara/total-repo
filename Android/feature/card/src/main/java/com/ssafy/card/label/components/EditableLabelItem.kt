@@ -77,8 +77,8 @@ fun EditableLabelItem(
                     shape = RoundedCornerShape(CornerSmall),
                 )
                 .clickable {
+                    onLabelClicked(!isSelected)
                     isSelected = !isSelected
-                    onLabelClicked(isSelected)
                 }
                 .padding(PaddingSmall),
         ) {
