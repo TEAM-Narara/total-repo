@@ -92,10 +92,11 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
 
     override suspend fun getStompOffset(topic: String): Long {
         val preferences = context.datastore.data.first()
-        return preferences[longPreferencesKey("$TOPIC_OFFSET/$topic")] ?: 0L
+        return preferences[longPreferencesKey("$TOPIC_OFFSET/$topic")] ?: -1L
     }
 
     override suspend fun saveStompOffset(topic: String, offset: Long) {
+        if (offset <= getStompOffset(topic)) return
         context.datastore.edit { preferences ->
             preferences[longPreferencesKey("$TOPIC_OFFSET/$topic")] = offset
         }

@@ -5,11 +5,12 @@ import java.util.PriorityQueue
 import java.util.Timer
 import java.util.TimerTask
 
-class StompDataHandler<R>(
+
+class StompDataHandler<T>(
     startOffset: Long = 0L,
-    private val onDataReleased: suspend (StompResponse<R>) -> Unit
+    private val callback: Callback<T>,
 ) {
-    private val priorityQueue = PriorityQueue<StompResponse<R>> { a, b ->
+    private val priorityQueue = PriorityQueue<StompResponse<T>> { a, b ->
         a.offset.compareTo(b.offset)
     }
 
@@ -19,12 +20,12 @@ class StompDataHandler<R>(
     private val onTimeout
         get() = object : TimerTask() {
             override fun run() {
-                throw RuntimeException("offset이 일치하지 않습니다.")
+                throw RuntimeException("offset ${lastOffset + 1}번 데이터가 누락되었습니다.")
             }
         }
 
-    suspend fun handleSocketData(data: StompResponse<R>) {
-        if (data.offset <= lastOffset) return
+    suspend fun handleSocketData(data: StompResponse<T>) {
+        if (data.offset <= lastOffset) return callback.ack(data)
         priorityQueue.offer(data)
         checkAndReleaseData()
         if (priorityQueue.isNotEmpty()) startTimer()
@@ -39,7 +40,8 @@ class StompDataHandler<R>(
             lastOffset = released.offset
 
             stopTimer()
-            onDataReleased(released)
+            callback.onDataReleased(released)
+            callback.ack(released)
         }
     }
 
@@ -51,5 +53,10 @@ class StompDataHandler<R>(
     private fun stopTimer() {
         timer?.cancel()
         timer = null
+    }
+
+    interface Callback<T> {
+        suspend fun ack(data: StompResponse<T>)
+        suspend fun onDataReleased(data: StompResponse<T>)
     }
 }

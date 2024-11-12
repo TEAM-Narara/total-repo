@@ -7,6 +7,7 @@ import com.ssafy.network.BuildConfig
 import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.socket.StompClientManager
 import com.ssafy.network.socket.StompData
+import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,21 +23,26 @@ class BaseStompManager @Inject constructor(
         val memberId = dataStoreRepository.getUser().memberId
         val lastOffset = dataStoreRepository.getStompOffset(topic)
 
-        val dataHandler = StompDataHandler<StompData>(lastOffset) { response ->
-            val ack = AckMessage(
-                offset = response.offset,
-                topic = topic.split("/").joinToString("-"),
-                partition = response.partition,
-                groupId = "member-$memberId"
-            )
+        val dataHandler = StompDataHandler<StompData>(
+            lastOffset,
+            object : StompDataHandler.Callback<StompData> {
+                override suspend fun ack(data: StompResponse<StompData>) {
+                    val ack = AckMessage(
+                        offset = data.offset,
+                        topic = topic.split("/").joinToString("-"),
+                        partition = data.partition,
+                        groupId = "member-$memberId"
+                    )
 
-            stompClientManager.send(SOCKET_ID, ACK_URL, ack)
-            Log.d("TAG", "ack: $ack")
+                    stompClientManager.send(SOCKET_ID, ACK_URL, ack)
+                    dataStoreRepository.saveStompOffset(topic, data.offset)
+                }
 
-            dataStoreRepository.saveStompOffset(topic, response.offset)
-
-            emit(response.data)
-        }
+                override suspend fun onDataReleased(data: StompResponse<StompData>) {
+                    emit(data.data)
+                }
+            }
+        )
 
         state.collect {
             when (it) {
