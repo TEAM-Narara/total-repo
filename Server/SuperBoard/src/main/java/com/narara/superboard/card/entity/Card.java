@@ -179,5 +179,10 @@ public class Card extends BaseTimeEntity implements Identifiable {
         this.setMyOrder(newOrder);
         this.setList(targetList);
     }
+
+
+    public void moveToList(List targetList) {
+        this.setList(targetList);
+    }
 }
 

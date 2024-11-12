@@ -22,6 +22,8 @@ public class CardReorderServiceImpl implements CardReorderService {
     @Override
     @Transactional
     public java.util.List<CardMoveResponseDto> reorderAllCardOrders(List list, Card targetCard, int targetIndex) {
+        targetCard.moveToList(list);
+
         // 해당 보드의 모든 카드를 myOrder 기준으로 오름차순 정렬하여 조회
         java.util.List<Card> cards = cardRepository.findAllByListOrderByMyOrderAsc(list);
 
