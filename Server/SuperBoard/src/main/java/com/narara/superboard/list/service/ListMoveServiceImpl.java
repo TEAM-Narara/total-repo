@@ -60,7 +60,8 @@ public class ListMoveServiceImpl implements ListMoveService {
         }).orElse(DEFAULT_TOP_ORDER);
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, 0, board,
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetList, 0, board,
                 baseOrder, null, topList.get().getMyOrder());
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
@@ -109,7 +110,8 @@ public class ListMoveServiceImpl implements ListMoveService {
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
         // 고유한 newOrder 값을 재시도로 생성 및 재배치 체크
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, -1, board,
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetList, -1, board,
                 baseOrder, bottomList.get().getMyOrder(), null);
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
@@ -142,6 +144,9 @@ public class ListMoveServiceImpl implements ListMoveService {
                     new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
         }
 
+
+        // TODO: 이전 이후의 리스트가 잘 들어오는가 붙어있는 건가
+
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
         log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
@@ -165,11 +170,12 @@ public class ListMoveServiceImpl implements ListMoveService {
                 : (prevOrder + nextOrder) / HALF_DIVIDER;
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
-        int targetIndex = listRepository.findAllByBoardOrderByMyOrderAsc(targetList.getBoard())
-                .indexOf(previousList) + 1;
+        int targetIndex = listRepository.findAllByBoardOrderByMyOrderAsc(
+                targetList.getBoard()).indexOf(previousList) + 1;
 
-        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(targetList, targetIndex,
-                previousList.getBoard(), baseOrder, prevOrder, nextOrder);
+        java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
+                targetList, targetIndex, previousList.getBoard(),
+                baseOrder, prevOrder, nextOrder);
         log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         if (orderInfoList.size() > 1) {
