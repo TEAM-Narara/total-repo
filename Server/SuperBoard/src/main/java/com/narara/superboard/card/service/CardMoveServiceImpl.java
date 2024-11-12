@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.narara.superboard.card.CardAction.MOVE_CARD;
@@ -44,18 +43,16 @@ public class CardMoveServiceImpl implements CardMoveService {
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
 
-        // TODO: 아무것도 없는 리스트에 이동시, 아래 로직에서 그 리스트가 삭제되는 경우 해야함.
-
         Card topCard = cardRepository.findFirstByListOrderByMyOrderAsc(targetList)
                 .orElseGet(() -> {
-                    // targetList가 비어 있는 경우 삭제 처리
-                    listRepository.delete(targetList);
-                    log.warn("targetList 비어 있어 삭제되었습니다 - listId: {}", targetList.getId());
                     return null; // null 반환
                 });
 
         if (topCard == null) {
-            return new CardMoveResult.DeletedCardMove(targetList.getId());
+            targetCard.setMyOrder(DEFAULT_TOP_ORDER);
+            targetList.setLastCardOrder(DEFAULT_TOP_ORDER);
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
         }
 
         if (topCard.getMyOrder() < 1) {
@@ -110,20 +107,17 @@ public class CardMoveServiceImpl implements CardMoveService {
                 listRepository.findById(targetListId)
                         .orElseThrow(() -> new NotFoundEntityException(targetListId, "목록"));
 
-        // TODO: 아무것도 없는 리스트에 이동시, 아래 로직에서 그 리스트가 삭제되는 경우 해야함.
-
         // 대상 리스트에서 가장 아래에 위치한 카드 조회
         Card bottomCard = cardRepository.findFirstByListOrderByMyOrderDesc(targetList)
                 .orElseGet(() -> {
-                    // targetList가 비어 있는 경우 삭제 처리
-                    listRepository.delete(targetList);
-                    log.warn("targetList가 비어 있어 삭제되었습니다 - listId: {}", targetList.getId());
                     return null; // null 반환
                 });
 
         if (bottomCard == null) {
-            return new CardMoveResult.DeletedCardMove(targetList.getId());
-        }
+            targetCard.setMyOrder(DEFAULT_TOP_ORDER);
+            targetList.setLastCardOrder(DEFAULT_TOP_ORDER);
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));         }
 
         if (bottomCard.getMyOrder() >= 9223372036854775807L) {
             // 의도적으로 재시도 로직 실행
@@ -162,6 +156,7 @@ public class CardMoveServiceImpl implements CardMoveService {
         targetCard.moveToListWithOrder(targetList, orderInfoList.getFirst().myOrder());
         targetList.setLastCardOrder(orderInfoList.getFirst().myOrder());
         System.out.println(orderInfoList.getFirst().myOrder());
+
         // 단일 카드 이동 결과 반환
         return new CardMoveResult.SingleCardMove(
                 new CardMoveResponseDto(targetCard.getId(), targetList.getId(), orderInfoList.getFirst().myOrder()));
