@@ -47,11 +47,23 @@ interface ListRepository {
 
     suspend fun createListWatch(listId: Long, isStatus: DataStatus): Flow<Long>
 
-    suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun toggleListWatch(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getLocalOperationListMember(): List<ListMemberDTO>
 
     suspend fun getLocalOperationListMemberAlarm(): List<ListMemberAlarmDTO>
 
     suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>>
+
+    suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
+                                                 includeNoRepresentative: Int,
+                                                 memberIdsEmpty: Int,
+                                                 memberIds: List<Long>,
+                                                 noLimitDate: Int,
+                                                 expireDate: Int,
+                                                 deadlineDateType: Int,
+                                                 includeNoLabel: Int,
+                                                 labelIdsEmpty: Int,
+                                                 cardLabelIds: List<Long>,
+                                                 keyword: String): Flow<List<ListInCard>>
 }

@@ -45,17 +45,9 @@ interface BoardRepository {
 
     suspend fun createBoardMember(boardId: Long, memberId: Long, isConnected: Boolean): Flow<Long>
 
-    suspend fun deleteBoardMember(
-        boardId: Long,
-        memberId: Long,
-        isConnected: Boolean
-    ): Flow<Unit>
+    suspend fun deleteBoardMember(boardId: Long, memberId: Long, isConnected: Boolean): Flow<Unit>
 
-    suspend fun updateBoardMember(
-        boardId: Long,
-        simpleMemberDto: SimpleMemberDto,
-        isConnected: Boolean
-    ): Flow<Unit>
+    suspend fun updateBoardMember(boardId: Long, simpleMemberDto: SimpleMemberDto, isConnected: Boolean): Flow<Unit>
 
     suspend fun getLocalOperationBoardMember(): List<BoardMemberDTO>
 
