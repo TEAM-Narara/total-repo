@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.order
 
+import androidx.room.util.copy
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.card.CardRepository
 import com.ssafy.data.repository.list.ListRepository
@@ -34,7 +35,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         isConnection: Boolean
     ): CardMoveResult? {
         // 이동할 카드 조회
-        val targetCard = cardDao.getCard(cardId) ?: return null
+        var targetCard = cardDao.getCard(cardId) ?: return null
 
         // targetListId가 0L이면 현재 카드의 리스트를 사용
         val targetList = if (targetListId == 0L) {
@@ -48,7 +49,11 @@ class CardMyOrderRepositoryImpl @Inject constructor(
 
         return if (topCard == null) {
             // 보드에 리스트가 없는 경우
-            targetCard.moveToListWithOrder(targetList, DEFAULT_TOP_ORDER)
+            targetCard = targetCard.copy(
+                myOrder = DEFAULT_TOP_ORDER,
+                listId = targetListId
+            )
+
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
@@ -103,7 +108,12 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             } else {
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
-                targetCard.moveToListWithOrder(targetList, newOrder)
+
+                targetCard = targetCard.copy(
+                    myOrder = newOrder,
+                    listId = targetListId
+                )
+
                 CardMoveResult.ReorderedCardMove(
                     listOf(
                         CardMoveResponseDto(
@@ -124,7 +134,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
     ): CardMoveResult? {
 
         // 이동할 카드 조회
-        val targetCard = cardDao.getCard(cardId) ?: return null
+        var targetCard = cardDao.getCard(cardId) ?: return null
 
         // targetListId가 0L이면 현재 카드의 리스트를 사용
         val targetList = if (targetListId == 0L) {
@@ -138,7 +148,12 @@ class CardMyOrderRepositoryImpl @Inject constructor(
 
         return if (bottomCard == null) {
             // 보드에 리스트가 없는 경우
-            targetCard.moveToListWithOrder(targetList, DEFAULT_TOP_ORDER)
+
+            targetCard = targetCard.copy(
+                myOrder = DEFAULT_TOP_ORDER,
+                listId = targetListId
+            )
+
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
@@ -192,7 +207,11 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             } else {
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
-                targetCard.moveToListWithOrder(targetList, newOrder)
+
+                targetCard = targetCard.copy(
+                    myOrder = newOrder,
+                    listId = targetListId
+                )
 
                 listDao.updateList(
                     targetList.copy(
@@ -223,7 +242,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         isConnection: Boolean
     ): CardMoveResult? {
 
-        val targetCard = cardDao.getCard(cardId) ?: return null
+        var targetCard = cardDao.getCard(cardId) ?: return null
 
         // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 카드의 순서 값으로 반환
         if (cardId == previousCardId || cardId == nextCardId || previousCardId == nextCardId) {
@@ -307,7 +326,10 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             // 단일 카드 이동
             val newOrder = orderInfoList.first().myOrder
 
-            targetCard.moveToListWithOrder(targetList, newOrder)
+            targetCard = targetCard.copy(
+                myOrder = newOrder,
+                listId = targetList.id
+            )
 
             CardMoveResult.ReorderedCardMove(
                 listOf(
@@ -425,11 +447,11 @@ class CardMyOrderRepositoryImpl @Inject constructor(
 
     private suspend fun reorderAllCardOrders(
         list: ListEntity,
-        targetCard: CardEntity,
+        prevCard: CardEntity,
         targetIndex: Int
     ): List<CardMoveResponseDto> {
         // 카드의 리스트 이동
-        targetCard.moveToList(list)
+        val targetCard = prevCard.copy(listId = list.id)
 
         // 해당 리스트의 모든 카드를 myOrder 기준으로 오름차순 정렬하여 조회
         val cards = cardDao.getAllCardsInList(list.id).toMutableList()

@@ -153,7 +153,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
     }
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
-    override fun generateUniqueOrder(baseOrder: Long): Long {
+    private fun generateUniqueOrder(baseOrder: Long): Long {
         val gap: Long = LARGE_INCREMENT / 100 // LARGE_INCREMENT의 1%를 기본 간격으로 사용
         val offset = System.nanoTime() % gap
         val uniqueOrder = baseOrder + offset
@@ -161,7 +161,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         return uniqueOrder
     }
 
-    override suspend fun generateUniqueOrderWithRetry(
+    private suspend fun generateUniqueOrderWithRetry(
         targetList: ListEntity,
         targetIndex: Int,
         board: BoardEntity,
@@ -204,13 +204,13 @@ class ListMyOrderRepositoryImpl @Inject constructor(
     }
 
     // 리스트 순서 중복 확인 메서드
-    override suspend fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
+    private suspend fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
         val conflictExists: Boolean = listDao.checkListInBoardExistMyOrder(board.id, order)
 
         return conflictExists
     }
 
-    override suspend fun reorderAllListOrders(
+    private suspend fun reorderAllListOrders(
         board: BoardEntity,
         targetList: ListEntity,
         targetIndex: Int
