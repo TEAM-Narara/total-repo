@@ -43,7 +43,7 @@ class SelectBoardBackgroundViewModel @Inject constructor(
             }
 
             if (boardId != null) {
-                updateBoardUseCase(boardId, cover).withUiState().collect {
+                updateBoardUseCase(boardId, cover, isConnected).safeCollect {
                     withMain { selectCover(cover) }
                 }
             } else {

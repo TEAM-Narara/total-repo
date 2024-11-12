@@ -1,6 +1,7 @@
 package com.ssafy.network.source.card
 
 import com.ssafy.model.attachment.AttachmentResponseDto
+import com.ssafy.model.card.CardDetailDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -14,6 +15,7 @@ import com.ssafy.network.api.CardLabelAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
 import com.ssafy.network.util.S3ImageUtil
+import com.ssafy.nullable.UpdateCardWithNull
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -23,7 +25,7 @@ class CardDataSourceImpl @Inject constructor(
     private val s3ImageUtil: S3ImageUtil
 ) : CardDataSource {
 
-    override suspend fun createCard(cardRequestDto: CardRequestDto): Flow<Unit> =
+    override suspend fun createCard(cardRequestDto: CardRequestDto): Flow<CardDetailDto> =
         safeApiCall { cardAPI.createCard(cardRequestDto) }.toFlow()
 
     override suspend fun deleteCard(cardId: Long): Flow<Unit> =
@@ -33,6 +35,11 @@ class CardDataSourceImpl @Inject constructor(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
     ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, cardUpdateRequestDto) }.toFlow()
+
+    override suspend fun updateCard(
+        cardId: Long,
+        updateCardWithNull: UpdateCardWithNull
+    ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, updateCardWithNull) }.toFlow()
 
     override suspend fun updateCardMember(
         boardId: Long,

@@ -1,7 +1,9 @@
 package com.ssafy.data.repository.list
 
-import com.ssafy.model.list.CreateListRequestDto
+import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.bitmask.UpdateListBitmaskDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.DataStatus
@@ -25,6 +27,8 @@ interface ListRepository {
         isConnected: Boolean
     ): Flow<Unit>
 
+    suspend fun updateList(listId: Long, dto: UpdateListBitmaskDTO)
+
     suspend fun deleteList(listId: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun setListArchive(listId: Long, isConnected: Boolean): Flow<Unit>
@@ -35,7 +39,7 @@ interface ListRepository {
 
     suspend fun getLocalCreateList(): List<ListInCardsDTO>
 
-    suspend fun getLocalOperationList(): List<ListResponseDto>
+    suspend fun getLocalOperationList(): List<ListEntity>
 
     suspend fun getListMembers(listId: Long): Flow<List<MemberResponseDTO>>
 
@@ -55,15 +59,17 @@ interface ListRepository {
 
     suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>>
 
-    suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
-                                                 includeNoRepresentative: Int,
-                                                 memberIdsEmpty: Int,
-                                                 memberIds: List<Long>,
-                                                 noLimitDate: Int,
-                                                 expireDate: Int,
-                                                 deadlineDateType: Int,
-                                                 includeNoLabel: Int,
-                                                 labelIdsEmpty: Int,
-                                                 cardLabelIds: List<Long>,
-                                                 keyword: String): Flow<List<ListInCard>>
+    suspend fun getLocalScreenListsInCardsFilter(
+        boardId: Long,
+        includeNoRepresentative: Int,
+        memberIdsEmpty: Int,
+        memberIds: List<Long>,
+        noLimitDate: Int,
+        expireDate: Int,
+        deadlineDateType: Int,
+        includeNoLabel: Int,
+        labelIdsEmpty: Int,
+        cardLabelIds: List<Long>,
+        keyword: String
+    ): Flow<List<ListInCard>>
 }

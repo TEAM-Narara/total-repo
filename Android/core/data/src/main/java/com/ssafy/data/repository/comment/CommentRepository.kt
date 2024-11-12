@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.comment
 
+import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.piece.ReplyCount
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.model.comment.CommentRequestDto
@@ -30,7 +31,7 @@ interface CommentRepository {
 
     suspend fun getLocalCreateReply(): List<ReplyDTO>
 
-    suspend fun getLocalOperationReply(): List<ReplyDTO>
+    suspend fun getLocalOperationReply(): List<ReplyEntity>
 
     suspend fun getReplyCounts(cardIds: List<Long>): Flow<List<ReplyCount>>
 }

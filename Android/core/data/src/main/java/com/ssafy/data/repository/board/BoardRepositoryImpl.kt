@@ -5,11 +5,13 @@ import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.NegativeIdGenerator
-import com.ssafy.database.dto.piece.bitmaskColumn
+import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.database.dto.piece.LocalTable
+import com.ssafy.database.dto.piece.bitmaskColumn
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
@@ -25,6 +27,8 @@ import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.board.BoardDataSource
+import com.ssafy.nullable.CoverWithNull
+import com.ssafy.nullable.UpdateBoardWithNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -192,11 +196,8 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationBoardList(): List<BoardDTO> =
-        withContext(ioDispatcher) {
-            boardDao.getLocalOperationBoards()
-                .map { it.toDto() }
-        }
+    override suspend fun getLocalOperationBoardList(): List<BoardEntity> =
+        withContext(ioDispatcher) { boardDao.getLocalOperationBoards() }
 
     override suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>> =
         withContext(ioDispatcher) {
@@ -344,7 +345,11 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun createLabel(boardId: Long, createLabelRequestDto: CreateLabelRequestDto, isConnected: Boolean): Flow<Long> =
+    override suspend fun createLabel(
+        boardId: Long,
+        createLabelRequestDto: CreateLabelRequestDto,
+        isConnected: Boolean
+    ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 boardDataSource.createLabel(boardId, createLabelRequestDto).map { it.labelId }
@@ -448,4 +453,16 @@ class BoardRepositoryImpl @Inject constructor(
             labelDao.getLocalOperationLabels()
                 .map { it.toDTO() }
         }
+
+    override suspend fun updateBoard(
+        id: Long,
+        updateBoardRequestDto: UpdateBoardBitmaskDTO
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        val dto = UpdateBoardWithNull(
+            name = updateBoardRequestDto.name,
+            cover = updateBoardRequestDto.cover?.let { CoverWithNull(it.type, it.value) },
+            visibility = updateBoardRequestDto.visibility
+        )
+        boardDataSource.updateBoard(id, dto)
+    }
 }

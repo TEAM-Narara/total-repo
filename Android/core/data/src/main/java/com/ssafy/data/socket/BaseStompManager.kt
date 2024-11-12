@@ -3,6 +3,7 @@ package com.ssafy.data.socket
 import android.util.Log
 import com.ssafy.data.repository.sync.SyncRepository
 import com.ssafy.datastore.DataStoreRepository
+import com.ssafy.model.manager.ConnectManager
 import com.ssafy.model.socket.AckMessage
 import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.BuildConfig
@@ -50,7 +51,10 @@ class BaseStompManager @Inject constructor(
     suspend fun connect() {
         stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
             Log.d("TAG", "subscribe: Socket is connected")
+            ConnectManager.sendConnectingEvent(true)
             syncRepository.syncAll()
+            Log.d("TAG", "subscribe: Sync all")
+            ConnectManager.sendConnectingEvent(false)
         }
     }
 

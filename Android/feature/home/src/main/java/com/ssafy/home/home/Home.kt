@@ -50,7 +50,7 @@ fun HomeScreen(
     moveToAlarmScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val homeData by viewModel.homeData.collectAsStateWithLifecycle()
+    val homeData by viewModel.homeData.collectAsStateWithLifecycle(null)
     val activity = LocalContext.current as? Activity
     activity?.let {
         WindowCompat.getInsetsController(it.window, it.window.decorView).apply {

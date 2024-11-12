@@ -13,6 +13,7 @@ import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
+import com.ssafy.database.dto.bitmask.UpdateCardBitmaskDTO
 import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
@@ -36,6 +37,8 @@ import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.network.source.card.CardDataSource
+import com.ssafy.nullable.CoverWithNull
+import com.ssafy.nullable.UpdateCardWithNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -66,8 +69,7 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            // TODO
-            cardDataSource.createCard(cardRequestDto).map { 5 }
+            cardDataSource.createCard(cardRequestDto).map { it.cardSimpleResponseDto.cardId }
         } else {
             val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
 
@@ -199,11 +201,8 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationCard(): List<CardResponseDto> =
-        withContext(ioDispatcher) {
-            cardDao.getLocalOperationCard()
-                .map { entity -> entity.toDto() }
-        }
+    override suspend fun getLocalOperationCard(): List<CardEntity> =
+        withContext(ioDispatcher) { cardDao.getLocalOperationCard() }
 
     override suspend fun getCard(id: Long): Flow<CardResponseDto?> =
         withContext(ioDispatcher) {
@@ -232,6 +231,11 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             cardMemberDao.getLocalOperationCardMember()
                 .map { it.toDTO() }
+        }
+
+    override suspend fun deleteLocalOperationCardMember(cardMemberId: Long) =
+        withContext(ioDispatcher) {
+            cardMemberDao.deleteCardMemberById(cardMemberId)
         }
 
     override suspend fun getLocalOperationCardMemberAlarm(): List<CardMemberAlarmDTO> =
@@ -363,11 +367,8 @@ class CardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationCardLabels(): List<CardLabelDTO> =
-        withContext(ioDispatcher) {
-            cardLabelDao.getLocalOperationCardLabels()
-                .map { it.toDTO() }
-        }
+    override suspend fun getLocalOperationCardLabels(): List<CardLabelEntity> =
+        withContext(ioDispatcher) { cardLabelDao.getLocalOperationCardLabels() }
 
     override suspend fun getLabelFlow(id: Long): Flow<CardLabelDTO?> =
         withContext(ioDispatcher) {
@@ -655,4 +656,16 @@ class CardRepositoryImpl @Inject constructor(
                 }
             }
     }
+
+    override suspend fun updateCard(cardId: Long, dto: UpdateCardBitmaskDTO): Flow<Unit> {
+        val updateDto = UpdateCardWithNull(
+            name = dto.name,
+            description = dto.description,
+            startAt = dto.startAt,
+            endAt = dto.endAt,
+            cover = dto.cover?.let { CoverWithNull(it.type, it.value) }
+        )
+        return cardDataSource.updateCard(cardId, updateDto)
+    }
+
 }

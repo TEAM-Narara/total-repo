@@ -1,5 +1,7 @@
 package com.ssafy.data.repository.board
 
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.BoardInListDTO
@@ -22,6 +24,7 @@ interface BoardRepository {
     suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto, isConnected: Boolean): Flow<Unit>
+    suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardBitmaskDTO): Flow<Unit>
 
     suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit>
 
@@ -29,7 +32,7 @@ interface BoardRepository {
 
     suspend fun getLocalCreateBoardList(): List<BoardInListDTO>
 
-    suspend fun getLocalOperationBoardList(): List<BoardDTO>
+    suspend fun getLocalOperationBoardList(): List<BoardEntity>
 
     suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 

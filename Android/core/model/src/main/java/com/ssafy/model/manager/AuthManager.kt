@@ -1,4 +1,4 @@
-package com.ssafy.model.auth
+package com.ssafy.model.manager
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +11,16 @@ object AuthManager {
 
     fun sendNoAuthEvent() = CoroutineScope(Dispatchers.Main).launch {
         noAuthEvent.emit(true)
+    }
+
+}
+
+object ConnectManager {
+    const val CONNECTING = "서버와 동기화를 진행하고 있습니다..."
+    val connectingEvent = MutableSharedFlow<Boolean>()
+
+    fun sendConnectingEvent(isConnecting: Boolean) = CoroutineScope(Dispatchers.Main).launch {
+        connectingEvent.emit(isConnecting)
     }
 
 }
