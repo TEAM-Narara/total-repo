@@ -18,6 +18,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
+import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
+
 @Entity
 @Getter
 @Builder
@@ -31,6 +33,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Setter(value = AccessLevel.PRIVATE)
     @JoinColumn(name = "list_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private List list;
@@ -52,6 +55,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Setter
     private Map<String, Object> cover;
 
+    @Setter
     @Column(name = "my_order", nullable = false, columnDefinition = "bigint default 0")
     private Long myOrder;
 
@@ -71,6 +75,9 @@ public class Card extends BaseTimeEntity implements Identifiable {
     private java.util.List<CardMember> cardMemberList;
 
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
+        long cardListOrder = list.getLastCardOrder() + LARGE_INCREMENT;
+        list.setLastCardOrder(cardListOrder);
+
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
@@ -78,8 +85,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
                     put("type", "NONE");
                     put("value", "NONE");
                 }}) //default cover 지정
-                .myOrder(list.getLastCardOrder() + 1)
-                .myOrder(0L)
+                .myOrder(cardListOrder)
                 .isDeleted(false)
                 .isArchived(false)
                 .build();
@@ -167,6 +173,16 @@ public class Card extends BaseTimeEntity implements Identifiable {
 
     public void changeArchiveStatus() {
         this.isArchived = !isArchived;
+    }
+
+    public void moveToListWithOrder(List targetList, long newOrder) {
+        this.setMyOrder(newOrder);
+        this.setList(targetList);
+    }
+
+
+    public void moveToList(List targetList) {
+        this.setList(targetList);
     }
 }
 

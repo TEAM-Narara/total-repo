@@ -13,17 +13,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.narara.superboard.common.constant.MoveConst.DEFAULT_TOP_ORDER;
+import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "list")
+@Table(name = "list", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"board_id", "myOrder"})
+})
 public class List extends BaseTimeEntity implements Identifiable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "list_seq_gen")
+    @SequenceGenerator(name = "list_seq_gen", sequenceName = "list_sequence", initialValue = 1, allocationSize = 1)
     private Long id;  // 기본키
 
     @JoinColumn(name = "board_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -39,8 +45,9 @@ public class List extends BaseTimeEntity implements Identifiable {
     @Column(name = "my_order", nullable = false)
     private Long myOrder;  // 보드 내 순서
 
-    @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 0")
-    private Long lastCardOrder;  // 리스트 내 마지막 카드 순서
+    @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 4000000000000000000")
+    @Builder.Default
+    private Long lastCardOrder = DEFAULT_TOP_ORDER;  // 리스트 내 마지막 카드 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;  // 아카이브 여부 (기본값: false)
@@ -51,12 +58,16 @@ public class List extends BaseTimeEntity implements Identifiable {
     @Column(name = "card_order_version", nullable = false, columnDefinition = "bigint default 0")
     private Long cardOrderVersion;  // 버전
 
+
     public static List createList(ListCreateRequestDto listCreateRequestDto, Board board) {
+        long lastListOrder = board.getLastListOrder() + LARGE_INCREMENT;
+        board.setLastListOrder(lastListOrder);
+
         return List.builder()
                 .name(listCreateRequestDto.listName())
                 .board(board)
-                .myOrder(board.getLastListOrder() +1)
-                .lastCardOrder(0L)
+                .myOrder(lastListOrder)
+                .lastCardOrder(DEFAULT_TOP_ORDER)
                 .isArchived(false)
                 .isDeleted(false)
                 .cardOrderVersion(0L)

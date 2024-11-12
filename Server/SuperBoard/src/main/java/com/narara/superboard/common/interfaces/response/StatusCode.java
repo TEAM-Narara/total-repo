@@ -12,4 +12,5 @@ public class StatusCode {
     public static final int TOO_MANY_REQUESTS = 429;
     public static final int INTERNAL_SERVER_ERROR = 500;
     public static final int SERVICE_UNAVAILABLE = 503;
+    public static final int GONE = 401;
 }

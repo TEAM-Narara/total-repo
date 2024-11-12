@@ -1,6 +1,7 @@
 package com.narara.superboard.card.service;
 
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.card.interfaces.dto.CardSimpleResponseDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
@@ -22,4 +23,6 @@ public interface CardService {
     void checkBoardMember(Card card, Member member, Action action);
     List<CardLogDetailResponseDto> getCardActivity(Long cardId);
     CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable);
+
+    List<CardSimpleResponseDto> getCardsByListId(Long listId);
 }

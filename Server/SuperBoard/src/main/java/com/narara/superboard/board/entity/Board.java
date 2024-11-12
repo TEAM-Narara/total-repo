@@ -16,11 +16,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
+
+import static com.narara.superboard.common.constant.MoveConst.DEFAULT_TOP_ORDER;
 
 @Slf4j
 @Entity
@@ -44,8 +47,10 @@ public class Board extends BaseTimeEntity implements Identifiable {
     @Column(name = "visibility", nullable = false, length = 50)
     private Visibility visibility;  // 가시성 (WORKSPACE, PRIVATE)
 
-    @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 0")
-    private Long lastListOrder;  // 보드 내 마지막 리스트 순서
+    @Setter
+    @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 4000000000000000000")
+    @Builder.Default
+    private Long lastListOrder = DEFAULT_TOP_ORDER; // 보드 내 마지막 리스트 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;
@@ -93,7 +98,7 @@ public class Board extends BaseTimeEntity implements Identifiable {
                 .name(boardCreateRequestDto.name())
                 .visibility(Visibility.fromString(boardCreateRequestDto.visibility()))
                 .workSpace(workSpace)
-                .lastListOrder(0L)
+                .lastListOrder(DEFAULT_TOP_ORDER)
                 .isArchived(boardCreateRequestDto.isClosed())
                 .listOrderVersion(0L)
                 .build();
@@ -131,6 +136,9 @@ public class Board extends BaseTimeEntity implements Identifiable {
         updateCover(boardUpdateRequestDto.cover());
         updateName(boardUpdateRequestDto.name());
 
+        if (!(boardUpdateRequestDto.name() == null || boardUpdateRequestDto.name().isEmpty() || boardUpdateRequestDto.name().isBlank())) {
+            this.name = boardUpdateRequestDto.name();
+        }
         return this;
     }
 
