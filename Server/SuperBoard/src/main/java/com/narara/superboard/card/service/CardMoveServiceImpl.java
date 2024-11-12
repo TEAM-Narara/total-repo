@@ -49,8 +49,8 @@ public class CardMoveServiceImpl implements CardMoveService {
                 });
 
         if (topCard == null) {
-            targetCard.setMyOrder(DEFAULT_TOP_ORDER);
-            targetList.setLastCardOrder(DEFAULT_TOP_ORDER);
+            targetCard.moveToListWithOrder(targetList, DEFAULT_TOP_ORDER);
+
             return new CardMoveResult.SingleCardMove(
                     new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
         }
@@ -112,12 +112,12 @@ public class CardMoveServiceImpl implements CardMoveService {
                 .orElseGet(() -> {
                     return null; // null 반환
                 });
-
+        System.out.println(bottomCard);
         if (bottomCard == null) {
-            targetCard.setMyOrder(DEFAULT_TOP_ORDER);
-            targetList.setLastCardOrder(DEFAULT_TOP_ORDER);
+            targetCard.moveToListWithOrder(targetList, DEFAULT_TOP_ORDER);
             return new CardMoveResult.SingleCardMove(
-                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));         }
+                    new CardMoveResponseDto(targetCard.getId(), targetList.getId(), targetCard.getMyOrder()));
+        }
 
         if (bottomCard.getMyOrder() >= 9223372036854775807L) {
             // 의도적으로 재시도 로직 실행
