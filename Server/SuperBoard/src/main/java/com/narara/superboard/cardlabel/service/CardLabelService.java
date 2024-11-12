@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface CardLabelService {
     CardLabel createCardLabel(Card card, Label label);
-    CardLabel changeCardLabelIsActivated(Card card, Label label);
+    CardLabel changeCardLabelIsActivated(Card card, Label label,Boolean isActivated);
     List<CardLabelDto> getCardLabelCollection(Long cardId);
 }

@@ -54,7 +54,7 @@ public class CardLabelController implements CardLabelAPI {
         Card card = cardService.getCard(request.cardId());
         Label label = labelService.getLabel(request.labelId());
 
-        CardLabel updatedCardLabel = cardLabelService.changeCardLabelIsActivated(card, label);
+        CardLabel updatedCardLabel = cardLabelService.changeCardLabelIsActivated(card, label,request.isActivated());
         CardLabelDto cardLabelDto = CardLabelDto.of(updatedCardLabel);
 
         return new ResponseEntity<>(
