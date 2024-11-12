@@ -43,7 +43,7 @@ public interface ListAPI {
             @RequestParam Long nextListId
     );
 
-    @PatchMapping("/{listId}/move")
+    @PatchMapping("/move")
     @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
     ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
             @AuthenticationPrincipal Member member,
