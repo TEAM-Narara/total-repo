@@ -25,8 +25,6 @@ import kotlin.math.roundToLong
 class ListMyOrderRepositoryImpl @Inject constructor(
     private val listDao: ListDao,
     private val boardDao: BoardDao,
-    private val listRepository: ListRepository,
-    private val boardRepository: BoardRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ListMyOrderRepository {
     // 맨 위로 옮김
@@ -39,10 +37,12 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
         // 이미 최상단
         if (topList != null && targetList.myOrder == topList.myOrder) {
-            return ListMoveResult.SingleListMove(
-                ListMoveResponseDto(
-                    targetList.id,
-                    targetList.myOrder
+            return ListMoveResult.ReorderedListMove(
+                listOf(
+                    ListMoveResponseDto(
+                        targetList.id,
+                        targetList.myOrder
+                    )
                 )
             )
         }
@@ -56,15 +56,6 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         val orderInfoList: List<ListMoveResponseDto> =
             generateUniqueOrderWithRetry(targetList, 0, board, baseOrder)
 
-        if (orderInfoList.size > 1) {
-            return ListMoveResult.ReorderedListMove(orderInfoList)
-        }
-
-        // TODO
-        listDao.updateList(targetList.copy(
-            myOrder = orderInfoList.first().myOrder
-        ))
-
         if (topList == null) {
             // TODO
             boardDao.updateBoard(board.copy(
@@ -72,7 +63,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
             ))
         }
 
-        return ListMoveResult.SingleListMove(orderInfoList.first())
+        return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
     override suspend fun moveListToBottom(listId: Long, isConnection: Boolean): ListMoveResult? {
@@ -84,10 +75,12 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
         // 이미 최하단
         if (bottomList != null && targetList.myOrder == bottomList.myOrder) {
-            return ListMoveResult.SingleListMove(
-                ListMoveResponseDto(
-                    targetList.id,
-                    targetList.myOrder
+            return ListMoveResult.ReorderedListMove(
+                listOf(
+                    ListMoveResponseDto(
+                        targetList.id,
+                        targetList.myOrder
+                    )
                 )
             )
         }
@@ -101,21 +94,12 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         val orderInfoList: List<ListMoveResponseDto> =
             generateUniqueOrderWithRetry(targetList, -1, board, baseOrder)
 
-        if (orderInfoList.size > 1) {
-            return ListMoveResult.ReorderedListMove(orderInfoList)
-        }
-
-        // TODO
-        listDao.updateList(targetList.copy(
-            myOrder = orderInfoList.first().myOrder
-        ))
-
         // TODO
         boardDao.updateBoard(board.copy(
             lastListOrder = orderInfoList.first().myOrder
         ))
 
-        return ListMoveResult.SingleListMove(orderInfoList.first())
+        return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
     override suspend fun moveListBetween(
@@ -129,10 +113,12 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
         // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 리스트의 순서 값으로 반환
         if (listId == previousListId || listId == nextListId || previousListId == nextListId) {
-            return ListMoveResult.SingleListMove(
-                ListMoveResponseDto(
-                    targetList.id,
-                    targetList.myOrder
+            return ListMoveResult.ReorderedListMove(
+                listOf(
+                    ListMoveResponseDto(
+                        targetList.id,
+                        targetList.myOrder
+                    )
                 )
             )
         }
@@ -163,16 +149,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
             baseOrder
         )
 
-        if (orderInfoList.size > 1) {
-            return ListMoveResult.ReorderedListMove(orderInfoList)
-        }
-
-        // TODO
-        listDao.updateList(targetList.copy(
-            myOrder = orderInfoList.first().myOrder
-        ))
-
-        return ListMoveResult.SingleListMove(orderInfoList.first())
+        return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
@@ -253,15 +230,13 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         var newOrder = DEFAULT_TOP_ORDER
         val orderInfoList: MutableList<ListMoveResponseDto> = ArrayList()
 
-        // TODO
         for (list in lists) {
-            listDao.updateList(targetList.copy(myOrder = newOrder))
             orderInfoList.add(ListMoveResponseDto(list.id, newOrder))
             newOrder += REORDER_GAP
         }
 
         // TODO
-        boardDao.updateBoard(board.copy(lastListOrder = newOrder))
+        boardDao.updateBoard(board.copy(lastListOrder = newOrder - REORDER_GAP))
 
         return orderInfoList
     }
