@@ -29,11 +29,37 @@ interface ListDao {
         SELECT * 
         FROM list
         WHERE boardId = :boardId 
-            AND isStatus != 'DELETE' 
+            AND isStatus != 'DELETE'
             AND isArchived = 0
         ORDER BY myOrder
     """)
     fun getAllListsInBoard(boardId: Long): Flow<List<ListEntity>>
+
+    // 현재 보드에서 볼 것
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list
+        WHERE boardId = :boardId 
+            AND isStatus != 'DELETE'
+            AND isArchived = 0
+        ORDER BY myOrder ASC
+        LIMIT 1
+    """)
+    fun getListInBoardToTop(boardId: Long): ListEntity?
+
+    // 현재 보드에서 볼 것
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list
+        WHERE boardId = :boardId 
+            AND isStatus != 'DELETE'
+            AND isArchived = 0
+        ORDER BY myOrder DESC
+        LIMIT 1
+    """)
+    fun getListInBoardToBottom(boardId: Long): ListEntity?
 
     // 리스트들의 보드ID 조회
     @Query("""
