@@ -46,4 +46,22 @@ interface CardAPI {
     @PATCH("api/v1/attachment/{attachmentId}/cover")
     suspend fun updateAttachmentToCover(@Path("attachmentId") attachmentId: Long): Response<ApiResponse<Unit>>
 
+    // 특정 카드에서 멤버의 알림 상태를 조회합니다
+    @GET("api/v1/card-member/{cardId}/alert/{memberId}")
+    suspend fun getAlertCard(
+        @Path("cardId") cardId: Long,
+        @Path("memberId") memberId: Long
+    ): Response<ApiResponse<Boolean>>
+
+    // 특정 카드에서 멤버의 알림 상태를 설정합니다
+    @PATCH("api/v1/card-member/{cardId}/alert/{memberId}")
+    suspend fun setAlertCard(
+        @Path("cardId") cardId: Long,
+        @Path("memberId") memberId: Long
+    ): Response<ApiResponse<Boolean>>
+
+    // 특정 카드 멤버를 담당자로 설정합니다.
+    @PATCH("api/v1/card-member/representative")
+    suspend fun setRepresentativeCard(@Body cardInfo: Map<String, Long>): Response<ApiResponse<Boolean>>
+
 }

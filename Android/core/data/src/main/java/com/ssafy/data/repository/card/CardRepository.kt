@@ -53,6 +53,12 @@ interface CardRepository {
 
     suspend fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<MemberResponseDTO>>
 
+    suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean>
+
     suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>>
 
     suspend fun getMembersWithRepresentativeFlag(

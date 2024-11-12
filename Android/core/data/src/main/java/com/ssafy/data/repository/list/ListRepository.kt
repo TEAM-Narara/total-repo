@@ -47,7 +47,7 @@ interface ListRepository {
 
     suspend fun createListWatch(listId: Long, isStatus: DataStatus): Flow<Long>
 
-    suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun toggleListWatch(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getLocalOperationListMember(): List<ListMemberDTO>
 

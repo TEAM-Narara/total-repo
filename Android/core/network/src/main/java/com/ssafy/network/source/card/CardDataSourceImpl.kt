@@ -72,4 +72,15 @@ class CardDataSourceImpl @Inject constructor(
     override suspend fun updateAttachmentToCover(attachmentId: Long): Flow<Unit> =
         safeApiCall { cardAPI.updateAttachmentToCover(attachmentId) }.toFlow()
 
+
+    override suspend fun getAlertCard(cardId: Long, memberId: Long): Flow<Boolean> =
+        safeApiCall { cardAPI.getAlertCard(cardId, memberId) }.toFlow()
+
+    override suspend fun setAlertCard(cardId: Long, memberId: Long): Flow<Boolean> =
+        safeApiCall { cardAPI.setAlertCard(cardId, memberId) }.toFlow()
+
+    override suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean> =
+        safeApiCall {
+            cardAPI.setRepresentativeCard(mapOf("cardId" to cardId, "memberId" to memberId))
+        }.toFlow()
 }
