@@ -2,6 +2,7 @@ package com.narara.superboard.list.interfaces;
 
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveCollectionRequest;
 import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
@@ -46,8 +47,7 @@ public interface ListAPI {
     @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
     ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
             @AuthenticationPrincipal Member member,
-            @PathVariable Long listId,
-            @RequestParam Long myOrder
+            @RequestBody ListMoveCollectionRequest listMoveCollectionRequest
     );
 
     @GetMapping("/{boardId}/lists")
