@@ -15,8 +15,8 @@ import com.ssafy.model.with.CoverType
 val CardData.Cover: (@Composable () -> Unit)?
     get() = when (coverType) {
         CoverType.NONE -> null
-        CoverType.COLOR -> coverValue?.let { { CardCoverImage(imgPath = it) } }
-        CoverType.IMAGE -> coverValue?.toColor()?.let { { CardCoverColor(color = it) } }
+        CoverType.IMAGE -> coverValue?.let { { CardCoverImage(imgPath = it) } }
+        CoverType.COLOR -> coverValue?.toColor()?.let { { CardCoverColor(color = it) } }
     }
 
 @Composable

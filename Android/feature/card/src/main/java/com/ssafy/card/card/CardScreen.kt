@@ -76,6 +76,8 @@ fun CardScreen(
             resetCardContent = { viewModel.resetCardContent() },
             deleteComment = { comment -> viewModel.deleteComment(comment) },
             addAttachment = { filePath -> viewModel.addAttachment(filePath) },
+            deleteAttachment = { id -> viewModel.deleteAttachment(id) },
+            updateAttachmentToCover = { id -> viewModel.updateAttachmentToCover(id) },
             addComment = { comment -> viewModel.addComment(comment) },
             setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
             saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
@@ -129,6 +131,8 @@ private fun CardScreen(
     resetCardTitle: () -> Unit,
     deleteComment: (CommentDTO) -> Unit,
     addAttachment: (String) -> Unit,
+    deleteAttachment: (Long) -> Unit,
+    updateAttachmentToCover: (Long) -> Unit,
     addComment: (String) -> Unit,
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
@@ -257,7 +261,9 @@ private fun CardScreen(
                 cardAttachmentInfo(
                     modifier = Modifier.padding(horizontal = PaddingDefault),
                     attachments = cardDTO.attachments,
-                    addPhoto = { attachmentLauncher.launch("image/*") }
+                    addPhoto = { attachmentLauncher.launch("image/*") },
+                    deleteAttachment = deleteAttachment,
+                    updateAttachmentToCover = updateAttachmentToCover
                 )
 
                 item(key = "divider3") {
@@ -305,6 +311,8 @@ fun CardScreenPreview() {
         saveCommitContent = { },
         resetCommitContent = { },
         showPeriod = { },
-        showCardMembers = { }
+        showCardMembers = { },
+        updateAttachmentToCover = { },
+        deleteAttachment = { },
     )
 }

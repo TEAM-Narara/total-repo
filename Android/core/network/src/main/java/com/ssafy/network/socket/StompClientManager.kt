@@ -69,7 +69,7 @@ class StompClientManager @Inject constructor(
 
             StompResponse(
                 offset = it.headers["offset"]?.toLong() ?: throw Exception("offset이 존재하지 않습니다."),
-                partition = it.headers["partition"]?.toLong() ?: 0,
+                partition = 0, // it.headers["partition"]?.toLong() ?: 0,
                 data = data
             )
         }.catch { exception ->

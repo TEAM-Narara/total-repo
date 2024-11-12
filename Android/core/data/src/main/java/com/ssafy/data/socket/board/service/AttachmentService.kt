@@ -7,13 +7,14 @@ import com.ssafy.data.socket.board.model.attachment.AddCardAttachmentRequestDto
 import com.ssafy.data.socket.board.model.attachment.DeleteCardAttachmentRequestDto
 import com.ssafy.data.socket.board.model.attachment.EditCardAttachmentCoverRequestDto
 import com.ssafy.database.dao.AttachmentDao
+import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dto.AttachmentEntity
-import com.ssafy.model.with.DataStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AttachmentService @Inject constructor(
+    private val cardDao: CardDao,
     private val attachmentDao: AttachmentDao,
     private val imageStorage: ImageStorage,
     private val gson: Gson
@@ -46,12 +47,14 @@ class AttachmentService @Inject constructor(
 
     suspend fun editCardAttachmentCover(data: JsonObject) {
         val dto = gson.fromJson(data, EditCardAttachmentCoverRequestDto::class.java)
-        val before =
-            attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
-        attachmentDao.updateAttachment(
-            before.copy(
-                isCover = dto.isCover,
-                isStatus = DataStatus.STAY,
+
+        val attachment = attachmentDao.getAttachment(dto.attachmentId) ?: throw Exception("존재하지 않는 첨부파일 입니다.")
+        val beforeCard = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드 입니다.")
+
+        cardDao.updateCard(
+            beforeCard.copy(
+                coverType = dto.type,
+                coverValue = attachment.url
             )
         )
     }
