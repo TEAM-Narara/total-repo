@@ -26,6 +26,7 @@ import com.ssafy.designsystem.values.LabelRed
 import com.ssafy.designsystem.values.PaddingXSmall
 import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.White
+import com.ssafy.model.background.Cover
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +38,7 @@ fun CardTopBar(
     onWatchSelected: (Boolean) -> Unit,
     moveToArchive: () -> Unit,
     moveToDelete: () -> Unit,
-    attachments: List<String>,
+    cover: Cover,
     heightOffset: Float,
 ) {
     val (isExpanded, setExpanded) = remember { mutableStateOf(false) }
@@ -45,7 +46,7 @@ fun CardTopBar(
     val iconText = if (isWatching) "알림 설정 해제" else "알림 설정"
 
     CardTopImage(
-        attachments = attachments,
+        cover = cover,
         heightOffset = heightOffset
     )
 

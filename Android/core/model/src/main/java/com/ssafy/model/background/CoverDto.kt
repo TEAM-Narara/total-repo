@@ -17,8 +17,8 @@ data class CoverDto(
 
 @Serializable
 data class Cover(
-    val type: CoverType,
-    val value: String,
+    val type: CoverType = CoverType.NONE,
+    val value: String = "NONE",
 
     @Transient
     val id: Long = 0,

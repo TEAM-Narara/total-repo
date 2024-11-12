@@ -5,9 +5,10 @@ import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
 import com.ssafy.database.dao.LabelDao
 import com.ssafy.database.dao.NegativeIdGenerator
+import com.ssafy.database.dto.piece.bitmaskColumn
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
-import com.ssafy.database.dto.bitmask.bitmaskColumn
+import com.ssafy.database.dto.LabelEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
@@ -15,6 +16,7 @@ import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
@@ -342,15 +344,19 @@ class BoardRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long> =
+    override suspend fun createLabel(boardId: Long, createLabelRequestDto: CreateLabelRequestDto, isConnected: Boolean): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                // TODO
-                boardDataSource.createLabel(labelDTO).map { 5 }
+                boardDataSource.createLabel(boardId, createLabelRequestDto).map { it.labelId }
             } else {
                 flowOf(
                     labelDao.insertLabel(
-                        labelDTO.copy(isStatus = DataStatus.CREATE).toEntity()
+                        LabelEntity(
+                            boardId = boardId,
+                            name = createLabelRequestDto.name,
+                            color = createLabelRequestDto.color,
+                            isStatus = DataStatus.CREATE
+                        )
                     )
                 )
             }
@@ -400,7 +406,7 @@ class BoardRepositoryImpl @Inject constructor(
 
             if (label != null) {
                 if (isConnected) {
-                    boardDataSource.updateLabel(id, updateLabelRequestDto)
+                    boardDataSource.updateLabel(id, updateLabelRequestDto).map { Unit }
                 } else {
                     // 변경 사항 확인하고 비트마스킹
                     val newLabel = label.copy(

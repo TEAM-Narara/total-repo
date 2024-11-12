@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import com.ssafy.designsystem.values.TextMedium
 
 @Composable
@@ -19,6 +21,8 @@ fun EditableText(
     onTextChanged: (String) -> Unit = {},
     onInputFinished: (String) -> Unit = {},
     maxTitleLength: Int = 15,
+    fontSize: TextUnit = TextMedium,
+    fontWeight: FontWeight = FontWeight.Normal,
     alignStyle: TextAlign = TextAlign.Start
 ) {
     val (value, onValueChange) = remember(text) { mutableStateOf(text) }
@@ -35,7 +39,7 @@ fun EditableText(
         },
         modifier = modifier,
         singleLine = true,
-        textStyle = TextStyle(fontSize = TextMedium, textAlign = alignStyle),
+        textStyle = TextStyle(fontSize = fontSize, fontWeight = fontWeight, textAlign = alignStyle),
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()

@@ -25,10 +25,11 @@ import com.ssafy.designsystem.values.MascotDefault
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.designsystem.values.RadiusLarge
+import com.ssafy.model.with.AttachmentDTO
 
 fun LazyListScope.cardAttachmentInfo(
     modifier: Modifier = Modifier,
-    attachments: List<String>,
+    attachments: List<AttachmentDTO>,
     addPhoto: () -> Unit
 ) {
     item {
@@ -57,7 +58,7 @@ fun LazyListScope.cardAttachmentInfo(
                             .clip(RoundedCornerShape(RadiusLarge))
                     ) {
                         AsyncImage(
-                            model = attachments[index],
+                            model = attachments[index].url,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxWidth()

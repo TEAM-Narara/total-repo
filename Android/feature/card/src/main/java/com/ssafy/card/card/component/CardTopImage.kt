@@ -13,11 +13,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.IconLegendLarge
+import com.ssafy.model.background.Cover
 
 @Composable
 fun CardTopImage(
     modifier: Modifier = Modifier,
-    attachments: List<String>,
+    cover: Cover,
     heightOffset: Float
 ) {
     val height by animateDpAsState(
@@ -27,10 +28,9 @@ fun CardTopImage(
         label = "height"
     )
 
-    if (attachments.isNotEmpty()) {
-        val attachment = attachments.first()
+    if (cover.value == "IMAGE") {
         AsyncImage(
-            model = attachment,
+            model = cover.value,
             contentDescription = null,
             modifier = modifier.height(height),
             contentScale = ContentScale.Crop

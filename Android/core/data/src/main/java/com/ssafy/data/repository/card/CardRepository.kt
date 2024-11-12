@@ -7,6 +7,8 @@ import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.label.CreateCardLabelRequestDto
+import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInMyRepresentativeCard
@@ -15,8 +17,10 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
+import com.ssafy.model.with.MemberWithRepresentativeDTO
 import kotlinx.coroutines.flow.Flow
 
 interface CardRepository {
@@ -41,7 +45,7 @@ interface CardRepository {
 
     suspend fun getCard(id: Long): Flow<CardResponseDto?>
 
-    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardName?>
+    suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardNameDTO?>
 
     suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>>
 
@@ -67,7 +71,7 @@ interface CardRepository {
         workspaceId: Long,
         boardId: Long,
         cardId: Long
-    ): Flow<List<MemberWithRepresentative>>
+    ): Flow<List<MemberWithRepresentativeDTO>>
 
     suspend fun createCardMember(cardId: Long, memberId: Long, isStatus: DataStatus): Flow<Long>
 
@@ -88,9 +92,11 @@ interface CardRepository {
 
     suspend fun getAllCardLabelsInCards(cardIds: List<Long>): Flow<List<CardLabelWithLabelDTO>>
 
-    suspend fun createCardLabel(cardLabel: CardLabelDTO, isConnected: Boolean): Flow<Long>
+    suspend fun getCardLabel(cardId: Long, labelId: Long): CardLabelDTO?
 
-    suspend fun updateCardLabel(id: Long, cardLabelUpdateDto: CardLabelUpdateDto, isConnected: Boolean): Flow<Unit>
+    suspend fun createCardLabel(createCardLabelRequestDto: CreateCardLabelRequestDto, isConnected: Boolean): Flow<Long>
+
+    suspend fun updateCardLabel(updateCardLabelActivateRequestDto: UpdateCardLabelActivateRequestDto, isConnected: Boolean): Flow<Unit>
 
     suspend fun deleteCardLabel(id: Long, isConnected: Boolean): Flow<Unit>
 
