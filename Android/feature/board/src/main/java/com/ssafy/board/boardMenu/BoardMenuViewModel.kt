@@ -1,13 +1,17 @@
 package com.ssafy.board.boardMenu
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.ssafy.board.DeleteBoardUseCase
+import com.ssafy.board.GetBoardActivityUseCase
 import com.ssafy.board.GetBoardMembersUseCase
 import com.ssafy.board.GetBoardUseCase
 import com.ssafy.board.GetBoardWatchStatusUseCase
 import com.ssafy.board.ToggleBoardWatchUseCase
 import com.ssafy.board.UpdateBoardUseCase
 import com.ssafy.board.boardMenu.data.BoardMenuData
+import com.ssafy.model.activity.BoardActivity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -19,6 +23,7 @@ import com.ssafy.workspace.GetWorkspaceUseCase
 import com.ssafy.workspace.UpdateWorkspaceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +45,8 @@ class BoardMenuViewModel @Inject constructor(
     private val getBoardMembersUseCase: GetBoardMembersUseCase,
     private val getBoardWatchStatusUseCase: GetBoardWatchStatusUseCase,
     private val toggleBoardWatchUseCase: ToggleBoardWatchUseCase,
-    private val deleteBoardUseCase: DeleteBoardUseCase
+    private val deleteBoardUseCase: DeleteBoardUseCase,
+    private val getBoardActivityUseCase: GetBoardActivityUseCase
 ) : BaseViewModel() {
 
     private val _workspaceId = MutableStateFlow<Long?>(null)
@@ -55,8 +61,6 @@ class BoardMenuViewModel @Inject constructor(
                 getBoardUseCase(boardId),
                 getBoardMembersUseCase(boardId),
                 getBoardWatchStatusUseCase(boardId)
-                // TODO 히스토리 데이터도 가져와야 합니다.
-                // HistoryData 클래스가 존재합니다. 참고하세요
             ) { workspace: WorkSpaceDTO?, board: BoardDTO?, members: List<MemberResponseDTO>, watchStatus: Boolean? ->
                 if (workspace != null && board != null) {
                     BoardMenuData(workspace, board, members, watchStatus ?: false)
@@ -69,6 +73,10 @@ class BoardMenuViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = null
         )
+
+    val boardActivity: Flow<PagingData<BoardActivity>> = _boardId.filterNotNull()
+        .flatMapLatest { boardId -> getBoardActivityUseCase(boardId) }
+        .cachedIn(viewModelScope)
 
     fun changeBoardName(name: String) = withIO {
         val boardState = boardState.value ?: return@withIO

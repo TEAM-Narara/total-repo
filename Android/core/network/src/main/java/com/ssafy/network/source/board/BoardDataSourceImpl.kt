@@ -1,5 +1,6 @@
 package com.ssafy.network.source.board
 
+import com.ssafy.model.activity.BoardActivityDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -105,5 +106,12 @@ class BoardDataSourceImpl @Inject constructor(
 
     override suspend fun updateBoard(id: Long, dto: UpdateBoardWithNull): Flow<Unit> =
         safeApiCall { boardAPI.updateBoardWithNull(id, dto) }.toFlow()
+
+    override suspend fun getBoardActivity(
+        boardId: Long,
+        page: Int,
+        size: Int
+    ): Flow<BoardActivityDto> =
+        safeApiCall { boardAPI.getBoardActivity(boardId, page, size) }.toFlow()
 
 }
