@@ -6,6 +6,7 @@ import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.member.entity.Member;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,14 @@ public interface ListAPI {
             @PathVariable Long listId,
             @RequestParam Long previousListId,
             @RequestParam Long nextListId
+    );
+
+    @PatchMapping("/{listId}/move")
+    @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
+    ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long listId,
+            @RequestParam Long myOrder
     );
 
     @GetMapping("/{boardId}/lists")

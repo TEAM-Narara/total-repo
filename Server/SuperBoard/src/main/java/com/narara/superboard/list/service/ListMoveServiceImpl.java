@@ -5,6 +5,9 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -206,6 +209,95 @@ public class ListMoveServiceImpl implements ListMoveService {
         return new ListMoveResult.SingleListMove(orderInfoList.getFirst());
     }
 
+    @Override
+    @Transactional
+    public ListMoveResult moveListVersion1(Member member, Long listId, Long myOrder) {
+        //바꿀 리스트 조회
+        List targetList = listRepository.findById(listId)
+                .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
+
+        //유저의 보드 접근 권한을 확인
+        listService.checkBoardMember(targetList, member, MOVE_LIST);
+
+        // 보드의 전체 리스트를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
+        java.util.List<List> allLists = listRepository.findAllByBoardOrderByMyOrderAsc(targetList.getBoard());
+
+        //리스트 myOrder 배정 및 재배치
+        java.util.List<List> updatedListCollection = insertAndRelocate(allLists, targetList, myOrder);
+
+        //혹시모를 에러를 위한 sort: 업데이트된 리스트들을 순서대로 정렬
+        Collections.sort(updatedListCollection, Comparator.comparingLong(List::getMyOrder));
+
+        //dto에 바뀐 리스트 값 매핑
+        java.util.List<ListMoveResponseDto> orderInfoList = ListMoveResponseDto.of(updatedListCollection);
+
+        return new ListMoveResult.ReorderedListMove(orderInfoList);
+    }
+
+    private java.util.List<List> insertAndRelocate(java.util.List<List> allLists, List targetList, Long wantedOrder) {
+        //1. allLists에 targetList가 이미 존재한다면 삭제(에러 방지를 위해)
+        for (List existList: allLists) {
+            if (existList.getId().equals(targetList.getId())) {
+                allLists.remove(targetList);
+                break;
+            }
+        }
+
+        //이진 탐색으로 내가 원하는 위치를 찾아냄
+        int wantedIdx = findIdxInAllList(allLists, wantedOrder);
+
+        return updateMyOrder(allLists, wantedIdx, targetList, wantedOrder);
+    }
+
+    private java.util.List<List> updateMyOrder(java.util.List<List> allLists, int wantedIdx, List targetList, Long wantedOrder) {
+        java.util.List<List> updatedList = new ArrayList<>();
+
+        //맨 뒤라면 바로 업데이트
+        if (allLists.size() <= wantedIdx) {
+            targetList.setMyOrder(wantedOrder);
+            return new ArrayList<>(java.util.List.of(targetList));
+        }
+
+        List currentList = allLists.get(wantedIdx);
+
+        //이미 wantedOrder를 MyOrder로 가지는 리스트가 있다면 재귀 업데이트
+        if (currentList.getMyOrder().equals(wantedOrder)) {
+            java.util.List<List> nextUpdatedList = updateMyOrder(allLists, wantedIdx + 1, currentList, wantedOrder + 1);
+            updatedList.addAll(nextUpdatedList);
+        }
+
+        targetList.setMyOrder(wantedOrder);
+        updatedList.add(targetList);
+
+        return updatedList;
+    }
+
+    private int findIdxInAllList(java.util.List<List> allLists, Long targetOrder) {
+        if (allLists == null) {
+            throw new IllegalArgumentException("allLists cannot be null");
+        }
+
+        //이진탐색을 통해 원하는 인덱스를 찾아냄
+        int startIdx = 0;
+        int endIdx = allLists.size();
+
+        while (startIdx < endIdx) {
+            int midIdx = startIdx + (endIdx - startIdx) / 2;
+            List midList = allLists.get(midIdx);
+
+            if (midList == null || midList.getMyOrder() == null) {
+                throw new IllegalStateException("Invalid list or order at index: " + midIdx);
+            }
+
+            if (midList.getMyOrder() < targetOrder) {
+                startIdx = midIdx + 1;
+            } else {
+                endIdx = midIdx;
+            }
+        }
+
+        return startIdx;
+    }
 
     private long generateUniqueOrder(long baseOrder, long maxOffset) {
         // 0부터 maxOffset까지의 범위에서 랜덤 offset 값을 생성
@@ -218,7 +310,6 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         return uniqueOrder;
     }
-
 
     private java.util.List<ListMoveResponseDto> generateUniqueOrderWithRetry(List targetList, int targetIndex,
                                                                              Board board, long baseOrder,

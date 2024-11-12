@@ -92,6 +92,17 @@ public class ListController implements ListAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
     }
 
+    @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
+    @Override
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long listId,
+            @RequestParam Long myOrder
+    ) {
+        ListMoveResult result = listMoveService.moveListVersion1(member, listId, myOrder);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
+    }
+
     @Override
     @Operation(summary = "보드 내의 리스트 조회")
     public ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getListsByBoardId(@PathVariable Long boardId) {

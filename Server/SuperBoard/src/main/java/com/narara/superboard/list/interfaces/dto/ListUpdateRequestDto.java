@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record ListUpdateRequestDto(
+        Long listId,
         String listName
 ) implements NameHolder {
     @Override
