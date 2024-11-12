@@ -19,6 +19,7 @@ import com.ssafy.database.dto.piece.getNullColumnCard
 import com.ssafy.database.dto.piece.getNullColumnList
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.background.CoverDto
+import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.CardAllInfoDTO
@@ -169,7 +170,12 @@ class SyncRepositoryImpl @Inject constructor(
                 }
 
             change.forEach { cardLabelEntity: CardLabelEntity ->
-                // TODO 이거 없음??
+                val updateCardLabelDTO = UpdateCardLabelActivateRequestDto(
+                    cardId = cardLabelEntity.id,
+                    labelId = cardLabelEntity.labelId,
+                    isActivated = cardLabelEntity.isActivated
+                )
+                cardRepository.updateCardLabel(updateCardLabelDTO, isConnected)
             }
         }.also { deleteManager.deleteFromCardLabel(create) }
     }
