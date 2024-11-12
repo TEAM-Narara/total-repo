@@ -159,14 +159,6 @@ public class CardController implements CardAPI {
 
         CardMoveResult result = cardMoveService.moveCardToTop(member, cardId, targetListId);
 
-        // 결과가 DeletedCardMove인 경우
-        if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
-            String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
-            log.warn(message);
-            return new ResponseEntity<>(
-                    DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result),
-                    HttpStatus.GONE);
-        }
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result),
                 HttpStatus.OK);
@@ -182,14 +174,6 @@ public class CardController implements CardAPI {
 
         CardMoveResult result = cardMoveService.moveCardToBottom(member, cardId, targetListId);
 
-        // 결과가 DeletedCardMove인 경우
-        if (result instanceof CardMoveResult.DeletedCardMove(Long listId)) {
-            String message = String.format("리스트가 비어 있어 삭제되었습니다 - listId: %d", listId);
-            log.warn(message);
-            return new ResponseEntity<>(
-                    DefaultResponse.res(StatusCode.GONE, ResponseMessage.DELETE_LIST_BY_EMPTY, result),
-                    HttpStatus.GONE);
-        }
         // FIXME: 반환 값과 응답 값이 로컬 서버에서 다른 경우 수정해야함.
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result),
@@ -214,7 +198,7 @@ public class CardController implements CardAPI {
     public ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(@PathVariable Long listId) {
         List<CardSimpleResponseDto> cards = cardService.getCardsByListId(listId);
         return new ResponseEntity<>(
-                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_DELETE_SUCCESS, cards)
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_FETCH_SUCCESS, cards)
                 , HttpStatus.OK);
     }
 }

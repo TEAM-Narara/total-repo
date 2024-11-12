@@ -78,6 +78,7 @@ public class ResponseMessage {
     public static final String CARD_LOG_FETCH_SUCCESS = "카드 로그 목록 조회 성공";
     public static final String CARD_ARCHIVE_STATUS_CHANGE_SUCCESS = "카드 아카이브 상태 변경 성공";
     public static final String CARD_ACTIVITY_FETCH_SUCCESS = "카드 로그 최신순 조회 성공";
+    public static final String CARD_FETCH_SUCCESS = "카드 조회 성공";
 
     // 댓글 관련 상수
     public static final String REPLY_CREATE_SUCCESS = "댓글 생성 성공";
