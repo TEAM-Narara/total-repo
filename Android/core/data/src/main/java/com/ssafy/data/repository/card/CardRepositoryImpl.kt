@@ -1,12 +1,11 @@
 package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dto.piece.toEntity
-import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
@@ -14,6 +13,7 @@ import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
+import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.database.dto.with.CardWithListAndBoardName
 import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
@@ -64,12 +64,15 @@ class CardRepositoryImpl @Inject constructor(
                     id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE))
+                    isStatus = DataStatus.CREATE
+                )
+            )
                 .also {
                     createCardMember(
                         cardId = localCardId,
                         memberId = myMemberId,
-                        isStatus = DataStatus.CREATE)
+                        isStatus = DataStatus.CREATE
+                    )
                     createCardWatch(localCardId, isStatus = DataStatus.CREATE)
                 }
             )
@@ -172,7 +175,7 @@ class CardRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getArchivedCards(boardId: Long): Flow<List<CardResponseDto>>  =
+    override suspend fun getArchivedCards(boardId: Long): Flow<List<CardResponseDto>> =
         withContext(ioDispatcher) {
             cardDao.getAllCardsArchived(boardId)
                 .map { entities -> entities.map { it.toDto() } }
@@ -258,23 +261,28 @@ class CardRepositoryImpl @Inject constructor(
         isStatus: DataStatus
     ): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(cardMemberDao.insertCardMember(
-                CardMemberEntity(
-                    cardId = cardId,
-                    memberId = memberId,
-                    isStatus = isStatus)
-            ))
+            flowOf(
+                cardMemberDao.insertCardMember(
+                    CardMemberEntity(
+                        cardId = cardId,
+                        memberId = memberId,
+                        isStatus = isStatus
+                    )
+                )
+            )
         }
 
     override suspend fun updateCardMember(
         simpleCardMemberDto: SimpleCardMemberDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val cardMember = cardMemberDao.getCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto.memberId)
+        val cardMember =
+            cardMemberDao.getCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto.memberId)
 
         if (cardMember != null) {
             if (isConnected) {
-                cardDataSource.updateCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto).map { Unit }
+                cardDataSource.updateCardMember(simpleCardMemberDto.cardId, simpleCardMemberDto)
+                    .map { Unit }
             } else {
                 val result = when (cardMember.isStatus) {
                     DataStatus.STAY ->
@@ -285,6 +293,7 @@ class CardRepositoryImpl @Inject constructor(
                                 isStatus = DataStatus.UPDATE
                             )
                         )
+
                     DataStatus.CREATE, DataStatus.UPDATE ->
                         cardMemberDao.updateCardMember(
                             cardMember.copy(
@@ -292,6 +301,7 @@ class CardRepositoryImpl @Inject constructor(
                                 isRepresentative = !cardMember.isRepresentative,
                             )
                         )
+
                     DataStatus.DELETE -> {}
                 }
 
@@ -304,11 +314,14 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun createCardWatch(cardId: Long, isStatus: DataStatus): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(cardMemberDao.insertCardAlarm(
-                CardMemberAlarmEntity(
-                    cardId = cardId,
-                    isStatus = isStatus)
-            ))
+            flowOf(
+                cardMemberDao.insertCardAlarm(
+                    CardMemberAlarmEntity(
+                        cardId = cardId,
+                        isStatus = isStatus
+                    )
+                )
+            )
         }
 
     override suspend fun getLocalCreateCardLabels(): List<CardLabelDTO> =
@@ -341,46 +354,61 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDto() } }
         }
 
-    override suspend fun createCardLabel(cardLabel: CardLabelDTO, isConnected: Boolean): Flow<Long> =
+    override suspend fun createCardLabel(
+        cardLabel: CardLabelDTO,
+        isConnected: Boolean
+    ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
                 // TODO
                 cardDataSource.createCardLabel(cardLabel).map { 5 }
             } else {
-                flowOf(cardLabelDao.insertCardLabel(
-                    cardLabel.copy(isStatus = DataStatus.CREATE).toEntity()
-                ))
+                flowOf(
+                    cardLabelDao.insertCardLabel(
+                        cardLabel.copy(isStatus = DataStatus.CREATE).toEntity()
+                    )
+                )
             }
         }
 
-    override suspend fun updateCardLabel(id: Long, cardLabelUpdateDto: CardLabelUpdateDto, isConnected: Boolean): Flow<Unit> =
+    override suspend fun updateCardLabel(
+        id: Long,
+        cardLabelUpdateDto: CardLabelUpdateDto,
+        isConnected: Boolean
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             val cardLabel = cardLabelDao.getCardLabel(id)
 
-            if(cardLabel != null) {
+            if (cardLabel != null) {
                 if (isConnected) {
                     cardDataSource.updateCardLabel(id, cardLabelUpdateDto)
                 } else {
-                    val result = when(cardLabel.isStatus) {
+                    val result = when (cardLabel.isStatus) {
                         DataStatus.STAY ->
-                            cardLabelDao.updateCardLabel(cardLabel.copy(
-                                labelId = cardLabelUpdateDto.labelId,
-                                cardId = cardLabelUpdateDto.cardId,
-                                isActivated = cardLabelUpdateDto.isActivated,
-                                isStatus = DataStatus.UPDATE
-                            ))
-                        DataStatus.CREATE, DataStatus.UPDATE  ->
-                            cardLabelDao.updateCardLabel(cardLabel.copy(
-                                labelId = cardLabelUpdateDto.labelId,
-                                cardId = cardLabelUpdateDto.cardId,
-                                isActivated = cardLabelUpdateDto.isActivated,
-                            ))
-                        DataStatus.DELETE -> { }
+                            cardLabelDao.updateCardLabel(
+                                cardLabel.copy(
+                                    labelId = cardLabelUpdateDto.labelId,
+                                    cardId = cardLabelUpdateDto.cardId,
+                                    isActivated = cardLabelUpdateDto.isActivated,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            cardLabelDao.updateCardLabel(
+                                cardLabel.copy(
+                                    labelId = cardLabelUpdateDto.labelId,
+                                    cardId = cardLabelUpdateDto.cardId,
+                                    isActivated = cardLabelUpdateDto.isActivated,
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
@@ -389,20 +417,21 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val label = cardLabelDao.getCardLabel(id)
 
-            if(label != null) {
+            if (label != null) {
                 if (isConnected) {
                     cardDataSource.deleteCardLabel(id)
                 } else {
-                    val result = when(label.isStatus) {
+                    val result = when (label.isStatus) {
                         DataStatus.CREATE ->
                             cardLabelDao.deleteCardLabel(label)
+
                         else ->
                             cardLabelDao.updateCardLabel(label.copy(isStatus = DataStatus.DELETE))
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
@@ -443,15 +472,16 @@ class CardRepositoryImpl @Inject constructor(
     ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                // TODO
-                cardDataSource.createAttachment(attachment).map { 5 }
+                cardDataSource.createAttachment(attachment).map { it.attachmentId }
             } else {
-                flowOf(attachmentDao.insertAttachment(
-                    attachment.copy(
-                        id = negativeIdGenerator.getNextNegativeId(LocalTable.ATTACHMENT),
-                        isStatus = DataStatus.CREATE
-                    ).toEntity()
-                ))
+                flowOf(
+                    attachmentDao.insertAttachment(
+                        attachment.copy(
+                            id = negativeIdGenerator.getNextNegativeId(LocalTable.ATTACHMENT),
+                            isStatus = DataStatus.CREATE
+                        ).toEntity()
+                    )
+                )
             }
         }
 
@@ -459,21 +489,37 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val attachment = attachmentDao.getAttachment(id)
 
-            if(attachment != null) {
+            if (attachment != null) {
                 if (isConnected) {
                     cardDataSource.deleteAttachment(id)
                 } else {
-                    val result = when(attachment.isStatus) {
+                    val result = when (attachment.isStatus) {
                         DataStatus.CREATE ->
                             attachmentDao.deleteAttachment(attachment)
+
                         else ->
                             attachmentDao.updateAttachment(attachment.copy(isStatus = DataStatus.DELETE))
                     }
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
+            }
+        }
+
+    override suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val attachment = attachmentDao.getAttachment(id)
+
+            if (attachment != null) {
+                if (isConnected) {
+                    cardDataSource.updateAttachmentToCover(id)
+                } else {
+                    TODO("Not yet implemented")
+                }
+            } else {
+                flowOf()
             }
         }
 }
