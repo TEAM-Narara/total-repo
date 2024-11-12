@@ -33,14 +33,19 @@ public class CardLabelServiceImpl implements CardLabelService {
     private final BoardOffsetService boardOffsetService;
 
     @Override
-    public CardLabel changeCardLabelIsActivated(Card card, Label label) {
+    public CardLabel changeCardLabelIsActivated(Card card, Label label,Boolean isActivated) {
+        // isActivated 유효성 체크
+        cardLabelValidator.validateIsActivated(isActivated);
+
         Optional<CardLabel> cardLabel = cardLabelRepository.findByCardAndLabel(card, label);
 
-        if (cardLabel.isEmpty()) {
-            return createCardLabel(card, label);
-        }
+        CardLabel changedIsActivated = null;
 
-        CardLabel changedIsActivated = cardLabel.get().changeIsActivated();
+        if (cardLabel.isEmpty()) {
+            changedIsActivated = createCardLabel(card, label);
+        }else{
+            changedIsActivated = cardLabel.get().changeIsActivated(isActivated);
+        }
 
         if (changedIsActivated.getIsActivated()) {
             boardOffsetService.saveAddCardLabel(changedIsActivated); //Websocket 카드라벨 추가

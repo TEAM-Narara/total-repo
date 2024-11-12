@@ -475,7 +475,7 @@ public class BoardOffsetService {
         data.put("cardLabelId", cardLabel.getId());
         data.put("labelId", label.getId());
         data.put("cardId", cardLabel.getCard().getId());
-        data.put("isActivated", label.getName());
+        data.put("isActivated", cardLabel.getIsActivated());
 
         DiffInfo diffInfo = new DiffInfo(
                 label.getUpdatedAt(),
@@ -496,7 +496,7 @@ public class BoardOffsetService {
         data.put("cardLabelId", cardLabel.getId());
         data.put("labelId", label.getId());
         data.put("cardId", cardLabel.getCard().getId());
-        data.put("isActivated", label.getName());
+        data.put("isActivated", cardLabel.getIsActivated());
 
         DiffInfo diffInfo = new DiffInfo(
                 label.getUpdatedAt(),

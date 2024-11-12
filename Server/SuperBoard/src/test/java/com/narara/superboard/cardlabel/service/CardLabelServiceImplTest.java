@@ -172,17 +172,16 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         // given
         Card card = Card.builder().id(1L).build();
         Label label = Label.builder().id(1L).build();
+        Boolean isActived = true;
 
         CardLabel existingCardLabel = spy(CardLabel.createCardLabel(card, label));
 
-        // 초기 상태를 false로 설정해두기 위해 토글 한 번 적용
-        existingCardLabel.changeIsActivated(); // 초기 상태 false로 설정
 
         // CardLabel이 존재하도록 모킹
         when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.of(existingCardLabel));
 
         // when
-        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label);
+        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label,isActived);
 
         // then
         assertNotNull(result, "기존 CardLabel이 반환되어야 합니다.");

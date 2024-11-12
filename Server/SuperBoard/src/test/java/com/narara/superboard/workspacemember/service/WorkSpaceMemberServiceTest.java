@@ -178,7 +178,7 @@ class WorkSpaceMemberServiceTest {
         // when & then
         assertThatThrownBy(() -> workSpaceMemberService.deleteMember(WORKSPACE_ID_1, MEMBER_ID_1))
                 .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("찾을 수 없습니다");
+                .hasMessage("워크스페이스에서 멤버를 찾을 수 없습니다");
     }
 
     @Test

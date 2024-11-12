@@ -40,8 +40,8 @@ public class CardLabel extends BaseTimeEntity {
                 .build();
     }
 
-    public CardLabel changeIsActivated(){
-        this.isActivated = !this.isActivated;
+    public CardLabel changeIsActivated(Boolean isActivated){
+        this.isActivated = isActivated;
         return this;
     }
 }
