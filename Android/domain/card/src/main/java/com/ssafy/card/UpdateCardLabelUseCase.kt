@@ -4,7 +4,6 @@ import com.ssafy.data.repository.card.CardRepository
 import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -26,16 +25,15 @@ class UpdateCardLabelUseCase @Inject constructor(
                 ),
                 isConnected
             ).map { Unit }
-        } else if (isActivated != cardLabel.isActivated) {
+        } else {
             cardRepository.updateCardLabel(
                 UpdateCardLabelActivateRequestDto(
                     labelId = labelId,
                     cardId = cardId,
+                    isActivated = isActivated
                 ),
                 isConnected
             )
-        } else {
-            flow { Unit }
         }
     }
 }

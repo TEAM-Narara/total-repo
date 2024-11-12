@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalDensity
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.IconLegendLarge
 import com.ssafy.model.background.Cover
+import com.ssafy.model.with.CoverType
 
 @Composable
 fun CardTopImage(
@@ -28,7 +29,7 @@ fun CardTopImage(
         label = "height"
     )
 
-    if (cover.value == "IMAGE") {
+    if (cover.type == CoverType.IMAGE) {
         AsyncImage(
             model = cover.value,
             contentDescription = null,

@@ -29,7 +29,6 @@ import com.ssafy.card.card.component.cardAttachmentInfo
 import com.ssafy.card.card.component.cardComment
 import com.ssafy.card.card.component.cardInfoScreen
 import com.ssafy.card.card.component.cardMemberInfo
-import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.member.dialogs.ModifyManagerDialog
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.card.period.dialogs.PeriodDialog
@@ -55,6 +54,7 @@ fun CardScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cardDTO by viewModel.cardDTO.collectAsStateWithLifecycle()
     val userId by viewModel.userId.collectAsStateWithLifecycle()
+    val memberList by viewModel.careMemberList.collectAsStateWithLifecycle()
 
     val managerDialogState = rememberDialogState<Unit>()
     val periodDialogState = rememberDialogState<PeriodData>()
@@ -76,6 +76,8 @@ fun CardScreen(
             resetCardContent = { viewModel.resetCardContent() },
             deleteComment = { comment -> viewModel.deleteComment(comment) },
             addAttachment = { filePath -> viewModel.addAttachment(filePath) },
+            deleteAttachment = { id -> viewModel.deleteAttachment(id) },
+            updateAttachmentToCover = { id -> viewModel.updateAttachmentToCover(id) },
             addComment = { comment -> viewModel.addComment(comment) },
             setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
             saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
@@ -88,14 +90,7 @@ fun CardScreen(
     ModifyManagerDialog(
         dialogState = managerDialogState,
         onIsManagerChanged = viewModel::toggleIsManager,
-        memberList = (0..10L).map {
-            ManagerData(
-                id = it,
-                nickname = "nickname",
-                email = "email@example.com",
-                isManager = true
-            )
-        }
+        memberList = memberList ?: emptyList()
     )
 
     PeriodDialog(
@@ -129,6 +124,8 @@ private fun CardScreen(
     resetCardTitle: () -> Unit,
     deleteComment: (CommentDTO) -> Unit,
     addAttachment: (String) -> Unit,
+    deleteAttachment: (Long) -> Unit,
+    updateAttachmentToCover: (Long) -> Unit,
     addComment: (String) -> Unit,
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
@@ -257,7 +254,9 @@ private fun CardScreen(
                 cardAttachmentInfo(
                     modifier = Modifier.padding(horizontal = PaddingDefault),
                     attachments = cardDTO.attachments,
-                    addPhoto = { attachmentLauncher.launch("image/*") }
+                    addPhoto = { attachmentLauncher.launch("image/*") },
+                    deleteAttachment = deleteAttachment,
+                    updateAttachmentToCover = updateAttachmentToCover
                 )
 
                 item(key = "divider3") {
@@ -305,6 +304,8 @@ fun CardScreenPreview() {
         saveCommitContent = { },
         resetCommitContent = { },
         showPeriod = { },
-        showCardMembers = { }
+        showCardMembers = { },
+        updateAttachmentToCover = { },
+        deleteAttachment = { },
     )
 }

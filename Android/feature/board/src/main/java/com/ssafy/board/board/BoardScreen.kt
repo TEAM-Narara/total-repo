@@ -227,7 +227,10 @@ private fun BoardScreen(
                 item {
                     AddListButton(addList = addList) {
                         scope.launch {
-                            listLazyListState.scrollToItem(listCollection.size)
+                            handleLazyListScrollToCenter(
+                                lazyListState = listLazyListState,
+                                dropIndex = listCollection.size,
+                            )
                         }
                     }
                 }

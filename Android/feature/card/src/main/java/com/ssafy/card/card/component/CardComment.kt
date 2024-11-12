@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.Comment
@@ -50,13 +53,14 @@ fun LazyListScope.cardComment(
                     model = comment.profileImageUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = rememberVectorPainter(image = Icons.Default.AccountCircle)
                 )
             },
             nickname = comment.nickname,
             date = comment.createDate,
             content = comment.content,
-            setContent = { content -> setCommitContent(comment, content)},
+            setContent = { content -> setCommitContent(comment, content) },
             isFocus = comment == focusedComment,
             setFocus = { isFocus ->
                 if (isFocus) setFocusedComment(comment)

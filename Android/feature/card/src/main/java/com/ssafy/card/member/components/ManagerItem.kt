@@ -5,11 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -21,9 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import coil3.compose.AsyncImage
 import com.ssafy.card.member.data.ManagerData
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.values.IconXLarge
@@ -44,9 +49,12 @@ fun ManagerItem(
         manager = isManager,
         onClick = { onIsManagerChanged(id, it) }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_github),
-            contentDescription = ""
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            model = profileUrl,
+            contentDescription = "profile image",
+            contentScale = ContentScale.Crop,
+            error = rememberVectorPainter(Icons.Default.AccountCircle),
         )
     }
 }
