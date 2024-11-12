@@ -42,10 +42,7 @@ import com.ssafy.model.with.ReplyDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -63,7 +60,6 @@ class SyncRepositoryImpl @Inject constructor(
 ) : SyncRepository {
 
     private val isConnected: Boolean = true
-    private val mutex: Mutex = Mutex()
 
     private suspend fun syncMemberBackgroundList() {
         val memberId = dataStoreRepository.getUser().memberId
@@ -100,9 +96,10 @@ class SyncRepositoryImpl @Inject constructor(
                 val workspaceName = workspaceInBoard.name
                 val boardList = workspaceInBoard.boards
 
-                workspaceRepository.createWorkspace(workspaceId, workspaceName, isConnected)
-                    .map { createBoard(it, boardList) }
-                    .collect()
+                val newWorkspaceId = workspaceRepository
+                    .createWorkspace(workspaceId, workspaceName, isConnected).first()
+
+                createBoard(newWorkspaceId, boardList)
             }
 
             change.forEach { workSpaceDTO: WorkSpaceDTO ->
@@ -264,18 +261,15 @@ class SyncRepositoryImpl @Inject constructor(
                 visibility = Visibility.valueOf(board.visibility),
             )
 
-            boardRepository.createBoard(memberId, boardDTO, isConnected)
-                .map { boardId: Long ->
-                    val lists: List<ListInCardsDTO> = board.lists
-                    val labels: List<LabelDTO> = board.labels
-                    val boardMembers: List<BoardMemberDTO> = board.boardMembers
-                    val isBoardMyWatch: Boolean = board.isBoardMyWatch
-
-                    createList(boardId, lists)
-                    createLabels(boardId, labels)
-                    createBoardMembers(boardId, boardMembers)
-                    if (isBoardMyWatch) boardRepository.toggleBoardWatch(boardId, isConnected)
-                }.collect()
+            val boardID = boardRepository.createBoard(memberId, boardDTO, isConnected).first()
+            val lists = board.lists
+            val labels = board.labels
+            val boardMembers = board.boardMembers
+            val isBoardMyWatch = board.isBoardMyWatch
+            createList(boardID, lists)
+            createLabels(boardID, labels)
+            createBoardMembers(boardID, boardMembers)
+            if (isBoardMyWatch) boardRepository.toggleBoardWatch(boardID, isConnected)
         }
     }
 
@@ -288,11 +282,9 @@ class SyncRepositoryImpl @Inject constructor(
                 listName = list.name,
             )
 
-            listRepository.createList(memberId, listDTO, isConnected)
-                .map { listId: Long ->
-                    val cards: List<CardAllInfoDTO> = list.cards
-                    createCards(listId, cards)
-                }.collect()
+            val listId = listRepository.createList(memberId, listDTO, isConnected).first()
+            val cards: List<CardAllInfoDTO> = list.cards
+            createCards(listId, cards)
         }
     }
 
@@ -305,22 +297,21 @@ class SyncRepositoryImpl @Inject constructor(
                 cardName = card.name,
             )
 
-            cardRepository.createCard(memberId, cardDTO, isConnected).map { cardId: Long ->
-                val dto = CardUpdateRequestDto(
-                    name = card.name,
-                    description = card.description,
-                    startAt = card.startAt,
-                    endAt = card.endAt,
-                    cover = card.cover ?: Cover(),
-                )
-                cardRepository.updateCard(cardId, dto, isConnected)
-                if (card.cardMemberAlarm) cardRepository.setCardAlertStatus(cardId, memberId)
+            val cardId = cardRepository.createCard(memberId, cardDTO, isConnected).first()
+            val dto = CardUpdateRequestDto(
+                name = card.name,
+                description = card.description,
+                startAt = card.startAt,
+                endAt = card.endAt,
+                cover = card.cover ?: Cover(),
+            )
 
-                createCardLabels(cardId, card.cardLabels)
-                createCardMembers(cardId, card.cardMembers)
-                createCardAttachments(cardId, card.cardAttachment)
-                createComments(cardId, card.cardReplies)
-            }.collect()
+            cardRepository.updateCard(cardId, dto, isConnected)
+            if (card.cardMemberAlarm) cardRepository.setCardAlertStatus(cardId, memberId)
+            createCardLabels(cardId, card.cardLabels)
+            createCardMembers(cardId, card.cardMembers)
+            createCardAttachments(cardId, card.cardAttachment)
+            createComments(cardId, card.cardReplies)
         }
     }
 
@@ -335,12 +326,11 @@ class SyncRepositoryImpl @Inject constructor(
     }
 
     // 카드의 담당자를 할당하는 것입니다.
-    private suspend fun createCardMembers(cardId: Long, members: List<CardMemberDTO>) =
-        mutex.withLock {
-            members.forEach { member: CardMemberDTO ->
-                cardRepository.setCardPresenter(cardId, member.memberId)
-            }
+    private suspend fun createCardMembers(cardId: Long, members: List<CardMemberDTO>) {
+        members.forEach { member: CardMemberDTO ->
+            cardRepository.setCardPresenter(cardId, member.memberId)
         }
+    }
 
     private suspend fun createCardAttachments(cardId: Long, attachments: List<AttachmentDTO>) {
         attachments.forEach { attachment: AttachmentDTO ->
@@ -378,7 +368,7 @@ class SyncRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncAll() {
+    override suspend fun syncAll() = withContext(ioDispatcher) {
         syncMemberBackgroundList()
         syncWorkspaceList()
         syncBoardList()
