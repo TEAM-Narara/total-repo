@@ -240,6 +240,26 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
+    // 해당 멤버의 카드 알람 상태 조회 (멤버 id는 내것만 가능합니다.)
+    override suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.getAlertCard(cardId, memberId)
+        }
+
+    // 카드 알람 상태 변경은 온라인 일 떄에만 가능합니다. (멤버 id는 내것만 가능합니다.)
+    override suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.setAlertCard(cardId, memberId)
+        }
+
+
+    // 대표자 할당은 온라인 일 떄에만 가능합니다.
+    override suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.setCardPresenter(cardId, memberId)
+        }
+
+
     override suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
             cardMemberDao.getCardMembers(cardId)

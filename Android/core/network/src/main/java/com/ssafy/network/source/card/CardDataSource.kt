@@ -42,4 +42,10 @@ interface CardDataSource {
 
     suspend fun updateAttachmentToCover(attachmentId: Long): Flow<Unit>
 
+    suspend fun getAlertCard(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setAlertCard(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean>
+
 }
