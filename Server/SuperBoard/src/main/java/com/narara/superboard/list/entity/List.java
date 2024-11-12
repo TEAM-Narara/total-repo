@@ -45,8 +45,9 @@ public class List extends BaseTimeEntity implements Identifiable {
     @Column(name = "my_order", nullable = false)
     private Long myOrder;  // 보드 내 순서
 
-    @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 0")
-    private Long lastCardOrder;  // 리스트 내 마지막 카드 순서
+    @Column(name = "last_card_order", nullable = false, columnDefinition = "bigint default 4000000000000000000")
+    @Builder.Default
+    private Long lastCardOrder = DEFAULT_TOP_ORDER;  // 리스트 내 마지막 카드 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;  // 아카이브 여부 (기본값: false)

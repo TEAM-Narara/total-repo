@@ -45,8 +45,9 @@ public class Board extends BaseTimeEntity implements Identifiable {
     private Visibility visibility;  // 가시성 (WORKSPACE, PRIVATE)
 
     @Setter
-    @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 0")
-    private Long lastListOrder;  // 보드 내 마지막 리스트 순서
+    @Column(name = "last_list_order", nullable = false, columnDefinition = "bigint default 4000000000000000000")
+    @Builder.Default
+    private Long lastListOrder = DEFAULT_TOP_ORDER; // 보드 내 마지막 리스트 순서
 
     @Column(name = "is_archived", nullable = false, columnDefinition = "boolean default false")
     private Boolean isArchived;
