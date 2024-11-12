@@ -3,11 +3,13 @@ package com.ssafy.network.source.board
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.CoverType
 import com.ssafy.network.api.BoardAPI
+import com.ssafy.network.api.LabelAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
 import com.ssafy.network.util.S3ImageUtil
@@ -16,6 +18,7 @@ import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(
     private val boardAPI: BoardAPI,
+    private val labelAPI: LabelAPI,
     private val s3ImageUtil: S3ImageUtil
 ) : BoardDataSource {
 
@@ -73,20 +76,19 @@ class BoardDataSourceImpl @Inject constructor(
     override suspend fun getBoardMembers(boardId: Long): Flow<List<MemberResponseDTO>> =
         safeApiCall { boardAPI.getBoardMembers(boardId) }.toFlow()
 
-    override suspend fun createLabel(labelDTO: LabelDTO): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun createLabel(
+        boardId: Long,
+        createLabelRequestDto: CreateLabelRequestDto
+    ): Flow<LabelDTO> =
+        safeApiCall { labelAPI.createLabel(boardId, createLabelRequestDto) }.toFlow()
 
-    override suspend fun deleteLabel(id: Long): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deleteLabel(id: Long): Flow<Unit> =
+        safeApiCall { labelAPI.deleteLabel(id) }.toFlow()
 
     override suspend fun updateLabel(
         id: Long,
         updateLabelRequestDto: UpdateLabelRequestDto
-    ): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    ): Flow<LabelDTO> = safeApiCall { labelAPI.updateLabel(id, updateLabelRequestDto) }.toFlow()
 
     override suspend fun createBoardMember(boardId: Long, memberId: Long): Flow<MemberResponseDTO> =
         safeApiCall { boardAPI.createBoardMember(boardId, mapOf("memberId" to memberId)) }.toFlow()

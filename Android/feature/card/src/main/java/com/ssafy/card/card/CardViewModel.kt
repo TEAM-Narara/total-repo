@@ -1,31 +1,62 @@
 package com.ssafy.card.card
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.card.DeleteCardUseCase
+import com.ssafy.card.GetCardsUseCase
+import com.ssafy.card.UpdateCardUseCase
 import com.ssafy.card.period.data.PeriodData
+import com.ssafy.comment.CreateCommentUseCase
+import com.ssafy.comment.DeleteCommentUseCase
+import com.ssafy.comment.UpdateCommentUseCase
+import com.ssafy.member.GetMemberUseCase
 import com.ssafy.model.card.CardDTO
+import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.card.CommentDTO
+import com.ssafy.model.comment.CommentRequestDto
+import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
 import javax.inject.Inject
-import kotlin.random.Random
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class CardViewModel @Inject constructor() : ViewModel() {
-    private val _cardDTO = MutableStateFlow(CardDTO())
-    val cardDTO = _cardDTO.asStateFlow()
+class CardViewModel @Inject constructor(
+    private val getMemberUseCase: GetMemberUseCase,
+    private val getCardUseCase: GetCardsUseCase,
+    private val updateCardUseCase: UpdateCardUseCase,
+    private val deleteCardUseCase: DeleteCardUseCase,
+    private val createCommentUseCase: CreateCommentUseCase,
+    private val updateCommentUseCase: UpdateCommentUseCase,
+    private val deleteCommentUseCase: DeleteCommentUseCase,
+) : BaseViewModel() {
+    private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setCardId(cardId: Long) = _cardId.update { cardId }
 
-    private val _userId = MutableStateFlow(1L)
-    val userId = _userId.asStateFlow()
+    val cardDTO: StateFlow<CardDTO?> = _cardId.filterNotNull().flatMapLatest { cardId ->
+        getCardUseCase(cardId)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
 
-    fun getCardDetail(cardId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        // TODO : 앱 db에서 cardId에 해당하는 카드 정보를 가져와서 _cardDetail에 저장
-        _cardDTO.value = CardDTO()
-    }
+    val userId = _cardId.filterNotNull().flatMapLatest {
+        getMemberUseCase().map { it?.memberId }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
 
     fun moveToArchive(popBack: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { /* 카드 데이터를 아카이브로 이동 */ }
@@ -39,18 +70,58 @@ class CardViewModel @Inject constructor() : ViewModel() {
             .onFailure { /* 실패 처리 */ }
     }
 
+    fun setCardTitle(title: String) {
+        cardDTO.value?.editableTitle = title
+    }
+
     fun setCardContent(content: String) {
-        cardDTO.value.editableContent = content
+        cardDTO.value?.editableContent = content
+    }
+
+    fun saveCardTitle() = viewModelScope.launch(Dispatchers.IO) {
+        val card = cardDTO.value ?: return@launch
+        if (card.editableTitle.isEmpty()) {
+            resetCardTitle()
+            return@launch
+        }
+        withSocketState { isConnected ->
+            updateCardUseCase(
+                cardId = card.cardId,
+                cardUpdateRequestDto = CardUpdateRequestDto(
+                    name = card.editableTitle,
+                    description = card.content,
+                    startAt = card.startDate,
+                    endAt = card.endDate,
+                    cover = card.cover
+                ),
+                isConnected = isConnected
+            )
+        }
     }
 
     fun saveCardContent() = viewModelScope.launch(Dispatchers.IO) {
-        val newCardDTO = _cardDTO.value.copy(content = _cardDTO.value.editableContent)
-        _cardDTO.emit(newCardDTO)
-        // TODO : 서버에 content 정보 전송
+        val card = cardDTO.value ?: return@launch
+        withSocketState { isConnected ->
+            updateCardUseCase(
+                cardId = card.cardId,
+                cardUpdateRequestDto = CardUpdateRequestDto(
+                    name = card.title,
+                    description = card.editableContent,
+                    startAt = card.startDate,
+                    endAt = card.endDate,
+                    cover = card.cover
+                ),
+                isConnected = isConnected
+            )
+        }
+    }
+
+    fun resetCardTitle() {
+        cardDTO.value?.editableTitle = cardDTO.value?.title ?: return
     }
 
     fun resetCardContent() {
-        cardDTO.value.editableContent = cardDTO.value.content
+        cardDTO.value?.editableContent = cardDTO.value?.content
     }
 
     fun setCommitContent(comment: CommentDTO, content: String) {
@@ -58,11 +129,13 @@ class CardViewModel @Inject constructor() : ViewModel() {
     }
 
     fun saveCommitContent(comment: CommentDTO) = viewModelScope.launch(Dispatchers.IO) {
-        val newComment = comment.copy(content = comment.editableContent)
-        val newComments = (_cardDTO.value.comments - comment + newComment).sortedBy { it.commentId }
-        val newCardDTO = _cardDTO.value.copy(comments = newComments)
-        _cardDTO.emit(newCardDTO)
-        // TODO : 서버에 댓글 정보 전송
+        withSocketState { isConnected ->
+            updateCommentUseCase(
+                commentId = comment.commentId,
+                content = comment.editableContent,
+                isConnected = isConnected
+            )
+        }
     }
 
     fun resetCommitContent(comment: CommentDTO) {
@@ -70,17 +143,7 @@ class CardViewModel @Inject constructor() : ViewModel() {
     }
 
     fun setCardWatching(isWatching: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        val newCardDTO = _cardDTO.value.copy(isWatching = isWatching)
-        _cardDTO.emit(newCardDTO)
-        runCatching { /* TODO 서버에 isWatching 정보 전송 */ }
-            .onSuccess { /* 성공 처리 */ }
-            .onFailure { /* 실패 처리 */ }
-    }
-
-    fun setUserId() = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { /* TODO 사용자 정보를 가져와서 _userId에 저장 */ }
-            .onSuccess { /* 성공 처리 */ }
-            .onFailure { /* 실패 처리 */ }
+        // TODO : card watch 정보 수정 usecase 연결
     }
 
     fun addAttachment(filePath: String) {
@@ -88,29 +151,43 @@ class CardViewModel @Inject constructor() : ViewModel() {
     }
 
     fun deleteComment(comment: CommentDTO) = viewModelScope.launch(Dispatchers.IO) {
-        val newCardDTO = _cardDTO.value.copy(comments = _cardDTO.value.comments - comment)
-        _cardDTO.emit(newCardDTO)
-        runCatching { /* 댓글 삭제 */ }
-            .onSuccess { /* 성공 처리 */ }
-            .onFailure { /* 실패 처리 */ }
+        withSocketState { isConnected ->
+            deleteCommentUseCase(
+                commentId = comment.commentId,
+                isConnected = isConnected
+            )
+        }
     }
 
     fun addComment(message: String) = viewModelScope.launch(Dispatchers.IO) {
-        val comment = CommentDTO(
-            commentId = Random.nextLong(),
-            userId = userId.value,
-            nickname = "nickname",
-            profileImageUrl = "profileImageUrl",
-            content = message,
-            date = Date().time
-        )
-        val newCardDTO = _cardDTO.value.copy(comments = _cardDTO.value.comments + comment)
-        _cardDTO.emit(newCardDTO)
-        runCatching { /* 댓글 추가 */ }
-            .onSuccess { /* 성공 처리 */ }
-            .onFailure { /* 실패 처리 */ }
+        val card = cardDTO.value ?: return@launch
+        withSocketState { isConnected ->
+            createCommentUseCase(
+                commentRequestDto = CommentRequestDto(
+                    cardId = card.cardId,
+                    content = message
+                ),
+                isConnected = isConnected
+            )
+        }
     }
 
     fun toggleIsManager(id: Long, isManager: Boolean) {}
-    fun updatePeriod(periodData: PeriodData) {}
+
+    fun updatePeriod(periodData: PeriodData) = viewModelScope.launch {
+        val card = cardDTO.value ?: return@launch
+        withSocketState { isConnected ->
+            updateCardUseCase(
+                cardId = card.cardId,
+                cardUpdateRequestDto = CardUpdateRequestDto(
+                    name = card.title,
+                    description = card.editableContent,
+                    startAt = periodData.startDate,
+                    endAt = periodData.endDate,
+                    cover = card.cover
+                ),
+                isConnected = isConnected
+            )
+        }
+    }
 }

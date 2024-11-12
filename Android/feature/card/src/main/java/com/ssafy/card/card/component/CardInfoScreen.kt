@@ -1,8 +1,11 @@
 package com.ssafy.card.card.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,15 +14,18 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.ssafy.designsystem.component.EditableMarkDownText
+import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.formatTimestamp
 import com.ssafy.designsystem.formatUnixTimeStamp
 import com.ssafy.designsystem.values.LabelHeight
 import com.ssafy.designsystem.values.LabelWidth
+import com.ssafy.designsystem.values.PaddingMedium
 import com.ssafy.designsystem.values.RadiusDefault
 import com.ssafy.designsystem.values.TextLarge
 import com.ssafy.model.card.CardDTO
@@ -29,18 +35,41 @@ fun LazyListScope.cardInfoScreen(
     cardDTO: CardDTO,
     onClickLabel: () -> Unit,
     onClickDate: () -> Unit,
+    isTitleFocus: Boolean = false,
+    setTitleFocus: (Boolean) -> Unit,
+    setTitle: (String) -> Unit,
     isContentFocus: Boolean = false,
     setContentFocus: (Boolean) -> Unit,
-    setContent: (String) -> Unit
+    setContent: (String) -> Unit,
 ) {
 
-    item(key = cardDTO.title) {
-        Text(
-            text = cardDTO.title,
-            fontSize = TextLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = modifier
-        )
+    item(key = cardDTO.title + isTitleFocus) {
+        val interactionSource = remember { MutableInteractionSource() }
+
+        if (isTitleFocus) {
+            EditableText(
+                text = cardDTO.title,
+                fontSize = TextLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = modifier.padding(top = PaddingMedium),
+                onTextChanged = setTitle,
+                onInputFinished = { setTitleFocus(false) }
+            )
+        } else {
+            Text(
+                text = cardDTO.title,
+                fontSize = TextLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = modifier
+                    .padding(top = PaddingMedium)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                    ) {
+                        setTitleFocus(true)
+                    },
+            )
+        }
     }
 
     item(key = cardDTO.boardTitle + cardDTO.listTitle) {
@@ -70,21 +99,23 @@ fun LazyListScope.cardInfoScreen(
     }
 
 
-    item(key = cardDTO.startDate + cardDTO.endDate) {
+    item(cardDTO.startDate, cardDTO.endDate) {
         ClickableIconText(
             modifier = modifier,
             icon = Icons.Outlined.Timer,
             onClickAction = onClickDate,
             contents = {
+                val startDate = cardDTO.startDate
+                val endDate = cardDTO.endDate
                 when {
-                    cardDTO.startDate != 0L && cardDTO.endDate != 0L ->
-                        Text(text = formatUnixTimeStamp(cardDTO.startDate, cardDTO.endDate))
+                    startDate != null && endDate != null ->
+                        Text(text = formatUnixTimeStamp(startDate, endDate))
 
-                    cardDTO.startDate != 0L ->
-                        Text(text = cardDTO.startDate.formatTimestamp())
+                    startDate != null ->
+                        Text(text = startDate.formatTimestamp())
 
-                    cardDTO.endDate != 0L ->
-                        Text(text = cardDTO.endDate.formatTimestamp())
+                    endDate != null ->
+                        Text(text = endDate.formatTimestamp())
                 }
             }
         )
