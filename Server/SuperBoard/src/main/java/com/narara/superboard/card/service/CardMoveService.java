@@ -9,4 +9,6 @@ public interface CardMoveService {
     CardMoveResult moveCardToBottom(Member member, Long cardId, Long targetListId);
 
     CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId);
+
+    CardMoveResult moveCard(Member member, Long cardId, Long listId, Long myOrder);
 }

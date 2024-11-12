@@ -1,7 +1,5 @@
 package com.narara.superboard.card.interfaces;
 
-import static org.apache.kafka.common.requests.DeleteAclsResponse.log;
-
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
@@ -192,6 +190,18 @@ public class CardController implements CardAPI {
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 
+    @Operation(summary = "카드들 특정 리스트의 특정 위치로 이동", description = "카드를 특정 리스트의 특정 위치로 이동시킵니다.")
+    @Override
+    public ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
+            @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
+            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
+            @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
+            @Parameter(description = "이전 카드의 ID", required = true) @RequestParam Long myOrder) {
+
+        CardMoveResult result = cardMoveService.moveCard(member, cardId, listId, myOrder);
+
+        return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
+    }
 
     @Override
     @Operation(summary = "리스트 내의 카드 조회")

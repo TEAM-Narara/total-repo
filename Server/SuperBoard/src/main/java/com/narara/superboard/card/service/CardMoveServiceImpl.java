@@ -240,6 +240,13 @@ public class CardMoveServiceImpl implements CardMoveService {
                 new CardMoveResponseDto(targetCard.getId(), previousCard.getList().getId(), orderInfoList.getFirst().myOrder()));
     }
 
+    @Override
+    public CardMoveResult moveCard(Member member, Long cardId, Long listId, Long myOrder) {
+        //TODO 구현
+
+        return null;
+    }
+
     private long generateUniqueOrder(long baseOrder, long maxOffset) {
         // 0부터 maxOffset까지의 범위에서 랜덤 offset 값을 생성
         long offset = ThreadLocalRandom.current().nextLong(0, maxOffset);
