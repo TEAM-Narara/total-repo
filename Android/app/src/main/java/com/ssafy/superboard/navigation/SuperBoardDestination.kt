@@ -195,8 +195,8 @@ fun SuperBoardNavHost(
                     BoardMenu(boardId, workspaceId)
                 )
             },
-            navigateToCardScreen = { cardId: Long ->
-                navController.navigate(Card(cardId))
+            navigateToCardScreen = { boardId: Long, cardId: Long ->
+                navController.navigate(Card(boardId, cardId))
             }
         )
 
@@ -204,8 +204,8 @@ fun SuperBoardNavHost(
             popBackToBoardScreen = {
                 navController.popBackStack()
             },
-            moveToSelectLabel = { cardId: Long ->
-                navController.navigate(Label(cardId))
+            moveToSelectLabel = { boardId: Long, cardId: Long ->
+                navController.navigate(Label(boardId, cardId))
             }
         )
 

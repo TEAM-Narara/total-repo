@@ -17,6 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -34,13 +35,19 @@ class LabelViewModel @Inject constructor(
     private val deleteLabelUseCase: DeleteLabelUseCase,
     private val updateCardLabelUseCase: UpdateCardLabelUseCase,
 ) : BaseViewModel() {
-    private var boardId: Long = 110L
-
+    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setBoardId(boardId: Long) = _boardId.update { boardId }
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
 
-    val labelList: StateFlow<List<LabelData>?> = _cardId.filterNotNull().flatMapLatest { cardId ->
-        getLabelListWithCardLabelUseCase(boardId = boardId, cardId = cardId).map { labels ->
+    val labelList: StateFlow<List<LabelData>?> = combine(
+        _boardId,
+        _cardId
+    ) { boardId, cardId ->
+        if (boardId == null || cardId == null) null
+        else Pair(boardId, cardId)
+    }.filterNotNull().flatMapLatest {
+        getLabelListWithCardLabelUseCase(boardId = it.first, cardId = it.second).map { labels ->
             labels?.map { it.toLabelData() }
         }
     }.stateIn(
@@ -50,6 +57,7 @@ class LabelViewModel @Inject constructor(
     )
 
     fun createLabel(color: Color, description: String) = viewModelScope.launch {
+        val boardId = _boardId.value ?: return@launch
         withSocketState { isConnected ->
             createLabelUseCase(
                 boardId = boardId,
@@ -86,7 +94,12 @@ class LabelViewModel @Inject constructor(
     fun selectLabel(id: Long, isSelected: Boolean) = viewModelScope.launch {
         val cardId = _cardId.value ?: return@launch
         withSocketState { isConnected ->
-            updateCardLabelUseCase(cardId = cardId, labelId = id, isActivated = isSelected, isConnected = isConnected)
+            updateCardLabelUseCase(
+                cardId = cardId,
+                labelId = id,
+                isActivated = isSelected,
+                isConnected = isConnected
+            )
         }
     }
 }

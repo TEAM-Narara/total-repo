@@ -4,10 +4,13 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.card.CreateAttachmentUseCase
 import com.ssafy.card.DeleteAttachmentUseCase
 import com.ssafy.card.DeleteCardUseCase
+import com.ssafy.card.GetCardMemberUseCase
 import com.ssafy.card.GetCardsUseCase
 import com.ssafy.card.SetCardArchiveUseCase
+import com.ssafy.card.SetCardRepresentativeUseCase
 import com.ssafy.card.UpdateAttachmentToCoverUseCase
 import com.ssafy.card.UpdateCardUseCase
+import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.comment.CreateCommentUseCase
 import com.ssafy.comment.DeleteCommentUseCase
@@ -46,6 +49,8 @@ class CardViewModel @Inject constructor(
     private val createAttachmentUseCase: CreateAttachmentUseCase,
     private val deleteAttachmentUseCase: DeleteAttachmentUseCase,
     private val updateAttachmentToCoverUseCase: UpdateAttachmentToCoverUseCase,
+    private val getCardMemberUseCase: GetCardMemberUseCase,
+    private val setCardRepresentativeUseCase: SetCardRepresentativeUseCase,
 ) : BaseViewModel() {
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
@@ -60,6 +65,24 @@ class CardViewModel @Inject constructor(
 
     val userId = _cardId.filterNotNull().flatMapLatest {
         getMemberUseCase().map { it?.memberId }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
+
+    val careMemberList = _cardId.filterNotNull().flatMapLatest { cardId ->
+        getCardMemberUseCase(cardId).map {
+            it.map {
+                ManagerData(
+                    id = it.memberId,
+                    nickname = it.memberNickname,
+                    email = it.memberEmail,
+                    profileUrl = it.memberProfileImgUrl,
+                    isManager = it.isRepresentative
+                )
+            }
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -199,11 +222,12 @@ class CardViewModel @Inject constructor(
         }
     }
 
-    fun toggleIsManager(id: Long, isManager: Boolean) {
-        // TODO : usecase 연결
+    fun toggleIsManager(id: Long, isManager: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        val cardId = _cardId.value ?: return@launch
+        setCardRepresentativeUseCase(cardId, id)
     }
 
-    fun updatePeriod(periodData: PeriodData) = viewModelScope.launch {
+    fun updatePeriod(periodData: PeriodData) = viewModelScope.launch(Dispatchers.IO) {
         val card = cardDTO.value ?: return@launch
         withSocketState { isConnected ->
             updateCardUseCase(

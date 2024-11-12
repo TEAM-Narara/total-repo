@@ -29,7 +29,6 @@ import com.ssafy.card.card.component.cardAttachmentInfo
 import com.ssafy.card.card.component.cardComment
 import com.ssafy.card.card.component.cardInfoScreen
 import com.ssafy.card.card.component.cardMemberInfo
-import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.member.dialogs.ModifyManagerDialog
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.card.period.dialogs.PeriodDialog
@@ -55,6 +54,7 @@ fun CardScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cardDTO by viewModel.cardDTO.collectAsStateWithLifecycle()
     val userId by viewModel.userId.collectAsStateWithLifecycle()
+    val memberList by viewModel.careMemberList.collectAsStateWithLifecycle()
 
     val managerDialogState = rememberDialogState<Unit>()
     val periodDialogState = rememberDialogState<PeriodData>()
@@ -90,14 +90,7 @@ fun CardScreen(
     ModifyManagerDialog(
         dialogState = managerDialogState,
         onIsManagerChanged = viewModel::toggleIsManager,
-        memberList = (0..10L).map {
-            ManagerData(
-                id = it,
-                nickname = "nickname",
-                email = "email@example.com",
-                isManager = true
-            )
-        }
+        memberList = memberList ?: emptyList()
     )
 
     PeriodDialog(
