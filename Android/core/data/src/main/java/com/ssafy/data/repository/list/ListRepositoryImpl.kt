@@ -64,26 +64,22 @@ class ListRepositoryImpl @Inject constructor(
         } else {
             val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
 
-            flowOf(
-                listDao.insertList(
-                    ListEntity(
-                        id = localListId,
-                        name = createListRequestDto.listName,
-                        boardId = createListRequestDto.boardId,
-                        isStatus = DataStatus.CREATE
-                    )
-                ).also {
-                    createListMember(
-                        listId = localListId,
-                        memberId = myMemberId,
-                        isStatus = DataStatus.CREATE
-                    )
-                    createListWatch(
-                        listId = localListId,
-                        isStatus = DataStatus.CREATE
-                    )
-                }
+            listDao.insertList(
+                ListEntity(
+                    id = localListId,
+                    name = createListRequestDto.listName,
+                    boardId = createListRequestDto.boardId,
+                    isStatus = DataStatus.CREATE
+                )
             )
+
+            createListMember(
+                listId = localListId,
+                memberId = myMemberId,
+                isStatus = DataStatus.CREATE
+            )
+
+            flowOf(localListId)
         }
     }
 

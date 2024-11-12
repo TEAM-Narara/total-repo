@@ -85,23 +85,22 @@ class WorkspaceRepositoryImpl @Inject constructor(
                 }
             } else {
                 val localWorkspaceId = negativeIdGenerator.getNextNegativeId(LocalTable.WORKSPACE)
-
-                flowOf(
-                    workspaceDao.insertWorkspace(
-                        WorkspaceEntity(
-                            id = localWorkspaceId,
-                            name = name,
-                            authority = Authority.ADMIN,
-                            isStatus = DataStatus.CREATE
-                        ).also {
-                            createWorkspaceMember(
-                                workspaceId = localWorkspaceId,
-                                memberId = myMemberId,
-                                isStatus = DataStatus.CREATE
-                            )
-                        }
+                workspaceDao.insertWorkspace(
+                    WorkspaceEntity(
+                        id = localWorkspaceId,
+                        name = name,
+                        authority = Authority.ADMIN,
+                        isStatus = DataStatus.CREATE
                     )
                 )
+
+                createWorkspaceMember(
+                    workspaceId = localWorkspaceId,
+                    memberId = myMemberId,
+                    isStatus = DataStatus.CREATE
+                )
+
+                flowOf(localWorkspaceId)
             }
         }
 

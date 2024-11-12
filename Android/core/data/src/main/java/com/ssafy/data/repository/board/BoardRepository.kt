@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
 
+    suspend fun createOnlyBoard(myMemberId: Long, boardDTO: BoardDTO)
     suspend fun createBoard(myMemberId: Long, boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun getBoard(boardId: Long): Flow<BoardDTO?>
@@ -40,7 +41,7 @@ interface BoardRepository {
 
     suspend fun getWatchStatus(id: Long): Flow<Boolean?>
 
-    suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun toggleBoardWatch(memberId: Long, id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?>
 

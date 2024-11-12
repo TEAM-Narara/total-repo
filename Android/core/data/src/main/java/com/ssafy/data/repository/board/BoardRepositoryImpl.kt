@@ -48,6 +48,14 @@ class BoardRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : BoardRepository {
 
+    override suspend fun createOnlyBoard(myMemberId: Long, boardDTO: BoardDTO) {
+        if(boardDTO.isStatus != DataStatus.STAY){
+            throw RuntimeException("이 보드는 워치 정보를 담기 위해 서버에서 생성된 보드여야 합니다.")
+        }
+
+        boardDao.insertBoard(boardDTO.toEntity())
+    }
+
     override suspend fun createBoard(
         myMemberId: Long,
         boardDTO: BoardDTO,
@@ -58,24 +66,25 @@ class BoardRepositoryImpl @Inject constructor(
         } else {
             val localBoardId = negativeIdGenerator.getNextNegativeId(LocalTable.BOARD)
 
-            flowOf(
-                boardDao.insertBoard(
-                    boardDTO.copy(
-                        id = localBoardId,
-                        isStatus = DataStatus.CREATE
-                    ).toEntity()
-                ).also {
-                    createBoardMember(
-                        boardId = localBoardId,
-                        memberId = myMemberId,
-                        isConnected = false
-                    )
-                    createBoardWatch(
-                        boardId = localBoardId,
-                        isStatus = DataStatus.CREATE
-                    )
-                }
+            boardDao.insertBoard(
+                boardDTO.copy(
+                    id = localBoardId,
+                    isStatus = DataStatus.CREATE
+                ).toEntity()
             )
+
+            createBoardMember(
+                boardId = localBoardId,
+                memberId = myMemberId,
+                isConnected = false
+            )
+
+            createBoardWatch(
+                boardId = localBoardId,
+                isStatus = DataStatus.CREATE
+            )
+
+            flowOf(localBoardId)
         }
     }
 
@@ -223,16 +232,31 @@ class BoardRepositoryImpl @Inject constructor(
         }
 
     // 워치 변환은 서버에서만 가능
-    override suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit> =
+    override suspend fun toggleBoardWatch(
+        memberId: Long,
+        id: Long,
+        isConnected: Boolean
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             boardDataSource.toggleWatchBoard(id)
             val isAlert = boardDataSource.getWatchStatus(id).first()
-            val boardMemberAlarmEntity = BoardMemberAlarmEntity(
-                boardId = id,
-                isStatus = DataStatus.STAY,
-                isAlert = isAlert
+
+            boardMemberDao.insertBoardMember(
+                BoardMemberEntity(
+                    boardId = id,
+                    memberId = memberId,
+                    isStatus = DataStatus.CREATE
+                )
             )
-            boardMemberDao.insertBoardAlarm(boardMemberAlarmEntity)
+
+            boardMemberDao.insertBoardAlarm(
+                BoardMemberAlarmEntity(
+                    boardId = id,
+                    isStatus = DataStatus.STAY,
+                    isAlert = isAlert
+                )
+            )
+
             flowOf()
         }
 

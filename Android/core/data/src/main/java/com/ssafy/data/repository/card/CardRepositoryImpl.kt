@@ -73,7 +73,7 @@ class CardRepositoryImpl @Inject constructor(
         } else {
             val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
 
-            flowOf(cardDao.insertCard(
+            cardDao.insertCard(
                 CardEntity(
                     id = localCardId,
                     name = cardRequestDto.cardName,
@@ -81,15 +81,13 @@ class CardRepositoryImpl @Inject constructor(
                     isStatus = DataStatus.CREATE
                 )
             )
-                .also {
-                    createCardMember(
-                        cardId = localCardId,
-                        memberId = myMemberId,
-                        isStatus = DataStatus.CREATE
-                    )
-                    createCardWatch(localCardId, isStatus = DataStatus.CREATE)
-                }
+
+            createCardMember(
+                cardId = localCardId,
+                memberId = myMemberId,
+                isStatus = DataStatus.CREATE
             )
+            flowOf(localCardId)
         }
     }
 

@@ -160,7 +160,11 @@ class MemberRepositoryImpl @Inject constructor(
             memberDataSource.createMemberBackground(memberId, background)
                 .map { it.memberBackgroundId }
         } else {
-            flowOf(memberBackgroundDao.insertMemberBackground(background.toEntity()))
+            flowOf(
+                memberBackgroundDao.insertMemberBackground(
+                    background.copy(isStatus = DataStatus.CREATE).toEntity()
+                )
+            )
         }
     }
 

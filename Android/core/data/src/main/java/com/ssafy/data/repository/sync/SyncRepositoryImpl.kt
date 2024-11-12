@@ -18,25 +18,12 @@ import com.ssafy.database.dto.piece.getNullColumnBoard
 import com.ssafy.database.dto.piece.getNullColumnCard
 import com.ssafy.database.dto.piece.getNullColumnList
 import com.ssafy.datastore.DataStoreRepository
-import com.ssafy.model.background.Cover
 import com.ssafy.model.background.CoverDto
-import com.ssafy.model.board.BoardDTO
-import com.ssafy.model.board.Visibility
-import com.ssafy.model.card.CardRequestDto
-import com.ssafy.model.card.CardUpdateRequestDto
-import com.ssafy.model.comment.CommentRequestDto
-import com.ssafy.model.label.CreateCardLabelRequestDto
-import com.ssafy.model.label.CreateLabelRequestDto
-import com.ssafy.model.label.LabelDTO
-import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInListDTO
-import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
-import com.ssafy.model.with.CoverType
-import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ReplyDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
@@ -49,6 +36,8 @@ import javax.inject.Singleton
 
 @Singleton
 class SyncRepositoryImpl @Inject constructor(
+    private val createManager: CreateManager,
+    private val deleteManager: DeleteManager,
     private val dataStoreRepository: DataStoreRepository,
     private val memberRepository: MemberRepository,
     private val workspaceRepository: WorkspaceRepository,
@@ -64,26 +53,21 @@ class SyncRepositoryImpl @Inject constructor(
     private suspend fun syncMemberBackgroundList() {
         val memberId = dataStoreRepository.getUser().memberId
         val create: List<CoverDto> = memberRepository.getLocalCreateMemberBackgrounds()
-        val change: List<CoverDto> = memberRepository.getLocalOperationMemberBackgrounds()
-
+//        val change: List<CoverDto> = memberRepository.getLocalOperationMemberBackgrounds()
+        // TODO 멤버의 배경은 수정, 삭제될 수 없습니다.
         runCatching {
             create.forEach {
                 memberRepository.createMemberBackground(memberId, it, isConnected)
             }
 
-            // 이게 change 가 있나?
-            change.forEach {
-                if (it.isStatus == DataStatus.CREATE)
-                    memberRepository.createMemberBackground(memberId, it, isConnected)
-                else if (it.isStatus == DataStatus.DELETE)
-                    memberRepository.deleteMemberBackground(memberId, it.id, isConnected)
-            }
+//            change.forEach {
+//                if (it.isStatus == DataStatus.CREATE)
+//                    memberRepository.createMemberBackground(memberId, it, isConnected)
+//                else if (it.isStatus == DataStatus.DELETE)
+//                    memberRepository.deleteMemberBackground(memberId, it.id, isConnected)
+//            }
 
-        }.onSuccess {
-            create.forEach { background ->
-                memberRepository.deleteMemberBackground(memberId, background.id, isConnected)
-            }
-        }
+        }.also { deleteManager.deleteMemberBackground(memberId, create) }
     }
 
     private suspend fun syncWorkspaceList() {
@@ -99,19 +83,15 @@ class SyncRepositoryImpl @Inject constructor(
                 val newWorkspaceId = workspaceRepository
                     .createWorkspace(workspaceId, workspaceName, isConnected).first()
 
-                createBoard(newWorkspaceId, boardList)
+                createManager.createBoard(newWorkspaceId, boardList)
             }
 
             change.forEach { workSpaceDTO: WorkSpaceDTO ->
                 val workspaceId = workSpaceDTO.workspaceId
                 val workspaceName = workSpaceDTO.name
-                workspaceRepository.createWorkspace(workspaceId, workspaceName, isConnected)
+                workspaceRepository.updateWorkspace(workspaceId, workspaceName, isConnected)
             }
-        }.onSuccess {
-            create.forEach { workspace ->
-                workspaceRepository.deleteWorkspace(workspace.id, false)
-            }
-        }
+        }.also { deleteManager.deleteFromWorkspaceList(create) }
     }
 
     private suspend fun syncBoardList() {
@@ -120,17 +100,15 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.workspaceId }
-                .forEach { (workspaceId, boardList) -> createBoard(workspaceId, boardList) }
+                .forEach { (workspaceId, boardList) ->
+                    createManager.createBoard(workspaceId, boardList)
+                }
 
             change.forEach { board: BoardEntity ->
                 val boardBitmaskDTO = getNullColumnBoard(board.columnUpdate, board)
                 boardRepository.updateBoard(board.id, boardBitmaskDTO)
             }
-        }.onSuccess {
-            create.forEach { board ->
-                boardRepository.deleteBoard(board.id, false)
-            }
-        }
+        }.also { deleteManager.deleteFromBoard(create) }
     }
 
     private suspend fun syncListList() {
@@ -139,18 +117,14 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.boardId }
-                .forEach { (boardId, listList) -> createList(boardId, listList) }
+                .forEach { (boardId, listList) -> createManager.createList(boardId, listList) }
 
             change.forEach { listEntity: ListEntity ->
                 val listBitmaskDto: UpdateListBitmaskDTO =
                     getNullColumnList(listEntity.columnUpdate, listEntity)
                 listRepository.updateList(listEntity.id, listBitmaskDto)
             }
-        }.onSuccess {
-            create.forEach { list ->
-                listRepository.deleteList(list.id, false)
-            }
-        }
+        }.also { deleteManager.deleteFromList(create) }
     }
 
     private suspend fun syncCardList() {
@@ -159,18 +133,14 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.listId }
-                .forEach { (listId, cardList) -> createCards(listId, cardList) }
+                .forEach { (listId, cardList) -> createManager.createCards(listId, cardList) }
 
             change.forEach { cardEntity ->
                 val cardBitmaskDTO: UpdateCardBitmaskDTO =
                     getNullColumnCard(cardEntity.columnUpdate, cardEntity)
                 cardRepository.updateCard(cardEntity.id, cardBitmaskDTO)
             }
-        }.onSuccess {
-            create.forEach { card ->
-                cardRepository.deleteCard(card.id, false)
-            }
-        }
+        }.also { deleteManager.deleteFromCard(create) }
     }
 
     private suspend fun syncCardMemberList() {
@@ -178,12 +148,10 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.memberId }
-                .forEach { (cardId, cardMemberList) -> createCardMembers(cardId, cardMemberList) }
+                .forEach { (cardId, cardMemberList) ->
+                    createManager.createCardMembers(cardId, cardMemberList)
+                }
 
-        }.onSuccess {
-            create.forEach { cardMember ->
-                cardRepository.deleteLocalOperationCardMember(cardMember.id)
-            }
         }
     }
 
@@ -193,16 +161,17 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.cardId }
-                .forEach { (cardId, cardLabelList) -> createCardLabels(cardId, cardLabelList) }
+                .forEach { (cardId, cardLabelList) ->
+                    createManager.createCardLabels(
+                        cardId,
+                        cardLabelList
+                    )
+                }
 
             change.forEach { cardLabelEntity: CardLabelEntity ->
                 // TODO 이거 없음??
             }
-        }.onSuccess {
-            create.forEach { cardLabel ->
-                cardRepository.deleteCardLabel(cardLabel.labelId, false)
-            }
-        }
+        }.also { deleteManager.deleteFromCardLabel(create) }
     }
 
     private suspend fun syncCardAttachmentList() {
@@ -212,16 +181,9 @@ class SyncRepositoryImpl @Inject constructor(
         runCatching {
             create.groupBy { it.cardId }
                 .forEach { (cardId, attachmentList) ->
-                    createCardAttachments(
-                        cardId,
-                        attachmentList
-                    )
+                    createManager.createCardAttachments(cardId, attachmentList)
                 }
-        }.onSuccess {
-            create.forEach { attachment ->
-                cardRepository.deleteAttachment(attachment.id, false)
-            }
-        }
+        }.also { deleteManager.deleteFromCardAttachment(create) }
     }
 
     private suspend fun syncCommentList() {
@@ -230,145 +192,16 @@ class SyncRepositoryImpl @Inject constructor(
 
         runCatching {
             create.groupBy { it.cardId }
-                .forEach { (cardId, commentList) -> createComments(cardId, commentList) }
+                .forEach { (cardId, commentList) ->
+                    createManager.createComments(cardId, commentList)
+                }
 
             change.forEach { commentRepository.updateComment(it.id, it.content, isConnected) }
-        }.onSuccess {
-            create.forEach { comment ->
-                commentRepository.deleteComment(comment.id, false)
-            }
-        }
-    }
-
-
-    private suspend fun createBoard(workspaceId: Long, boardList: List<BoardInListDTO>) {
-        val memberId = dataStoreRepository.getUser().memberId
-
-        boardList.forEach { board: BoardInListDTO ->
-            val coverType = board.coverType?.let { type -> CoverType.valueOf(type) }
-                ?: CoverType.NONE
-            val coverValue = board.coverValue ?: ""
-            val cover = Cover(
-                type = coverType,
-                value = coverValue,
-            )
-            val boardDTO = BoardDTO(
-                workspaceId = workspaceId,
-                id = board.id,
-                name = board.name,
-                cover = cover,
-                isClosed = board.isClosed,
-                visibility = Visibility.valueOf(board.visibility),
-            )
-
-            val boardID = boardRepository.createBoard(memberId, boardDTO, isConnected).first()
-            val lists = board.lists
-            val labels = board.labels
-            val boardMembers = board.boardMembers
-            val isBoardMyWatch = board.isBoardMyWatch
-            createList(boardID, lists)
-            createLabels(boardID, labels)
-            createBoardMembers(boardID, boardMembers)
-            if (isBoardMyWatch) boardRepository.toggleBoardWatch(boardID, isConnected)
-        }
-    }
-
-    private suspend fun createList(boardId: Long, lists: List<ListInCardsDTO>) {
-        val memberId = dataStoreRepository.getUser().memberId
-
-        lists.forEach { list: ListInCardsDTO ->
-            val listDTO = CreateListRequestDto(
-                boardId = boardId,
-                listName = list.name,
-            )
-
-            val listId = listRepository.createList(memberId, listDTO, isConnected).first()
-            val cards: List<CardAllInfoDTO> = list.cards
-            createCards(listId, cards)
-        }
-    }
-
-    private suspend fun createCards(listId: Long, cards: List<CardAllInfoDTO>) {
-        val memberId = dataStoreRepository.getUser().memberId
-
-        cards.forEach { card: CardAllInfoDTO ->
-            val cardDTO = CardRequestDto(
-                listId = listId,
-                cardName = card.name,
-            )
-
-            val cardId = cardRepository.createCard(memberId, cardDTO, isConnected).first()
-            val dto = CardUpdateRequestDto(
-                name = card.name,
-                description = card.description,
-                startAt = card.startAt,
-                endAt = card.endAt,
-                cover = card.cover ?: Cover(),
-            )
-
-            cardRepository.updateCard(cardId, dto, isConnected)
-            if (card.cardMemberAlarm) cardRepository.setCardAlertStatus(cardId, memberId)
-            createCardLabels(cardId, card.cardLabels)
-            createCardMembers(cardId, card.cardMembers)
-            createCardAttachments(cardId, card.cardAttachment)
-            createComments(cardId, card.cardReplies)
-        }
-    }
-
-    private suspend fun createCardLabels(cardId: Long, labels: List<CardLabelDTO>) {
-        labels.forEach { label: CardLabelDTO ->
-            val dto = CreateCardLabelRequestDto(
-                cardId = cardId,
-                labelId = label.labelId,
-            )
-            cardRepository.createCardLabel(dto, isConnected)
-        }
-    }
-
-    // 카드의 담당자를 할당하는 것입니다.
-    private suspend fun createCardMembers(cardId: Long, members: List<CardMemberDTO>) {
-        members.forEach { member: CardMemberDTO ->
-            cardRepository.setCardPresenter(cardId, member.memberId)
-        }
-    }
-
-    private suspend fun createCardAttachments(cardId: Long, attachments: List<AttachmentDTO>) {
-        attachments.forEach { attachment: AttachmentDTO ->
-            val dto = AttachmentDTO(
-                cardId = cardId,
-                url = attachment.url,
-            )
-            cardRepository.createAttachment(dto, isConnected)
-        }
-    }
-
-    private suspend fun createComments(cardId: Long, comments: List<ReplyDTO>) {
-        comments.forEach { comment: ReplyDTO ->
-            val dto = CommentRequestDto(
-                cardId = cardId,
-                content = comment.content
-            )
-            commentRepository.createComment(dto, isConnected)
-        }
-    }
-
-    private suspend fun createLabels(boardId: Long, labels: List<LabelDTO>) {
-        labels.forEach { label: LabelDTO ->
-            val createLabelRequestDto = CreateLabelRequestDto(
-                name = label.labelName,
-                color = label.labelColor,
-            )
-            boardRepository.createLabel(boardId, createLabelRequestDto, isConnected)
-        }
-    }
-
-    private suspend fun createBoardMembers(boardId: Long, members: List<BoardMemberDTO>) {
-        members.forEach { member: BoardMemberDTO ->
-            boardRepository.createBoardMember(boardId, member.memberId, isConnected)
-        }
+        }.also { deleteManager.deleteFromComment(create) }
     }
 
     override suspend fun syncAll() = withContext(ioDispatcher) {
+        memberRepository.addMember(dataStoreRepository.getUser())
         syncMemberBackgroundList()
         syncWorkspaceList()
         syncBoardList()

@@ -7,6 +7,7 @@ import com.ssafy.model.background.toCoverDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
+import kotlin.random.Random
 
 class CreateMemberBackgroundUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
@@ -16,12 +17,14 @@ class CreateMemberBackgroundUseCase @Inject constructor(
     suspend operator fun invoke(cover: Cover, isConnected: Boolean): Flow<Long> {
         val memberId = dataStoreRepository.getUser().memberId
         val coverDto = cover.toCoverDto()
-        val prevBackground = memberRepository.getMemberBackground(coverDto.id)
+        val prevBackgroundList =
+            memberRepository.getLocalCreateMemberBackgrounds().map { it.imgPath }
 
-        return if (prevBackground != null) {
-            memberRepository.createMemberBackground(memberId, coverDto, isConnected)
-        }else{
-            flowOf(coverDto.id)
-        }
+        return if (prevBackgroundList.contains(coverDto.imgPath)) flowOf(coverDto.id)
+        else memberRepository.createMemberBackground(
+            memberId,
+            coverDto.copy(id = -1L * Random.nextLong()),
+            isConnected
+        )
     }
 }
