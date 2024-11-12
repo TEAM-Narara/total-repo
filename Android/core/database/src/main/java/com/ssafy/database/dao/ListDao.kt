@@ -23,6 +23,20 @@ interface ListDao {
     """)
     fun getList(listId: Long): ListEntity?
 
+    // 보드 안에 리스트들과 겹치는 MyOrder 존재 하는지 확인(충돌 방지)
+    @Transaction
+    @Query("""
+        SELECT EXISTS(
+            SELECT 1 
+            FROM list
+            WHERE boardId = :boardId 
+                AND isStatus != 'DELETE'
+                AND isArchived = 0
+                AND myOrder = :myOrder
+        )
+    """)
+    fun checkListInBoardExistMyOrder(boardId: Long, myOrder: Long): Boolean
+
     // 현재 보드에서 볼 것
     @Transaction
     @Query("""
@@ -31,9 +45,21 @@ interface ListDao {
         WHERE boardId = :boardId 
             AND isStatus != 'DELETE'
             AND isArchived = 0
-        ORDER BY myOrder
+        ORDER BY myOrder ASC
     """)
-    fun getAllListsInBoard(boardId: Long): Flow<List<ListEntity>>
+    fun getAllListsInBoard(boardId: Long): List<ListEntity>
+
+    // 현재 보드에서 볼 것
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM list
+        WHERE boardId = :boardId 
+            AND isStatus != 'DELETE'
+            AND isArchived = 0
+        ORDER BY myOrder ASC
+    """)
+    fun getAllListsInBoardFlow(boardId: Long): Flow<List<ListEntity>>
 
     // 현재 보드에서 볼 것
     @Transaction
@@ -79,7 +105,7 @@ interface ListDao {
         WHERE isStatus != 'DELETE' 
             And isArchived = 1
             And boardId = :boardId
-        ORDER BY myOrder
+        ORDER BY myOrder ASC
     """)
     fun getAllListsArchived(boardId: Long): Flow<List<ListEntity>>
 

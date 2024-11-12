@@ -176,7 +176,7 @@ class ListRepositoryImpl @Inject constructor(
 
     override suspend fun getLists(boardId: Long): Flow<List<ListResponseDto>> =
         withContext(ioDispatcher) {
-            listDao.getAllListsInBoard(boardId)
+            listDao.getAllListsInBoardFlow(boardId)
                 .map { entities -> entities.map { it.toDto() } }
         }
 
@@ -303,7 +303,7 @@ class ListRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLocalScreenListsInCards(boardId: Long): Flow<List<ListInCard>> {
-        return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
+        return listDao.getAllListsInBoardFlow(boardId).flatMapLatest { lists ->
             val listIds = lists.map { it.id }
 
             combine(
@@ -362,7 +362,7 @@ class ListRepositoryImpl @Inject constructor(
                                                           labelIdsEmpty: Int,
                                                           cardLabelIds: List<Long>,
                                                           keyword: String): Flow<List<ListInCard>> {
-        return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
+        return listDao.getAllListsInBoardFlow(boardId).flatMapLatest { lists ->
             val listIds = lists.map { it.id }
 
             combine(

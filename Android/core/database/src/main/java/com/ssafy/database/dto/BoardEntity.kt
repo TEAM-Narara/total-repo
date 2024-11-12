@@ -15,10 +15,11 @@ data class BoardEntity(
     @BitPosition(3) val visibility: String = "",
     @BitPosition(4) val isClosed: Boolean = false,
 
-//    val lastListOrder: Long = 0L,
+
 //    val offset: Long = 0L,
 //    val version: Long = 0L
 
+    val lastListOrder: Long = 0L,
     val isStatus: DataStatus = DataStatus.STAY,
     val columnUpdate: Long = 0L,
 )
