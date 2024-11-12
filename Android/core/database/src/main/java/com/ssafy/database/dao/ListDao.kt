@@ -49,7 +49,7 @@ interface ListDao {
     """)
     fun getAllListsInBoard(boardId: Long): List<ListEntity>
 
-    // 현재 보드에서 볼 것
+    // 오름차순
     @Transaction
     @Query("""
         SELECT * 
@@ -61,7 +61,7 @@ interface ListDao {
     """)
     fun getAllListsInBoardFlow(boardId: Long): Flow<List<ListEntity>>
 
-    // 현재 보드에서 볼 것
+    // 내림차순
     @Transaction
     @Query("""
         SELECT * 

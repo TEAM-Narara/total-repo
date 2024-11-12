@@ -1,10 +1,19 @@
 package com.ssafy.data.repository.order
 
+data class CardMoveResponseDto(val cardId: Long, val listId: Long, val myOrder: Long)
+
+
 data class ListMoveResponseDto(val listId: Long, val myOrder: Long)
 
 sealed class ListMoveResult {
     data class SingleListMove(val response: ListMoveResponseDto) : ListMoveResult()
     data class ReorderedListMove(val responses: List<ListMoveResponseDto>) : ListMoveResult()
+}
+
+sealed class CardMoveResult {
+    data class SingleCardMove(val response: CardMoveResponseDto): CardMoveResult()
+    data class ReorderedCardMove(val response: List<CardMoveResponseDto>): CardMoveResult()
+    data class DeletedCardMove(val listId: Long): CardMoveResult()
 }
 
 object MoveConst {

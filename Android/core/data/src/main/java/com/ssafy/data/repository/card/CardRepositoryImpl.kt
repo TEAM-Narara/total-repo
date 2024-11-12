@@ -216,7 +216,7 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>> =
         withContext(ioDispatcher) {
-            cardDao.getAllCardsInList(listId)
+            cardDao.getAllCardsInListFlow(listId)
                 .map { list -> list.map { it.toDto() } }
         }
 
