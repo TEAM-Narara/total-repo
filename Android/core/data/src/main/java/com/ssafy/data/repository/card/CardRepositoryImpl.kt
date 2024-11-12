@@ -6,8 +6,8 @@ import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
-import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ListDao
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
@@ -526,80 +526,105 @@ class CardRepositoryImpl @Inject constructor(
                 if (isConnected) {
                     cardDataSource.updateAttachmentToCover(id)
                 } else {
-                    TODO("Not yet implemented")
+                    val result = when (attachment.isStatus) {
+                        DataStatus.STAY ->
+                            attachmentDao.updateAttachment(
+                                attachment.copy(
+                                    isCover = !attachment.isCover,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            attachmentDao.updateAttachment(
+                                attachment.copy(
+                                    isCover = !attachment.isCover,
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
+                    }
+
+                    flowOf(result)
                 }
             } else {
-                flowOf()
+                flowOf(Unit)
             }
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLocalScreenMyRepresentativeCard(memberId: Long): Flow<List<BoardInMyRepresentativeCard>> {
-        return cardMemberDao.getRepresentativeCardMember(memberId).flatMapLatest { representativeCardIds ->
-            if (representativeCardIds.isEmpty()) {
-                flowOf(emptyList())
-            } else {
-                cardDao.getCardsToList(representativeCardIds).flatMapLatest { cards ->
-                    val listIds = cards.map { it.listId }.distinct()
+        return cardMemberDao.getRepresentativeCardMember(memberId)
+            .flatMapLatest { representativeCardIds ->
+                if (representativeCardIds.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    cardDao.getCardsToList(representativeCardIds).flatMapLatest { cards ->
+                        val listIds = cards.map { it.listId }.distinct()
 
-                    listDao.getAllListsToBoard(listIds).flatMapLatest { lists ->
-                        val listIdToBoardId = lists.associate { it.id to it.boardId }
-                        val boardIds = lists.map { it.boardId }.distinct()
+                        listDao.getAllListsToBoard(listIds).flatMapLatest { lists ->
+                            val listIdToBoardId = lists.associate { it.id to it.boardId }
+                            val boardIds = lists.map { it.boardId }.distinct()
 
-                        boardDao.getAllBoards(boardIds).flatMapLatest { boards ->
-                            val boardIdToBoard = boards.associateBy { it.id }
+                            boardDao.getAllBoards(boardIds).flatMapLatest { boards ->
+                                val boardIdToBoard = boards.associateBy { it.id }
 
-                            val cardIds = cards.map { it.id }
+                                val cardIds = cards.map { it.id }
 
-                            combine(
-                                replyDao.getReplyCounts(cardIds),
-                                cardMemberDao.getCardRepresentativesInCards(cardIds),
-                                cardMemberDao.getCardsMemberAlarms(cardIds),
-                                cardLabelDao.getAllCardLabelsInCards(cardIds),
-                                attachmentDao.getCardsIsAttachment(cardIds)
-                            ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
-                                val replyCountMap = replyCounts.associateBy { it.cardId }
-                                val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
-                                val cardWatchMap = cardWatch.associateBy { it.cardId }
-                                val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
-                                val attachmentMap = isAttachment.associateBy { it.cardId }
+                                combine(
+                                    replyDao.getReplyCounts(cardIds),
+                                    cardMemberDao.getCardRepresentativesInCards(cardIds),
+                                    cardMemberDao.getCardsMemberAlarms(cardIds),
+                                    cardLabelDao.getAllCardLabelsInCards(cardIds),
+                                    attachmentDao.getCardsIsAttachment(cardIds)
+                                ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
+                                    val replyCountMap = replyCounts.associateBy { it.cardId }
+                                    val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                                    val cardWatchMap = cardWatch.associateBy { it.cardId }
+                                    val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+                                    val attachmentMap = isAttachment.associateBy { it.cardId }
 
-                                val cardThumbnails = cards.map { card ->
-                                    card.toDTO(
-                                        replyCount = replyCountMap[card.id]?.count ?: 0,
-                                        isWatch = cardWatchMap[card.id]?.isAlert ?: false,
-                                        isAttachment = attachmentMap[card.id]?.isAttachment ?: false,
-                                        cardMembers = cardMemberMap[card.id]?.map { it.toDTO() } ?: emptyList(),
-                                        cardLabels = cardLabelMap[card.id]?.map { it.toDto() } ?: emptyList()
-                                    )
-                                }
-
-                                val boardIdToCards = cardThumbnails.groupBy { thumbnail ->
-                                    val listId = thumbnail.listId
-                                    listIdToBoardId[listId] ?: -1L
-                                }
-
-                                boardIdToCards.mapNotNull { (boardId, thumbnails) ->
-                                    val board = boardIdToBoard[boardId]
-                                    if (board != null) {
-                                        BoardInMyRepresentativeCard(
-                                            id = board.id,
-                                            workspaceId = board.workspaceId,
-                                            name = board.name,
-                                            coverType = board.coverType,
-                                            coverValue = board.coverValue,
-                                            visibility = board.visibility,
-                                            isClosed = board.isClosed,
-                                            isStatus = board.isStatus,
-                                            cards = thumbnails
+                                    val cardThumbnails = cards.map { card ->
+                                        card.toDTO(
+                                            replyCount = replyCountMap[card.id]?.count ?: 0,
+                                            isWatch = cardWatchMap[card.id]?.isAlert ?: false,
+                                            isAttachment = attachmentMap[card.id]?.isAttachment
+                                                ?: false,
+                                            cardMembers = cardMemberMap[card.id]?.map { it.toDTO() }
+                                                ?: emptyList(),
+                                            cardLabels = cardLabelMap[card.id]?.map { it.toDto() }
+                                                ?: emptyList()
                                         )
-                                    } else { null }
+                                    }
+
+                                    val boardIdToCards = cardThumbnails.groupBy { thumbnail ->
+                                        val listId = thumbnail.listId
+                                        listIdToBoardId[listId] ?: -1L
+                                    }
+
+                                    boardIdToCards.mapNotNull { (boardId, thumbnails) ->
+                                        val board = boardIdToBoard[boardId]
+                                        if (board != null) {
+                                            BoardInMyRepresentativeCard(
+                                                id = board.id,
+                                                workspaceId = board.workspaceId,
+                                                name = board.name,
+                                                coverType = board.coverType,
+                                                coverValue = board.coverValue,
+                                                visibility = board.visibility,
+                                                isClosed = board.isClosed,
+                                                isStatus = board.isStatus,
+                                                cards = thumbnails
+                                            )
+                                        } else {
+                                            null
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
     }
 }
