@@ -18,4 +18,6 @@ interface DataStoreRepository {
 
     suspend fun clearAll()
 
+    suspend fun getStompOffset(topic: String): Long
+    suspend fun saveStompOffset(topic: String, offset: Long)
 }
