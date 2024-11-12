@@ -18,10 +18,6 @@ import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
-import com.ssafy.database.dto.with.CardWithListAndBoardName
-import com.ssafy.database.dto.with.MemberWithRepresentative
-import com.ssafy.model.with.CardWithListAndBoardNameDTO
-import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
@@ -36,11 +32,15 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
+import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -213,7 +213,7 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun getCardWithListAndBoardName(cardId: Long): Flow<CardWithListAndBoardNameDTO?> =
         withContext(ioDispatcher) {
-            cardDao.getCardWithListAndBoardName(cardId).filterNotNull().map { it.toDTO() }
+            cardDao.getCardWithListAndBoardName(cardId).map { it?.toDTO() }
         }
 
     override suspend fun getAllCardsInList(listId: Long): Flow<List<CardResponseDto>> =
@@ -285,6 +285,7 @@ class CardRepositoryImpl @Inject constructor(
     ): Flow<List<MemberWithRepresentativeDTO>> =
         withContext(ioDispatcher) {
             cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
+                .map { it.map { it.toDTO() } }
         }
 
     override suspend fun createCardMember(
@@ -386,9 +387,10 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDto() } }
         }
 
-    override suspend fun getCardLabel(cardId: Long, labelId: Long): CardLabelDTO? = withContext(ioDispatcher) {
-        cardLabelDao.getCardLabelByCardIdAndLabelId(cardId, labelId)?.toDTO()
-    }
+    override suspend fun getCardLabel(cardId: Long, labelId: Long): CardLabelDTO? =
+        withContext(ioDispatcher) {
+            cardLabelDao.getCardLabelByCardIdAndLabelId(cardId, labelId)?.toDTO()
+        }
 
     override suspend fun createCardLabel(
         createCardLabelRequestDto: CreateCardLabelRequestDto,
@@ -444,7 +446,7 @@ class CardRepositoryImpl @Inject constructor(
 
                     flowOf(result)
                 }
-            } else{
+            } else {
                 flowOf(Unit)
             }
         }
