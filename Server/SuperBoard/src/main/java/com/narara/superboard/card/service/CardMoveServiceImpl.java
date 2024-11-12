@@ -216,7 +216,7 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         // 전체 순서에서 이전 리스트와 다음 리스트가 인접해 있는지 확인
         if (previousIndex != -1 && nextIndex != -1 && !(nextIndex == previousIndex + 1)) {
-            log.info("이전 리스트와 다음 리스트가 전체 순서에서 바로 인접해 있지 않음. - previousListId: {}, nextListId: {}", previousListId, nextListId);
+            log.info("이전 리스트와 다음 리스트가 전체 순서에서 바로 인접해 있지 않음. - previousCardId: {}, nextCardId: {}", previousCardId, nextCardId);
             return new CardMoveResult.SingleCardMove(
                     new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), targetCard.getMyOrder()));
         }
