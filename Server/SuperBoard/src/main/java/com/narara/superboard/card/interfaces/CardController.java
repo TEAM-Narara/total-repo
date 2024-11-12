@@ -194,12 +194,9 @@ public class CardController implements CardAPI {
     @Override
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
-            @Parameter(description = "이동할 카드의 ID", required = true) @PathVariable Long cardId,
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
-            @Parameter(description = "이전 카드의 ID", required = true) @RequestParam Long myOrder) {
-
-        CardMoveResult result = cardMoveService.moveCard(member, cardId, listId, myOrder);
-
+            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
+        CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 
