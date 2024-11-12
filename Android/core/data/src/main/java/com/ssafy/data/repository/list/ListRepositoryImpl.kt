@@ -381,4 +381,79 @@ class ListRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
+                                                          includeNoRepresentative: Int,
+                                                          memberIdsEmpty: Int,
+                                                          memberIds: List<Long>,
+                                                          noLimitDate: Int,
+                                                          expireDate: Int,
+                                                          deadlineDateType: Int,
+                                                          includeNoLabel: Int,
+                                                          labelIdsEmpty: Int,
+                                                          cardLabelIds: List<Long>,
+                                                          keyword: String): Flow<List<ListInCard>> {
+        return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
+            val listIds = lists.map { it.id }
+
+            combine(
+                listMemberDao.getListsMemberAlarms(listIds),
+                // 담당자 없음, 담당자 종류
+                // 날짜 제한 없음, 기한 만료, {선택 안함(0), 내일 내(1), 일주일 내(2), 한달 내(3)}
+                // 라벨 없음, 라벨 종류
+                // 키워드
+                cardDao.getAllCardsInListsFilter(
+                    listIds,
+                    includeNoRepresentative,
+                    memberIdsEmpty,
+                    memberIds,
+                    noLimitDate,
+                    expireDate,
+                    deadlineDateType,
+                    includeNoLabel,
+                    labelIdsEmpty,
+                    cardLabelIds,
+                    keyword
+                    ).flatMapLatest { cards ->
+                    val cardIds = cards.map { it.id }
+
+                    combine(
+                        replyDao.getReplyCounts(cardIds),
+                        cardMemberDao.getCardRepresentativesInCards(cardIds),
+                        cardMemberDao.getCardsMemberAlarms(cardIds),
+                        cardLabelDao.getAllCardLabelsInCards(cardIds),
+                        attachmentDao.getCardsIsAttachment(cardIds)
+                    ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
+                        val replyCountMap = replyCounts.associateBy { it.cardId }
+                        val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                        val cardWatchMap = cardWatch.associateBy { it.cardId }
+                        val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+                        val attachmentMap = isAttachment.associateBy { it.cardId }
+
+                        val cardThumbnails = cards.map { card ->
+                            card.toDTO(
+                                replyCount = replyCountMap[card.id]?.count ?: 0,
+                                isWatch = cardWatchMap[card.id]?.isAlert ?: false,
+                                isAttachment = attachmentMap[card.id]?.isAttachment ?: false,
+                                cardMembers = cardMemberMap[card.id]?.map { it.toDTO() } ?: emptyList(),
+                                cardLabels = cardLabelMap[card.id]?.map { it.toDto() } ?: emptyList()
+                            )
+                        }
+
+                        cardThumbnails
+                    }
+                }
+            ) { listWatch, updatedCards ->
+                val listWatchMap = listWatch.associateBy { it.listId }
+
+                lists.map { list ->
+                    list.toDto(
+                        cards = updatedCards.filter { it.listId == list.id },
+                        isWatch = listWatchMap[list.id]?.isAlert ?: false
+                    )
+                }
+            }
+        }
+    }
 }

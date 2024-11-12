@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.with.BoardInList
 import kotlinx.coroutines.flow.Flow
 
@@ -21,6 +22,16 @@ interface BoardDao {
     // 보드 단일 조회
     @Query("SELECT * FROM board WHERE id = :boardId")
     fun getBoardFlow(boardId: Long): Flow<BoardEntity?>
+
+    // 리스트들의 보드ID 조회
+    @Query("""
+        SELECT * 
+        FROM board 
+        WHERE id IN (:boardIds) 
+            And isStatus != 'DELETE' 
+            And isClosed = 0
+    """)
+    fun getAllBoards(boardIds: List<Long>): Flow<List<BoardEntity>>
 
     // 워크스페이스에서 볼 것
     @Query("""

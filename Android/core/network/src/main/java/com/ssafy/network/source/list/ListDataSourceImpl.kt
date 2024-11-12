@@ -15,10 +15,7 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.createList(createListRequestDto) }.toFlow()
 
-    override suspend fun updateList(
-        listId: Long,
-        updateListRequestDto: UpdateListRequestDto
-    ): Flow<Unit> =
+    override suspend fun updateList(listId: Long, updateListRequestDto: UpdateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.updateList(listId, updateListRequestDto) }.toFlow()
 
     // 리스트는 삭제가 없습니다.

@@ -24,6 +24,14 @@ interface CardMemberDao {
     @Query("SELECT * FROM card_member WHERE cardId = :cardId AND memberId = :memberId")
     fun getCardMemberFlow(cardId: Long, memberId: Long): Flow<CardMemberEntity?>
 
+    // 내가 담당자인 카드 조회
+    @Query("""
+       SELECT cardId
+        FROM card_member 
+        WHERE isRepresentative = 1 AND memberId = :memberId AND isStatus != 'DELETE'
+    """)
+    fun getRepresentativeCardMember(memberId: Long): Flow<List<Long>>
+
     // 카드 멤버들 조회
     @Transaction
     @Query("""

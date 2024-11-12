@@ -35,6 +35,16 @@ interface ListDao {
     """)
     fun getAllListsInBoard(boardId: Long): Flow<List<ListEntity>>
 
+    // 리스트들의 보드ID 조회
+    @Query("""
+        SELECT * 
+        FROM list 
+        WHERE id IN (:listIds) 
+            And isStatus != 'DELETE' 
+            And isArchived = 0
+    """)
+    fun getAllListsToBoard(listIds: List<Long>): Flow<List<ListEntity>>
+
     // 아카이브에서 볼 것
     @Transaction
     @Query("""
