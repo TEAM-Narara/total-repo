@@ -43,8 +43,27 @@ public class Label extends BaseTimeEntity {
     }
 
     public Label updateLabel(LabelUpdateRequestDto updateLabelRequestDto) {
-        this.name = updateLabelRequestDto.name();
-        this.color = updateLabelRequestDto.color();
+        updateName(updateLabelRequestDto.name());
+        updateColor(updateLabelRequestDto.color());
+
         return this;
+    }
+
+    private void updateColor(Long updateColor) {
+        //null 이면 변경하지 말아주세요
+        if (updateColor == null) {
+            return;
+        }
+
+        this.color = updateColor;
+    }
+
+    private void updateName(String updateName) {
+        //null 이면 변경하지 말아주세요
+        if (updateName == null) {
+            return;
+        }
+
+        this.name = updateName;
     }
 }

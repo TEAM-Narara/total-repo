@@ -31,13 +31,17 @@ public class BoardValidator {
     }
 
     public void validateVisibilityIsValid(BoardCoreHolder boardCoreHolder) {
+        //변경되지 않음, return
+        if (boardCoreHolder.visibility() == null) {
+            return;
+        }
+
+        if (boardCoreHolder.visibility().trim().isEmpty()) {
+            throw new BoardVisibilityNotFoundException();
+        }
+
         try {
             String visibility = boardCoreHolder.visibility();
-
-            //변경되지 않음, return
-            if (visibility == null) {
-                return;
-            }
             Visibility.fromString(visibility.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BoardInvalidVisibilityFormatException();

@@ -58,9 +58,8 @@ public class ListServiceImpl implements ListService{
 
         List list = List.createList(listCreateRequestDto, board);
 
-        boardOffsetService.saveAddListDiff(list); //Websocket 리스트 생성
-
         List savedlist = listRepository.save(list);
+        boardOffsetService.saveAddListDiff(savedlist); //Websocket 리스트 생성
         // 리스트 생성 로그 기록
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 
@@ -68,7 +67,6 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE, EventData.LIST, createListInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket 리스트 생성 로그 추가
 
         return savedlist;
     }
@@ -92,7 +90,6 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.UPDATE, EventData.LIST, updateListInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket 리스트 업데이트 로그 추가
 
         return list;
     }
@@ -119,7 +116,6 @@ public class ListServiceImpl implements ListService{
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), EventType.ARCHIVE, EventData.LIST, archiveListInfo);
 
         boardHistoryRepository.save(boardHistory);
-        //TODO Websocket 리스트 아카이브 로그 생성
 
         return list;
     }

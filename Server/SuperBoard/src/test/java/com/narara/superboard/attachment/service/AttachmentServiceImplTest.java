@@ -4,6 +4,7 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -33,6 +34,9 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CardHistoryRepository cardHistoryRepository;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @InjectMocks
     private AttachmentServiceImpl attachmentService;

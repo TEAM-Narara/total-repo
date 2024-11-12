@@ -16,7 +16,7 @@ import java.util.List;
 public interface CardAPI {
 
     @PostMapping
-    ResponseEntity<DefaultResponse<CardSimpleResponseDto>> createCard(
+    ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
             @RequestBody CardCreateRequestDto cardCreateRequestDto);
 

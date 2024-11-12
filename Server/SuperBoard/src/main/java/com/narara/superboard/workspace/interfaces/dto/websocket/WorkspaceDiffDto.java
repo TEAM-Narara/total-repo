@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkspaceDiffDto {
-    private Long offset;
+    // private Long offset;
     private Long updatedAt;
     private String target;
     private String action;
@@ -18,7 +18,7 @@ public class WorkspaceDiffDto {
 
     public static WorkspaceDiffDto from(DiffInfo diffInfo) {
         return new WorkspaceDiffDto(
-                diffInfo.getOffset(),
+                // diffInfo.getOffset(),
                 diffInfo.getUpdatedAt(),
                 diffInfo.getTarget(),
                 diffInfo.getAction(),

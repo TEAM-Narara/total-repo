@@ -35,9 +35,10 @@ public class LabelServiceImpl implements LabelService {
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
 
         Label label = Label.createLabel(board, createLabelRequestDto);
-        boardOffsetService.saveAddLabel(label); // Websocket 라벨 추가
+        Label savedLabel = labelRepository.save(label);
+        boardOffsetService.saveAddLabel(savedLabel); // Websocket 라벨 추가
 
-        return labelRepository.save(label);
+        return savedLabel;
     }
 
     @Override
@@ -52,9 +53,10 @@ public class LabelServiceImpl implements LabelService {
         colorValidator.validateLabelColor(updateLabelRequestDto);
 
         Label label = getLabel(labelId);
-        boardOffsetService.saveEditLabel(label); //Websocket 라벨 업데이트
+        Label savedLabel = label.updateLabel(updateLabelRequestDto);
+        boardOffsetService.saveEditLabel(savedLabel); //Websocket 라벨 업데이트
 
-        return label.updateLabel(updateLabelRequestDto);
+        return savedLabel;
     }
 
     @Transactional

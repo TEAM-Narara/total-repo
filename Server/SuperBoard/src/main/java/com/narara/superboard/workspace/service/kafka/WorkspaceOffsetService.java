@@ -3,6 +3,7 @@ package com.narara.superboard.workspace.service.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
@@ -58,7 +59,7 @@ public class WorkspaceOffsetService {
         data.put(IS_DELETED_COLUMN, workspace.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_WORKSPACE.name(),
@@ -85,7 +86,7 @@ public class WorkspaceOffsetService {
         data.put(IS_DELETED_COLUMN, workspace.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_WORKSPACE.name(),
@@ -102,6 +103,7 @@ public class WorkspaceOffsetService {
      */
     public void saveAddMemberDiff(WorkSpaceMember workspaceMember) {
         WorkSpace workspace = workspaceMember.getWorkSpace();
+        Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_MEMBER_ID_COLUMN, workspaceMember.getId());
@@ -115,7 +117,7 @@ public class WorkspaceOffsetService {
         data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.ADD_WORKSPACE_MEMBER.name(),
@@ -139,7 +141,7 @@ public class WorkspaceOffsetService {
         data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_WORKSPACE_MEMBER.name(),
@@ -156,6 +158,7 @@ public class WorkspaceOffsetService {
      */
     public void saveEditMemberDiff(WorkSpaceMember workspaceMember) {
         WorkSpace workspace = workspaceMember.getWorkSpace();
+        Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
         data.put(WORKSPACE_MEMBER_ID_COLUMN, workspaceMember.getId());
@@ -164,7 +167,7 @@ public class WorkspaceOffsetService {
         data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_WORKSPACE_MEMBER.name(),
@@ -192,7 +195,7 @@ public class WorkspaceOffsetService {
         data.put(VISIBILITY_COLUMN, board.getVisibility().name());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.ADD_BOARD.name(),
@@ -216,7 +219,7 @@ public class WorkspaceOffsetService {
         data.put("isClosed", board.getIsArchived()); //true로 나와야해
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
+                // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.DELETE_BOARD.name(),
@@ -240,7 +243,6 @@ public class WorkspaceOffsetService {
         data.put(VISIBILITY_COLUMN, board.getVisibility().name());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_BOARD.name(),
@@ -260,7 +262,6 @@ public class WorkspaceOffsetService {
         data.put(IS_ARCHIVE_COLUMN, board.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(
-                workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
                 WorkspaceAction.EDIT_ARCHIVE_BOARD.name(),

@@ -236,7 +236,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                         new CardUpdateRequestDto(null, null, null, null, new CoverDto((String)background2.get("type"), (String)background2.get("value"))),
                         "Existing Name", null, Map.of("type", "IMAGE", "value", "https://example.com/image.png"), null, null
                 ),
-                // 이름이 비어 있는 경우 기존 이름 유지
+                // 이름이 비어 있는 경우 프론트 에러, 아무 일도 발생하지 않음
                 Arguments.of(
                         new CardUpdateRequestDto("   ", "Description Updated", null, null, null),
                         "Existing Name", "Description Updated", null, null, null

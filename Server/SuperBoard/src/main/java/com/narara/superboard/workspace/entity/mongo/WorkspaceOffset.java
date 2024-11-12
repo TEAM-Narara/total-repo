@@ -30,7 +30,7 @@ public class WorkspaceOffset {
     @Data
     @AllArgsConstructor
     public static class DiffInfo {
-        private Long offset;
+        // private Long offset;
         private Long updatedAt;
         private String target;
         private String action;
