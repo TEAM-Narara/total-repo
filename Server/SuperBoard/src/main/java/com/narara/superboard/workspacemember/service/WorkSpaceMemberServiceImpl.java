@@ -87,7 +87,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Transactional
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
-        WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
+        WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
 
         if (authority.equals(Authority.MEMBER)) {
             //권한을 MEBMER로 바꾸는 경우 Workspace Admin이 한 명 이상인지 검증
@@ -109,8 +109,10 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     }
 
     private WorkSpaceMember getWorkSpaceMember(Long workspaceId, Long memberId) {
+        log.info("@@@: " + workspaceId);
+        log.info("@@@: " + memberId);
         return workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
+                .orElseThrow(() -> new NoSuchElementException("워크스페이스에서 멤버를 찾을 수 없습니다"));
     }
 
     @Transactional
