@@ -1,6 +1,7 @@
 package com.ssafy.data.socket
 
 import android.util.Log
+import com.ssafy.data.repository.sync.SyncRepository
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.socket.AckMessage
 import com.ssafy.model.socket.ConnectionState
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 class BaseStompManager @Inject constructor(
     private val stompClientManager: StompClientManager,
     private val dataStoreRepository: DataStoreRepository,
+    private val syncRepository: SyncRepository
 ) {
     val state = stompClientManager.observeConnectionState(SOCKET_ID)
 
@@ -48,7 +50,7 @@ class BaseStompManager @Inject constructor(
     suspend fun connect() {
         stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
             Log.d("TAG", "subscribe: Socket is connected")
-            // TODO : 데이터 동기화 작업 추가하기
+            syncRepository.syncAll()
         }
     }
 

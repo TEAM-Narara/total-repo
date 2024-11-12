@@ -36,55 +36,55 @@ class SyncRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : SyncRepository {
 
-    override suspend fun syncMemberBackgroundList() = withContext(ioDispatcher) {
+    private suspend fun syncMemberBackgroundList() = withContext(ioDispatcher) {
         val createList: List<CoverDto> = memberRepository.getLocalCreateMemberBackgrounds()
         val changeList: List<CoverDto> = memberRepository.getLocalOperationMemberBackgrounds()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncWorkspaceList() = withContext(ioDispatcher) {
+    private suspend fun syncWorkspaceList() = withContext(ioDispatcher) {
         val create: List<WorkspaceInBoardDTO> = workspaceRepository.getLocalCreateWorkspaceList()
         val change: List<WorkSpaceDTO> = workspaceRepository.getLocalOperationWorkspaceList()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncBoardList() = withContext(ioDispatcher) {
+    private suspend fun syncBoardList() = withContext(ioDispatcher) {
         val create: List<BoardInListDTO> = boardRepository.getLocalCreateBoardList()
         val change: List<BoardDTO> = boardRepository.getLocalOperationBoardList()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncListList() {
+    private suspend fun syncListList() {
         val create: List<ListInCardsDTO> = listRepository.getLocalCreateList()
         val change: List<ListResponseDto> = listRepository.getLocalOperationList()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncCardList() = withContext(ioDispatcher) {
+    private suspend fun syncCardList() = withContext(ioDispatcher) {
         val create: List<CardAllInfoDTO> = cardRepository.getLocalCreateCard()
         val change: List<CardResponseDto> = cardRepository.getLocalOperationCard()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncCardMemberList() {
+    private suspend fun syncCardMemberList() {
         val change: List<CardMemberDTO> = cardRepository.getLocalOperationCardMember()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncCardLabelList() {
+    private suspend fun syncCardLabelList() {
         val create: List<CardLabelDTO> = cardRepository.getLocalCreateCardLabels()
         val change: List<CardLabelDTO> = cardRepository.getLocalOperationCardLabels()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncCardAttachmentList() {
+    private suspend fun syncCardAttachmentList() {
         val create: List<AttachmentDTO> = cardRepository.getLocalCreateAttachments()
         val change: List<AttachmentDTO> = cardRepository.getLocalOperationAttachment()
 
@@ -92,11 +92,23 @@ class SyncRepositoryImpl @Inject constructor(
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
     }
 
-    override suspend fun syncCommentList() = withContext(ioDispatcher) {
+    private suspend fun syncCommentList() = withContext(ioDispatcher) {
         val create: List<ReplyDTO> = commentRepository.getLocalCreateReply()
         val change: List<ReplyDTO> = commentRepository.getLocalOperationReply()
 
         // TODO : 서버와 동기화 이후 변경 사항들 전부 삭제
+    }
+
+    override suspend fun syncAll() {
+        syncMemberBackgroundList()
+        syncWorkspaceList()
+        syncBoardList()
+        syncListList()
+        syncCardList()
+        syncCardMemberList()
+        syncCardLabelList()
+        syncCardAttachmentList()
+        syncCommentList()
     }
 
 }
