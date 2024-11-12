@@ -1,34 +1,36 @@
-package com.ssafy.data.repository
+package com.ssafy.data.repository.order
 
-import com.ssafy.data.repository.MoveConst.DEFAULT_TOP_ORDER
-import com.ssafy.data.repository.MoveConst.HALF_DIVIDER
-import com.ssafy.data.repository.MoveConst.LARGE_INCREMENT
-import com.ssafy.data.repository.MoveConst.MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
-import com.ssafy.data.repository.MoveConst.MOVE_BOTTOM_ORDER_RATIO
-import com.ssafy.data.repository.MoveConst.MOVE_TOP_ORDER_RATIO
-import com.ssafy.data.repository.MoveConst.REORDER_GAP
+import com.ssafy.data.di.IoDispatcher
+import com.ssafy.data.repository.board.BoardRepository
+import com.ssafy.data.repository.list.ListRepository
+import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
+import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
+import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
+import com.ssafy.data.repository.order.MoveConst.MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
+import com.ssafy.data.repository.order.MoveConst.MOVE_BOTTOM_ORDER_RATIO
+import com.ssafy.data.repository.order.MoveConst.MOVE_TOP_ORDER_RATIO
+import com.ssafy.data.repository.order.MoveConst.REORDER_GAP
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.ListEntity
+import kotlinx.coroutines.CoroutineDispatcher
 import java.util.concurrent.ThreadLocalRandom
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.max
 import kotlin.math.roundToLong
 
-data class ListMoveResponseDto(val listId: Long, val myOrder: Long)
-
-sealed class ListMoveResult {
-    data class SingleListMove(val response: ListMoveResponseDto) : ListMoveResult()
-    data class ReorderedListMove(val responses: List<ListMoveResponseDto>) : ListMoveResult()
-}
-
-class ListMoveServiceImpl(
+@Singleton
+class ListMyOrderRepositoryImpl @Inject constructor(
     private val listDao: ListDao,
     private val boardDao: BoardDao,
-    private val listReorderServiceImpl: ListReorderServiceImpl,
-) {
+    private val listRepository: ListRepository,
+    private val boardRepository: BoardRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : ListMyOrderRepository {
     // 맨 위로 옮김
-    suspend fun moveListToTop(listId: Long): ListMoveResult? {
+    override suspend fun moveListToTop(listId: Long, isConnection: Boolean): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
         val board = boardDao.getBoard(targetList.boardId) ?: return null
@@ -58,11 +60,13 @@ class ListMoveServiceImpl(
             return ListMoveResult.ReorderedListMove(orderInfoList)
         }
 
+        // TODO
         listDao.updateList(targetList.copy(
             myOrder = orderInfoList.first().myOrder
         ))
 
         if (topList == null) {
+            // TODO
             boardDao.updateBoard(board.copy(
                 lastListOrder = orderInfoList.first().myOrder
             ))
@@ -71,7 +75,7 @@ class ListMoveServiceImpl(
         return ListMoveResult.SingleListMove(orderInfoList.first())
     }
 
-    suspend fun moveListToBottom(listId: Long): ListMoveResult? {
+    override suspend fun moveListToBottom(listId: Long, isConnection: Boolean): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
         val board = boardDao.getBoard(targetList.boardId) ?: return null
@@ -101,10 +105,12 @@ class ListMoveServiceImpl(
             return ListMoveResult.ReorderedListMove(orderInfoList)
         }
 
+        // TODO
         listDao.updateList(targetList.copy(
             myOrder = orderInfoList.first().myOrder
         ))
 
+        // TODO
         boardDao.updateBoard(board.copy(
             lastListOrder = orderInfoList.first().myOrder
         ))
@@ -112,10 +118,12 @@ class ListMoveServiceImpl(
         return ListMoveResult.SingleListMove(orderInfoList.first())
     }
 
-    suspend fun moveListBetween(
+    override suspend fun moveListBetween(
+        memberId: Long,
         listId: Long,
         previousListId: Long,
-        nextListId: Long
+        nextListId: Long,
+        isConnection: Boolean
     ): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
@@ -159,17 +167,16 @@ class ListMoveServiceImpl(
             return ListMoveResult.ReorderedListMove(orderInfoList)
         }
 
+        // TODO
         listDao.updateList(targetList.copy(
             myOrder = orderInfoList.first().myOrder
         ))
-
-        listDao.insertList(targetList)
 
         return ListMoveResult.SingleListMove(orderInfoList.first())
     }
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
-    private fun generateUniqueOrder(baseOrder: Long): Long {
+    override fun generateUniqueOrder(baseOrder: Long): Long {
         val gap: Long = LARGE_INCREMENT / 100 // LARGE_INCREMENT의 1%를 기본 간격으로 사용
         val offset = System.nanoTime() % gap
         val uniqueOrder = baseOrder + offset
@@ -177,7 +184,7 @@ class ListMoveServiceImpl(
         return uniqueOrder
     }
 
-    private suspend fun generateUniqueOrderWithRetry(
+    override suspend fun generateUniqueOrderWithRetry(
         targetList: ListEntity,
         targetIndex: Int,
         board: BoardEntity,
@@ -189,7 +196,7 @@ class ListMoveServiceImpl(
 
         while (attempt < maxAttempts) {
             if (newOrder <= 0 || newOrder >= Long.MAX_VALUE) {
-                return listReorderServiceImpl.reorderAllListOrders(board, targetList, targetIndex)
+                return reorderAllListOrders(board, targetList, targetIndex)
             }
 
             if (!isOrderConflict(board, newOrder)) {
@@ -216,22 +223,17 @@ class ListMoveServiceImpl(
                 attempt++
             }
         }
-        return listReorderServiceImpl.reorderAllListOrders(board, targetList, targetIndex)
+        return reorderAllListOrders(board, targetList, targetIndex)
     }
 
     // 리스트 순서 중복 확인 메서드
-    private fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
+    override suspend fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
         val conflictExists: Boolean = listDao.checkListInBoardExistMyOrder(board.id, order)
 
         return conflictExists
     }
-}
 
-class ListReorderServiceImpl(
-    private val listDao: ListDao,
-    private val boardDao: BoardDao,
-) {
-    suspend fun reorderAllListOrders(
+    override suspend fun reorderAllListOrders(
         board: BoardEntity,
         targetList: ListEntity,
         targetIndex: Int
@@ -249,29 +251,18 @@ class ListReorderServiceImpl(
 
         // 고정된 간격으로 리스트 순서 재설정
         var newOrder = DEFAULT_TOP_ORDER
-        val orderInfoList: MutableList<ListMoveResponseDto> = ArrayList<ListMoveResponseDto>()
+        val orderInfoList: MutableList<ListMoveResponseDto> = ArrayList()
+
+        // TODO
         for (list in lists) {
             listDao.updateList(targetList.copy(myOrder = newOrder))
             orderInfoList.add(ListMoveResponseDto(list.id, newOrder))
             newOrder += REORDER_GAP
         }
 
-        listDao.insertLists(lists)
-
+        // TODO
         boardDao.updateBoard(board.copy(lastListOrder = newOrder))
 
         return orderInfoList
     }
-}
-
-object MoveConst {
-    const val DEFAULT_TOP_ORDER: Long = 4000000000000000000L // 초기 순서 값
-    const val MOVE_TOP_ORDER_RATIO: Double = 2.0 / 3.0
-    const val MOVE_BOTTOM_ORDER_RATIO: Double = 1.0 / 3.0
-    const val LARGE_INCREMENT: Long = 50000000000000000L
-
-    const val MAX_INSERTION_DISTANCE_FOR_FIXED_GAP: Long = 10000000000000000L
-    const val HALF_DIVIDER: Long = 2
-
-    const val REORDER_GAP: Long = 10000000000000000L // 각 카드 사이 간
 }
