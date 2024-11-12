@@ -49,6 +49,8 @@ class CardMyOrderRepositoryImpl @Inject constructor(
 
         return if (topCard == null) {
             // 보드에 리스트가 없는 경우
+
+            // TODO
             targetCard = targetCard.copy(
                 myOrder = DEFAULT_TOP_ORDER,
                 listId = targetListId
@@ -109,6 +111,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
 
+                // TODO
                 targetCard = targetCard.copy(
                     myOrder = newOrder,
                     listId = targetListId
@@ -149,6 +152,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         return if (bottomCard == null) {
             // 보드에 리스트가 없는 경우
 
+            // TODO
             targetCard = targetCard.copy(
                 myOrder = DEFAULT_TOP_ORDER,
                 listId = targetListId
@@ -208,19 +212,21 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
 
+                // TODO
                 targetCard = targetCard.copy(
                     myOrder = newOrder,
                     listId = targetListId
                 )
 
+                // TODO
                 listDao.updateList(
                     targetList.copy(
                         lastCardOrder = newOrder
                     )
                 )
 
-                // TODO 이게 무슨 의미?
-//                targetList.lastCardOrder = newOrder
+                // TODO
+                listDao.updateList(targetList.copy(lastCardOrder = newOrder))
 
                 CardMoveResult.ReorderedCardMove(
                     listOf(
@@ -326,6 +332,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             // 단일 카드 이동
             val newOrder = orderInfoList.first().myOrder
 
+            // TODO
             targetCard = targetCard.copy(
                 myOrder = newOrder,
                 listId = targetList.id
@@ -398,7 +405,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             }
 
             // 중복 여부 확인
-            val isConflict = cardDao.checkCardInListExistMyOrder(targetList.id, newOrder)
+            val isConflict = isOrderConflict(targetList, newOrder)
 
             if (!isConflict) {
                 // 충돌 없음 - 고유 순서 값 반환
