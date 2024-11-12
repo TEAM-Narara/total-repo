@@ -1,5 +1,6 @@
 package com.ssafy.network.source.card
 
+import com.ssafy.model.attachment.AttachmentResponseDto
 import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
@@ -10,10 +11,14 @@ import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.network.api.CardAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
+import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : CardDataSource {
+class CardDataSourceImpl @Inject constructor(
+    private val cardAPI: CardAPI,
+    private val s3ImageUtil: S3ImageUtil
+) : CardDataSource {
 
     override suspend fun createCard(cardRequestDto: CardRequestDto): Flow<Unit> =
         safeApiCall { cardAPI.createCard(cardRequestDto) }.toFlow()
@@ -54,12 +59,17 @@ class CardDataSourceImpl @Inject constructor(private val cardAPI: CardAPI) : Car
         TODO("Not yet implemented")
     }
 
-    override suspend fun createAttachment(attachment: AttachmentDTO): Flow<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun createAttachment(attachment: AttachmentDTO): Flow<AttachmentResponseDto> {
+        val key = "${attachment.id}/${attachment.url}"
+        if (attachment.url.isNotBlank()) s3ImageUtil.uploadS3Image(attachment.url, key)
+        return safeApiCall { cardAPI.createAttachment(attachment.cardId, key) }.toFlow()
     }
 
-    override suspend fun deleteAttachment(id: Long): Flow<Unit> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deleteAttachment(attachmentId: Long): Flow<Unit> =
+        safeApiCall { cardAPI.deleteAttachment(attachmentId) }.toFlow()
+
+
+    override suspend fun updateAttachmentToCover(attachmentId: Long): Flow<Unit> =
+        safeApiCall { cardAPI.updateAttachmentToCover(attachmentId) }.toFlow()
 
 }

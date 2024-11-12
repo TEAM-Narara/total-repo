@@ -1,6 +1,5 @@
 package com.ssafy.data.repository.card
 
-import com.ssafy.database.dto.AttachmentEntity
 import com.ssafy.database.dto.with.CardWithListAndBoardName
 import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
@@ -9,7 +8,6 @@ import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
-import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
@@ -101,4 +99,6 @@ interface CardRepository {
     suspend fun createAttachment(attachment: AttachmentDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteAttachment(id: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit>
 }
