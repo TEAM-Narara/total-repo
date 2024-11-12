@@ -145,8 +145,6 @@ public class ListMoveServiceImpl implements ListMoveService {
         }
 
 
-        // TODO: 이전 이후의 리스트가 잘 들어오는가 붙어있는 건가
-
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
         log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
@@ -159,6 +157,26 @@ public class ListMoveServiceImpl implements ListMoveService {
         List nextList = listRepository.findById(nextListId)
                 .orElseThrow(() -> new NotFoundEntityException(nextListId, "다음 리스트"));
 
+        // 이전 이후의 리스트가 같은 보드에 있는가?
+        if (!previousList.getBoard().getId().equals(nextList.getBoard().getId())) {
+            log.info("이전 List와 이후 List가 다른 Board에 있습니다.");
+            return new ListMoveResult.SingleListMove(
+                    new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
+        }
+
+        // 보드의 전체 리스트를 myOrder 순서로 정렬하여 가져옴
+        java.util.List<List> allLists = listRepository.findAllByBoardOrderByMyOrderAsc(targetList.getBoard());
+        int previousIndex = allLists.indexOf(previousList);
+        int nextIndex = allLists.indexOf(nextList);
+        int targetIndex = previousIndex + 1;
+
+        // 전체 순서에서 이전 리스트와 다음 리스트가 인접해 있는지 확인
+        if (previousIndex != -1 && nextIndex != -1 && !(nextIndex == previousIndex + 1)) {
+            log.info("이전 리스트와 다음 리스트가 전체 순서에서 바로 인접해 있지 않음. - previousListId: {}, nextListId: {}", previousListId, nextListId);
+            return new ListMoveResult.SingleListMove(
+                    new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
+        }
+
         long prevOrder = previousList.getMyOrder();
         long nextOrder = nextList.getMyOrder();
         long gap = nextOrder - prevOrder;
@@ -170,8 +188,6 @@ public class ListMoveServiceImpl implements ListMoveService {
                 : (prevOrder + nextOrder) / HALF_DIVIDER;
         log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
-        int targetIndex = listRepository.findAllByBoardOrderByMyOrderAsc(
-                targetList.getBoard()).indexOf(previousList) + 1;
 
         java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetList, targetIndex, previousList.getBoard(),

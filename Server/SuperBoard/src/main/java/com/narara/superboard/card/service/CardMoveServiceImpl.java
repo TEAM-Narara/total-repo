@@ -7,6 +7,8 @@ import com.narara.superboard.card.interfaces.dto.CardMoveResult;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.list.interfaces.dto.ListMoveResponseDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -190,6 +192,13 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 두 카드가 동일한 리스트에 있는지 확인
         validateCardsInSameList(previousCard, nextCard);
 
+        // 이전 이후의 리스트가 붙어있는 건가
+        if (!previousCard.getList().getId().equals(nextCard.getList().getId())) {
+            log.info("이전 Card와 이후 Card가 다른 List에 있습니다.");
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), targetCard.getMyOrder()));
+        }
+
         // 이전 카드와 다음 카드의 순서값을 가져옴
         long prevOrder = previousCard.getMyOrder();
         long nextOrder = nextCard.getMyOrder();
@@ -200,8 +209,19 @@ public class CardMoveServiceImpl implements CardMoveService {
                 ? prevOrder + MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
                 : (prevOrder + nextOrder) / HALF_DIVIDER;
 
-        int targetIndex = cardRepository.findAllByListOrderByMyOrderAsc(previousCard.getList())
-                .indexOf(previousCard) + 1;
+        java.util.List<Card> allLists = cardRepository.findAllByListOrderByMyOrderAsc(targetCard.getList());
+        int previousIndex = allLists.indexOf(previousCard);
+        int nextIndex = allLists.indexOf(nextCard);
+        int targetIndex = previousIndex + 1;
+
+        // 전체 순서에서 이전 리스트와 다음 리스트가 인접해 있는지 확인
+        if (previousIndex != -1 && nextIndex != -1 && !(nextIndex == previousIndex + 1)) {
+            log.info("이전 리스트와 다음 리스트가 전체 순서에서 바로 인접해 있지 않음. - previousListId: {}, nextListId: {}", previousListId, nextListId);
+            return new CardMoveResult.SingleCardMove(
+                    new CardMoveResponseDto(targetCard.getId(), targetCard.getList().getId(), targetCard.getMyOrder()));
+        }
+
+
         // 고유한 순서값 생성 후 재배치 필요 여부 체크
         java.util.List<CardMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetCard, targetIndex, previousCard.getList(),
