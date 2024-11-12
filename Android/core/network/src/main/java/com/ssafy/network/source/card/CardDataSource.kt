@@ -1,5 +1,6 @@
 package com.ssafy.network.source.card
 
+import com.ssafy.model.attachment.AttachmentResponseDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -36,7 +37,15 @@ interface CardDataSource {
 
     suspend fun updateCardLabel(updateCardLabelActivateRequestDto: UpdateCardLabelActivateRequestDto): Flow<CardLabelDTO>
 
-    suspend fun createAttachment(attachment: AttachmentDTO): Flow<Unit>
+    suspend fun createAttachment(attachment: AttachmentDTO): Flow<AttachmentResponseDto>
 
-    suspend fun deleteAttachment(id: Long): Flow<Unit>
+    suspend fun deleteAttachment(attachmentId: Long): Flow<Unit>
+
+    suspend fun updateAttachmentToCover(attachmentId: Long): Flow<Unit>
+
+    suspend fun getAlertCard(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setAlertCard(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean>
 }

@@ -1,12 +1,14 @@
 package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dto.piece.toEntity
-import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
+import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
+import com.ssafy.database.dao.ListDao
+import com.ssafy.database.dao.NegativeIdGenerator
+import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
@@ -15,6 +17,9 @@ import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
+import com.ssafy.database.dto.piece.toEntity
+import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.model.board.MemberResponseDTO
@@ -25,6 +30,7 @@ import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
+import com.ssafy.model.with.BoardInMyRepresentativeCard
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
@@ -33,8 +39,8 @@ import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.card.CardDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -47,7 +53,10 @@ class CardRepositoryImpl @Inject constructor(
     private val cardDao: CardDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
+    private val replyDao: ReplyDao,
     private val attachmentDao: AttachmentDao,
+    private val listDao: ListDao,
+    private val boardDao: BoardDao,
     private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
@@ -243,6 +252,26 @@ class CardRepositoryImpl @Inject constructor(
                 .map { list -> list.map { it.toDTO() } }
         }
 
+    // 해당 멤버의 카드 알람 상태 조회 (멤버 id는 내것만 가능합니다.)
+    override suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.getAlertCard(cardId, memberId)
+        }
+
+    // 카드 알람 상태 변경은 온라인 일 떄에만 가능합니다. (멤버 id는 내것만 가능합니다.)
+    override suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.setAlertCard(cardId, memberId)
+        }
+
+
+    // 대표자 할당은 온라인 일 떄에만 가능합니다.
+    override suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean> =
+        withContext(ioDispatcher) {
+            cardDataSource.setCardPresenter(cardId, memberId)
+        }
+
+
     override suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
             cardMemberDao.getCardMembers(cardId)
@@ -256,7 +285,6 @@ class CardRepositoryImpl @Inject constructor(
     ): Flow<List<MemberWithRepresentativeDTO>> =
         withContext(ioDispatcher) {
             cardMemberDao.getMembersWithRepresentativeFlag(workspaceId, boardId, cardId)
-                .map { list -> list.map { it.toDTO() } }
         }
 
     override suspend fun createCardMember(
@@ -416,7 +444,7 @@ class CardRepositoryImpl @Inject constructor(
 
                     flowOf(result)
                 }
-            } else {
+            } else{
                 flowOf(Unit)
             }
         }
@@ -480,8 +508,7 @@ class CardRepositoryImpl @Inject constructor(
     ): Flow<Long> =
         withContext(ioDispatcher) {
             if (isConnected) {
-                // TODO
-                cardDataSource.createAttachment(attachment).map { 5 }
+                cardDataSource.createAttachment(attachment).map { it.attachmentId }
             } else {
                 flowOf(
                     attachmentDao.insertAttachment(
@@ -516,4 +543,114 @@ class CardRepositoryImpl @Inject constructor(
                 flowOf(Unit)
             }
         }
+
+    override suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit> =
+        withContext(ioDispatcher) {
+            val attachment = attachmentDao.getAttachment(id)
+
+            if (attachment != null) {
+                if (isConnected) {
+                    cardDataSource.updateAttachmentToCover(id)
+                } else {
+                    val result = when (attachment.isStatus) {
+                        DataStatus.STAY ->
+                            attachmentDao.updateAttachment(
+                                attachment.copy(
+                                    isCover = !attachment.isCover,
+                                    isStatus = DataStatus.UPDATE
+                                )
+                            )
+
+                        DataStatus.CREATE, DataStatus.UPDATE ->
+                            attachmentDao.updateAttachment(
+                                attachment.copy(
+                                    isCover = !attachment.isCover,
+                                )
+                            )
+
+                        DataStatus.DELETE -> {}
+                    }
+
+                    flowOf(result)
+                }
+            } else {
+                flowOf(Unit)
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getLocalScreenMyRepresentativeCard(memberId: Long): Flow<List<BoardInMyRepresentativeCard>> {
+        return cardMemberDao.getRepresentativeCardMember(memberId)
+            .flatMapLatest { representativeCardIds ->
+                if (representativeCardIds.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    cardDao.getCardsToList(representativeCardIds).flatMapLatest { cards ->
+                        val listIds = cards.map { it.listId }.distinct()
+
+                        listDao.getAllListsToBoard(listIds).flatMapLatest { lists ->
+                            val listIdToBoardId = lists.associate { it.id to it.boardId }
+                            val boardIds = lists.map { it.boardId }.distinct()
+
+                            boardDao.getAllBoards(boardIds).flatMapLatest { boards ->
+                                val boardIdToBoard = boards.associateBy { it.id }
+
+                                val cardIds = cards.map { it.id }
+
+                                combine(
+                                    replyDao.getReplyCounts(cardIds),
+                                    cardMemberDao.getCardRepresentativesInCards(cardIds),
+                                    cardMemberDao.getCardsMemberAlarms(cardIds),
+                                    cardLabelDao.getAllCardLabelsInCards(cardIds),
+                                    attachmentDao.getCardsIsAttachment(cardIds)
+                                ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
+                                    val replyCountMap = replyCounts.associateBy { it.cardId }
+                                    val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                                    val cardWatchMap = cardWatch.associateBy { it.cardId }
+                                    val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+                                    val attachmentMap = isAttachment.associateBy { it.cardId }
+
+                                    val cardThumbnails = cards.map { card ->
+                                        card.toDTO(
+                                            replyCount = replyCountMap[card.id]?.count ?: 0,
+                                            isWatch = cardWatchMap[card.id]?.isAlert ?: false,
+                                            isAttachment = attachmentMap[card.id]?.isAttachment
+                                                ?: false,
+                                            cardMembers = cardMemberMap[card.id]?.map { it.toDTO() }
+                                                ?: emptyList(),
+                                            cardLabels = cardLabelMap[card.id]?.map { it.toDto() }
+                                                ?: emptyList()
+                                        )
+                                    }
+
+                                    val boardIdToCards = cardThumbnails.groupBy { thumbnail ->
+                                        val listId = thumbnail.listId
+                                        listIdToBoardId[listId] ?: -1L
+                                    }
+
+                                    boardIdToCards.mapNotNull { (boardId, thumbnails) ->
+                                        val board = boardIdToBoard[boardId]
+                                        if (board != null) {
+                                            BoardInMyRepresentativeCard(
+                                                id = board.id,
+                                                workspaceId = board.workspaceId,
+                                                name = board.name,
+                                                coverType = board.coverType,
+                                                coverValue = board.coverValue,
+                                                visibility = board.visibility,
+                                                isClosed = board.isClosed,
+                                                isStatus = board.isStatus,
+                                                cards = thumbnails
+                                            )
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    }
 }

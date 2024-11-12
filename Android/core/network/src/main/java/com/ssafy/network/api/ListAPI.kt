@@ -1,5 +1,6 @@
 package com.ssafy.network.api
 
+import com.ssafy.model.alert.AlertResponse
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
@@ -27,5 +28,14 @@ interface ListAPI {
 
     @GET("api/v1/list/{boardId}/archived")
     suspend fun getArchivedLists(@Path("boardId") boardId: Long): Response<ApiResponse<List<ListResponseDto>>>
+
+    @GET("api/v1/list/{listId}/alert")
+    suspend fun getAlertList(@Path("listId") listId: Long): Response<ApiResponse<AlertResponse>>
+
+    @PATCH("api/v1/list/{listId}/alert/{memberId}")
+    suspend fun setAlertList(
+        @Path("listId") listId: Long,
+        @Path("memberId") memberId: Long
+    ): Response<ApiResponse<AlertResponse>>
 
 }

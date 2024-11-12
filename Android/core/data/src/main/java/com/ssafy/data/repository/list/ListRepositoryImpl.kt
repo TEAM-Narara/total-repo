@@ -1,15 +1,13 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
-
-import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dao.ListMemberDao
+import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
@@ -19,12 +17,12 @@ import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
-import com.ssafy.model.with.ListInCardsDTO
-
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCard
+import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.list.ListDataSource
@@ -32,6 +30,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -63,7 +62,7 @@ class ListRepositoryImpl @Inject constructor(
         } else {
             val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
 
-            flowOf (
+            flowOf(
                 listDao.insertList(
                     ListEntity(
                         id = localListId,
@@ -75,10 +74,12 @@ class ListRepositoryImpl @Inject constructor(
                     createListMember(
                         listId = localListId,
                         memberId = myMemberId,
-                        isStatus = DataStatus.CREATE)
+                        isStatus = DataStatus.CREATE
+                    )
                     createListWatch(
                         listId = localListId,
-                        isStatus = DataStatus.CREATE)
+                        isStatus = DataStatus.CREATE
+                    )
                 }
             )
         }
@@ -210,15 +211,24 @@ class ListRepositoryImpl @Inject constructor(
         isStatus: DataStatus
     ): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(listMemberDao.insertListMember(
-                ListMemberEntity(
-                    listId = listId,
-                    memberId = memberId,
-                    isStatus = isStatus)
-            ))
+            flowOf(
+                listMemberDao.insertListMember(
+                    ListMemberEntity(
+                        listId = listId,
+                        memberId = memberId,
+                        isStatus = isStatus
+                    )
+                )
+            )
         }
 
-    override suspend fun deleteListMember(memberId: Long, listId: Long, isConnected: Boolean): Flow<Unit> =
+    // TODO 해당 기능은 사용하지 않습니다 리스트 멤버는 삭제가 없습니다
+    // 리스트 워치 할당 해제만 있습니다
+    override suspend fun deleteListMember(
+        memberId: Long,
+        listId: Long,
+        isConnected: Boolean
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
             val member = listMemberDao.getListMember(memberId, listId)
 
@@ -248,45 +258,65 @@ class ListRepositoryImpl @Inject constructor(
 
     override suspend fun createListWatch(listId: Long, isStatus: DataStatus): Flow<Long> =
         withContext(ioDispatcher) {
-            flowOf(listMemberDao.insertListAlarm(
-                ListMemberAlarmEntity(
-                    listId = listId,
-                    isStatus = isStatus)
-            ))
+            flowOf(
+                listMemberDao.insertListAlarm(
+                    ListMemberAlarmEntity(
+                        listId = listId,
+                        isStatus = isStatus
+                    )
+                )
+            )
         }
 
-    override suspend fun toggleListWatch(id: Long, isConnected: Boolean): Flow<Unit> =
+    // TODO 리스트 워치는 온라인일 때에만 가능합니다
+    override suspend fun toggleListWatch(
+        memberId: Long,
+        listId: Long,
+        isConnected: Boolean
+    ): Flow<Unit> =
         withContext(ioDispatcher) {
-            val memberAlarm = listMemberDao.getListMemberAlarm(id)
-
-            if (memberAlarm != null) {
-                if (isConnected) {
-                    listDataSource.toggleListWatchBoard(id)
-                } else {
-                    val result = when (memberAlarm.isStatus) {
-                        DataStatus.STAY ->
-                            listMemberDao.updateListMemberAlarm(
-                                memberAlarm.copy(
-                                    isAlert = !memberAlarm.isAlert,
-                                    isStatus = DataStatus.UPDATE
-                                )
-                            )
-
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            listMemberDao.updateListMemberAlarm(
-                                memberAlarm.copy(
-                                    isAlert = !memberAlarm.isAlert,
-                                )
-                            )
-
-                        DataStatus.DELETE -> {}
-                    }
-
-                    flowOf(result)
-                }
-            } else {
-                flowOf(Unit)
+            val isWatch = listDataSource.toggleListWatchBoard(memberId, listId).firstOrNull()
+            isWatch?.let {
+                listMemberDao.insertListAlarm(
+                    ListMemberAlarmEntity(
+                        listId = listId,
+                        isAlert = it.isAlert,
+                        isStatus = DataStatus.STAY
+                    )
+                )
             }
+            flowOf()
+//            val memberAlarm = listMemberDao.getListMemberAlarm(id)
+
+
+//            if (memberAlarm != null) {
+//                if (isConnected) {
+//                    listDataSource.toggleListWatchBoard(id)
+//                } else {
+//                    val result = when (memberAlarm.isStatus) {
+//                        DataStatus.STAY ->
+//                            listMemberDao.updateListMemberAlarm(
+//                                memberAlarm.copy(
+//                                    isAlert = !memberAlarm.isAlert,
+//                                    isStatus = DataStatus.UPDATE
+//                                )
+//                            )
+//
+//                        DataStatus.CREATE, DataStatus.UPDATE ->
+//                            listMemberDao.updateListMemberAlarm(
+//                                memberAlarm.copy(
+//                                    isAlert = !memberAlarm.isAlert,
+//                                )
+//                            )
+//
+//                        DataStatus.DELETE -> {}
+//                    }
+//
+//                    flowOf(result)
+//                }
+//            } else {
+//                flowOf(Unit)
+//            }
         }
 
     override suspend fun getLocalOperationListMember(): List<ListMemberDTO> =
@@ -309,6 +339,83 @@ class ListRepositoryImpl @Inject constructor(
             combine(
                 listMemberDao.getListsMemberAlarms(listIds),
                 cardDao.getAllCardsInLists(listIds).flatMapLatest { cards ->
+                    val cardIds = cards.map { it.id }
+
+                    combine(
+                        replyDao.getReplyCounts(cardIds),
+                        cardMemberDao.getCardRepresentativesInCards(cardIds),
+                        cardMemberDao.getCardsMemberAlarms(cardIds),
+                        cardLabelDao.getAllCardLabelsInCards(cardIds),
+                        attachmentDao.getCardsIsAttachment(cardIds)
+                    ) { replyCounts, cardMembers, cardWatch, cardLabels, isAttachment ->
+                        val replyCountMap = replyCounts.associateBy { it.cardId }
+                        val cardMemberMap = cardMembers.groupBy { it.cardMember.cardId }
+                        val cardWatchMap = cardWatch.associateBy { it.cardId }
+                        val cardLabelMap = cardLabels.groupBy { it.cardLabel.cardId }
+                        val attachmentMap = isAttachment.associateBy { it.cardId }
+
+                        val cardThumbnails = cards.map { card ->
+                            card.toDTO(
+                                replyCount = replyCountMap[card.id]?.count ?: 0,
+                                isWatch = cardWatchMap[card.id]?.isAlert ?: false,
+                                isAttachment = attachmentMap[card.id]?.isAttachment ?: false,
+                                cardMembers = cardMemberMap[card.id]?.map { it.toDTO() }
+                                    ?: emptyList(),
+                                cardLabels = cardLabelMap[card.id]?.map { it.toDto() }
+                                    ?: emptyList()
+                            )
+                        }
+
+                        cardThumbnails
+                    }
+                }
+            ) { listWatch, updatedCards ->
+                val listWatchMap = listWatch.associateBy { it.listId }
+
+                lists.map { list ->
+                    list.toDto(
+                        cards = updatedCards.filter { it.listId == list.id },
+                        isWatch = listWatchMap[list.id]?.isAlert ?: false
+                    )
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getLocalScreenListsInCardsFilter(boardId: Long,
+                                                          includeNoRepresentative: Int,
+                                                          memberIdsEmpty: Int,
+                                                          memberIds: List<Long>,
+                                                          noLimitDate: Int,
+                                                          expireDate: Int,
+                                                          deadlineDateType: Int,
+                                                          includeNoLabel: Int,
+                                                          labelIdsEmpty: Int,
+                                                          cardLabelIds: List<Long>,
+                                                          keyword: String): Flow<List<ListInCard>> {
+        return listDao.getAllListsInBoard(boardId).flatMapLatest { lists ->
+            val listIds = lists.map { it.id }
+
+            combine(
+                listMemberDao.getListsMemberAlarms(listIds),
+                // 담당자 없음, 담당자 종류
+                // 날짜 제한 없음, 기한 만료, {선택 안함(0), 내일 내(1), 일주일 내(2), 한달 내(3)}
+                // 라벨 없음, 라벨 종류
+                // 키워드
+                cardDao.getAllCardsInListsFilter(
+                    listIds,
+                    includeNoRepresentative,
+                    memberIdsEmpty,
+                    memberIds,
+                    noLimitDate,
+                    expireDate,
+                    deadlineDateType,
+                    includeNoLabel,
+                    labelIdsEmpty,
+                    cardLabelIds,
+                    keyword
+                    ).flatMapLatest { cards ->
                     val cardIds = cards.map { it.id }
 
                     combine(

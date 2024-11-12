@@ -1,6 +1,9 @@
 package com.ssafy.data.repository.card
 
+import com.ssafy.database.dto.with.CardWithListAndBoardName
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -8,6 +11,7 @@ import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
+import com.ssafy.model.with.BoardInMyRepresentativeCard
 import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardLabelWithLabelDTO
@@ -15,6 +19,7 @@ import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.DataStatus
+import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import kotlinx.coroutines.flow.Flow
 
@@ -53,6 +58,12 @@ interface CardRepository {
     suspend fun getCardRepresentativesInCard(cardId: Long): Flow<List<MemberResponseDTO>>
 
     suspend fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<MemberResponseDTO>>
+
+    suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+
+    suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean>
 
     suspend fun getCardMembers(cardId: Long): Flow<List<MemberResponseDTO>>
 
@@ -102,4 +113,8 @@ interface CardRepository {
     suspend fun createAttachment(attachment: AttachmentDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun deleteAttachment(id: Long, isConnected: Boolean): Flow<Unit>
+
+    suspend fun getLocalScreenMyRepresentativeCard(memberId: Long): Flow<List<BoardInMyRepresentativeCard>>
+
+    suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit>
 }
