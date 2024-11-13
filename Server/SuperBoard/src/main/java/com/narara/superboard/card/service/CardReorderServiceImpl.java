@@ -47,7 +47,7 @@ public class CardReorderServiceImpl implements CardReorderService {
 
         // 업데이트된 카드 순서 저장
         cardRepository.saveAll(cards);
-        list.setLastCardOrder(newOrder);
+        list.setLastCardOrder(newOrder - REORDER_GAP);
 
         return orderInfoList;
     }
