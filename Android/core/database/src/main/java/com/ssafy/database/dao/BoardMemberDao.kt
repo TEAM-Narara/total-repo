@@ -48,13 +48,12 @@ interface BoardMemberDao {
 
     // 리스트들 내에 카드들 조회
     @Query("""
-        SELECT 
+        SELECT DISTINCT
             m.*
         FROM member m
         INNER JOIN board_member bm ON m.id = bm.memberId
         INNER JOIN workspace_member wm ON m.id = wm.memberId
         WHERE bm.boardId = :boardId AND wm.workspaceId = :workspaceId
-
     """)
     fun getAllBoardAndWorkspaceMember(
         workspaceId: Long,
