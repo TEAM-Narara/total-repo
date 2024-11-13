@@ -1,30 +1,29 @@
 package com.ssafy.home.mycard
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.ssafy.designsystem.R
+import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.CardItem
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.Gray
@@ -33,14 +32,14 @@ import com.ssafy.designsystem.values.PaddingSemiLarge
 import com.ssafy.designsystem.values.TextSmall
 import com.ssafy.designsystem.values.Transparent
 import com.ssafy.designsystem.values.White
-import java.util.Date
+import com.ssafy.model.with.BoardInMyRepresentativeCard
 
 @Composable
 fun BoardWithMyCards(
     modifier: Modifier = Modifier,
-    board: Any,
+    board: BoardInMyRepresentativeCard,
     boardIcon: @Composable () -> Unit,
-    onClick: (Any) -> Unit
+    onClick: (cardId: Long) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -70,9 +69,8 @@ fun BoardWithMyCards(
                     boardIcon()
                 }
 
-                // TODO : Board Name을 표시하는 부분
                 Text(
-                    text = "Board Name",
+                    text = board.name,
                     modifier = Modifier.padding(start = PaddingMedium),
                     fontSize = TextSmall
                 )
@@ -87,41 +85,29 @@ fun BoardWithMyCards(
             contentPadding = PaddingValues(horizontal = PaddingSemiLarge)
         ) {
 
-            // TODO : Board 내부의 Card 리스트의 개수에 따라 수정
-            items(5) { item ->
+            items(board.cards.size) { index ->
+                val card = board.cards[index]
                 CardItem(
-                    onClick = { onClick(item) },
-                    title = "제목", startTime = Date().time, commentCount = 1,
-                    image = {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            modifier = Modifier.fillMaxSize(),
-                            contentDescription = "",
-                            contentScale = ContentScale.FillWidth
-                        )
-                    },
-                    modifier = Modifier.width(300.dp),
-                    description = true,
+                    modifier = modifier,
+                    title = card.name,
+                    image = { /*이미지 할당 */ },
+                    labels = { /*라벨 할당 */ },
+                    startTime = card.startAt,
+                    endTime = card.endAt,
+                    description = card.description != null,
+                    attachment = card.isAttachment,
+                    commentCount = card.replyCount,
                     manager = {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            modifier = Modifier.size(48.dp),
-                            contentDescription = "",
-                            contentScale = ContentScale.FillWidth
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            modifier = Modifier.size(48.dp),
-                            contentDescription = "",
-                            contentScale = ContentScale.FillWidth
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            modifier = Modifier.size(48.dp),
-                            contentDescription = "",
-                            contentScale = ContentScale.FillWidth
-                        )
-                    }
+                        card.cardMembers.forEach { member ->
+                            AsyncImage(
+                                model = member.memberProfileImgUrl,
+                                contentDescription = "Member Profile Image",
+                                contentScale = ContentScale.Crop,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle),
+                            )
+                        }
+                    },
+                    onClick = { onClick(card.id) }
                 )
             }
         }
