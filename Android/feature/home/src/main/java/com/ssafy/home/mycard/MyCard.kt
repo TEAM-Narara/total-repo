@@ -28,7 +28,7 @@ import com.ssafy.ui.uistate.UiState
 fun MyCardScreen(
     viewModel: MyCardViewModel = hiltViewModel(),
     popBackToHome: () -> Unit,
-    moveToCardScreen: (boardId: Long, cardId: Long) -> Unit
+    moveToCardScreen: (workspaceId: Long, boardId: Long, cardId: Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val myCardList by viewModel.myCardList.collectAsStateWithLifecycle()
@@ -53,7 +53,7 @@ fun MyCardScreen(
 private fun MyCardScreen(
     boardList: List<BoardInMyRepresentativeCard>,
     popBackToHome: () -> Unit,
-    moveToCardScreen: (boardId: Long, cardId: Long) -> Unit
+    moveToCardScreen: (workspaceId: Long, boardId: Long, cardId: Long) -> Unit
 ) {
     Scaffold(
         topBar = { MyCardTopBar(onNavigateClick = popBackToHome) }
@@ -85,10 +85,11 @@ private fun MyCardScreen(
                                     error = ColorPainter(Yellow)
                                 )
                             }
+
                             else -> {}
                         }
                     },
-                    onClick = { cardId -> moveToCardScreen(board.id, cardId) }
+                    onClick = { cardId -> moveToCardScreen(board.workspaceId, board.id, cardId) }
                 )
             }
         }
@@ -100,6 +101,6 @@ private fun MyCardScreen(
 private fun MyCardScreenPreview() {
     MyCardScreen(
         popBackToHome = {},
-        moveToCardScreen = { _, _ -> }
+        moveToCardScreen = { _, _, _ -> }
     )
 }

@@ -124,9 +124,9 @@ fun SuperBoardNavHost(
 
         myCardScreen(
             popBackToHome = navController::popBackStack,
-            moveToCardScreen = { boardId: Long, cardId: Long ->
-                navController.navigate(Board(boardId))
-                navController.navigate(Card(boardId, cardId))
+            moveToCardScreen = { workspaceId: Long, boardId: Long, cardId: Long ->
+                navController.navigate(Board(workspaceId, boardId))
+                navController.navigate(Card(workspaceId, boardId, cardId))
             }
         )
 
