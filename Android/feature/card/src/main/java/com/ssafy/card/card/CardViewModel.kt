@@ -28,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -54,6 +55,10 @@ class CardViewModel @Inject constructor(
     private val setCardRepresentativeUseCase: SetCardRepresentativeUseCase,
     private val setCardAlertStatusUseCase: SetCardAlertStatusUseCase,
 ) : BaseViewModel() {
+    private var _workspaceId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setWorkspaceId(workspaceId: Long) = _workspaceId.update { workspaceId }
+    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setBardId(boardId: Long) = _boardId.update { boardId }
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
 
@@ -73,14 +78,18 @@ class CardViewModel @Inject constructor(
         initialValue = null,
     )
 
-    val careMemberList = _cardId.filterNotNull().flatMapLatest { cardId ->
-        getCardMemberUseCase(cardId).map {
+    val careMemberList = combine(_workspaceId, _boardId, _cardId) { workspaceId, boardId, cardId ->
+        if (workspaceId == null || boardId == null || cardId == null) null
+        else Triple(workspaceId, boardId, cardId)
+    }.filterNotNull().flatMapLatest {
+        val (workspaceId, boardId, cardId) = it
+        getCardMemberUseCase(workspaceId, boardId, cardId).map {
             it.map {
                 ManagerData(
                     id = it.memberId,
-                    nickname = it.memberNickname,
-                    email = it.memberEmail,
-                    profileUrl = it.memberProfileImgUrl,
+                    nickname = it.nickname,
+                    email = it.email,
+                    profileUrl = it.profileImageUrl,
                     isManager = it.isRepresentative
                 )
             }

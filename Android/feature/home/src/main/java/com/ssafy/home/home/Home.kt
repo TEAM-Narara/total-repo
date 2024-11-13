@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    moveToBoardScreen: (Long) -> Unit,
+    moveToBoardScreen: (Long, Long) -> Unit,
     moveToCreateNewBoardScreen: (List<WorkSpaceDTO>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: (Long) -> Unit,
@@ -66,7 +66,11 @@ fun HomeScreen(
             user = data.user,
             workSpaceList = data.workspaceList,
             selectedWorkspace = data.selectedWorkSpace,
-            moveToBoardScreen = moveToBoardScreen,
+            moveToBoardScreen = { boardId ->
+                viewModel.homeData.value?.selectedWorkSpace?.workspaceId?.let { workspaceId ->
+                    moveToBoardScreen(workspaceId, boardId)
+                }
+            },
             moveToCreateNewBoardScreen = { moveToCreateNewBoardScreen(data.workspaceList) },
             moveToLoginScreen = { viewModel.logout(moveToLoginScreen) },
             moveToSettingScreen = { moveToSettingScreen(data.selectedWorkSpace.workspaceId) },
