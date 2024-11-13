@@ -2,9 +2,8 @@ package com.narara.superboard.card.service;
 
 import static com.narara.superboard.card.CardAction.*;
 
-import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
-import com.narara.superboard.attachment.service.AttachmentServiceImpl;
+import com.narara.superboard.attachment.service.AttachmentServiceImpl.AttachmentInfo;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
@@ -42,6 +41,11 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -223,18 +227,45 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable) {
         // 카드 활동 및 댓글 리스트를 Page로 가져옴
-        Page<CardHistory> cardActivities =
+        Page<CardHistory> cardHistoriesPage =
                 cardHistoryRepository.findByWhere_CardIdAndEventDataNotInOrderByWhenDesc(cardId, pageable);
         Page<Reply> cardReplies =
                 replyRepository.findAllByCardId(cardId, pageable);
 
+        Page<CardHistory> attachmentHistoryPage = cardHistoryRepository.findByWhere_CardIdAndEventDataInAttachmentOrderByWhenDesc(
+                cardId, pageable);
+
+        ArrayList<CardHistory> attachmentHistorys = new ArrayList<>(attachmentHistoryPage.getContent());
+
+        // 2. Attachment 타입의 기록을 필터링하고 attachmentId로 그룹화
+        Map<Long, java.util.List<CardHistory>> attachmentGroups = attachmentHistorys.stream()
+                .collect(Collectors.groupingBy(ch -> ((AttachmentInfo) ch.getTarget()).attachmentId()));
+
+        // 3. 각 attachmentId 그룹에서 delete와 create가 모두 있는 경우 두 항목을 삭제
+        Iterator<CardHistory> iterator = attachmentHistorys.iterator();
+        while (iterator.hasNext()) {
+            CardHistory cardHistory = iterator.next();
+            Long attachmentId = ((AttachmentInfo) cardHistory.getTarget()).attachmentId();
+
+            // 그룹 내에서 delete와 create가 모두 있는지 확인
+            java.util.List<CardHistory> attachmentHistory = attachmentGroups.get(attachmentId);
+
+            boolean hasCreate = attachmentHistory.stream().anyMatch(ch -> EventType.CREATE.equals(ch.getEventType()));
+            boolean hasDelete = attachmentHistory.stream().anyMatch(ch -> EventType.DELETE.equals(ch.getEventType()));
+
+            // delete와 create가 모두 있으면 해당 그룹의 항목 삭제
+            if (hasCreate && hasDelete) {
+                iterator.remove();
+            }
+        }
+
         // 두 Page 객체의 총 페이지 수와 총 요소 수 계산
-        long totalElements = cardActivities.getTotalElements() + cardReplies.getTotalElements();
+        long totalElements = cardHistoriesPage.getTotalElements() + cardReplies.getTotalElements();
         long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
 
         // DTO로 변환 및 최신순 정렬
         java.util.List<CardCombinedActivityDto> combinedLogs =
-                mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(),  pageable.getPageSize());
+                mergeAndLimitSortedList(cardHistoriesPage.getContent(), cardReplies.getContent(), attachmentHistorys, pageable.getPageSize());
 
         return new CardCombinedActivityResponseDto(combinedLogs, totalPages, totalElements);
     }
@@ -250,49 +281,48 @@ public class CardServiceImpl implements CardService {
                 .toList();
     }
 
-    private static java.util.List<CardCombinedActivityDto> mergeAndLimitSortedList(
+    private static record Entry(CardHistory cardHistory, Iterator<CardHistory> iterator) {}
+
+    public static java.util.List<CardCombinedActivityDto> mergeAndLimitSortedList(
             java.util.List<CardHistory> cardLogs,
             java.util.List<Reply> cardReplies,
+            java.util.List<CardHistory> attachments,
             int pageSize) {
 
-        java.util.List<CardCombinedActivityDto> combinedList = new ArrayList<>();
+        java.util.List<CardCombinedActivityDto> combinedList = new ArrayList<>(pageSize);
         java.util.List<CardHistory> replyList = new ArrayList<>();
 
+        // Reply -> CardHistory 변환 후 replyList에 추가
         for (Reply cardReply : cardReplies) {
             Card card = cardReply.getCard();
-            ReplyInfo replyInfo =
-                    new ReplyInfo(card.getId(), card.getName(),
-                            cardReply.getId(), cardReply.getContent());
+            ReplyInfo replyInfo = new ReplyInfo(card.getId(), card.getName(),
+                    cardReply.getId(), cardReply.getContent());
             CardHistory cardHistory = CardHistory.createCardHistory(
                     cardReply.getMember(), cardReply.getUpdatedAt(),
                     card.getList().getBoard(), card,
-                    EventType.CREATE , EventData.COMMENT, replyInfo);
-            System.out.println(cardHistory);
+                    EventType.CREATE, EventData.COMMENT, replyInfo);
             replyList.add(cardHistory);
         }
 
-        int i = 0, j = 0;
+        // 최대 힙 생성 (getWhen() 값이 큰 순서대로 정렬)
+        PriorityQueue<Entry> maxHeap = new PriorityQueue<>(
+                Comparator.comparingLong((Entry e) -> e.cardHistory.getWhen()).reversed()
+        );
 
-        // 병합하면서 최신순으로 정렬
-        while (i < cardLogs.size() && j < replyList.size() && combinedList.size() < pageSize) {
-            if (cardLogs.get(i).getWhen() >= replyList.get(j).getWhen()) {
-                combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
-                i++;
-            } else {
-                combinedList.add(CardCombinedActivityDto.of(replyList.get(j)));
-                j++;
+        // 각 리스트의 첫 번째 요소를 힙에 추가
+        if (!cardLogs.isEmpty()) maxHeap.add(new Entry(cardLogs.get(0), cardLogs.iterator()));
+        if (!replyList.isEmpty()) maxHeap.add(new Entry(replyList.get(0), replyList.iterator()));
+        if (!attachments.isEmpty()) maxHeap.add(new Entry(attachments.get(0), attachments.iterator()));
+
+        // 병합 작업 수행
+        while (!maxHeap.isEmpty() && combinedList.size() < pageSize) {
+            Entry latestEntry = maxHeap.poll();
+            combinedList.add(CardCombinedActivityDto.of(latestEntry.cardHistory()));
+
+            // 해당 리스트의 다음 요소를 힙에 추가
+            if (latestEntry.iterator().hasNext()) {
+                maxHeap.add(new Entry(latestEntry.iterator().next(), latestEntry.iterator()));
             }
-        }
-
-        // 남은 요소 추가 (pageSize에 도달할 때까지)
-        while (i < cardLogs.size() && combinedList.size() < pageSize) {
-            combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
-            i++;
-        }
-
-        while (j < replyList.size() && combinedList.size() < pageSize) {
-            combinedList.add(CardCombinedActivityDto.of(replyList.get(j)));
-            j++;
         }
 
         return combinedList;

@@ -17,6 +17,9 @@ public interface CardHistoryRepository extends MongoRepository<CardHistory, Stri
     List<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId);
     Page<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId, Pageable pageable);
 
-    @Query("{ 'where.cardId': ?0, 'eventData': { $ne: ['COMMENT'] } }")
+    @Query("{ 'where.cardId': ?0, 'eventData': { $ne: ['COMMENT', 'ATTACHMENT'] } }")
     Page<CardHistory> findByWhere_CardIdAndEventDataNotInOrderByWhenDesc(Long cardId, Pageable pageable);
+
+    @Query("{ 'where.cardId': ?0, 'eventData': { $eq: 'ATTACHMENT' } }")
+    Page<CardHistory> findByWhere_CardIdAndEventDataInAttachmentOrderByWhenDesc(Long cardId, Pageable pageable);
 }
