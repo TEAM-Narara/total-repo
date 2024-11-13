@@ -17,8 +17,6 @@ import javax.inject.Singleton
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
-import kotlin.random.Random
-import kotlin.random.Random.Default.nextLong
 
 @Singleton
 class ListMyOrderRepositoryImpl @Inject constructor(
@@ -156,7 +154,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
     private fun generateUniqueOrder(baseOrder: Long, maxOffset: Long): Long {
-        val offset = Random.nextLong(0, maxOffset)
+        val offset = ThreadLocalRandom.current().nextLong(0, maxOffset)
         return baseOrder + offset
     }
 

@@ -11,6 +11,7 @@ import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.ListEntity
+import java.util.concurrent.ThreadLocalRandom
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.max
@@ -262,7 +263,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
      * @return 고유 순서 값
      */
     private fun generateUniqueOrder(baseOrder: Long, maxOffset: Long): Long {
-        val offset = Random.nextLong(0, maxOffset)
+        val offset = ThreadLocalRandom.current().nextLong(0, maxOffset)
         return baseOrder + offset
     }
 
@@ -322,7 +323,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 )
             } else {
                 // 충돌 발생 - 새로운 순서 값 생성 시도
-                val randomOffset = Random.nextLong(0, maxOffset)
+                val randomOffset = ThreadLocalRandom.current().nextLong(0, maxOffset)
                 newOrder = baseOrder + randomOffset
                 attempt++
             }
