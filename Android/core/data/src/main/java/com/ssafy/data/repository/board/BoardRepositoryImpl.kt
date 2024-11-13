@@ -9,6 +9,7 @@ import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.LabelEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.bitmaskColumn
@@ -489,4 +490,12 @@ class BoardRepositoryImpl @Inject constructor(
         )
         boardDataSource.updateBoard(id, dto)
     }
+
+    override suspend fun getAllBoardAndWorkspaceMember(
+        workspaceId: Long,
+        boardId: Long
+    ): Flow<List<MemberEntity> > =
+        withContext(ioDispatcher) {
+            boardMemberDao.getAllBoardAndWorkspaceMember(workspaceId = workspaceId, boardId = boardId)
+        }
 }
