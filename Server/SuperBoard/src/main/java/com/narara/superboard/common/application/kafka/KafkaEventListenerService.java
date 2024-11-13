@@ -109,6 +109,8 @@ public class KafkaEventListenerService {
 
         // 메모리 맵과 Redis에 ACK 추가
         OffsetKey offsetKey = new OffsetKey(record.topic(), record.partition(), offset, "member-" + memberId);
+        log.info("partition: {}, offset: {}", record.partition(), offset);
+
         //pendingAcks는 acknowledgment를 임시로 저장하고 있는것
         pendingAcks.put(offsetKey, acknowledgment);
         // ACK 대기 큐에 추가
