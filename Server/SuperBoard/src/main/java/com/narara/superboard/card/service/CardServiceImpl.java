@@ -2,6 +2,9 @@ package com.narara.superboard.card.service;
 
 import static com.narara.superboard.card.CardAction.*;
 
+import com.narara.superboard.attachment.entity.Attachment;
+import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
+import com.narara.superboard.attachment.service.AttachmentServiceImpl;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
@@ -31,6 +34,7 @@ import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
+import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.websocket.constant.Action;
 
 import java.time.LocalDateTime;
@@ -56,6 +60,7 @@ public class CardServiceImpl implements CardService {
     private final CardMemberRepository cardMemberRepository;
     private final CardHistoryRepository cardHistoryRepository;
     private final ReplyRepository replyRepository;
+    private final AttachmentRepository attachmentRepository;
 
     private final NameValidator nameValidator;
     private final CoverValidator coverValidator;
@@ -219,7 +224,7 @@ public class CardServiceImpl implements CardService {
     public CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable) {
         // 카드 활동 및 댓글 리스트를 Page로 가져옴
         Page<CardHistory> cardActivities =
-                cardHistoryRepository.findByWhere_CardIdOrderByWhenDesc(cardId, pageable);
+                cardHistoryRepository.findByWhere_CardIdAndEventDataNotInOrderByWhenDesc(cardId, pageable);
         Page<Reply> cardReplies =
                 replyRepository.findAllByCardId(cardId, pageable);
 
@@ -229,7 +234,7 @@ public class CardServiceImpl implements CardService {
 
         // DTO로 변환 및 최신순 정렬
         java.util.List<CardCombinedActivityDto> combinedLogs =
-                mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(), pageable.getPageSize());
+                mergeAndLimitSortedList(cardActivities.getContent(), cardReplies.getContent(),  pageable.getPageSize());
 
         return new CardCombinedActivityResponseDto(combinedLogs, totalPages, totalElements);
     }
@@ -251,27 +256,42 @@ public class CardServiceImpl implements CardService {
             int pageSize) {
 
         java.util.List<CardCombinedActivityDto> combinedList = new ArrayList<>();
+        java.util.List<CardHistory> replyList = new ArrayList<>();
+
+        for (Reply cardReply : cardReplies) {
+            Card card = cardReply.getCard();
+            ReplyInfo replyInfo =
+                    new ReplyInfo(card.getId(), card.getName(),
+                            cardReply.getId(), cardReply.getContent());
+            CardHistory cardHistory = CardHistory.createCardHistory(
+                    cardReply.getMember(), cardReply.getUpdatedAt(),
+                    card.getList().getBoard(), card,
+                    EventType.CREATE , EventData.COMMENT, replyInfo);
+            System.out.println(cardHistory);
+            replyList.add(cardHistory);
+        }
+
         int i = 0, j = 0;
 
         // 병합하면서 최신순으로 정렬
-        while (i < cardLogs.size() && j < cardReplies.size() && combinedList.size() < pageSize) {
-            if (cardLogs.get(i).getWhen() >= cardReplies.get(j).getCreatedAt()) {
+        while (i < cardLogs.size() && j < replyList.size() && combinedList.size() < pageSize) {
+            if (cardLogs.get(i).getWhen() >= replyList.get(j).getWhen()) {
                 combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
                 i++;
             } else {
-                combinedList.add(CardCombinedActivityDto.of(cardReplies.get(j)));
+                combinedList.add(CardCombinedActivityDto.of(replyList.get(j)));
                 j++;
             }
         }
 
-        // 나머지 요소를 pageSize에 도달할 때까지 추가
+        // 남은 요소 추가 (pageSize에 도달할 때까지)
         while (i < cardLogs.size() && combinedList.size() < pageSize) {
             combinedList.add(CardCombinedActivityDto.of(cardLogs.get(i)));
             i++;
         }
 
-        while (j < cardReplies.size() && combinedList.size() < pageSize) {
-            combinedList.add(CardCombinedActivityDto.of(cardReplies.get(j)));
+        while (j < replyList.size() && combinedList.size() < pageSize) {
+            combinedList.add(CardCombinedActivityDto.of(replyList.get(j)));
             j++;
         }
 

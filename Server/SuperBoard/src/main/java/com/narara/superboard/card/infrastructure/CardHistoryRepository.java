@@ -12,10 +12,11 @@ public interface CardHistoryRepository extends MongoRepository<CardHistory, Stri
     List<CardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId);
     Page<CardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId, Pageable pageable);
 
-    @Query("{ 'where.boardId': ?0, 'eventData': { $nin: ['COMMENT', 'ATTACHMENT'] } }")
     Page<CardHistory> findByWhere_BoardIdAndEventDataNotInOrderByWhenDesc(Long boardId, Pageable pageable);
 
     List<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId);
     Page<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId, Pageable pageable);
 
+    @Query("{ 'where.cardId': ?0, 'eventData': { $ne: ['COMMENT'] } }")
+    Page<CardHistory> findByWhere_CardIdAndEventDataNotInOrderByWhenDesc(Long cardId, Pageable pageable);
 }
