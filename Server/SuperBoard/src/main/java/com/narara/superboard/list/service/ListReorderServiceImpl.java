@@ -42,7 +42,7 @@ public class ListReorderServiceImpl implements ListReorderService {
         }
 
         listRepository.saveAll(lists);
-        board.setLastListOrder(newOrder);
+        board.setLastListOrder(newOrder - REORDER_GAP);
 
         return orderInfoList;
     }

@@ -258,10 +258,27 @@ public class ListMoveServiceImpl implements ListMoveService {
         // 보드의 전체 리스트를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
         java.util.List<List> allLists = listRepository.findAllByBoardOrderByMyOrderAsc(testList.getBoard());
 
+        //하나의 보드에서 가져온 리스트들인지 검증
+        validateOneBoard(allLists);
+
         //리스트 myOrder 배정 및 재배치
         java.util.List<List> updatedListCollection = insertAndRelocateList(allLists, listMoveRequests);
 
         return new ReorderedListMove(ListMoveResponseDto.of(updatedListCollection));
+    }
+
+    //모든 리스트들이 하나의 보드에 있는지 확인하기
+    private void validateOneBoard(java.util.List<List> allLists) {
+        if (allLists.isEmpty()) {
+            throw new IllegalArgumentException("수정할 리스트는 비어있으면 안됩니다");
+        }
+
+        Board board = allLists.get(0).getBoard();
+        for (List list: allLists) {
+            if (!list.getBoard().getId().equals(board.getId())) {
+                throw new IllegalArgumentException("입력으로 들어온 리스트들은 하나의 보드에 있어야합니다");
+            }
+        }
     }
 
     private java.util.List<List> insertAndRelocateList(java.util.List<List> allLists,
