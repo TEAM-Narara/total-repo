@@ -34,8 +34,10 @@ import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardLabelWithLabelInfo
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
+import com.ssafy.database.dto.with.CardWithListAndBoardName
 import com.ssafy.database.dto.with.ListInCards
 import com.ssafy.database.dto.with.ListMemberWithMemberInfo
+import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.database.dto.with.ReplyWithMemberInfo
 import com.ssafy.database.dto.with.WorkspaceInBoard
 import com.ssafy.database.dto.with.WorkspaceMemberWithMemberInfo
@@ -59,11 +61,13 @@ import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardThumbnail
+import com.ssafy.model.with.CardWithListAndBoardNameDTO
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.ListInCard
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
+import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.model.with.ReplyDTO
 import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
@@ -219,10 +223,10 @@ fun BoardMemberAlarmEntity.toDTO(): BoardMemberAlarmDTO {
 // LABEL
 fun LabelEntity.toDTO(): LabelDTO {
     return LabelDTO(
-        id = this.id,
+        labelId = this.id,
         boardId = this.boardId,
-        name = this.name,
-        color = this.color,
+        labelName = this.name,
+        labelColor = this.color,
         isStatus = this.isStatus
     )
 }
@@ -459,7 +463,7 @@ fun CardMemberAlarmEntity.toDTO(): CardMemberAlarmDTO {
 
 fun CardLabelEntity.toDTO(): CardLabelDTO {
     return CardLabelDTO(
-        id = this.id,
+        cardLabelId = this.id,
         labelId = this.labelId,
         cardId = this.cardId,
         isActivated = this.isActivated,
@@ -528,5 +532,24 @@ fun ReplyWithMemberDTO.toEntity(): ReplyWithMemberInfo {
     return ReplyWithMemberInfo(
         reply = replyEntity,
         member = memberEntity
+    )
+}
+
+fun CardWithListAndBoardName.toDTO() : CardWithListAndBoardNameDTO = with(this) {
+    CardWithListAndBoardNameDTO(
+        cardId = cardId,
+        cardName = cardName,
+        listName = listName,
+        boardName = boardName,
+    )
+}
+
+fun MemberWithRepresentative.toDTO(): MemberWithRepresentativeDTO = with(this) {
+    MemberWithRepresentativeDTO(
+        memberId = memberId,
+        email = email,
+        nickname = nickname,
+        profileImageUrl = profileImageUrl,
+        isRepresentative = isRepresentative
     )
 }

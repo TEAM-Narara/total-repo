@@ -5,6 +5,7 @@ import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.member.SimpleMemberDto
 import com.ssafy.network.source.ApiResponse
+import com.ssafy.nullable.UpdateBoardWithNull
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -29,6 +30,12 @@ interface BoardAPI {
     suspend fun updateBoard(
         @Path("boardId") id: Long,
         @Body updateBoardRequestDto: UpdateBoardRequestDto
+    ): Response<ApiResponse<Unit>>
+
+    @PATCH("api/v1/boards/{boardId}")
+    suspend fun updateBoardWithNull(
+        @Path("boardId") id: Long,
+        @Body updateBoardRequestDto: UpdateBoardWithNull
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/boards/{boardId}/archive")

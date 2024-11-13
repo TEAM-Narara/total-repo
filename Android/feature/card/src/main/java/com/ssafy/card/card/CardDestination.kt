@@ -7,22 +7,21 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Card(val id: Long)
+data class Card(val boardId: Long, val cardId: Long)
 
 fun NavGraphBuilder.cardScreen(
     popBackToBoardScreen: () -> Unit,
-    moveToSelectLabel: (Long) -> Unit
+    moveToSelectLabel: (Long, Long) -> Unit
 ) {
     composable<Card> { backStackEntry ->
         val card: Card = backStackEntry.toRoute()
-        val id = card.id
         val viewModel: CardViewModel = hiltViewModel()
-        viewModel.getCardDetail(id)
-        viewModel.setUserId()
+
+        viewModel.setCardId(card.cardId)
 
         CardScreen(
             popBackToBoardScreen = popBackToBoardScreen,
-            moveToSelectLabel = { moveToSelectLabel(id) }
+            moveToSelectLabel = { moveToSelectLabel(card.boardId, card.cardId) }
         )
     }
 }

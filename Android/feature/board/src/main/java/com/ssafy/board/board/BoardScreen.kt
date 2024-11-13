@@ -87,18 +87,6 @@ fun BoardScreen(
 
         boardData?.let {
             Box(modifier = Modifier.padding(paddingValues)) {
-                BoardScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    boardData = it,
-                    onListTitleChanged = viewModel::updateListName,
-                    onCardReordered = viewModel::updateCardOrder,
-                    onListReordered = viewModel::updateListOrder,
-                    navigateToCardScreen = navigateToCardScreen,
-                    addList = viewModel::addList,
-                    addCard = viewModel::addCard,
-                    addPhoto = viewModel::addPhoto
-                )
-
                 when (it.cover.type) {
 
                     CoverType.IMAGE -> {
@@ -120,6 +108,18 @@ fun BoardScreen(
 
                     else -> {}
                 }
+
+                BoardScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    boardData = it,
+                    onListTitleChanged = viewModel::updateListName,
+                    onCardReordered = viewModel::updateCardOrder,
+                    onListReordered = viewModel::updateListOrder,
+                    navigateToCardScreen = navigateToCardScreen,
+                    addList = viewModel::addList,
+                    addCard = viewModel::addCard,
+                    addPhoto = viewModel::addPhoto
+                )
             }
         } ?: LoadingScreen()
     }
@@ -227,7 +227,10 @@ private fun BoardScreen(
                 item {
                     AddListButton(addList = addList) {
                         scope.launch {
-                            listLazyListState.scrollToItem(listCollection.size)
+                            handleLazyListScrollToCenter(
+                                lazyListState = listLazyListState,
+                                dropIndex = listCollection.size,
+                            )
                         }
                     }
                 }

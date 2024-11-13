@@ -17,8 +17,7 @@ import com.ssafy.designsystem.values.RadiusDefault
 
 val CardData.Label: (@Composable RowScope.() -> Unit)?
     get() = if (cardLabels.isEmpty()) null else {
-        // TODO : CardLabel Color 지정 필요
-        { cardLabels.map { CardLabel(color = Color.Yellow) } }
+        { cardLabels.map { CardLabel(color = Color(it.labelColor)) } }
     }
 
 @Composable

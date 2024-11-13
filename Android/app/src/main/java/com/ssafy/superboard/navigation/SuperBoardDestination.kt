@@ -41,8 +41,9 @@ import com.ssafy.login.login.LogIn
 import com.ssafy.login.login.loginScreen
 import com.ssafy.login.signup.SignUp
 import com.ssafy.login.signup.signupScreen
-import com.ssafy.model.auth.AuthManager
 import com.ssafy.model.background.Cover
+import com.ssafy.model.manager.AuthManager
+import com.ssafy.model.manager.ConnectManager
 import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
@@ -50,6 +51,7 @@ import com.ssafy.splash.StartDirection
 import com.ssafy.superboard.MainViewModel
 import com.ssafy.ui.safetype.coverType
 import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
 
 @Composable
 fun SuperBoardNavHost(
@@ -59,10 +61,15 @@ fun SuperBoardNavHost(
     direction: StartDirection = StartDirection.LOGIN
 ) {
     val authEvent by viewModel.authEvent.collectAsStateWithLifecycle(false)
+    val connectingEvent by ConnectManager.connectingEvent.collectAsStateWithLifecycle(false)
 
     if (authEvent) {
         navController.navigate(LogIn) { popUpAll(navController) }
         ErrorScreen(errorMessage = AuthManager.NO_AUTH)
+    }
+
+    if (connectingEvent) {
+        LoadingScreen(text = ConnectManager.CONNECTING)
     }
 
     NavHost(
@@ -195,8 +202,8 @@ fun SuperBoardNavHost(
                     BoardMenu(boardId, workspaceId)
                 )
             },
-            navigateToCardScreen = { cardId: Long ->
-                navController.navigate(Card(cardId))
+            navigateToCardScreen = { boardId: Long, cardId: Long ->
+                navController.navigate(Card(boardId, cardId))
             }
         )
 
@@ -204,8 +211,8 @@ fun SuperBoardNavHost(
             popBackToBoardScreen = {
                 navController.popBackStack()
             },
-            moveToSelectLabel = { cardId: Long ->
-                navController.navigate(Label(cardId))
+            moveToSelectLabel = { boardId: Long, cardId: Long ->
+                navController.navigate(Label(boardId, cardId))
             }
         )
 

@@ -110,11 +110,8 @@ class CommentRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationReply(): List<ReplyDTO> =
-        withContext(ioDispatcher) {
-            replyDao.getLocalOperationReplies()
-                .map { it.toDTO() }
-        }
+    override suspend fun getLocalOperationReply(): List<ReplyEntity> =
+        withContext(ioDispatcher) { replyDao.getLocalOperationReplies() }
 
     override suspend fun getReplyCounts(cardIds: List<Long>): Flow<List<ReplyCount>> =
         withContext(ioDispatcher) {

@@ -1,5 +1,7 @@
 package com.ssafy.designsystem.component
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,12 +19,13 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 fun EditableMarkDownText(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    content: String,
+    content: String?,
     setContent: (String) -> Unit,
     isFocus: Boolean = false,
     setFocus: (Boolean) -> Unit,
 ) {
-    val (text, setText) = remember { mutableStateOf(content) }
+    val (text, setText) = remember(content) { mutableStateOf(content) }
+    val interactionSource = remember { MutableInteractionSource() }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
@@ -30,18 +33,23 @@ fun EditableMarkDownText(
     ) {
 
         if (icon != null) {
-            Icon(imageVector = icon, contentDescription = "아이콘")
+            Icon(imageVector = icon, contentDescription = "아이콘", modifier = Modifier.clickable(
+                interactionSource = interactionSource,
+                indication = null,
+            ) {
+                setFocus(true)
+            })
         }
 
         if (!isFocus) {
             MarkdownText(
                 fontSize = TextMedium,
-                markdown = text,
+                markdown = text ?: "",
                 onClick = { setFocus(true) },
             )
         } else {
             EmptyBasicTextField(
-                content = text,
+                content = text ?: "",
                 setContent = {
                     setText(it)
                     setContent(it)

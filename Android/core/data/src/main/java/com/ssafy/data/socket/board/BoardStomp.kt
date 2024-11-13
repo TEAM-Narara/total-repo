@@ -30,34 +30,38 @@ class BoardStomp @Inject constructor(
     fun connect(boardId: Long) {
         disconnect()
         _job = CoroutineScope(ioDispatcher).launch {
-            stomp.subscribe("board/$boardId").stateIn(this).collect {
-                when (it.action) {
-                    "ADD_BOARD_MEMBER" -> boardService.addBoardMember(it.data)
-                    "EDIT_BOARD_MEMBER" -> boardService.editBoardMember(it.data)
-                    "DELETE_BOARD_MEMBER" -> boardService.deleteBoardMember(it.data)
-                    "EDIT_BOARD_WATCH" -> boardService.editBoardWatch(it.data)
-                    "ADD_BOARD_LABEL" -> boardService.addBoardLabel(it.data)
-                    "EDIT_BOARD_LABEL" -> boardService.editBoardLabel(it.data)
-                    "DELETE_BOARD_LABEL" -> boardService.deleteBoardLabel(it.data)
-                    "ADD_LIST" -> listService.addList(it.data)
-                    "EDIT_LIST" -> listService.editList(it.data)
-                    "EDIT_LIST_ARCHIVE" -> listService.editListArchive(it.data)
-                    "ADD_CARD" -> cardService.addCard(it.data)
-                    "EDIT_CARD" -> cardService.editCard(it.data)
-                    "ARCHIVE_CARD" -> cardService.archiveCard(it.data)
-                    "DELETE_CARD" -> cardService.deleteCard(it.data)
-                    "ADD_CARD_MEMBER" -> cardService.addCardMember(it.data)
-                    "DELETE_CARD_MEMBER" -> cardService.deleteCardMember(it.data)
-                    "ADD_CARD_LABEL" -> cardService.addCardLabel(it.data)
-                    "DELETE_CARD_LABEL" -> cardService.deleteCardLabel(it.data)
-                    "ADD_REPLY" -> replyService.addReply(it.data)
-                    "EDIT_REPLY" -> replyService.editReply(it.data)
-                    "DELETE_REPLY" -> replyService.deleteReply(it.data)
-                    "ADD_CARD_ATTACHMENT" -> attachmentService.addCardAttachment(it.data)
-                    "DELETE_CARD_ATTACHMENT" -> attachmentService.deleteCardAttachment(it.data)
-                    "EDIT_CARD_ATTACHMENT_COVER" -> attachmentService.editCardAttachmentCover(it.data)
-                    else -> {}
+            runCatching {
+                stomp.subscribe("board/$boardId").stateIn(this).collect {
+                    when (it.action) {
+                        "ADD_BOARD_MEMBER" -> boardService.addBoardMember(it.data)
+                        "EDIT_BOARD_MEMBER" -> boardService.editBoardMember(it.data)
+                        "DELETE_BOARD_MEMBER" -> boardService.deleteBoardMember(it.data)
+                        "EDIT_BOARD_WATCH" -> boardService.editBoardWatch(it.data)
+                        "ADD_BOARD_LABEL" -> boardService.addBoardLabel(it.data)
+                        "EDIT_BOARD_LABEL" -> boardService.editBoardLabel(it.data)
+                        "DELETE_BOARD_LABEL" -> boardService.deleteBoardLabel(it.data)
+                        "ADD_LIST" -> listService.addList(it.data)
+                        "EDIT_LIST" -> listService.editList(it.data)
+                        "EDIT_LIST_ARCHIVE" -> listService.editListArchive(it.data)
+                        "ADD_CARD" -> cardService.addCard(it.data)
+                        "EDIT_CARD" -> cardService.editCard(it.data)
+                        "ARCHIVE_CARD" -> cardService.archiveCard(it.data)
+                        "DELETE_CARD" -> cardService.deleteCard(it.data)
+                        "ADD_CARD_MEMBER" -> cardService.addCardMember(it.data)
+                        "DELETE_CARD_MEMBER" -> cardService.deleteCardMember(it.data)
+                        "ADD_CARD_LABEL" -> cardService.addCardLabel(it.data)
+                        "DELETE_CARD_LABEL" -> cardService.deleteCardLabel(it.data)
+                        "ADD_REPLY" -> replyService.addReply(it.data)
+                        "EDIT_REPLY" -> replyService.editReply(it.data)
+                        "DELETE_REPLY" -> replyService.deleteReply(it.data)
+                        "ADD_CARD_ATTACHMENT" -> attachmentService.addCardAttachment(it.data)
+                        "DELETE_CARD_ATTACHMENT" -> attachmentService.deleteCardAttachment(it.data)
+                        "EDIT_CARD_ATTACHMENT_COVER" -> attachmentService.editCardAttachmentCover(it.data)
+                        else -> {}
+                    }
                 }
+            }.onFailure { e ->
+                e.printStackTrace()
             }
         }
     }

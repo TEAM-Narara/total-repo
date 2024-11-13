@@ -50,7 +50,8 @@ private fun ModifyManagerDialogPrev() {
                 id = it,
                 nickname = "nickname",
                 email = "email@example.com",
-                isManager = true
+                isManager = true,
+                profileUrl = null,
             )
         },
         onIsManagerChanged = { _, _ -> }

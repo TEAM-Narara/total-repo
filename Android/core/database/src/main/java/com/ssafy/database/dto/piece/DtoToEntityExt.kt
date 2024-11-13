@@ -40,24 +40,24 @@ fun BoardDTO.toEntity(): BoardEntity {
         coverValue = cover.value,
         visibility = visibility.name,
         isClosed = this.isClosed,
-        isStatus = DataStatus.STAY,
+        isStatus = this.isStatus ?: DataStatus.STAY,
         columnUpdate = 0L
     )
 }
 
 fun LabelDTO.toEntity(): LabelEntity {
     return LabelEntity(
-        id = this.id,
+        id = this.labelId,
         boardId = this.boardId,
-        name = this.name,
-        color = this.color,
+        name = this.labelName,
+        color = this.labelColor,
         isStatus = this.isStatus
     )
 }
 
 fun CardLabelDTO.toEntity(): CardLabelEntity {
     return CardLabelEntity(
-        id = this.id,
+        id = this.cardLabelId,
         cardId = this.cardId,
         labelId = this.labelId,
         isActivated = this.isActivated,

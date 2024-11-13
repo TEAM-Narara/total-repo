@@ -61,7 +61,7 @@ fun EditableLabelItem(
     onEditLabel: () -> Unit,
     onDeleteLabel: () -> Unit,
 ) {
-    var isSelected by remember { mutableStateOf(selected) }
+    var isSelected by remember(selected) { mutableStateOf(selected) }
 
     Row(
         modifier = modifier,
@@ -77,8 +77,8 @@ fun EditableLabelItem(
                     shape = RoundedCornerShape(CornerSmall),
                 )
                 .clickable {
-                    isSelected = !isSelected
                     onLabelClicked(!isSelected)
+                    isSelected = !isSelected
                 }
                 .padding(PaddingSmall),
         ) {

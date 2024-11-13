@@ -21,13 +21,15 @@ class WorkspaceStomp @Inject constructor(
     private var _workspaceId: Long? = null
 
     fun connect(workspaceId: Long) {
-        if(_workspaceId == workspaceId) return
+        if (_workspaceId == workspaceId) return
 
         _workspaceId = workspaceId
+
         disconnect()
+
         _job = CoroutineScope(ioDispatcher).launch {
-            stomp.subscribe("workspace/$workspaceId").stateIn(this).collect {
-                runCatching {
+            runCatching {
+                stomp.subscribe("workspace/$workspaceId").stateIn(this).collect {
                     when (it.action) {
                         "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(it.data)
                         "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(it.data)
@@ -40,9 +42,9 @@ class WorkspaceStomp @Inject constructor(
                         "EDIT_ARCHIVE_BOARD" -> workspaceService.editArchivedBoard(it.data)
                         else -> {}
                     }
-                }.onFailure { e ->
-                    e.printStackTrace()
                 }
+            }.onFailure { e ->
+                e.printStackTrace()
             }
         }
     }

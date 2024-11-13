@@ -3,7 +3,8 @@ package com.ssafy.superboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.logout.LogoutUseCase
-import com.ssafy.model.auth.AuthManager
+import com.ssafy.model.manager.AuthManager
+import com.ssafy.model.manager.ConnectManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -18,6 +18,8 @@ import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val TAG = "StompClientManager"
+
 @Singleton
 class StompClientManager @Inject constructor(
     @AuthInterceptorOkHttpClient okHttpClient: OkHttpClient,
@@ -55,14 +57,21 @@ class StompClientManager @Inject constructor(
         id: String,
         topic: String,
         clazz: Class<T>,
-        ack: suspend (headers: MutableMap<String, String>) -> Unit = {}
-    ): Flow<T> {
-        Log.d("TAG", "subscribe: $id $topic")
+    ): Flow<StompResponse<T>> {
+        Log.i(TAG, "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
-            Log.d("TAG", "data: ${it.bodyAsText}")
-            ack(it.headers)
-            gson.fromJson(it.bodyAsText, clazz)
+            Log.i(TAG, "<------ receive $topic")
+            Log.i(TAG, "offset : ${it.headers["offset"]?.toLong()}")
+            Log.i(TAG, "data: ${it.bodyAsText}")
+            Log.i(TAG, "<------ receive end")
+            val data = gson.fromJson(it.bodyAsText, clazz)
+
+            StompResponse(
+                offset = it.headers["offset"]?.toLong() ?: throw Exception("offset이 존재하지 않습니다."),
+                partition = 0, // it.headers["partition"]?.toLong() ?: 0,
+                data = data
+            )
         }.catch { exception ->
             exception.printStackTrace()
             sessions.remove(id)
@@ -80,6 +89,9 @@ class StompClientManager @Inject constructor(
     }
 
     suspend fun <T> send(id: String, url: String, body: T) {
+        Log.i(TAG, "------> send $url")
+        Log.i(TAG, "data: ${gson.toJson(body)}")
+        Log.i(TAG, "------> send end")
         sessions[id]?.sendText(url, gson.toJson(body))
     }
 }

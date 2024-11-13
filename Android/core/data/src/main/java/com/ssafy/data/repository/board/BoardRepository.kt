@@ -1,9 +1,12 @@
 package com.ssafy.data.repository.board
 
+import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
+import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
@@ -14,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BoardRepository {
 
+    suspend fun createOnlyBoard(myMemberId: Long, boardDTO: BoardDTO)
     suspend fun createBoard(myMemberId: Long, boardDTO: BoardDTO, isConnected: Boolean): Flow<Long>
 
     suspend fun getBoard(boardId: Long): Flow<BoardDTO?>
@@ -21,6 +25,7 @@ interface BoardRepository {
     suspend fun deleteBoard(id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto, isConnected: Boolean): Flow<Unit>
+    suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardBitmaskDTO): Flow<Unit>
 
     suspend fun setBoardArchive(id: Long, isConnected: Boolean): Flow<Unit>
 
@@ -28,7 +33,7 @@ interface BoardRepository {
 
     suspend fun getLocalCreateBoardList(): List<BoardInListDTO>
 
-    suspend fun getLocalOperationBoardList(): List<BoardDTO>
+    suspend fun getLocalOperationBoardList(): List<BoardEntity>
 
     suspend fun getArchivedBoardsByWorkspace(id: Long): Flow<List<BoardDTO>>
 
@@ -36,7 +41,7 @@ interface BoardRepository {
 
     suspend fun getWatchStatus(id: Long): Flow<Boolean?>
 
-    suspend fun toggleBoardWatch(id: Long, isConnected: Boolean): Flow<Unit>
+    suspend fun toggleBoardWatch(memberId: Long, id: Long, isConnected: Boolean): Flow<Unit>
 
     suspend fun getBoardMemberMyInfo(boardId: Long, memberId: Long): Flow<BoardMemberDTO?>
 
@@ -52,7 +57,7 @@ interface BoardRepository {
 
     suspend fun getLocalOperationBoardMemberAlarm(): List<BoardMemberAlarmDTO>
 
-    suspend fun createLabel(labelDTO: LabelDTO, isConnected: Boolean): Flow<Long>
+    suspend fun createLabel(boardId: Long, createLabelRequestDto: CreateLabelRequestDto, isConnected: Boolean): Flow<Long>
 
     suspend fun getLabel(id: Long): Flow<LabelDTO?>
 

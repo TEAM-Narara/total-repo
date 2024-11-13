@@ -90,6 +90,18 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
         }
     }
 
+    override suspend fun getStompOffset(topic: String): Long {
+        val preferences = context.datastore.data.first()
+        return preferences[longPreferencesKey("$TOPIC_OFFSET/$topic")] ?: -1L
+    }
+
+    override suspend fun saveStompOffset(topic: String, offset: Long) {
+        if (offset <= getStompOffset(topic)) return
+        context.datastore.edit { preferences ->
+            preferences[longPreferencesKey("$TOPIC_OFFSET/$topic")] = offset
+        }
+    }
+
     private fun String?.ifNotBlank() = if (!this.isNullOrBlank()) this else null
 
     companion object {
@@ -101,5 +113,7 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext val contex
 
         const val ACCESS_TOKEN = "access_token"
         const val REFRESH_TOKEN = "refresh_token"
+
+        const val TOPIC_OFFSET = "topic_offset"
     }
 }

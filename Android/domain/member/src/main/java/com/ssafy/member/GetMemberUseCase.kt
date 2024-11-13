@@ -11,13 +11,12 @@ class GetMemberUseCase @Inject constructor(
     private val memberRepository: MemberRepository
 ) {
 
+    suspend operator fun invoke(): Flow<User?> {
+        val memberId = dataStoreRepository.getUser().memberId
+        return invoke(memberId)
+    }
+
     suspend operator fun invoke(memberId: Long): Flow<User?> {
         return memberRepository.getMember(memberId)
     }
-
-    suspend operator fun invoke(): Flow<User?> {
-        val myId = dataStoreRepository.getUser().memberId
-        return memberRepository.getMember(myId)
-    }
-
 }

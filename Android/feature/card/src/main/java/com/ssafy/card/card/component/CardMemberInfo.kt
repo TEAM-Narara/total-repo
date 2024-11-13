@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,14 +21,16 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.values.IconXLarge
 import com.ssafy.designsystem.values.PaddingSmall
+import com.ssafy.model.board.MemberResponseDTO
 
 fun LazyListScope.cardMemberInfo(
     modifier: Modifier = Modifier,
-    members: List<String>,
+    members: List<MemberResponseDTO>,
     showCardMembers: () -> Unit
 ) {
     item {
@@ -57,10 +60,11 @@ fun LazyListScope.cardMemberInfo(
                             .aspectRatio(1f)
                     ) {
                         AsyncImage(
-                            model = members[index],
+                            model = members[index].memberProfileImgUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            error = rememberVectorPainter(Icons.Default.AccountCircle)
                         )
                     }
                 }

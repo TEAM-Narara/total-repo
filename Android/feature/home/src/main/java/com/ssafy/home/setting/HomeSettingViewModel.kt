@@ -49,7 +49,7 @@ class HomeSettingViewModel @Inject constructor(
             _uiState.emit(UiState.Error("공백은 입력할 수 없습니다."))
         } else {
             withSocketState { isConnected ->
-                updateWorkspaceUseCase(workspaceId, name, isConnected).safeCollect()
+                updateWorkspaceUseCase(workspaceId, name, isConnected)
             }
         }
     }

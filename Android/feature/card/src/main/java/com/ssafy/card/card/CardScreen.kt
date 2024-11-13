@@ -29,7 +29,6 @@ import com.ssafy.card.card.component.cardAttachmentInfo
 import com.ssafy.card.card.component.cardComment
 import com.ssafy.card.card.component.cardInfoScreen
 import com.ssafy.card.card.component.cardMemberInfo
-import com.ssafy.card.member.data.ManagerData
 import com.ssafy.card.member.dialogs.ModifyManagerDialog
 import com.ssafy.card.period.data.PeriodData
 import com.ssafy.card.period.dialogs.PeriodDialog
@@ -42,6 +41,9 @@ import com.ssafy.designsystem.values.PaddingLegendLarge
 import com.ssafy.model.card.CardDTO
 import com.ssafy.model.card.CommentDTO
 import com.ssafy.ui.launcher.rememberLauncherForSaveImage
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
 @Composable
 fun CardScreen(
@@ -49,50 +51,60 @@ fun CardScreen(
     popBackToBoardScreen: () -> Unit,
     moveToSelectLabel: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cardDTO by viewModel.cardDTO.collectAsStateWithLifecycle()
     val userId by viewModel.userId.collectAsStateWithLifecycle()
+    val memberList by viewModel.careMemberList.collectAsStateWithLifecycle()
 
     val managerDialogState = rememberDialogState<Unit>()
     val periodDialogState = rememberDialogState<PeriodData>()
 
-    CardScreen(
-        cardDTO = cardDTO,
-        userId = userId,
-        moveToSelectLabel = moveToSelectLabel,
-        popBackToBoardScreen = popBackToBoardScreen,
-        moveToArchive = { viewModel.moveToArchive(popBackToBoardScreen) },
-        moveToDelete = { viewModel.moveToDelete(popBackToBoardScreen) },
-        setCardWatching = { isWatching -> viewModel.setCardWatching(isWatching) },
-        setCardContent = { content -> viewModel.setCardContent(content) },
-        saveCardContent = { viewModel.saveCardContent() },
-        resetCardContent = { viewModel.resetCardContent() },
-        deleteComment = { comment -> viewModel.deleteComment(comment) },
-        addAttachment = { filePath -> viewModel.addAttachment(filePath) },
-        addComment = { comment -> viewModel.addComment(comment) },
-        setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
-        saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
-        resetCommitContent = { comment -> viewModel.resetCommitContent(comment) },
-        showPeriod = { periodDialogState.show(PeriodData(cardDTO.startDate, cardDTO.endDate)) },
-        showCardMembers = { managerDialogState.show() }
-    )
+    cardDTO?.let {
+        CardScreen(
+            cardDTO = it,
+            userId = userId ?: -1,
+            moveToSelectLabel = moveToSelectLabel,
+            popBackToBoardScreen = popBackToBoardScreen,
+            moveToArchive = { viewModel.moveToArchive(popBackToBoardScreen) },
+            moveToDelete = { viewModel.moveToDelete(popBackToBoardScreen) },
+            setCardWatching = { isWatching -> viewModel.setCardWatching(isWatching) },
+            setCardTitle = { title -> viewModel.setCardTitle(title) },
+            setCardContent = { content -> viewModel.setCardContent(content) },
+            saveCardTitle = { viewModel.saveCardTitle() },
+            saveCardContent = { viewModel.saveCardContent() },
+            resetCardTitle = { viewModel.resetCardTitle() },
+            resetCardContent = { viewModel.resetCardContent() },
+            deleteComment = { comment -> viewModel.deleteComment(comment) },
+            addAttachment = { filePath -> viewModel.addAttachment(filePath) },
+            deleteAttachment = { id -> viewModel.deleteAttachment(id) },
+            updateAttachmentToCover = { id -> viewModel.updateAttachmentToCover(id) },
+            addComment = { comment -> viewModel.addComment(comment) },
+            setCommitContent = { comment, content -> viewModel.setCommitContent(comment, content) },
+            saveCommitContent = { comment -> viewModel.saveCommitContent(comment) },
+            resetCommitContent = { comment -> viewModel.resetCommitContent(comment) },
+            showPeriod = { periodDialogState.show(PeriodData(it.startDate, it.endDate)) },
+            showCardMembers = { managerDialogState.show() }
+        )
+    }
 
     ModifyManagerDialog(
         dialogState = managerDialogState,
         onIsManagerChanged = viewModel::toggleIsManager,
-        memberList = (0..10L).map {
-            ManagerData(
-                id = it,
-                nickname = "nickname",
-                email = "email@example.com",
-                isManager = true
-            )
-        }
+        memberList = memberList ?: emptyList()
     )
 
     PeriodDialog(
         dialogState = periodDialogState,
         onConfirm = viewModel::updatePeriod
     )
+
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
 }
 
 @Composable
@@ -104,11 +116,16 @@ private fun CardScreen(
     moveToArchive: () -> Unit,
     moveToDelete: () -> Unit,
     setCardWatching: (Boolean) -> Unit,
+    setCardTitle: (String) -> Unit,
     setCardContent: (String) -> Unit,
+    saveCardTitle: () -> Unit,
     saveCardContent: () -> Unit,
     resetCardContent: () -> Unit,
+    resetCardTitle: () -> Unit,
     deleteComment: (CommentDTO) -> Unit,
     addAttachment: (String) -> Unit,
+    deleteAttachment: (Long) -> Unit,
+    updateAttachmentToCover: (Long) -> Unit,
     addComment: (String) -> Unit,
     setCommitContent: (CommentDTO, String) -> Unit,
     saveCommitContent: (CommentDTO) -> Unit,
@@ -117,6 +134,7 @@ private fun CardScreen(
     showCardMembers: () -> Unit
 ) {
 
+    val (isTitleFocus, setTitleFocus) = remember { mutableStateOf(false) }
     val (isContentFocus, setContentFocus) = remember { mutableStateOf(false) }
     val (focusedComment, setFocusedComment) = remember { mutableStateOf<CommentDTO?>(null) }
     val attachmentLauncher = rememberLauncherForSaveImage { filePath ->
@@ -169,17 +187,21 @@ private fun CardScreen(
                     isWatching = cardDTO.isWatching,
                     moveToArchive = moveToArchive,
                     moveToDelete = moveToDelete,
-                    attachments = cardDTO.attachments,
+                    cover = cardDTO.cover,
                     heightOffset = heightOffset.floatValue
                 )
             },
             bottomBar = {
                 CardBottomBar(
+                    isTitleFocus = isTitleFocus,
+                    setTitleFocus = setTitleFocus,
                     isContentFocus = isContentFocus,
                     setContentFocus = setContentFocus,
                     focusedComment = focusedComment,
                     setFocusedComment = setFocusedComment,
+                    saveCardTitle = saveCardTitle,
                     saveCardContent = saveCardContent,
+                    resetCardTitle = resetCardTitle,
                     resetCardContent = resetCardContent,
                     saveCommitContent = { focusedComment?.let(saveCommitContent) },
                     resetCommitContent = { focusedComment?.let(resetCommitContent) },
@@ -201,6 +223,9 @@ private fun CardScreen(
                     cardDTO = cardDTO,
                     onClickLabel = moveToSelectLabel,
                     onClickDate = showPeriod,
+                    isTitleFocus = isTitleFocus,
+                    setTitleFocus = setTitleFocus,
+                    setTitle = setCardTitle,
                     isContentFocus = isContentFocus,
                     setContentFocus = setContentFocus,
                     setContent = setCardContent
@@ -229,7 +254,9 @@ private fun CardScreen(
                 cardAttachmentInfo(
                     modifier = Modifier.padding(horizontal = PaddingDefault),
                     attachments = cardDTO.attachments,
-                    addPhoto = { attachmentLauncher.launch("image/*") }
+                    addPhoto = { attachmentLauncher.launch("image/*") },
+                    deleteAttachment = deleteAttachment,
+                    updateAttachmentToCover = updateAttachmentToCover
                 )
 
                 item(key = "divider3") {
@@ -264,9 +291,12 @@ fun CardScreenPreview() {
         moveToArchive = { },
         moveToDelete = { },
         setCardWatching = { },
+        setCardTitle = { },
         setCardContent = { },
+        saveCardTitle = { },
         saveCardContent = { },
         resetCardContent = { },
+        resetCardTitle = { },
         deleteComment = { },
         addAttachment = { },
         addComment = { },
@@ -274,6 +304,8 @@ fun CardScreenPreview() {
         saveCommitContent = { },
         resetCommitContent = { },
         showPeriod = { },
-        showCardMembers = { }
+        showCardMembers = { },
+        updateAttachmentToCover = { },
+        deleteAttachment = { },
     )
 }

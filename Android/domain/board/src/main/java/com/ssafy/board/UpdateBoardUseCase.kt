@@ -20,7 +20,7 @@ class UpdateBoardUseCase @Inject constructor(
         return boardRepository.updateBoard(id, updateBoardRequestDto, isConnected)
     }
 
-    suspend operator fun invoke(id: Long, cover: Cover) = flow<Unit> {
+    suspend operator fun invoke(id: Long, cover: Cover, isConnected: Boolean) = flow {
         val error = "보드를 찾을 수 없습니다."
         val boardInfo =
             boardRepository.getBoard(id).firstOrNull() ?: throw IllegalArgumentException(error)
@@ -31,7 +31,7 @@ class UpdateBoardUseCase @Inject constructor(
             visibility = boardInfo.visibility
         )
 
-        boardRepository.updateBoard(id, updateBoardRequestDto, true)
+        boardRepository.updateBoard(id, updateBoardRequestDto, isConnected).collect { emit(it) }
     }
 
 }
