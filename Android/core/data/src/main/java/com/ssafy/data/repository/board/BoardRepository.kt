@@ -2,17 +2,17 @@ package com.ssafy.data.repository.board
 
 import androidx.paging.PagingData
 import com.ssafy.database.dto.BoardEntity
-import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.model.activity.BoardActivity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
+import com.ssafy.model.user.User
+import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.DataStatus
@@ -76,5 +76,5 @@ interface BoardRepository {
 
     suspend fun getBoardActivity(boardId: Long): Flow<PagingData<BoardActivity>>
 
-    suspend fun getAllBoardAndWorkspaceMember(workspaceId: Long, boardId: Long): Flow<List<MemberEntity>>
+    suspend fun getAllBoardAndWorkspaceMember(workspaceId: Long, boardId: Long): Flow<List<User>>
 }

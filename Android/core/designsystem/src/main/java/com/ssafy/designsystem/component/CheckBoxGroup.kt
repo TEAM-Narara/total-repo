@@ -24,6 +24,7 @@ fun <T> CheckBoxGroup(
     options: List<T>,
     onOptionSelected: (T) -> Unit,
     isOptionChecked: (T) -> Boolean,
+    noOptionItem: @Composable () -> Unit = {},
     option: @Composable (T) -> Unit
 ) {
     Column(
@@ -31,27 +32,43 @@ fun <T> CheckBoxGroup(
             .fillMaxWidth()
             .padding(PaddingSmall)
     ) {
-
         Text(text = title, fontSize = TextMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(PaddingSmall))
 
-        options.forEach { option ->
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
-                onOptionSelected(option)
-            }) {
-                Checkbox(
-                    checked = isOptionChecked(option),
-                    onCheckedChange = { onOptionSelected(option) }
-                )
+        noOptionItem()
 
-                Box(
-                    modifier = Modifier
-                        .padding(start = PaddingSmall)
-                        .weight(1f)
-                ) {
-                    option(option)
-                }
+        options.forEach { option ->
+            CheckBoxItem(
+                checked = isOptionChecked(option),
+                onCheckedChanged = { onOptionSelected(option) }
+            ) {
+                option(option)
             }
+        }
+    }
+}
+
+@Composable
+fun CheckBoxItem(
+    modifier: Modifier = Modifier,
+    checked: Boolean,
+    onCheckedChanged: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier.clickable {
+        onCheckedChanged()
+    }) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onCheckedChanged() }
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(start = PaddingSmall)
+                .weight(1f)
+        ) {
+            content()
         }
     }
 }

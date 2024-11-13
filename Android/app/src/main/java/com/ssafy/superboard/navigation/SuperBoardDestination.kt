@@ -182,7 +182,7 @@ fun SuperBoardNavHost(
             },
 
             popBackToBoardScreenWithParams = { boardSearch: BoardSearch, params: SearchParameters ->
-                navController.navigate(BoardSearch(params)) {
+                navController.navigate(BoardSearch(0, 0, params)) {
                     popUpTo(boardSearch) {
                         inclusive = true
                     }
@@ -192,9 +192,9 @@ fun SuperBoardNavHost(
 
         boardScreen(
             popBack = navController::popBackStack,
-            navigateToFilterScreen = { searchParameters: SearchParameters ->
+            navigateToFilterScreen = { workspaceId, boardId, searchParameters ->
                 navController.navigate(
-                    BoardSearch(searchParameters)
+                    BoardSearch(workspaceId, boardId, searchParameters)
                 )
             },
             navigateToNotificationScreen = {},

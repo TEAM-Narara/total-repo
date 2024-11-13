@@ -10,7 +10,11 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-data class BoardSearch(val searchParameters: SearchParameters)
+data class BoardSearch(
+    val workspaceId: Long,
+    val boardId: Long,
+    val searchParameters: SearchParameters
+)
 
 fun NavGraphBuilder.boardSearchScreen(
     popBackToBoardScreenWithParams: (BoardSearch, SearchParameters) -> Unit,
@@ -18,12 +22,11 @@ fun NavGraphBuilder.boardSearchScreen(
 ) {
     composable<BoardSearch>(
         mapOf(typeOf<SearchParameters>() to SearchParametersType),
-
-        ) { backStackEntry ->
+    ) { backStackEntry ->
         val boardSearch: BoardSearch = backStackEntry.toRoute()
         val searchParameters = boardSearch.searchParameters
         val viewModel = hiltViewModel<BoardSearchViewModel>().apply {
-            updateSearchParams(searchParameters)
+            updateSearchParams(boardSearch.workspaceId, boardSearch.boardId, searchParameters)
         }
 
         BoardSearchScreen(

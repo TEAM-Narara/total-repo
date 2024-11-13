@@ -6,6 +6,6 @@ import com.ssafy.designsystem.values.Gray
 
 sealed interface IconType {
     data class Vector(val image: ImageVector, val backgroundColor: Color = Gray) : IconType
-    data class Image(val imageUrl: String) : IconType
+    data class Image(val imageUrl: String?) : IconType
     data object None : IconType
 }

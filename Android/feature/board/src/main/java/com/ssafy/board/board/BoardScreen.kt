@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
-    searchParameters: SearchParameters,
     popBack: () -> Unit,
     navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
@@ -66,6 +65,7 @@ fun BoardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
+    val searchParameters by viewModel.searchParams.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 

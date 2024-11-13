@@ -18,7 +18,7 @@ data class Board(
 
 fun NavGraphBuilder.boardScreen(
     popBack: () -> Unit,
-    navigateToFilterScreen: (SearchParameters) -> Unit,
+    navigateToFilterScreen: (Long, Long, SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (Long, Long) -> Unit,
     navigateToCardScreen: (Long, Long, Long) -> Unit
@@ -29,12 +29,12 @@ fun NavGraphBuilder.boardScreen(
         val board: Board = backStackEntry.toRoute()
         val viewModel: BoardViewModel = hiltViewModel<BoardViewModel>().apply {
             setBoardId(board.boardId)
+            setSearchParams(board.searchParameters)
         }
         BoardScreen(
             viewModel = viewModel,
             popBack = popBack,
-            searchParameters = board.searchParameters,
-            navigateToFilterScreen = navigateToFilterScreen,
+            navigateToFilterScreen = { navigateToFilterScreen(board.workspaceId, board.boardId, it) },
             navigateToNotificationScreen = navigateToNotificationScreen,
             navigateToBoardMenuScreen = navigateToBoardMenuScreen,
             navigateToCardScreen = { cardId -> navigateToCardScreen(board.workspaceId, board.boardId, cardId) }

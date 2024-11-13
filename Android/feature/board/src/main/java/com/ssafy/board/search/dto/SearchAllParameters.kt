@@ -4,45 +4,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.LabelOff
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.LabelRed
 import com.ssafy.designsystem.values.LabelYellow
 import com.ssafy.designsystem.values.Transparent
+import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.search.DueDate
 import com.ssafy.model.search.Label
+import com.ssafy.model.user.User
 
 @Immutable
 data class SearchAllParameters(
-    val memberMap: Map<String, ParamsInfo> = mapOf(
-        "담당자 없음" to ParamsInfo(
-            startIcon = IconType.Vector(
-                image = Icons.Default.CalendarMonth,
-                backgroundColor = Gray,
-            ),
-            isSelected = false
+    val noMember: Pair<String, ParamsInfo> = "담당자 없음" to ParamsInfo(
+        startIcon = IconType.Vector(
+            image = Icons.Default.Person,
+            backgroundColor = Gray,
         ),
-        "손오공-1" to ParamsInfo(
-            startIcon = IconType.Image(
-                imageUrl = "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z",
-            ),
-            isSelected = false
-        ),
-        "손오공-2" to ParamsInfo(
-            startIcon = IconType.Image(
-                imageUrl = "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z",
-            ),
-            isSelected = false
-        ),
-        "손오공-3" to ParamsInfo(
-            startIcon = IconType.Image(
-                imageUrl = "https://an2-img.amz.wtchn.net/image/v2/h6S3XfqeRo7KBUmE9ArtBA.jpg?jwt=ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKdmNIUnpJanBiSW1SZk1USTRNSGczTWpCeE9EQWlYU3dpY0NJNklpOTJNaTl6ZEc5eVpTOXBiV0ZuWlM4eE5qRTFPRGN5T0RNd05UazJOVFF4TWpRNUluMC5OOTZYYXplajFPaXdHaWFmLWlmTjZDU1AzczFRXzRQcW4zM0diQmR4bC1z",
-            ),
-            isSelected = false
-        )
+        isSelected = false
     ),
+    val memberMap: Map<User, ParamsInfo> = mapOf(),
 
     val dueDateMap: Map<DueDate, ParamsInfo> = mapOf(
         DueDate.NO_DUE_DATE to ParamsInfo(
@@ -80,47 +63,35 @@ data class SearchAllParameters(
         ),
     ),
 
-    val labelMap: Map<Label, ParamsInfo> = mapOf(
-        Label(
-            content = "라벨 없음",
-            color = Transparent.toArgb().toLong()
-        ) to ParamsInfo(
-            startIcon = IconType.Vector(
-                image = Icons.AutoMirrored.Outlined.LabelOff,
-                backgroundColor = Gray,
-            ),
-            isSelected = false
+    val noLabel: Pair<Label, ParamsInfo> = Label(
+        id = 0,
+        content = "라벨 없음",
+        color = Transparent.toArgb().toLong()
+    ) to ParamsInfo(
+        startIcon = IconType.Vector(
+            image = Icons.AutoMirrored.Outlined.LabelOff,
+            backgroundColor = Gray,
         ),
-        Label(
-            content = "라벨1",
-            color = Color.Green.toArgb().toLong()
-        ) to ParamsInfo(
-            startIcon = IconType.None,
-            isSelected = false
-        ),
-        Label(
-            content = "라벨2",
-            color = Color.Red.toArgb().toLong()
-        ) to ParamsInfo(
-            startIcon = IconType.None,
-            isSelected = false
-        ),
-        Label(
-            content = "라벨3",
-            color = Color.Blue.toArgb().toLong()
-        ) to ParamsInfo(
-            startIcon = IconType.None,
-            isSelected = false
-        ),
-        Label(
-            content = "라벨4",
-            color = Color.Yellow.toArgb().toLong()
-        ) to ParamsInfo(
-            startIcon = IconType.None,
-            isSelected = false
-        ),
-    )
+        isSelected = false
+    ),
 
+    val labelMap: Map<Label, ParamsInfo> = mapOf()
 ) {
     var searchedText: String = ""
 }
+
+fun User.toParamsInfo() = ParamsInfo(
+    startIcon = IconType.Image(imageUrl = profileImgUrl),
+    isSelected = false
+)
+
+fun LabelDTO.toLabel() = Label(
+    id = labelId,
+    content = labelName,
+    color = labelColor
+)
+
+fun LabelDTO.toParamsInfo() = ParamsInfo(
+    startIcon = IconType.None,
+    isSelected = false
+)

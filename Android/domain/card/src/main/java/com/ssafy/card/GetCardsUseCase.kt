@@ -33,7 +33,7 @@ class GetCardsUseCase @Inject constructor(
             listTitle = cardWithListAndBoardName.listName,
             startDate = card.startAt,
             endDate = card.endAt,
-            labels = labels.map { Label(it.labelName, it.labelColor) },
+            labels = labels.map { Label(it.labelId, it.labelName, it.labelColor) },
             members = members,
             cover = card.cover ?: Cover(),
             attachments = attachments,

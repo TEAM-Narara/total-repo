@@ -24,13 +24,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.board.search.dto.SearchAllParameters
 import com.ssafy.designsystem.component.CheckBoxGroup
+import com.ssafy.designsystem.component.CheckBoxItem
 import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.component.IconButton
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
 import com.ssafy.model.search.DueDate
-import com.ssafy.model.search.Label
 import com.ssafy.model.search.SearchParameters
 
 @Composable
@@ -44,8 +44,10 @@ fun BoardSearchScreen(
     BoardSearchScreen(
         parameters = parameters,
         updateSearchText = viewModel::updateSearchText,
+        updateNoMember = viewModel::updateNoMember,
         updateMember = viewModel::updateMember,
         updateDueDate = viewModel::updateDueDate,
+        updateNoLabel = viewModel::updateNoLabel,
         updateLabel = viewModel::updateLabel,
         popBackToBoardScreen = { popBackToBoardScreen() },
         popBackToBoardScreenWithParams = { popBackToBoardScreenWithParams(viewModel.getSearchParameters()) }
@@ -56,9 +58,11 @@ fun BoardSearchScreen(
 private fun BoardSearchScreen(
     parameters: SearchAllParameters,
     updateSearchText: (String) -> Unit,
-    updateMember: (String) -> Unit,
+    updateNoMember: () -> Unit,
+    updateMember: (Long) -> Unit,
     updateDueDate: (DueDate) -> Unit,
-    updateLabel: (Label) -> Unit,
+    updateNoLabel: () -> Unit,
+    updateLabel: (Long) -> Unit,
     popBackToBoardScreenWithParams: () -> Unit,
     popBackToBoardScreen: () -> Unit
 ) {
@@ -106,12 +110,23 @@ private fun BoardSearchScreen(
         CheckBoxGroup(
             title = "담당자",
             options = parameters.memberMap.toList(),
-            onOptionSelected = { updateMember(it.first) },
+            onOptionSelected = { updateMember(it.first.memberId) },
             isOptionChecked = { it.second.isSelected },
+            noOptionItem = {
+                CheckBoxItem(
+                    checked = parameters.noMember.second.isSelected,
+                    onCheckedChanged = { updateNoMember() },
+                ) {
+                    OptionText(
+                        startIcon = parameters.noMember.second.startIcon,
+                        content = parameters.noMember.first,
+                    )
+                }
+            },
             option = { (member, memberInfo) ->
                 OptionText(
                     startIcon = memberInfo.startIcon,
-                    content = member,
+                    content = member.nickname,
                 )
             }
         )
@@ -136,8 +151,20 @@ private fun BoardSearchScreen(
         CheckBoxGroup(
             title = "라벨",
             options = parameters.labelMap.toList(),
-            onOptionSelected = { updateLabel(it.first) },
+            onOptionSelected = { updateLabel(it.first.id) },
             isOptionChecked = { it.second.isSelected },
+            noOptionItem = {
+                CheckBoxItem(
+                    checked = parameters.noLabel.second.isSelected,
+                    onCheckedChanged = { updateNoLabel() }
+                ) {
+                    OptionText(
+                        startIcon = parameters.noLabel.second.startIcon,
+                        content = parameters.noLabel.first.content,
+                        backGroundColor = Color(parameters.noLabel.first.color)
+                    )
+                }
+            },
             option = { (label, labelInfo) ->
                 OptionText(
                     startIcon = labelInfo.startIcon,

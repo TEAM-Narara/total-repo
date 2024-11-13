@@ -15,6 +15,7 @@ import com.ssafy.model.board.UpdateBoardRequestDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.UpdateListRequestDto
+import com.ssafy.model.search.SearchParameters
 import com.ssafy.model.with.ListInCard
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,8 +42,12 @@ class BoardViewModel @Inject constructor(
     private val setListArchiveUseCase: SetListArchiveUseCase,
     private val createCardUseCase: CreateCardUseCase
 ) : BaseViewModel() {
-    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    private val _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
+
+    private val _searchParams: MutableStateFlow<SearchParameters> = MutableStateFlow(SearchParameters())
+    fun setSearchParams(searchParameters: SearchParameters) = _searchParams.update { searchParameters }
+    val searchParams: StateFlow<SearchParameters> = _searchParams
 
     val boardData: StateFlow<BoardData?> = _boardId.filterNotNull().flatMapLatest { boardId ->
         combine(
