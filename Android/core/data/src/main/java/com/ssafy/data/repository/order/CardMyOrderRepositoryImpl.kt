@@ -23,7 +23,7 @@ import kotlin.random.Random
 @Singleton
 class CardMyOrderRepositoryImpl @Inject constructor(
     private val cardDao: CardDao,
-    private val listDao: ListDao,
+    private val listDao: ListDao
 ) : CardMyOrderRepository {
     override suspend fun moveCardToTop(
         cardId: Long,

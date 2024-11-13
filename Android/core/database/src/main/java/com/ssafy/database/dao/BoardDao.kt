@@ -8,7 +8,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardEntity
+import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.ListEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.with.BoardInList
 import kotlinx.coroutines.flow.Flow
 
