@@ -16,8 +16,6 @@ import com.ssafy.board.boardMenu.boardMenuScreen
 import com.ssafy.board.boardMenu.selectBackgroundScreen
 import com.ssafy.board.member.BoardInviteMember
 import com.ssafy.board.member.boardInviteMemberDestination
-import com.ssafy.board.search.BoardSearch
-import com.ssafy.board.search.boardSearchScreen
 import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.card.label.Label
@@ -44,7 +42,6 @@ import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.background.Cover
 import com.ssafy.model.manager.AuthManager
 import com.ssafy.model.manager.ConnectManager
-import com.ssafy.model.search.SearchParameters
 import com.ssafy.notification.notification.Notification
 import com.ssafy.notification.notification.notificationScreen
 import com.ssafy.splash.StartDirection
@@ -176,27 +173,8 @@ fun SuperBoardNavHost(
             }
         )
 
-        boardSearchScreen(
-            popBackToBoardScreen = {
-                navController.popBackStack()
-            },
-
-            popBackToBoardScreenWithParams = { boardSearch: BoardSearch, params: SearchParameters ->
-                navController.navigate(BoardSearch(params)) {
-                    popUpTo(boardSearch) {
-                        inclusive = true
-                    }
-                }
-            }
-        )
-
         boardScreen(
             popBack = navController::popBackStack,
-            navigateToFilterScreen = { searchParameters: SearchParameters ->
-                navController.navigate(
-                    BoardSearch(searchParameters)
-                )
-            },
             navigateToNotificationScreen = {},
             navigateToBoardMenuScreen = { boardId: Long, workspaceId: Long ->
                 navController.navigate(

@@ -16,7 +16,7 @@ data class CardDTO(
     val listTitle: String = "나는야 리스트 제목",
     val startDate: Long? = 1730041200000, // 2024-01-01 00:00:00
     val endDate: Long? = 1730127600000, // 2024-01-02 00:00:00
-    val labels: List<Label> = listOf(Label("trello", 0xFF0000FF), Label("ssafy", 0xFF00FF00)),
+    val labels: List<Label> = listOf(),
     // 멤버와 첨부파일의 이미지의 파일 경로가 담겨야 합니다.
     val members: List<MemberResponseDTO> = emptyList(),
     val cover: Cover = Cover(),

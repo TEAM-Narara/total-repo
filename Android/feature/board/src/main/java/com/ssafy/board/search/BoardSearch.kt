@@ -1,5 +1,7 @@
 package com.ssafy.board.search
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,36 +21,38 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.board.search.dto.SearchAllParameters
 import com.ssafy.designsystem.component.CheckBoxGroup
+import com.ssafy.designsystem.component.CheckBoxItem
 import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.component.IconButton
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
+import com.ssafy.designsystem.values.White
 import com.ssafy.model.search.DueDate
-import com.ssafy.model.search.Label
-import com.ssafy.model.search.SearchParameters
 
 @Composable
 fun BoardSearchScreen(
-    viewModel: BoardSearchViewModel = hiltViewModel(),
-    popBackToBoardScreenWithParams: (SearchParameters) -> Unit,
+    controller: BoardSearchController,
     popBackToBoardScreen: () -> Unit
 ) {
-    val parameters by viewModel.searchAllParameters.collectAsStateWithLifecycle()
+    val parameters by controller.searchAllParameters.collectAsStateWithLifecycle()
+
+    BackHandler {
+        popBackToBoardScreen()
+    }
 
     BoardSearchScreen(
         parameters = parameters,
-        updateSearchText = viewModel::updateSearchText,
-        updateMember = viewModel::updateMember,
-        updateDueDate = viewModel::updateDueDate,
-        updateLabel = viewModel::updateLabel,
+        updateSearchText = controller::updateSearchText,
+        updateNoMember = controller::updateNoMember,
+        updateMember = controller::updateMember,
+        updateDueDate = controller::updateDueDate,
+        updateNoLabel = controller::updateNoLabel,
+        updateLabel = controller::updateLabel,
         popBackToBoardScreen = { popBackToBoardScreen() },
-        popBackToBoardScreenWithParams = { popBackToBoardScreenWithParams(viewModel.getSearchParameters()) }
     )
 }
 
@@ -56,10 +60,11 @@ fun BoardSearchScreen(
 private fun BoardSearchScreen(
     parameters: SearchAllParameters,
     updateSearchText: (String) -> Unit,
-    updateMember: (String) -> Unit,
+    updateNoMember: () -> Unit,
+    updateMember: (Long) -> Unit,
     updateDueDate: (DueDate) -> Unit,
-    updateLabel: (Label) -> Unit,
-    popBackToBoardScreenWithParams: () -> Unit,
+    updateNoLabel: () -> Unit,
+    updateLabel: (Long) -> Unit,
     popBackToBoardScreen: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -67,6 +72,7 @@ private fun BoardSearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(White)
             .verticalScroll(scrollState)
             .padding(PaddingDefault)
     ) {
@@ -92,7 +98,7 @@ private fun BoardSearchScreen(
             IconButton(
                 imageVector = Icons.Default.Search,
                 contentDescription = "검색",
-                onClick = popBackToBoardScreenWithParams
+                onClick = popBackToBoardScreen
             )
 
         }
@@ -106,12 +112,23 @@ private fun BoardSearchScreen(
         CheckBoxGroup(
             title = "담당자",
             options = parameters.memberMap.toList(),
-            onOptionSelected = { updateMember(it.first) },
+            onOptionSelected = { updateMember(it.first.memberId) },
             isOptionChecked = { it.second.isSelected },
+            noOptionItem = {
+                CheckBoxItem(
+                    checked = parameters.noMember.second.isSelected,
+                    onCheckedChanged = { updateNoMember() },
+                ) {
+                    OptionText(
+                        startIcon = parameters.noMember.second.startIcon,
+                        content = parameters.noMember.first,
+                    )
+                }
+            },
             option = { (member, memberInfo) ->
                 OptionText(
                     startIcon = memberInfo.startIcon,
-                    content = member,
+                    content = member.nickname,
                 )
             }
         )
@@ -136,8 +153,20 @@ private fun BoardSearchScreen(
         CheckBoxGroup(
             title = "라벨",
             options = parameters.labelMap.toList(),
-            onOptionSelected = { updateLabel(it.first) },
+            onOptionSelected = { updateLabel(it.first.id) },
             isOptionChecked = { it.second.isSelected },
+            noOptionItem = {
+                CheckBoxItem(
+                    checked = parameters.noLabel.second.isSelected,
+                    onCheckedChanged = { updateNoLabel() }
+                ) {
+                    OptionText(
+                        startIcon = parameters.noLabel.second.startIcon,
+                        content = parameters.noLabel.first.content,
+                        backGroundColor = Color(parameters.noLabel.first.color)
+                    )
+                }
+            },
             option = { (label, labelInfo) ->
                 OptionText(
                     startIcon = labelInfo.startIcon,
@@ -147,13 +176,4 @@ private fun BoardSearchScreen(
             }
         )
     }
-}
-
-@Composable
-@Preview
-fun BoardSearchScreenPreview() {
-    BoardSearchScreen(
-        popBackToBoardScreen = {},
-        popBackToBoardScreenWithParams = {},
-    )
 }

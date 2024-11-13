@@ -12,7 +12,6 @@ import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.LabelEntity
-import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.bitmaskColumn
@@ -27,6 +26,7 @@ import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
+import com.ssafy.model.user.User
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
@@ -513,8 +513,11 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun getAllBoardAndWorkspaceMember(
         workspaceId: Long,
         boardId: Long
-    ): Flow<List<MemberEntity> > =
+    ): Flow<List<User>> =
         withContext(ioDispatcher) {
-            boardMemberDao.getAllBoardAndWorkspaceMember(workspaceId = workspaceId, boardId = boardId)
+            boardMemberDao.getAllBoardAndWorkspaceMember(
+                workspaceId = workspaceId,
+                boardId = boardId
+            ).map { it.map { it.toDTO() } }
         }
 }
