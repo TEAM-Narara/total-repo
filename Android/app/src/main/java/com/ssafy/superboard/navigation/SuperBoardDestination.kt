@@ -87,8 +87,8 @@ fun SuperBoardNavHost(
         )
 
         homeScreen(
-            moveToBoardScreen = {
-                navController.navigate(Board(it))
+            moveToBoardScreen = { workspaceId, boardId ->
+                navController.navigate(Board(workspaceId, boardId))
             },
             moveToCreateNewBoardScreen = {
                 navController.navigate(CreateBoard())
@@ -203,8 +203,8 @@ fun SuperBoardNavHost(
                     BoardMenu(boardId, workspaceId)
                 )
             },
-            navigateToCardScreen = { boardId: Long, cardId: Long ->
-                navController.navigate(Card(boardId, cardId))
+            navigateToCardScreen = { workspaceId: Long, boardId: Long, cardId: Long ->
+                navController.navigate(Card(workspaceId, boardId, cardId))
             }
         )
 
