@@ -13,7 +13,6 @@ sealed class ListMoveResult {
 sealed class CardMoveResult {
     data class SingleCardMove(val response: CardMoveResponseDto): CardMoveResult()
     data class ReorderedCardMove(val response: List<CardMoveResponseDto>): CardMoveResult()
-    data class DeletedCardMove(val listId: Long): CardMoveResult()
 }
 
 object MoveConst {

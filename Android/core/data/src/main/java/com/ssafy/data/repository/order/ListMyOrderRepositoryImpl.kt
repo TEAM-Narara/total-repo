@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.order
 
+import com.ssafy.data.repository.order.ListMoveResult.SingleListMove
 import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
 import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
 import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
@@ -15,13 +16,15 @@ import java.util.concurrent.ThreadLocalRandom
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToLong
 
 @Singleton
 class ListMyOrderRepositoryImpl @Inject constructor(
     private val listDao: ListDao,
-    private val boardDao: BoardDao,
-) : ListMyOrderRepository {
+    private val boardDao: BoardDao
+): ListMyOrderRepository {
+
     // 맨 위로 옮김
     override suspend fun moveListToTop(listId: Long, isConnection: Boolean): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
@@ -49,7 +52,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         } ?: DEFAULT_TOP_ORDER
 
         val orderInfoList: List<ListMoveResponseDto> =
-            generateUniqueOrderWithRetry(targetList, 0, board, baseOrder)
+            generateUniqueOrderWithRetry(targetList, 0, board, baseOrder, null, topList?.myOrder)
 
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
@@ -73,14 +76,13 @@ class ListMyOrderRepositoryImpl @Inject constructor(
             )
         }
 
-        val baseOrder = bottomList?.let { list ->
-            val minLimit = (list.myOrder * MOVE_BOTTOM_ORDER_RATIO).roundToLong()
-            val calculatedOrder = max(list.myOrder - LARGE_INCREMENT, minLimit)
-            calculatedOrder
+        val baseOrder = bottomList?.let {
+            val minLimit = it.myOrder + ((Long.MAX_VALUE - it.myOrder) * MOVE_BOTTOM_ORDER_RATIO).toLong()
+            min(it.myOrder + LARGE_INCREMENT, minLimit)
         } ?: DEFAULT_TOP_ORDER
 
-        val orderInfoList: List<ListMoveResponseDto> =
-            generateUniqueOrderWithRetry(targetList, -1, board, baseOrder)
+        val orderInfoList = generateUniqueOrderWithRetry(
+            targetList, -1, board, baseOrder, bottomList?.myOrder, null)
 
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
@@ -109,6 +111,27 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
         val nextList = listDao.getList(nextListId) ?: return null
 
+        if (previousList.boardId != nextList.boardId) {
+            return ListMoveResult.ReorderedListMove(
+                listOf(
+                    ListMoveResponseDto(targetList.id, targetList.myOrder)
+                )
+            )
+        }
+
+        val sortedLists = listDao.getAllListsInBoard(targetList.boardId)
+        val previousIndex: Int = sortedLists.indexOf(previousList)
+        val nextIndex: Int = sortedLists.indexOf(nextList)
+        val targetIndex = previousIndex + 1
+
+        if (previousIndex != -1 && nextIndex != -1 && nextIndex != previousIndex + 1) {
+            return ListMoveResult.ReorderedListMove(
+                listOf(
+                    ListMoveResponseDto(targetList.id, targetList.myOrder)
+                )
+            )
+        }
+
         val prevOrder: Long = previousList.myOrder
         val nextOrder: Long = nextList.myOrder
         val gap = nextOrder - prevOrder
@@ -117,27 +140,23 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         ) prevOrder + MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
         else (prevOrder + nextOrder) / HALF_DIVIDER
 
-        val board = boardDao.getBoard(targetList.boardId) ?: return null
         val previousBoard = boardDao.getBoard(previousList.boardId) ?: return null
-
-        val sortedLists = listDao.getAllListsInBoard(board.id)
-
-        val targetIndex = sortedLists.indexOf(previousList) + 1
 
         val orderInfoList: List<ListMoveResponseDto> = generateUniqueOrderWithRetry(
             targetList,
             targetIndex,
             previousBoard,
-            baseOrder
+            baseOrder,
+            prevOrder,
+            nextOrder
         )
 
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
-    private fun generateUniqueOrder(baseOrder: Long): Long {
-        val gap: Long = LARGE_INCREMENT / 100 // LARGE_INCREMENT의 1%를 기본 간격으로 사용
-        val offset = System.nanoTime() % gap
+    private fun generateUniqueOrder(baseOrder: Long, maxOffset: Long): Long {
+        val offset = ThreadLocalRandom.current().nextLong(0, maxOffset)
         val uniqueOrder = baseOrder + offset
 
         return uniqueOrder
@@ -147,19 +166,35 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         targetList: ListEntity,
         targetIndex: Int,
         board: BoardEntity,
-        baseOrder: Long
+        baseOrder: Long,
+        prevOrder: Long?,
+        nextOrder: Long?
     ): List<ListMoveResponseDto> {
-        val maxAttempts = 2
+        val maxAttempts = 1
         var attempt = 0
-        var newOrder = generateUniqueOrder(baseOrder)
+        var maxOffset: Long = 100
+
+        // 맨 위로 이동할 경우: offset이 기존 최상위 order보다 크지 않도록 제한
+        if (prevOrder == null && nextOrder != null) {
+            maxOffset = min(maxOffset, nextOrder - baseOrder - 1)
+        }
+        // 두 리스트 사이에 배치할 경우: offset이 두 리스트의 중간값을 넘지 않도록 제한
+        else if (prevOrder != null && nextOrder != null) {
+            maxOffset = min(maxOffset, (nextOrder - prevOrder + 1) / 2)
+        }
+        if (maxOffset < 1) {
+            maxOffset = 1
+        }
+
+        var newOrder = generateUniqueOrder(baseOrder, maxOffset)
 
         while (attempt < maxAttempts) {
+
             if (newOrder <= 0 || newOrder >= Long.MAX_VALUE) {
                 return reorderAllListOrders(board, targetList, targetIndex)
             }
 
             if (!isOrderConflict(board, newOrder)) {
-                // 변경된 값만 반환,
                 return listOf(
                     ListMoveResponseDto(
                         listId = targetList.id,
@@ -167,21 +202,13 @@ class ListMyOrderRepositoryImpl @Inject constructor(
                     )
                 )
             } else {
-                // 랜덤 오프셋을 통해 순서 값 충돌을 방지하고, 여러 번의 시도를 통해 고유한 순서 값을 생성
-                // 1. 50과 150 사이의 난수를 생성하여 `randomOffset`에 할당
-                //    - 이 값은 `newOrder`에 더해져 기존 순서 값과의 충돌을 방지하는 역할을 합니다.
-                //    - ThreadLocalRandom.current().nextLong(50, 150)은 50 이상 150 미만의 임의의 값을 생성합니다.
-                // 2. 시도 횟수(`attempt`)에 따라 고유 순서 값을 다르게 적용
-                //    - 시도가 진행될 때마다 `(attempt + 1) * 100L`를 계산하여 `baseOrder`에 추가
-                //    - `attempt + 1`은 시도 횟수에 따라 증가하므로 매번 고유한 값을 보장할 수 있습니다.
-                // 3. 최종적으로 `newOrder`는 `baseOrder + (attempt + 1) * 100L + randomOffset` 형태로 계산
-                //    - 충돌이 발생해도 시도 횟수에 따라 순서 값이 바뀌면서 고유한 순서를 찾을 가능성이 높아집니다.
+                val randomOffset = ThreadLocalRandom.current().nextLong(0, maxOffset)
+                newOrder = baseOrder + randomOffset
 
-                val randomOffset = ThreadLocalRandom.current().nextLong(50, 150)
-                newOrder = baseOrder + (attempt + 1) * 100L + randomOffset
                 attempt++
             }
         }
+
         return reorderAllListOrders(board, targetList, targetIndex)
     }
 
