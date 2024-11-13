@@ -12,6 +12,7 @@ import com.narara.superboard.member.service.validator.MemberValidator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailServiceImpl implements EmailService {
     private final MemberValidator memberValidator;
     private final SpringTemplateEngine templateEngine;
@@ -36,6 +38,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmailVerificationCode(String email) {
         memberValidator.validateEmail(email);
         checkExistingMember(email);
+        log.info("manageRedisData 들어가기전: {}", email);
         manageRedisData(email);
         sendVerificationEmailToUser(email);
     }
@@ -75,8 +78,10 @@ public class EmailServiceImpl implements EmailService {
 
     private void manageRedisData(String email) {
         if (redisService.existData(email)) {
+            log.info("redis 데이터 있는 경우 삭제 :{}" ,email);
             redisService.deleteData(email); // 기존 인증 코드 삭제
         }
+        log.info("manageRedisData 완료");
     }
 
     private void sendVerificationEmailToUser(String email) {
