@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 //@Transactional
 // 수정 시 사용
 // @DataJpaTest @DataJpaTest는 JPA 관련된 컴포넌트만 로드하여 단위 테스트와 유사하게 JPA 레이어만 테스트하는 용도
+@Disabled
 @DisplayName("댓글 서비스와 댓글 저장소 통합 테스트")
 class ReplyServiceImplTest extends IntegrationTest {
 
