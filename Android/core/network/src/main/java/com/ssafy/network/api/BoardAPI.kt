@@ -58,19 +58,19 @@ interface BoardAPI {
     @GET("api/v1/boards/{boardId}/members")
     suspend fun getBoardMembers(@Path("boardId") boardId: Long): Response<ApiResponse<List<MemberResponseDTO>>>
 
-    @POST("api/v1/boards/{boardId}/members")
+    @POST("api/v1/boards/{boardId}/member")
     suspend fun createBoardMember(
         @Path("boardId") boardId: Long,
         @Body memberId: Map<String, Long>
     ): Response<ApiResponse<MemberResponseDTO>>
 
-    @DELETE("api/v1/boards/{boardId}/members")
+    @DELETE("api/v1/boards/{boardId}/member")
     suspend fun deleteBoardMember(
         @Path("boardId") boardId: Long,
         @Body memberId: Map<String, Long>
     ): Response<ApiResponse<MemberResponseDTO>>
 
-    @PATCH("api/v1/boards/{boardId}/members")
+    @PATCH("api/v1/boards/{boardId}/member")
     suspend fun updateBoardMember(
         @Path("boardId") boardId: Long,
         @Body simpleMemberDto: SimpleMemberDto
