@@ -95,7 +95,7 @@ fun BoardWithMyCards(
 
             items(board.cards.size) { index ->
                 val card = board.cards[index]
-                val image = runCatching { CoverType.valueOf(card.coverValue ?: "") }
+                val type = runCatching { CoverType.valueOf(card.coverType ?: "") }
                     .getOrDefault(CoverType.NONE)
 
                 CardItem(
@@ -103,7 +103,7 @@ fun BoardWithMyCards(
                     title = card.name,
                     image = {
                         card.coverValue?.let {
-                            if (image == CoverType.IMAGE) CardCoverImage(imgPath = it)
+                            if (type == CoverType.IMAGE) CardCoverImage(imgPath = it)
                             else CardCoverColor(color = it.toColor())
                         }
                     },
