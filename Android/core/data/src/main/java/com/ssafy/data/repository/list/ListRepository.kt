@@ -3,6 +3,7 @@ package com.ssafy.data.repository.list
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.bitmask.UpdateListBitmaskDTO
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
@@ -26,6 +27,11 @@ interface ListRepository {
         updateListRequestDto: UpdateListRequestDto,
         isConnected: Boolean
     ): Flow<Unit>
+
+    suspend fun moveList(boardId: Long,
+                         listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>,
+                         isConnected: Boolean
+    ) : Flow<Unit>
 
     suspend fun updateList(listId: Long, dto: UpdateListBitmaskDTO)
 

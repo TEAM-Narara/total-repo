@@ -2,6 +2,8 @@ package com.ssafy.network.source.card
 
 import com.ssafy.model.attachment.AttachmentResponseDto
 import com.ssafy.model.card.CardDetailDto
+import com.ssafy.model.card.CardLabelUpdateDto
+import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -22,6 +24,11 @@ interface CardDataSource {
     suspend fun updateCard(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
+    ): Flow<Unit>
+
+    suspend fun moveCard(
+        listId: Long,
+        cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>
     ): Flow<Unit>
 
     suspend fun updateCard(

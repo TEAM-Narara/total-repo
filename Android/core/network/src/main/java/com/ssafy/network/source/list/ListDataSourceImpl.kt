@@ -2,6 +2,7 @@ package com.ssafy.network.source.list
 
 import com.ssafy.model.alert.AlertResponse
 import com.ssafy.model.list.CreateListRequestDto
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.api.ListAPI
@@ -25,6 +26,9 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     ): Flow<Unit>  = safeApiCall { listAPI.updateList(listId, updateListWithNull) }.toFlow()
 
     // 리스트는 삭제가 없습니다.
+    override suspend fun moveList(listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>): Flow<Unit> =
+        safeApiCall { listAPI.moveList(listMoveUpdateRequestDTO) }.toFlow()
+
     override suspend fun deleteList(listId: Long): Flow<Unit> {
         TODO("Not yet implemented")
     }
