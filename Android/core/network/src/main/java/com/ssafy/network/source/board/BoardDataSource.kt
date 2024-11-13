@@ -1,5 +1,6 @@
 package com.ssafy.network.source.board
 
+import com.ssafy.model.activity.BoardActivityDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -47,4 +48,6 @@ interface BoardDataSource {
         boardId: Long,
         simpleMemberDto: SimpleMemberDto
     ): Flow<MemberResponseDTO>
+
+    suspend fun getBoardActivity(boardId: Long, page: Int, size: Int): Flow<BoardActivityDto>
 }

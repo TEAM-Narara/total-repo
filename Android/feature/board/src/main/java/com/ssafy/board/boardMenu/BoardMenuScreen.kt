@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,16 +35,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.ssafy.board.board.components.BoardMemberItem
 import com.ssafy.board.boardMenu.data.BoardMenuData
 import com.ssafy.board.components.MenuEditTextRow
 import com.ssafy.board.components.MenuHorizontalDivider
+import com.ssafy.designsystem.component.ActivityLog
 import com.ssafy.designsystem.values.ImageSmall
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingOne
@@ -54,6 +61,7 @@ import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextXLarge
 import com.ssafy.designsystem.values.White
 import com.ssafy.designsystem.values.toColor
+import com.ssafy.model.activity.BoardActivity
 import com.ssafy.model.background.Cover
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.CoverType
@@ -71,12 +79,15 @@ fun BoardMenuScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardState by viewModel.boardState.collectAsStateWithLifecycle()
+    val lazyActivity = viewModel.boardActivity.collectAsLazyPagingItems()
+
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     boardState?.let { boardMenuData ->
         BoardMenuScreen(
             modifier = modifier,
             boardMenuData = boardMenuData,
+            lazyActivity = lazyActivity,
             backHome = popBack,
             moveToSelectBackGroundScreen = moveToSelectBackGroundScreen,
             moveToInviteMemberScreen = moveToInviteMemberScreen,
@@ -113,6 +124,7 @@ fun BoardMenuScreen(
 private fun BoardMenuScreen(
     modifier: Modifier = Modifier,
     boardMenuData: BoardMenuData,
+    lazyActivity: LazyPagingItems<BoardActivity>,
     backHome: () -> Unit,
     moveToSelectBackGroundScreen: (Cover) -> Unit,
     moveToInviteMemberScreen: () -> Unit,
@@ -290,7 +302,25 @@ private fun BoardMenuScreen(
                         .padding(PaddingDefault, PaddingZero)
                 )
             }
-            // TODO ActivityLog 라는 screen이 있습니다. 이것으로 historyContent를 만들어주세요
+
+            items(lazyActivity.itemCount, key = lazyActivity.itemKey { it.hashCode() }) {
+
+                lazyActivity[it]?.let { boardActivity: BoardActivity ->
+                    ActivityLog(
+                        icon = {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = boardActivity.activity.who.memberProfileImageUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                error = rememberVectorPainter(Icons.Default.AccountCircle),
+                            )
+                        },
+                        content = boardActivity.message ?: boardActivity.toString(),
+                        editDate = boardActivity.`when`
+                    )
+                }
+            }
         }
     }
 

@@ -37,6 +37,9 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:datastore"))
     implementation(libs.javax.inject)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.gson)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

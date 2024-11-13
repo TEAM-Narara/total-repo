@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.CardEntity
+import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardWithListAndBoardName
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +21,7 @@ interface CardDao {
     @Query("""
         SELECT * 
         FROM card 
-        WHERE id = :cardId
+        WHERE id = :cardId AND isStatus != 'DELETE'
     """)
     fun getCard(cardId: Long): CardEntity?
 
@@ -32,6 +33,46 @@ interface CardDao {
         WHERE id = :cardId
     """)
     fun getCardFlow(cardId: Long): Flow<CardEntity?>
+
+    // 오름차순
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE listId = :listId 
+            AND isStatus != 'DELETE'
+            AND isArchived = 0
+        ORDER BY myOrder ASC
+        LIMIT 1
+    """)
+    fun getCardInListToTop(listId: Long): CardEntity?
+
+    // 내림차순
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM card
+        WHERE listId = :listId 
+            AND isStatus != 'DELETE'
+            AND isArchived = 0
+        ORDER BY myOrder DESC
+        LIMIT 1
+    """)
+    fun getCardInListToBottom(listId: Long): CardEntity?
+
+    // 리스트 안에 카드들과 겹치는 MyOrder 존재 하는지 확인(충돌 방지)
+    @Transaction
+    @Query("""
+        SELECT EXISTS(
+            SELECT 1 
+            FROM card
+            WHERE listId = :listId 
+                AND isStatus != 'DELETE'
+                AND isArchived = 0
+                AND myOrder = :myOrder
+        )
+    """)
+    fun checkCardInListExistMyOrder(listId: Long, myOrder: Long): Boolean
 
     // 카드들의 리스트ID 조회
     @Query("""
@@ -52,7 +93,18 @@ interface CardDao {
             And isArchived = 0
         ORDER BY myOrder
     """)
-    fun getAllCardsInList(listId: Long): Flow<List<CardEntity>>
+    fun getAllCardsInList(listId: Long): List<CardEntity>
+
+    // 리스트 내에 카드들 조회
+    @Query("""
+        SELECT * 
+        FROM card 
+        WHERE listId = :listId
+            And isStatus != 'DELETE' 
+            And isArchived = 0
+        ORDER BY myOrder
+    """)
+    fun getAllCardsInListFlow(listId: Long): Flow<List<CardEntity>>
 
     // 리스트들 내에 카드들 조회
     @Query("""

@@ -1,7 +1,9 @@
 package com.ssafy.data.repository.board
 
+import androidx.paging.PagingData
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.bitmask.UpdateBoardBitmaskDTO
+import com.ssafy.model.activity.BoardActivity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.with.BoardInListDTO
@@ -70,4 +72,6 @@ interface BoardRepository {
     suspend fun getLocalCreateLabels(): List<LabelDTO>
 
     suspend fun getLocalOperationLabels(): List<LabelDTO>
+
+    suspend fun getBoardActivity(boardId: Long): Flow<PagingData<BoardActivity>>
 }

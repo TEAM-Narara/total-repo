@@ -1,5 +1,6 @@
 package com.ssafy.network.api
 
+import com.ssafy.model.activity.BoardActivityDto
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -14,6 +15,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface BoardAPI {
 
@@ -73,5 +75,12 @@ interface BoardAPI {
         @Path("boardId") boardId: Long,
         @Body simpleMemberDto: SimpleMemberDto
     ): Response<ApiResponse<MemberResponseDTO>>
+
+    @GET("api/v1/boards/{boardId}/activity")
+    suspend fun getBoardActivity(
+        @Path("boardId") boardId: Long,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<ApiResponse<BoardActivityDto>>
 
 }

@@ -1,6 +1,8 @@
 package com.ssafy.network.source.card
 
 import com.ssafy.model.attachment.AttachmentResponseDto
+import com.ssafy.model.card.CardLabelUpdateDto
+import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardDetailDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
@@ -40,6 +42,12 @@ class CardDataSourceImpl @Inject constructor(
         cardId: Long,
         updateCardWithNull: UpdateCardWithNull
     ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, updateCardWithNull) }.toFlow()
+
+    override suspend fun moveCard(
+        listId: Long,
+        cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>
+    ): Flow<Unit> =
+        safeApiCall { cardAPI.moveCard(listId, cardMoveUpdateRequestDTO) }.toFlow()
 
     override suspend fun updateCardMember(
         boardId: Long,
