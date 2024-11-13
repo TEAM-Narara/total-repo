@@ -2,6 +2,8 @@ package com.narara.superboard.card.service;
 
 import static com.narara.superboard.card.CardAction.*;
 
+import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.document.CardHistory;
@@ -34,6 +36,8 @@ import com.narara.superboard.websocket.constant.Action;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -180,10 +184,20 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void checkBoardMember(Card card, Member member, Action action) {
-        java.util.List<BoardMember> boardMemberList = card.getList().getBoard().getBoardMemberList();
+        Board board = card.getList().getBoard();
+
+        java.util.List<BoardMember> boardMemberList = board.getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {
                 return;
+            }
+        }
+        if (board.getVisibility().equals(Visibility.WORKSPACE)) {
+            java.util.List<WorkSpaceMember> workspaceMemberList = board.getWorkSpace().getWorkspaceMemberList();
+            for (WorkSpaceMember workSpaceMember : workspaceMemberList) {
+                if (workSpaceMember.getMember().getId().equals(member.getId())) {
+                    return;
+                }
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);
