@@ -1,6 +1,7 @@
 package com.ssafy.network.source.comment
 
 import com.ssafy.model.comment.CommentRequestDto
+import com.ssafy.model.comment.CommentResponseDto
 import com.ssafy.model.comment.UpdateCommentDto
 import com.ssafy.network.api.CommentAPI
 import com.ssafy.network.source.safeApiCall
@@ -12,7 +13,7 @@ class CommentDataSourceImpl @Inject constructor(
     private val commentAPI: CommentAPI
 ) : CommentDataSource {
 
-    override suspend fun createComment(commentRequestDto: CommentRequestDto): Flow<Unit> =
+    override suspend fun createComment(commentRequestDto: CommentRequestDto): Flow<CommentResponseDto> =
         safeApiCall { commentAPI.createComment(commentRequestDto) }.toFlow()
 
     override suspend fun deleteComment(commentId: Long): Flow<Unit> =
