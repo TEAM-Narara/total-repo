@@ -66,9 +66,9 @@ interface CardRepository {
 
     suspend fun getCardRepresentativesInCards(cardIds: List<Long>): Flow<List<MemberResponseDTO>>
 
-    suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+    suspend fun getCardAlertStatus(cardId: Long): Flow<Boolean>
 
-    suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean>
+    suspend fun setCardAlertStatus(cardId: Long, memberId: Long)
 
     suspend fun setCardPresenter(cardId: Long, memberId: Long): Flow<Boolean>
 

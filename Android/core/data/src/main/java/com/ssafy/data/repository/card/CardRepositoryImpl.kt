@@ -255,15 +255,22 @@ class CardRepositoryImpl @Inject constructor(
         }
 
     // 해당 멤버의 카드 알람 상태 조회 (멤버 id는 내것만 가능합니다.)
-    override suspend fun getCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+    override suspend fun getCardAlertStatus(cardId: Long): Flow<Boolean> =
         withContext(ioDispatcher) {
-            cardDataSource.getAlertCard(cardId, memberId)
+            cardMemberDao.getCardMemberAlarmFlow(cardId).map { it?.isAlert ?: false }
         }
 
     // 카드 알람 상태 변경은 온라인 일 떄에만 가능합니다. (멤버 id는 내것만 가능합니다.)
-    override suspend fun setCardAlertStatus(cardId: Long, memberId: Long): Flow<Boolean> =
+    override suspend fun setCardAlertStatus(cardId: Long, memberId: Long) =
         withContext(ioDispatcher) {
-            cardDataSource.setAlertCard(cardId, memberId)
+            cardDataSource.setAlertCard(cardId, memberId).collect {
+                cardMemberDao.insertCardAlarm(
+                    CardMemberAlarmEntity(
+                        cardId = cardId,
+                        isAlert = it
+                    )
+                )
+            }
         }
 
 
@@ -404,6 +411,7 @@ class CardRepositoryImpl @Inject constructor(
                         CardLabelEntity(
                             labelId = createCardLabelRequestDto.labelId,
                             cardId = createCardLabelRequestDto.cardId,
+                            isStatus = DataStatus.CREATE,
                         )
                     )
                 )

@@ -6,6 +6,7 @@ import com.ssafy.card.DeleteAttachmentUseCase
 import com.ssafy.card.DeleteCardUseCase
 import com.ssafy.card.GetCardMemberUseCase
 import com.ssafy.card.GetCardsUseCase
+import com.ssafy.card.SetCardAlertStatusUseCase
 import com.ssafy.card.SetCardArchiveUseCase
 import com.ssafy.card.SetCardRepresentativeUseCase
 import com.ssafy.card.UpdateAttachmentToCoverUseCase
@@ -51,6 +52,7 @@ class CardViewModel @Inject constructor(
     private val updateAttachmentToCoverUseCase: UpdateAttachmentToCoverUseCase,
     private val getCardMemberUseCase: GetCardMemberUseCase,
     private val setCardRepresentativeUseCase: SetCardRepresentativeUseCase,
+    private val setCardAlertStatusUseCase: SetCardAlertStatusUseCase,
 ) : BaseViewModel() {
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
@@ -178,7 +180,8 @@ class CardViewModel @Inject constructor(
     }
 
     fun setCardWatching(isWatching: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        // TODO : card watch 정보 수정 usecase 연결
+        val cardId = _cardId.value ?: return@launch
+        setCardAlertStatusUseCase(cardId, isWatching)
     }
 
     fun addAttachment(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -224,7 +227,7 @@ class CardViewModel @Inject constructor(
 
     fun toggleIsManager(id: Long, isManager: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
-        setCardRepresentativeUseCase(cardId, id)
+        setCardRepresentativeUseCase(cardId, id, isManager)
     }
 
     fun updatePeriod(periodData: PeriodData) = viewModelScope.launch(Dispatchers.IO) {
