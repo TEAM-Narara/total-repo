@@ -1,57 +1,95 @@
 package com.ssafy.home.mycard
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ssafy.designsystem.values.Primary
+import coil3.compose.AsyncImage
+import com.ssafy.designsystem.values.Yellow
+import com.ssafy.designsystem.values.toColor
+import com.ssafy.model.with.BoardInMyRepresentativeCard
+import com.ssafy.model.with.CoverType
+import com.ssafy.ui.uistate.ErrorScreen
+import com.ssafy.ui.uistate.LoadingScreen
+import com.ssafy.ui.uistate.UiState
 
 @Composable
 fun MyCardScreen(
     viewModel: MyCardViewModel = hiltViewModel(),
     popBackToHome: () -> Unit,
-    moveToCardScreen: (Any) -> Unit
+    moveToCardScreen: (workspaceId: Long, boardId: Long, cardId: Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val myCardList by viewModel.myCardList.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     MyCardScreen(
-        // TODO : BoardList의 타입이 지정되면 수정
-        boardList = uiState.boards,
+        boardList = myCardList,
         popBackToHome = popBackToHome,
-        // TODO : Card에 대한 타입이 지정되면 수정
         moveToCardScreen = moveToCardScreen
     )
+
+    when (uiState) {
+        is UiState.Loading -> LoadingScreen()
+        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Success -> {}
+        is UiState.Idle -> {}
+    }
 }
 
 @Composable
 private fun MyCardScreen(
-    boardList: List<Any>,
+    boardList: List<BoardInMyRepresentativeCard>,
     popBackToHome: () -> Unit,
-    moveToCardScreen: (Any) -> Unit
+    moveToCardScreen: (workspaceId: Long, boardId: Long, cardId: Long) -> Unit
 ) {
     Scaffold(
         topBar = { MyCardTopBar(onNavigateClick = popBackToHome) }
     ) { innerPadding ->
 
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(boardList.size) { board ->
+            items(boardList.size) { index ->
+                val board: BoardInMyRepresentativeCard = boardList[index]
+                val coverType = runCatching { CoverType.valueOf(board.coverType ?: "") }
+                    .getOrDefault(CoverType.NONE)
+
                 BoardWithMyCards(
                     board = board,
-                    // TODO : BoardIcon에 대한 이미지가 있으면 수정
                     boardIcon = {
-                        Image(
-                            painter = ColorPainter(Primary),
-                            contentDescription = null
-                        )
+                        when (coverType) {
+                            CoverType.COLOR -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color = board.coverValue?.toColor() ?: Yellow)
+                                )
+                            }
+
+                            CoverType.IMAGE -> {
+                                AsyncImage(
+                                    model = board.coverValue,
+                                    contentDescription = "Board Cover",
+                                    contentScale = ContentScale.Crop,
+                                    error = ColorPainter(Yellow)
+                                )
+                            }
+
+                            else -> {}
+                        }
                     },
-                    onClick = moveToCardScreen
+                    onClick = { cardId -> moveToCardScreen(board.workspaceId, board.id, cardId) }
                 )
             }
         }
@@ -63,6 +101,6 @@ private fun MyCardScreen(
 private fun MyCardScreenPreview() {
     MyCardScreen(
         popBackToHome = {},
-        moveToCardScreen = {}
+        moveToCardScreen = { _, _, _ -> }
     )
 }
