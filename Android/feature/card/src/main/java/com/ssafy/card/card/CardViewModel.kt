@@ -203,10 +203,10 @@ class CardViewModel @Inject constructor(
         }
     }
 
-    // TODO 확인 필요
+    // TODO 이제 토글이 아니라 card의 cover 값을 변경합니다.
     fun updateAttachmentToCover(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
-            updateAttachmentToCoverUseCase(id, isConnected)
+            updateAttachmentToCoverUseCase(id, isConnected).withUiState().collect()
         }
     }
 
