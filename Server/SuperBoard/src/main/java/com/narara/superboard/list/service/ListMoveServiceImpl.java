@@ -293,10 +293,9 @@ public class ListMoveServiceImpl implements ListMoveService {
             }
         }
 
+        java.util.List<List> updatedList = new ArrayList<>(); //업데이트된 리스트들을 저장함
+
         int idx = 0;
-
-        java.util.List<List> updatedList = new ArrayList<>();
-
         while (idx < listMoveRequests.size()) {
             ListMoveRequest currentListRequest = listMoveRequests.get(idx);
             List currentList = listRepository.findById(currentListRequest.listId())
@@ -313,7 +312,7 @@ public class ListMoveServiceImpl implements ListMoveService {
 
             List alreadyExistsList = allLists.get(wantedIdx);
 
-            //이미 wantedOrder를 MyOrder로 가지는 리스트가 있다면 재귀 업데이트
+            //이미 wantedOrder를 MyOrder로 가지는 리스트가 있다면 listMoveRequests 업데이트
             if (alreadyExistsList.getMyOrder().equals(currentListRequest.myOrder())) {
                 int gap = 1;
                 long updateOrder = listMoveRequests.get(listMoveRequests.size() - 1).myOrder() + gap; //TODO 적당히 잘 띄우기
