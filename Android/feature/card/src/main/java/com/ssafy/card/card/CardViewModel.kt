@@ -28,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -190,7 +191,9 @@ class CardViewModel @Inject constructor(
 
     fun setCardWatching(isWatching: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
-        setCardAlertStatusUseCase(cardId, isWatching)
+        withSocketState { isConnected: Boolean ->
+            setCardAlertStatusUseCase(cardId, isWatching, isConnected).withUiState().collect()
+        }
     }
 
     fun addAttachment(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -200,6 +203,7 @@ class CardViewModel @Inject constructor(
         }
     }
 
+    // TODO 확인 필요
     fun updateAttachmentToCover(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
             updateAttachmentToCoverUseCase(id, isConnected)
@@ -234,9 +238,16 @@ class CardViewModel @Inject constructor(
         }
     }
 
-    fun toggleIsManager(id: Long, isManager: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleIsManager(
+        id: Long,
+        isManager: Boolean,
+        onError: (Throwable) -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
-        setCardRepresentativeUseCase(cardId, id, isManager)
+        withSocketState { isConnected: Boolean ->
+            setCardRepresentativeUseCase(cardId, id, isManager, isConnected).withUiState(onError)
+                .collect()
+        }
     }
 
     fun updatePeriod(periodData: PeriodData) = viewModelScope.launch(Dispatchers.IO) {

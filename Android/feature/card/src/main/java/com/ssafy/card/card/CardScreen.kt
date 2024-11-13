@@ -89,7 +89,13 @@ fun CardScreen(
 
     ModifyManagerDialog(
         dialogState = managerDialogState,
-        onIsManagerChanged = viewModel::toggleIsManager,
+        onIsManagerChanged = { id: Long, isManager: Boolean ->
+            viewModel.toggleIsManager(
+                id = id,
+                isManager = isManager,
+                onError = { managerDialogState.dismiss() }
+            )
+        },
         memberList = memberList ?: emptyList()
     )
 
