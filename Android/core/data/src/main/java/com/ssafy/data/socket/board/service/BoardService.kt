@@ -33,17 +33,15 @@ class BoardService @Inject constructor(
     suspend fun addBoardMember(data: JsonObject) {
         val dto = gson.fromJson(data, AddBoardMemberRequestDto::class.java)
 
-        memberDao.getMember(dto.memberId)?.let {
-            imageStorage.saveAll(key = dto.profileImgUrl) { path ->
-                memberDao.insertMember(
-                    MemberEntity(
-                        id = dto.memberId,
-                        nickname = dto.memberName,
-                        email = dto.memberEmail,
-                        profileImageUrl = path,
-                    )
+        if (memberDao.getMember(dto.memberId) == null) imageStorage.saveAll(key = dto.profileImgUrl) { path ->
+            memberDao.insertMember(
+                MemberEntity(
+                    id = dto.memberId,
+                    nickname = dto.memberName,
+                    email = dto.memberEmail,
+                    profileImageUrl = path,
                 )
-            }
+            )
         }
 
         boardMemberDao.insertBoardMember(

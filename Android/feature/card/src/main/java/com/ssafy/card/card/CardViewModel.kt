@@ -6,6 +6,7 @@ import com.ssafy.card.DeleteAttachmentUseCase
 import com.ssafy.card.DeleteCardUseCase
 import com.ssafy.card.GetCardMemberUseCase
 import com.ssafy.card.GetCardsUseCase
+import com.ssafy.card.SetCardAlertStatusUseCase
 import com.ssafy.card.SetCardArchiveUseCase
 import com.ssafy.card.SetCardRepresentativeUseCase
 import com.ssafy.card.UpdateAttachmentToCoverUseCase
@@ -27,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -51,7 +53,12 @@ class CardViewModel @Inject constructor(
     private val updateAttachmentToCoverUseCase: UpdateAttachmentToCoverUseCase,
     private val getCardMemberUseCase: GetCardMemberUseCase,
     private val setCardRepresentativeUseCase: SetCardRepresentativeUseCase,
+    private val setCardAlertStatusUseCase: SetCardAlertStatusUseCase,
 ) : BaseViewModel() {
+    private var _workspaceId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setWorkspaceId(workspaceId: Long) = _workspaceId.update { workspaceId }
+    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setBardId(boardId: Long) = _boardId.update { boardId }
     private var _cardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setCardId(cardId: Long) = _cardId.update { cardId }
 
@@ -71,14 +78,18 @@ class CardViewModel @Inject constructor(
         initialValue = null,
     )
 
-    val careMemberList = _cardId.filterNotNull().flatMapLatest { cardId ->
-        getCardMemberUseCase(cardId).map {
+    val careMemberList = combine(_workspaceId, _boardId, _cardId) { workspaceId, boardId, cardId ->
+        if (workspaceId == null || boardId == null || cardId == null) null
+        else Triple(workspaceId, boardId, cardId)
+    }.filterNotNull().flatMapLatest {
+        val (workspaceId, boardId, cardId) = it
+        getCardMemberUseCase(workspaceId, boardId, cardId).map {
             it.map {
                 ManagerData(
                     id = it.memberId,
-                    nickname = it.memberNickname,
-                    email = it.memberEmail,
-                    profileUrl = it.memberProfileImgUrl,
+                    nickname = it.nickname,
+                    email = it.email,
+                    profileUrl = it.profileImageUrl,
                     isManager = it.isRepresentative
                 )
             }
@@ -178,7 +189,8 @@ class CardViewModel @Inject constructor(
     }
 
     fun setCardWatching(isWatching: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        // TODO : card watch 정보 수정 usecase 연결
+        val cardId = _cardId.value ?: return@launch
+        setCardAlertStatusUseCase(cardId, isWatching)
     }
 
     fun addAttachment(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -224,7 +236,7 @@ class CardViewModel @Inject constructor(
 
     fun toggleIsManager(id: Long, isManager: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
-        setCardRepresentativeUseCase(cardId, id)
+        setCardRepresentativeUseCase(cardId, id, isManager)
     }
 
     fun updatePeriod(periodData: PeriodData) = viewModelScope.launch(Dispatchers.IO) {

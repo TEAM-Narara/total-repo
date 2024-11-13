@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Card(val boardId: Long, val cardId: Long)
+data class Card(val workspaceId: Long, val boardId: Long, val cardId: Long)
 
 fun NavGraphBuilder.cardScreen(
     popBackToBoardScreen: () -> Unit,
@@ -17,6 +17,8 @@ fun NavGraphBuilder.cardScreen(
         val card: Card = backStackEntry.toRoute()
         val viewModel: CardViewModel = hiltViewModel()
 
+        viewModel.setWorkspaceId(card.workspaceId)
+        viewModel.setBardId(card.boardId)
         viewModel.setCardId(card.cardId)
 
         CardScreen(

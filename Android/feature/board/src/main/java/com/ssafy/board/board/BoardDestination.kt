@@ -11,6 +11,7 @@ import kotlin.reflect.typeOf
 
 @Serializable
 data class Board(
+    val workspaceId: Long,
     val boardId: Long,
     val searchParameters: SearchParameters = SearchParameters()
 )
@@ -20,7 +21,7 @@ fun NavGraphBuilder.boardScreen(
     navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (Long, Long) -> Unit,
-    navigateToCardScreen: (Long, Long) -> Unit
+    navigateToCardScreen: (Long, Long, Long) -> Unit
 ) {
     composable<Board>(
         mapOf(typeOf<SearchParameters>() to SearchParametersType)
@@ -36,7 +37,7 @@ fun NavGraphBuilder.boardScreen(
             navigateToFilterScreen = navigateToFilterScreen,
             navigateToNotificationScreen = navigateToNotificationScreen,
             navigateToBoardMenuScreen = navigateToBoardMenuScreen,
-            navigateToCardScreen = { cardId -> navigateToCardScreen(board.boardId, cardId) }
+            navigateToCardScreen = { cardId -> navigateToCardScreen(board.workspaceId, board.boardId, cardId) }
         )
     }
 }

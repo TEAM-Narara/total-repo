@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 object Home
 
 fun NavGraphBuilder.homeScreen(
-    moveToBoardScreen: (Long) -> Unit,
+    moveToBoardScreen: (Long, Long) -> Unit,
     moveToCreateNewBoardScreen: (List<WorkSpaceDTO>) -> Unit,
     moveToLoginScreen: () -> Unit,
     moveToSettingScreen: (Long) -> Unit,

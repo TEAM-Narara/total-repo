@@ -1,5 +1,8 @@
 package com.ssafy.data.repository.board
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.BoardMemberDao
@@ -16,6 +19,7 @@ import com.ssafy.database.dto.piece.bitmaskColumn
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
+import com.ssafy.model.activity.BoardActivity
 import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.board.UpdateBoardRequestDto
@@ -27,6 +31,7 @@ import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
 import com.ssafy.model.with.DataStatus
+import com.ssafy.network.source.board.BoardActivityPagingSource
 import com.ssafy.network.source.board.BoardDataSource
 import com.ssafy.nullable.CoverWithNull
 import com.ssafy.nullable.UpdateBoardWithNull
@@ -34,6 +39,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -50,7 +56,7 @@ class BoardRepositoryImpl @Inject constructor(
 ) : BoardRepository {
 
     override suspend fun createOnlyBoard(myMemberId: Long, boardDTO: BoardDTO) {
-        if(boardDTO.isStatus != DataStatus.STAY){
+        if (boardDTO.isStatus != DataStatus.STAY) {
             throw RuntimeException("이 보드는 워치 정보를 담기 위해 서버에서 생성된 보드여야 합니다.")
         }
 
@@ -490,6 +496,19 @@ class BoardRepositoryImpl @Inject constructor(
         )
         boardDataSource.updateBoard(id, dto)
     }
+
+    override suspend fun getBoardActivity(boardId: Long): Flow<PagingData<BoardActivity>> = Pager(
+        config = PagingConfig(
+            pageSize = BoardActivityPagingSource.PAGE_SIZE,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            BoardActivityPagingSource(
+                boardId = boardId,
+                boardDataSource = boardDataSource,
+            )
+        }
+    ).flow.flowOn(ioDispatcher)
 
     override suspend fun getAllBoardAndWorkspaceMember(
         workspaceId: Long,
