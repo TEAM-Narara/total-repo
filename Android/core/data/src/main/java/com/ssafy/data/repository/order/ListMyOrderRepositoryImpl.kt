@@ -1,6 +1,5 @@
 package com.ssafy.data.repository.order
 
-import com.ssafy.data.repository.order.ListMoveResult.SingleListMove
 import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
 import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
 import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
@@ -26,7 +25,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 ): ListMyOrderRepository {
 
     // 맨 위로 옮김
-    override suspend fun moveListToTop(listId: Long, isConnection: Boolean): ListMoveResult? {
+    override suspend fun moveListToTop(listId: Long): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
         val board = boardDao.getBoard(targetList.boardId) ?: return null
@@ -57,7 +56,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
-    override suspend fun moveListToBottom(listId: Long, isConnection: Boolean): ListMoveResult? {
+    override suspend fun moveListToBottom(listId: Long): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
         val board = boardDao.getBoard(targetList.boardId) ?: return null
@@ -90,8 +89,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
     override suspend fun moveListBetween(
         listId: Long,
         previousListId: Long,
-        nextListId: Long,
-        isConnection: Boolean
+        nextListId: Long
     ): ListMoveResult? {
         val targetList = listDao.getList(listId) ?: return null
 
@@ -157,9 +155,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
     // 고유성 보장을 위해 임의 간격 조정 로직 추가
     private fun generateUniqueOrder(baseOrder: Long, maxOffset: Long): Long {
         val offset = ThreadLocalRandom.current().nextLong(0, maxOffset)
-        val uniqueOrder = baseOrder + offset
-
-        return uniqueOrder
+        return baseOrder + offset
     }
 
     private fun generateUniqueOrderWithRetry(
