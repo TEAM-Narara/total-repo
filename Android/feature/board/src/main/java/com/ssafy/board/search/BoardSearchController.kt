@@ -1,7 +1,5 @@
 package com.ssafy.board.search
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ssafy.board.GetBoardAndWorkspaceMemberUseCase
 import com.ssafy.board.GetLabelUseCase
 import com.ssafy.board.search.dto.SearchAllParameters
@@ -9,23 +7,40 @@ import com.ssafy.board.search.dto.toLabel
 import com.ssafy.board.search.dto.toParamsInfo
 import com.ssafy.model.search.DueDate
 import com.ssafy.model.search.SearchParameters
-import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class BoardSearchViewModel @Inject constructor(
+class BoardSearchController(
+    private val coroutineScope: CoroutineScope,
     private val getLabelUseCase: GetLabelUseCase,
     private val getBoardAndWorkspaceMemberUseCase: GetBoardAndWorkspaceMemberUseCase,
-) : ViewModel() {
+) {
     private val _searchAllParameters = MutableStateFlow(SearchAllParameters())
     val searchAllParameters = _searchAllParameters.asStateFlow()
+    val searchParameters = _searchAllParameters.map {
+        val dueDates = searchAllParameters.value.dueDateMap.filter { it.value.isSelected }.keys
+        val noMember = searchAllParameters.value.noMember.second.isSelected
+        val members = searchAllParameters.value.memberMap.filter { it.value.isSelected }.keys
+        val noLabel = searchAllParameters.value.noLabel.second.isSelected
+        val labels = searchAllParameters.value.labelMap.filter { it.value.isSelected }.keys
+        val searchText = searchAllParameters.value.searchedText
 
-    fun updateDueDate(dueDate: DueDate) = viewModelScope.launch {
+        SearchParameters(
+            searchText = searchText,
+            noMember = noMember,
+            members = members.map { it.memberId }.toSet(),
+            dueDates = dueDates.toSet(),
+            noLabel = noLabel,
+            labels = labels.map { it.id }.toSet()
+        )
+    }
+
+    fun updateDueDate(dueDate: DueDate) = coroutineScope.launch {
         val dueDateMap = searchAllParameters.value.dueDateMap.toMutableMap()
 
         when (dueDate) {
@@ -81,7 +96,7 @@ class BoardSearchViewModel @Inject constructor(
         _searchAllParameters.emit(searchAllParameters.value.copy(dueDateMap = dueDateMap))
     }
 
-    fun updateNoMember() = viewModelScope.launch(Dispatchers.IO) {
+    fun updateNoMember() = coroutineScope.launch(Dispatchers.IO) {
         val noMember = searchAllParameters.value.noMember
         _searchAllParameters.emit(
             searchAllParameters.value.copy(
@@ -93,7 +108,7 @@ class BoardSearchViewModel @Inject constructor(
         )
     }
 
-    fun updateMember(memberId: Long) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateMember(memberId: Long) = coroutineScope.launch(Dispatchers.IO) {
         val memberMap = searchAllParameters.value.memberMap.toMutableMap()
         val member = memberMap.keys.firstOrNull { it.memberId == memberId } ?: return@launch
         memberMap[member]?.let {
@@ -102,7 +117,7 @@ class BoardSearchViewModel @Inject constructor(
         _searchAllParameters.emit(searchAllParameters.value.copy(memberMap = memberMap))
     }
 
-    fun updateNoLabel() = viewModelScope.launch(Dispatchers.IO) {
+    fun updateNoLabel() = coroutineScope.launch(Dispatchers.IO) {
         val noLabel = searchAllParameters.value.noLabel
         _searchAllParameters.emit(
             searchAllParameters.value.copy(
@@ -114,7 +129,7 @@ class BoardSearchViewModel @Inject constructor(
         )
     }
 
-    fun updateLabel(labelId: Long) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateLabel(labelId: Long) = coroutineScope.launch(Dispatchers.IO) {
         val labelMap = searchAllParameters.value.labelMap.toMutableMap()
         val label = labelMap.keys.firstOrNull { it.id == labelId } ?: return@launch
         labelMap[label]?.let {
@@ -127,8 +142,8 @@ class BoardSearchViewModel @Inject constructor(
         searchAllParameters.value.searchedText = searchText
     }
 
-    fun updateSearchParams(workspaceId: Long, boardId: Long, params: SearchParameters) =
-        viewModelScope.launch(Dispatchers.IO) {
+    fun setSearchParams(workspaceId: Long, boardId: Long) =
+        coroutineScope.launch(Dispatchers.IO) {
             combine(
                 getBoardAndWorkspaceMemberUseCase(workspaceId, boardId),
                 getLabelUseCase(boardId)
@@ -142,29 +157,6 @@ class BoardSearchViewModel @Inject constructor(
                         labelMap = labels.associate { it.toLabel() to it.toParamsInfo() },
                     )
                 )
-
-                params.dueDates.forEach { updateDueDate(it) }
-                params.members.forEach { updateMember(it) }
-                params.labels.forEach { updateLabel(it) }
-                searchAllParameters.value.searchedText = params.searchText
             }
         }
-
-    fun getSearchParameters(): SearchParameters {
-        val dueDates = searchAllParameters.value.dueDateMap.filter { it.value.isSelected }.keys
-        val noMember = searchAllParameters.value.noMember.second.isSelected
-        val members = searchAllParameters.value.memberMap.filter { it.value.isSelected }.keys
-        val noLabel = searchAllParameters.value.noLabel.second.isSelected
-        val labels = searchAllParameters.value.labelMap.filter { it.value.isSelected }.keys
-        val searchText = searchAllParameters.value.searchedText
-
-        return SearchParameters(
-            searchText = searchText,
-            noMember = noMember,
-            members = members.map { it.memberId }.toSet(),
-            dueDates = dueDates.toSet(),
-            noLabel = noLabel,
-            labels = labels.map { it.id }.toSet()
-        )
-    }
 }

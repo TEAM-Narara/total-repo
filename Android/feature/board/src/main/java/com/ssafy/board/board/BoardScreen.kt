@@ -40,13 +40,13 @@ import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ListData
 import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.board.board.data.toReorderCardData
+import com.ssafy.board.search.BoardSearchScreen
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
 import com.ssafy.model.board.Visibility
-import com.ssafy.model.search.SearchParameters
 import com.ssafy.model.with.CoverType
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
@@ -58,14 +58,14 @@ fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
     popBack: () -> Unit,
-    navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (boardId: Long, workspaceId: Long) -> Unit,
     navigateToCardScreen: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
-    val searchParameters by viewModel.searchParams.collectAsStateWithLifecycle()
+
+    var isFilterScreenShow by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
@@ -76,7 +76,7 @@ fun BoardScreen(
                 title = boardData?.name ?: "",
                 onBackPressed = popBack,
                 onBoardNameChanged = viewModel::updateBoardName,
-                onFilterPressed = { navigateToFilterScreen(searchParameters) },
+                onFilterPressed = { isFilterScreenShow = true },
                 onNotificationPressed = navigateToNotificationScreen,
                 onMorePressed = {
                     boardData?.let { navigateToBoardMenuScreen(it.id, it.workspaceId) }
@@ -122,6 +122,10 @@ fun BoardScreen(
                 )
             }
         } ?: LoadingScreen()
+    }
+
+    if (isFilterScreenShow) BoardSearchScreen(viewModel.boardSearchController) {
+        isFilterScreenShow = false
     }
 
     when (uiState) {

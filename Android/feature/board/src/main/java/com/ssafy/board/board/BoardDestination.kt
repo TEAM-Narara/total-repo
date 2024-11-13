@@ -13,12 +13,10 @@ import kotlin.reflect.typeOf
 data class Board(
     val workspaceId: Long,
     val boardId: Long,
-    val searchParameters: SearchParameters = SearchParameters()
 )
 
 fun NavGraphBuilder.boardScreen(
     popBack: () -> Unit,
-    navigateToFilterScreen: (Long, Long, SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (Long, Long) -> Unit,
     navigateToCardScreen: (Long, Long, Long) -> Unit
@@ -28,13 +26,12 @@ fun NavGraphBuilder.boardScreen(
     ) { backStackEntry ->
         val board: Board = backStackEntry.toRoute()
         val viewModel: BoardViewModel = hiltViewModel<BoardViewModel>().apply {
+            setWorkspaceId(board.workspaceId)
             setBoardId(board.boardId)
-            setSearchParams(board.searchParameters)
         }
         BoardScreen(
             viewModel = viewModel,
             popBack = popBack,
-            navigateToFilterScreen = { navigateToFilterScreen(board.workspaceId, board.boardId, it) },
             navigateToNotificationScreen = navigateToNotificationScreen,
             navigateToBoardMenuScreen = navigateToBoardMenuScreen,
             navigateToCardScreen = { cardId -> navigateToCardScreen(board.workspaceId, board.boardId, cardId) }
