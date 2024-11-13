@@ -44,7 +44,7 @@ interface MemberBackgroundDao {
     suspend fun getLocalOperationMemberBackgrounds(): List<MemberBackgroundEntity>
 
     // 로컬에서 생성
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMemberBackground(memberBackground: MemberBackgroundEntity): Long
 
     // 서버 변경사항 동기화

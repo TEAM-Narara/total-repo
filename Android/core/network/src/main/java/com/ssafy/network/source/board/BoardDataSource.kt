@@ -7,6 +7,7 @@ import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
+import com.ssafy.nullable.UpdateBoardWithNull
 import kotlinx.coroutines.flow.Flow
 
 interface BoardDataSource {
@@ -18,6 +19,7 @@ interface BoardDataSource {
     suspend fun deleteBoard(id: Long): Flow<Unit>
 
     suspend fun updateBoard(id: Long, updateBoardRequestDto: UpdateBoardRequestDto): Flow<Unit>
+    suspend fun updateBoard(id: Long, dto: UpdateBoardWithNull): Flow<Unit>
 
     suspend fun setBoardArchive(boardId: Long): Flow<Unit>
 

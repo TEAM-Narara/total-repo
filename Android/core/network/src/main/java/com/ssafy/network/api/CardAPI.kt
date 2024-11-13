@@ -1,10 +1,12 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.attachment.AttachmentResponseDto
+import com.ssafy.model.card.CardDetailDto
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.network.source.ApiResponse
+import com.ssafy.nullable.UpdateCardWithNull
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -17,7 +19,7 @@ import retrofit2.http.Query
 interface CardAPI {
 
     @POST("api/v1/card")
-    suspend fun createCard(@Body cardRequestDto: CardRequestDto): Response<ApiResponse<Unit>>
+    suspend fun createCard(@Body cardRequestDto: CardRequestDto): Response<ApiResponse<CardDetailDto>>
 
     @DELETE("api/v1/card/{cardId}")
     suspend fun deleteCard(@Path("cardId") cardId: Long): Response<ApiResponse<Unit>>
@@ -26,6 +28,12 @@ interface CardAPI {
     suspend fun updateCard(
         @Path("cardId") cardId: Long,
         @Body cardUpdateRequestDto: CardUpdateRequestDto
+    ): Response<ApiResponse<Unit>>
+
+    @PATCH("api/v1/card/{cardId}")
+    suspend fun updateCard(
+        @Path("cardId") cardId: Long,
+        @Body cardUpdateRequestDto: UpdateCardWithNull
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/card/{cardId}/archive")

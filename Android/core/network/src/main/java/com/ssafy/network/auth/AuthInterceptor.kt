@@ -1,7 +1,7 @@
 package com.ssafy.network.auth
 
 import com.ssafy.datastore.DataStoreRepository
-import com.ssafy.model.auth.AuthManager
+import com.ssafy.model.manager.AuthManager
 import com.ssafy.network.source.auth.AuthDataSource
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

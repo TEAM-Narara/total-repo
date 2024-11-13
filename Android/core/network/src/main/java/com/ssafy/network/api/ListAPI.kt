@@ -5,6 +5,7 @@ import com.ssafy.model.list.CreateListRequestDto
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.source.ApiResponse
+import com.ssafy.nullable.UpdateListWithNull
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -15,12 +16,18 @@ import retrofit2.http.Path
 interface ListAPI {
 
     @POST("api/v1/list")
-    suspend fun createList(@Body createListRequestDto: CreateListRequestDto): Response<ApiResponse<Unit>>
+    suspend fun createList(@Body createListRequestDto: CreateListRequestDto): Response<ApiResponse<ListResponseDto>>
 
     @PATCH("api/v1/list/{listId}")
     suspend fun updateList(
         @Path("listId") listId: Long,
         @Body updateListRequestDto: UpdateListRequestDto
+    ): Response<ApiResponse<Unit>>
+
+    @PATCH("api/v1/list/{listId}")
+    suspend fun updateList(
+        @Path("listId") listId: Long,
+        @Body updateListRequestDto: UpdateListWithNull
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/list/{listId}/archive")

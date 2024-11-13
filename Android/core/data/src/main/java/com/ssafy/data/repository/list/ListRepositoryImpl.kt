@@ -12,6 +12,7 @@ import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.ListMemberAlarmEntity
 import com.ssafy.database.dto.ListMemberEntity
+import com.ssafy.database.dto.bitmask.UpdateListBitmaskDTO
 import com.ssafy.database.dto.bitmask.bitmaskColumn
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
@@ -26,6 +27,7 @@ import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ListMemberAlarmDTO
 import com.ssafy.model.with.ListMemberDTO
 import com.ssafy.network.source.list.ListDataSource
+import com.ssafy.nullable.UpdateListWithNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -58,30 +60,26 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            listDataSource.createList(createListRequestDto).map { -1 }
+            listDataSource.createList(createListRequestDto).map { it.listId }
         } else {
             val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
 
-            flowOf(
-                listDao.insertList(
-                    ListEntity(
-                        id = localListId,
-                        name = createListRequestDto.listName,
-                        boardId = createListRequestDto.boardId,
-                        isStatus = DataStatus.CREATE
-                    )
-                ).also {
-                    createListMember(
-                        listId = localListId,
-                        memberId = myMemberId,
-                        isStatus = DataStatus.CREATE
-                    )
-                    createListWatch(
-                        listId = localListId,
-                        isStatus = DataStatus.CREATE
-                    )
-                }
+            listDao.insertList(
+                ListEntity(
+                    id = localListId,
+                    name = createListRequestDto.listName,
+                    boardId = createListRequestDto.boardId,
+                    isStatus = DataStatus.CREATE
+                )
             )
+
+            createListMember(
+                listId = localListId,
+                memberId = myMemberId,
+                isStatus = DataStatus.CREATE
+            )
+
+            flowOf(localListId)
         }
     }
 
@@ -193,11 +191,8 @@ class ListRepositoryImpl @Inject constructor(
                 .map { it.toDTO() }
         }
 
-    override suspend fun getLocalOperationList(): List<ListResponseDto> =
-        withContext(ioDispatcher) {
-            listDao.getLocalOperationList()
-                .map { entity -> entity.toDto() }
-        }
+    override suspend fun getLocalOperationList(): List<ListEntity> =
+        withContext(ioDispatcher) { listDao.getLocalOperationList() }
 
     override suspend fun getListMembers(listId: Long): Flow<List<MemberResponseDTO>> =
         withContext(ioDispatcher) {
@@ -455,5 +450,10 @@ class ListRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun updateList(listId: Long, dto: UpdateListBitmaskDTO) {
+        val updateDto = UpdateListWithNull(dto.name)
+        listDataSource.updateList(listId, updateDto)
     }
 }

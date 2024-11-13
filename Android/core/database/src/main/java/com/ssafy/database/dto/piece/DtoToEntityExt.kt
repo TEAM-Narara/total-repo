@@ -40,7 +40,7 @@ fun BoardDTO.toEntity(): BoardEntity {
         coverValue = cover.value,
         visibility = visibility.name,
         isClosed = this.isClosed,
-        isStatus = DataStatus.STAY,
+        isStatus = this.isStatus ?: DataStatus.STAY,
         columnUpdate = 0L
     )
 }

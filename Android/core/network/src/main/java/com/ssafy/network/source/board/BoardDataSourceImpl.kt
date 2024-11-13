@@ -13,6 +13,7 @@ import com.ssafy.network.api.LabelAPI
 import com.ssafy.network.source.safeApiCall
 import com.ssafy.network.source.toFlow
 import com.ssafy.network.util.S3ImageUtil
+import com.ssafy.nullable.UpdateBoardWithNull
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -101,5 +102,8 @@ class BoardDataSourceImpl @Inject constructor(
         simpleMemberDto: SimpleMemberDto
     ): Flow<MemberResponseDTO> =
         safeApiCall { boardAPI.updateBoardMember(boardId, simpleMemberDto) }.toFlow()
+
+    override suspend fun updateBoard(id: Long, dto: UpdateBoardWithNull): Flow<Unit> =
+        safeApiCall { boardAPI.updateBoardWithNull(id, dto) }.toFlow()
 
 }

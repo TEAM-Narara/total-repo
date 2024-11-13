@@ -39,7 +39,8 @@ class HomeViewModel @Inject constructor(
         ) { workspaceId, isConnected ->
             when (isConnected) {
                 ConnectionState.Connected -> getHomeInfoUseCase(true, workspaceId)
-                ConnectionState.Disconnected -> getHomeInfoUseCase(false, workspaceId)
+                ConnectionState.Disconnected  -> getHomeInfoUseCase(false, workspaceId)
+                is ConnectionState.Error -> getHomeInfoUseCase(false, workspaceId)
                 else -> null
             }
         }.filterNotNull()
