@@ -138,8 +138,8 @@ class BoardSearchController(
         _searchAllParameters.emit(searchAllParameters.value.copy(labelMap = labelMap))
     }
 
-    fun updateSearchText(searchText: String) {
-        searchAllParameters.value.searchedText = searchText
+    fun updateSearchText(searchText: String) = coroutineScope.launch(Dispatchers.IO) {
+        _searchAllParameters.emit(searchAllParameters.value.copy(searchedText = searchText))
     }
 
     fun setSearchParams(workspaceId: Long, boardId: Long) =

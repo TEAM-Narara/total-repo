@@ -75,10 +75,10 @@ data class SearchAllParameters(
         isSelected = false
     ),
 
-    val labelMap: Map<Label, ParamsInfo> = mapOf()
-) {
+    val labelMap: Map<Label, ParamsInfo> = mapOf(),
+
     var searchedText: String = ""
-}
+)
 
 fun User.toParamsInfo() = ParamsInfo(
     startIcon = IconType.Image(imageUrl = profileImgUrl),

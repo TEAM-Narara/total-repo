@@ -1,5 +1,6 @@
 package com.ssafy.board.board
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.ssafy.board.GetBoardAndWorkspaceMemberUseCase
 import com.ssafy.board.GetBoardUseCase
@@ -77,6 +78,7 @@ class BoardViewModel @Inject constructor(
         else Pair(boardId, searchParameters)
     }.filterNotNull().flatMapLatest {
         val (boardId, searchParameters) = it
+        Log.d("TAG", "searchParameters: ${searchParameters.searchText}")
         combine(
             getBoardUseCase(boardId),
             getLocalScreenListsInCardsFilterUseCase(boardId, searchParameters)
