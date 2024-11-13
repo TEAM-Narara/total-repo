@@ -1,13 +1,13 @@
 package com.ssafy.data.repository.comment
 
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.ReplyDao
 import com.ssafy.database.dto.ReplyEntity
 import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.ReplyCount
 import com.ssafy.database.dto.piece.toDTO
+import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.comment.CommentRequestDto
 import com.ssafy.model.comment.UpdateCommentDto
 import com.ssafy.model.with.DataStatus
@@ -31,21 +31,25 @@ class CommentRepositoryImpl @Inject constructor(
 ) : CommentRepository {
 
     override suspend fun createComment(
+        memberId: Long,
         commentRequestDto: CommentRequestDto,
         isConnected: Boolean
     ): Flow<Long> = withContext(ioDispatcher) {
         if (isConnected) {
-            commentDataSource.createComment(commentRequestDto).map { 5 }
+            commentDataSource.createComment(commentRequestDto).map { it.replyId }
         } else {
-            flowOf(replyDao.insertReply(ReplyEntity(
-                id = negativeIdGenerator.getNextNegativeId(LocalTable.REPLY),
-                content = commentRequestDto.content,
-                cardId = commentRequestDto.cardId,
-                isStatus = DataStatus.CREATE,
-                createAt = System.currentTimeMillis(),
-                // TODO 내 아이디 가져오기
-                memberId = 0L
-            )))
+            flowOf(
+                replyDao.insertReply(
+                    ReplyEntity(
+                        id = negativeIdGenerator.getNextNegativeId(LocalTable.REPLY),
+                        content = commentRequestDto.content,
+                        cardId = commentRequestDto.cardId,
+                        isStatus = DataStatus.CREATE,
+                        createAt = System.currentTimeMillis(),
+                        memberId = memberId
+                    )
+                )
+            )
 
         }
     }
@@ -54,13 +58,14 @@ class CommentRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val reply = replyDao.getReply(commentId)
 
-            if(reply != null) {
+            if (reply != null) {
                 if (isConnected) {
                     commentDataSource.deleteComment(commentId)
                 } else {
-                    val result = when(reply.isStatus) {
+                    val result = when (reply.isStatus) {
                         DataStatus.CREATE ->
                             replyDao.deleteReply(reply)
+
                         else ->
                             replyDao.updateReply(reply.copy(isStatus = DataStatus.DELETE))
                     }
@@ -79,16 +84,23 @@ class CommentRepositoryImpl @Inject constructor(
     ): Flow<Unit> = withContext(ioDispatcher) {
         val reply = replyDao.getReply(commentId)
 
-        if(reply != null) {
+        if (reply != null) {
             if (isConnected) {
                 commentDataSource.updateComment(commentId, UpdateCommentDto(content))
             } else {
-                val result = when(reply.isStatus) {
+                val result = when (reply.isStatus) {
                     DataStatus.STAY ->
-                        replyDao.updateReply(reply.copy(isStatus = DataStatus.UPDATE, content = content))
-                    DataStatus.CREATE, DataStatus.UPDATE  ->
+                        replyDao.updateReply(
+                            reply.copy(
+                                isStatus = DataStatus.UPDATE,
+                                content = content
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
                         replyDao.updateReply(reply.copy(content = content))
-                    DataStatus.DELETE -> { }
+
+                    DataStatus.DELETE -> {}
                 }
 
                 flowOf(result)
@@ -104,7 +116,7 @@ class CommentRepositoryImpl @Inject constructor(
                 .map { entities -> entities.map { it.toDto() } }
         }
 
-    override suspend fun getLocalCreateReply(): List<ReplyDTO>  =
+    override suspend fun getLocalCreateReply(): List<ReplyDTO> =
         withContext(ioDispatcher) {
             replyDao.getLocalCreateReplies()
                 .map { it.toDTO() }

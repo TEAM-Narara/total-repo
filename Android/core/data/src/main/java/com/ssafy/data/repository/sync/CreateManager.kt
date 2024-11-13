@@ -22,7 +22,6 @@ import com.ssafy.model.with.CardAllInfoDTO
 import com.ssafy.model.with.CardLabelDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CoverType
-import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.ListInCardsDTO
 import com.ssafy.model.with.ReplyDTO
 import kotlinx.coroutines.flow.first
@@ -159,12 +158,14 @@ class CreateManager @Inject constructor(
     suspend fun createComments(cardId: Long, comments: List<ReplyDTO>) {
         if (cardId < 0) return
 
+        val memberId = dataStoreRepository.getUser().memberId
         comments.forEach { comment: ReplyDTO ->
             val dto = CommentRequestDto(
                 cardId = cardId,
                 content = comment.content
             )
-            commentRepository.createComment(dto, isConnected)
+
+            commentRepository.createComment(memberId, dto, isConnected)
         }
     }
 
