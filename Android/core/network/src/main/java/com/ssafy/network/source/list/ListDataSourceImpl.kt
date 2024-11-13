@@ -1,6 +1,7 @@
 package com.ssafy.network.source.list
 
 import com.ssafy.model.list.CreateListRequestDto
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.api.ListAPI
@@ -16,6 +17,9 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
 
     override suspend fun updateList(listId: Long, updateListRequestDto: UpdateListRequestDto): Flow<Unit> =
         safeApiCall { listAPI.updateList(listId, updateListRequestDto) }.toFlow()
+
+    override suspend fun moveList(listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>): Flow<Unit> =
+        safeApiCall { listAPI.moveList(listMoveUpdateRequestDTO) }.toFlow()
 
     override suspend fun deleteList(listId: Long): Flow<Unit> {
         TODO("Not yet implemented")

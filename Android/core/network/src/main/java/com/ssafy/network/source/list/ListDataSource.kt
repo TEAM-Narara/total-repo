@@ -1,6 +1,7 @@
 package com.ssafy.network.source.list
 
 import com.ssafy.model.list.CreateListRequestDto
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,8 @@ interface ListDataSource {
     suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<Unit>
 
     suspend fun updateList(listId: Long, updateListRequestDto: UpdateListRequestDto): Flow<Unit>
+
+    suspend fun moveList(listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>): Flow<Unit>
 
     suspend fun deleteList(listId: Long): Flow<Unit>
 

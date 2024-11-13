@@ -21,9 +21,11 @@ import com.ssafy.database.dto.with.CardWithListAndBoardName
 import com.ssafy.database.dto.with.MemberWithRepresentative
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.card.CardLabelUpdateDto
+import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInMyRepresentativeCard
@@ -150,6 +152,53 @@ class CardRepositoryImpl @Inject constructor(
             flowOf(Unit)
         }
     }
+
+    override suspend fun moveCard(
+        listId: Long,
+        cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+        if (isConnected) {
+            cardDataSource.moveCard(listId, cardMoveUpdateRequestDTO)
+        } else {
+            cardMoveUpdateRequestDTO.forEach {
+                val card = cardDao.getCard(it.cardId) ?: return@forEach
+
+                val newCard = card.copy(myOrder = it.myOrder)
+                val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
+
+                val result = when (card.isStatus) {
+                    DataStatus.STAY, DataStatus.UPDATE ->
+                        cardDao.updateCard(
+                            card.copy(
+                                myOrder = it.myOrder,
+                                isStatus = DataStatus.UPDATE,
+                                columnUpdate = newBit
+                            )
+                        )
+
+                    DataStatus.CREATE ->
+                        cardDao.updateCard(newCard)
+
+                    DataStatus.DELETE -> {}
+                }
+                flowOf(result)
+            }.also {
+                val list = listDao.getList(listId)
+
+                val maxMyOrder = cardMoveUpdateRequestDTO.maxByOrNull { it.myOrder }?.myOrder ?: 0L
+
+                if (list != null) {
+                    listDao.updateList(list.copy(
+                        lastCardOrder = maxMyOrder
+                    ))
+                }
+            }
+        }
+
+        flowOf(Unit)
+    }
+
 
     override suspend fun setCardArchive(cardId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {

@@ -1,6 +1,7 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.attachment.AttachmentResponseDto
+import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -28,6 +29,10 @@ interface CardAPI {
         @Body cardUpdateRequestDto: CardUpdateRequestDto
     ): Response<ApiResponse<Unit>>
 
+    @PATCH("api/v1/card/{listId}/move")
+    suspend fun moveCard(@Path("listId") listId: Long,
+                         @Body cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>): Response<ApiResponse<Unit>>
+
     @PATCH("api/v1/card/{cardId}/archive")
     suspend fun setCardArchive(@Path("cardId") cardId: Long): Response<ApiResponse<Unit>>
 
@@ -45,5 +50,4 @@ interface CardAPI {
 
     @PATCH("api/v1/attachment/{attachmentId}/cover")
     suspend fun updateAttachmentToCover(@Path("attachmentId") attachmentId: Long): Response<ApiResponse<Unit>>
-
 }

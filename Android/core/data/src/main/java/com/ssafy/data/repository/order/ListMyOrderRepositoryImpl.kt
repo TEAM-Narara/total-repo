@@ -1,8 +1,5 @@
 package com.ssafy.data.repository.order
 
-import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.board.BoardRepository
-import com.ssafy.data.repository.list.ListRepository
 import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
 import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
 import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
@@ -14,7 +11,6 @@ import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.BoardEntity
 import com.ssafy.database.dto.ListEntity
-import kotlinx.coroutines.CoroutineDispatcher
 import java.util.concurrent.ThreadLocalRandom
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +21,6 @@ import kotlin.math.roundToLong
 class ListMyOrderRepositoryImpl @Inject constructor(
     private val listDao: ListDao,
     private val boardDao: BoardDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ListMyOrderRepository {
     // 맨 위로 옮김
     override suspend fun moveListToTop(listId: Long, isConnection: Boolean): ListMoveResult? {
@@ -55,13 +50,6 @@ class ListMyOrderRepositoryImpl @Inject constructor(
 
         val orderInfoList: List<ListMoveResponseDto> =
             generateUniqueOrderWithRetry(targetList, 0, board, baseOrder)
-
-        if (topList == null) {
-            // TODO
-            boardDao.updateBoard(board.copy(
-                lastListOrder = orderInfoList.first().myOrder
-            ))
-        }
 
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
@@ -94,16 +82,10 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         val orderInfoList: List<ListMoveResponseDto> =
             generateUniqueOrderWithRetry(targetList, -1, board, baseOrder)
 
-        // TODO
-        boardDao.updateBoard(board.copy(
-            lastListOrder = orderInfoList.first().myOrder
-        ))
-
         return ListMoveResult.ReorderedListMove(orderInfoList)
     }
 
     override suspend fun moveListBetween(
-        memberId: Long,
         listId: Long,
         previousListId: Long,
         nextListId: Long,
@@ -161,7 +143,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         return uniqueOrder
     }
 
-    private suspend fun generateUniqueOrderWithRetry(
+    private fun generateUniqueOrderWithRetry(
         targetList: ListEntity,
         targetIndex: Int,
         board: BoardEntity,
@@ -204,13 +186,13 @@ class ListMyOrderRepositoryImpl @Inject constructor(
     }
 
     // 리스트 순서 중복 확인 메서드
-    private suspend fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
+    private fun isOrderConflict(board: BoardEntity, order: Long): Boolean {
         val conflictExists: Boolean = listDao.checkListInBoardExistMyOrder(board.id, order)
 
         return conflictExists
     }
 
-    private suspend fun reorderAllListOrders(
+    private fun reorderAllListOrders(
         board: BoardEntity,
         targetList: ListEntity,
         targetIndex: Int
@@ -234,9 +216,6 @@ class ListMyOrderRepositoryImpl @Inject constructor(
             orderInfoList.add(ListMoveResponseDto(list.id, newOrder))
             newOrder += REORDER_GAP
         }
-
-        // TODO
-        boardDao.updateBoard(board.copy(lastListOrder = newOrder - REORDER_GAP))
 
         return orderInfoList
     }

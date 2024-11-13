@@ -3,6 +3,7 @@ package com.ssafy.data.repository.list
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.database.dao.NegativeIdGenerator
 import com.ssafy.database.dao.AttachmentDao
+import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
@@ -19,6 +20,7 @@ import com.ssafy.database.dto.piece.LocalTable
 import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCardsDTO
@@ -49,6 +51,7 @@ class ListRepositoryImpl @Inject constructor(
     private val attachmentDao: AttachmentDao,
     private val cardMemberDao: CardMemberDao,
     private val cardLabelDao: CardLabelDao,
+    private val boardDao: BoardDao,
     private val negativeIdGenerator: NegativeIdGenerator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ListRepository {
@@ -121,6 +124,52 @@ class ListRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun moveList(
+        boardId: Long,
+        listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>,
+        isConnected: Boolean
+    ): Flow<Unit> = withContext(ioDispatcher) {
+            if (isConnected) {
+                listDataSource.moveList(listMoveUpdateRequestDTO)
+            } else {
+                listMoveUpdateRequestDTO.forEach {
+                    val list = listDao.getList(it.listId) ?: return@forEach
+
+                    val newList = list.copy(myOrder = it.myOrder)
+                    val newBit = bitmaskColumn(list.columnUpdate, list, newList)
+
+                    val result = when (list.isStatus) {
+                        DataStatus.STAY, DataStatus.UPDATE ->
+                            listDao.updateList(
+                                list.copy(
+                                    myOrder = it.myOrder,
+                                    isStatus = DataStatus.UPDATE,
+                                    columnUpdate = newBit
+                                )
+                            )
+
+                        DataStatus.CREATE ->
+                            listDao.updateList(newList)
+
+                        DataStatus.DELETE -> {}
+                    }
+                    flowOf(result)
+                }.also {
+                    val board = boardDao.getBoard(boardId)
+
+                    val maxMyOrder = listMoveUpdateRequestDTO.maxByOrNull { it.myOrder }?.myOrder ?: 0L
+
+                    if (board != null) {
+                        boardDao.updateBoard(board.copy(
+                            lastListOrder = maxMyOrder
+                        ))
+                    }
+                }
+            }
+
+        flowOf(Unit)
+    }
+
     override suspend fun deleteList(listId: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
             val list = listDao.getList(listId)
@@ -164,7 +213,7 @@ class ListRepositoryImpl @Inject constructor(
                         DataStatus.CREATE ->
                             listDao.updateList(newList)
 
-                        DataStatus.DELETE -> {}
+                        DataStatus.DELETE -> { }
                     }
 
                     flowOf(result)

@@ -1,9 +1,6 @@
 package com.ssafy.data.repository.order
 
-import androidx.room.util.copy
 import com.ssafy.data.di.IoDispatcher
-import com.ssafy.data.repository.card.CardRepository
-import com.ssafy.data.repository.list.ListRepository
 import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
 import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
 import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
@@ -27,7 +24,6 @@ import kotlin.random.Random
 class CardMyOrderRepositoryImpl @Inject constructor(
     private val cardDao: CardDao,
     private val listDao: ListDao,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CardMyOrderRepository {
     override suspend fun moveCardToTop(
         cardId: Long,
@@ -50,18 +46,12 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         return if (topCard == null) {
             // 보드에 리스트가 없는 경우
 
-            // TODO
-            targetCard = targetCard.copy(
-                myOrder = DEFAULT_TOP_ORDER,
-                listId = targetListId
-            )
-
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
-                        listId = targetCard.listId,
+                        listId = targetListId,
                         cardId = targetCard.id,
-                        myOrder = targetCard.myOrder
+                        myOrder = DEFAULT_TOP_ORDER
                     )
                 )
             )
@@ -111,16 +101,10 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
 
-                // TODO
-                targetCard = targetCard.copy(
-                    myOrder = newOrder,
-                    listId = targetListId
-                )
-
                 CardMoveResult.ReorderedCardMove(
                     listOf(
                         CardMoveResponseDto(
-                            listId = targetList.id,
+                            listId = targetListId,
                             cardId = targetCard.id,
                             myOrder = newOrder
                         )
@@ -152,18 +136,12 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         return if (bottomCard == null) {
             // 보드에 리스트가 없는 경우
 
-            // TODO
-            targetCard = targetCard.copy(
-                myOrder = DEFAULT_TOP_ORDER,
-                listId = targetListId
-            )
-
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
-                        listId = targetCard.listId,
+                        listId = targetListId,
                         cardId = targetCard.id,
-                        myOrder = targetCard.myOrder
+                        myOrder = DEFAULT_TOP_ORDER
                     )
                 )
             )
@@ -212,26 +190,10 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 // 단일 카드 이동
                 val newOrder = orderInfoList.first().myOrder
 
-                // TODO
-                targetCard = targetCard.copy(
-                    myOrder = newOrder,
-                    listId = targetListId
-                )
-
-                // TODO
-                listDao.updateList(
-                    targetList.copy(
-                        lastCardOrder = newOrder
-                    )
-                )
-
-                // TODO
-                listDao.updateList(targetList.copy(lastCardOrder = newOrder))
-
                 CardMoveResult.ReorderedCardMove(
                     listOf(
                         CardMoveResponseDto(
-                            listId = targetList.id,
+                            listId = targetListId,
                             cardId = targetCard.id,
                             myOrder = newOrder
                         )
@@ -331,12 +293,6 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         } else {
             // 단일 카드 이동
             val newOrder = orderInfoList.first().myOrder
-
-            // TODO
-            targetCard = targetCard.copy(
-                myOrder = newOrder,
-                listId = targetList.id
-            )
 
             CardMoveResult.ReorderedCardMove(
                 listOf(
@@ -490,9 +446,6 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             )
             newOrder += REORDER_GAP
         }
-
-        // TODO
-        listDao.updateList(list.copy(lastCardOrder = newOrder - REORDER_GAP))
 
         return orderInfoList
     }
