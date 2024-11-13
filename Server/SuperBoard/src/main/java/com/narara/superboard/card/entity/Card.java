@@ -74,6 +74,10 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @OneToMany(mappedBy = "card")
     private java.util.List<CardMember> cardMemberList;
 
+    public void updateList(List list) {
+        this.list = list;
+    }
+
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
         long cardListOrder = list.getLastCardOrder() + LARGE_INCREMENT;
         list.setLastCardOrder(cardListOrder);

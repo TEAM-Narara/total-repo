@@ -3,11 +3,12 @@ package com.narara.superboard.card.infrastructure;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.list.entity.List;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
 import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
@@ -27,6 +28,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     boolean existsByListAndMyOrder(List list, long order);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     java.util.List<Card> findAllByListOrderByMyOrderAsc(List list);
 
     java.util.List<Card> findByListAndIsDeletedFalseOrderByMyOrderAsc(List list);

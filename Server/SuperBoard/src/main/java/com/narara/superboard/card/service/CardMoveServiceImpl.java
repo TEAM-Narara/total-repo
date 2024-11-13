@@ -3,21 +3,27 @@ package com.narara.superboard.card.service;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardMoveCollectionRequest;
+import com.narara.superboard.card.interfaces.dto.CardMoveRequest;
 import com.narara.superboard.card.interfaces.dto.CardMoveResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardMoveResult;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
+import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.narara.superboard.card.CardAction.MOVE_CARD;
 import static com.narara.superboard.common.constant.MoveConst.*;
+import static com.narara.superboard.list.ListAction.MOVE_LIST;
 
 @Slf4j
 @Service
@@ -28,7 +34,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final ListRepository listRepository;
     private final CardReorderService cardReorderService; // CardReorderService 주입
     private final CardService cardService; // CardService 주입
-
+    private final ListService listService;
 
     @Override
     @Transactional
@@ -240,9 +246,181 @@ public class CardMoveServiceImpl implements CardMoveService {
     }
 
     @Override
+    @Transactional
     public CardMoveResult moveCardVersion2(Member member, Long listId,
                                            CardMoveCollectionRequest cardMoveCollectionRequest) {
-        return null;
+        //현재 리스트 조회
+        List currentList = listRepository.findById(listId)
+                .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
+
+        java.util.List<CardMoveRequest> cardMoveRequests = cardMoveCollectionRequest.moveRequest();
+        if (cardMoveRequests.isEmpty()) {
+            throw new IllegalArgumentException("빈 입력을 보내면 안됩니다!");
+        }
+
+        //사이즈가 1이라면(하나만 이동한다면) version 1을 호출
+        if (cardMoveRequests.size() == 1) {
+            return moveCardVersion1(member, currentList, cardMoveRequests.get(0).cardId(), cardMoveRequests.get(0).myOrder());
+        }
+
+        //유저의 보드 접근 권한을 확인
+        listService.checkBoardMember(currentList, member, MOVE_LIST);
+
+        //리스트의 전체 카드를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
+        //request로 들어온 애들이 모두 같은 보드에 있는지 검증해야하나?
+        java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(currentList);
+
+        //카드 myOrder 배정 및 재배치
+        java.util.List<Card> updatedCardCollection = insertAndRelocateCard(allCards, currentList, cardMoveRequests);
+
+        return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
+    }
+
+    @Transactional
+    public CardMoveResult moveCardVersion1(Member member, List targetList, Long cardId, Long myOrder) {
+        //바꿀 리스트 조회
+        Card targetCard = cardRepository.findById(cardId)
+                .orElseThrow(() -> new NotFoundEntityException(cardId, "리스트"));
+
+        //유저의 보드 접근 권한을 확인
+        cardService.checkBoardMember(targetCard, member, MOVE_LIST);
+
+        // 보드의 전체 카드를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
+        java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(targetList);
+
+        //카드 myOrder 배정 및 재배치
+        java.util.List<Card> updatedCardCollection = insertAndRelocate(allCards, targetList, targetCard, myOrder);
+
+        //혹시모를 에러를 위한 sort: 업데이트된 카드들을 순서대로 정렬
+        Collections.sort(updatedCardCollection, Comparator.comparingLong(Card::getMyOrder));
+
+        //dto에 바뀐 리스트 값 매핑
+        java.util.List<CardMoveResponseDto> orderInfoCard = CardMoveResponseDto.of(updatedCardCollection);
+
+        return new CardMoveResult.ReorderedCardMove(orderInfoCard);
+    }
+
+    private java.util.List<Card> insertAndRelocateCard(java.util.List<Card> allCards,
+                                                       List targetList,
+                                                       java.util.List<CardMoveRequest> cardMoveRequests) {
+        //request에 포함된 card들을 모두 제거해줌
+        for (CardMoveRequest cardMoveRequest : cardMoveRequests) {
+            for (Card tmpCard: allCards) {
+                if (tmpCard.getId().equals(cardMoveRequest.cardId())) {
+                    allCards.remove(tmpCard);
+                    break;
+                }
+            }
+        }
+
+        int idx = 0;
+
+        java.util.List<Card> updatedCard = new ArrayList<>();
+
+        while (idx < cardMoveRequests.size()) {
+            CardMoveRequest currentCardRequest = cardMoveRequests.get(idx);
+            Card currentCard = cardRepository.findById(currentCardRequest.cardId())
+                    .orElseThrow(() -> new NotFoundEntityException(currentCardRequest.cardId(), "리스트"));
+
+            int wantedIdx = findIdxInAllCard(allCards, currentCardRequest.myOrder());
+
+            if (allCards.size() <= wantedIdx) {
+                //cardUpdate 로직
+                updateCard(targetList, currentCard, currentCardRequest.myOrder());
+                updatedCard.add(currentCard);
+                log.info("@@@@ currentCard: " + currentCard.getId() + "      " + currentCard.getList().getId());
+                idx++;
+                continue;
+            }
+
+            Card alreadyExistsCard = allCards.get(wantedIdx);
+
+            //이미 wantedOrder를 MyOrder로 가지는 리스트가 있다면 재귀 업데이트
+            if (alreadyExistsCard.getMyOrder().equals(currentCardRequest.myOrder())) {
+                int gap = 1;
+                long updateOrder = cardMoveRequests.get(cardMoveRequests.size() - 1).myOrder() + gap; //TODO 적당히 잘 띄우기
+                cardMoveRequests.add(new CardMoveRequest(alreadyExistsCard.getId(), updateOrder));
+            }
+
+            //cardUpdate 로직
+            updateCard(targetList, currentCard, currentCardRequest.myOrder());
+            log.info("@@@@ currentCard: " + currentCard.getId() + "      " + currentCard.getList().getId());
+            idx++;
+
+            updatedCard.add(currentCard);
+        }
+
+        return updatedCard;
+    }
+
+    private java.util.List<Card> insertAndRelocate(java.util.List<Card> allCards, List targetList, Card targetCard, Long wantedOrder) {
+        //1. allLists에 targetList가 이미 존재한다면 삭제(에러 방지를 위해)
+        for (Card existList: allCards) {
+            if (existList.getId().equals(targetCard.getId())) {
+                allCards.remove(targetCard);
+                break;
+            }
+        }
+
+        //이진 탐색으로 내가 원하는 위치를 찾아냄
+        int wantedIdx = findIdxInAllCard(allCards, wantedOrder);
+
+        return updateMyOrder(allCards, targetList, wantedIdx, targetCard, wantedOrder);
+    }
+
+    private java.util.List<Card> updateMyOrder(java.util.List<Card> allCards, List targetList, int wantedIdx, Card targetCard, Long wantedOrder) {
+        java.util.List<Card> updatedCard = new ArrayList<>();
+
+        //맨 뒤라면 바로 업데이트
+        if (allCards.size() <= wantedIdx) {
+            updateCard(targetList, targetCard, wantedOrder);
+            return new ArrayList<>(java.util.List.of(targetCard));
+        }
+
+        Card currentCard = allCards.get(wantedIdx);
+
+        //이미 wantedOrder를 MyOrder로 가지는 리스트가 있다면 재귀 업데이트
+        if (currentCard.getMyOrder().equals(wantedOrder)) {
+            java.util.List<Card> nextUpdatedList = updateMyOrder(allCards,  targetList, wantedIdx + 1, currentCard, wantedOrder + 1);
+            updatedCard.addAll(nextUpdatedList);
+        }
+
+        updateCard(targetList, targetCard, wantedOrder);
+        updatedCard.add(targetCard);
+
+        return updatedCard;
+    }
+
+    private static void updateCard(List targetList, Card targetCard, Long wantedOrder) {
+        targetCard.setMyOrder(wantedOrder);
+        targetCard.updateList(targetList);
+    }
+
+    private int findIdxInAllCard(java.util.List<Card> allCards, Long targetOrder) {
+        if (allCards == null) {
+            throw new IllegalArgumentException("allLists cannot be null");
+        }
+
+        //이진탐색을 통해 원하는 인덱스를 찾아냄
+        int startIdx = 0;
+        int endIdx = allCards.size();
+
+        while (startIdx < endIdx) {
+            int midIdx = startIdx + (endIdx - startIdx) / 2;
+            Card midCard = allCards.get(midIdx);
+
+            if (midCard == null || midCard.getMyOrder() == null) {
+                throw new IllegalStateException("Invalid list or order at index: " + midIdx);
+            }
+
+            if (midCard.getMyOrder() < targetOrder) {
+                startIdx = midIdx + 1;
+            } else {
+                endIdx = midIdx;
+            }
+        }
+
+        return startIdx;
     }
 
     private long generateUniqueOrder(long baseOrder, long maxOffset) {

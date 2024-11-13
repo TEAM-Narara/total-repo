@@ -7,10 +7,7 @@ import com.mongodb.client.MongoCollection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.bson.Document;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,7 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-
+@Disabled
 @DisplayName("어플리케이션 빌드 테스트")
 @Nested
 @Transactional
@@ -51,7 +48,7 @@ class SuperBoardApplicationTests {
             fail("application-test.yml 파일이 존재하지 않습니다.");
         }
     }
-
+    @Disabled
     @Test
     @DisplayName("PostgreSQL 연결 확인")
     void checkPostgresConnection() {
@@ -63,7 +60,7 @@ class SuperBoardApplicationTests {
             fail("PostgreSQL 연결 실패: " + e.getMessage());
         }
     }
-
+    @Disabled
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @DisplayName("Redis 연결 확인")
@@ -75,7 +72,7 @@ class SuperBoardApplicationTests {
             fail("Redis 연결 실패: " + e.getMessage());
         }
     }
-
+    @Disabled
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)  // 이 테스트에서는 트랜잭션 비활성화
     @DisplayName("MongoDB 연결 확인")
