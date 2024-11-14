@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import coil3.compose.AsyncImage
@@ -63,9 +66,8 @@ private fun DrawIcon(iconType: IconType, size: Dp) {
                 model = iconType.imageUrl,
                 contentDescription = "이미지",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(size)
-                    .clip(CircleShape)
+                modifier = Modifier.size(size).clip(CircleShape),
+                error = rememberVectorPainter(image = Icons.Default.AccountCircle)
             )
         }
 

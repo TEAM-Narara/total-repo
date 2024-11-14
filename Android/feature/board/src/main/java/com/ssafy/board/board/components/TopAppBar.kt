@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.ssafy.designsystem.component.EditableText
 import com.ssafy.designsystem.component.IconButton
+import com.ssafy.designsystem.values.Black
 import com.ssafy.designsystem.values.IconMedium
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,29 +29,40 @@ fun TopAppBar(
     onFilterPressed: () -> Unit,
     onNotificationPressed: () -> Unit,
     onMorePressed: () -> Unit,
+    tint: Color = Black
 ) {
     TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         title = {
-            EditableText(text = title, onInputFinished = onBoardNameChanged)
+            EditableText(text = title, onInputFinished = onBoardNameChanged, textColor = tint)
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "",
-                    modifier = Modifier.size(IconMedium)
+                    modifier = Modifier.size(IconMedium),
+                    tint = tint
                 )
             }
         },
         actions = {
-            IconButton(imageVector = Icons.Default.FilterList, onClick = onFilterPressed)
+            IconButton(
+                imageVector = Icons.Default.FilterList,
+                onClick = onFilterPressed,
+                tint = tint
+            )
             IconButton(
                 imageVector = Icons.Default.NotificationsNone,
-                onClick = onNotificationPressed
+                onClick = onNotificationPressed,
+                tint = tint
             )
-            IconButton(imageVector = Icons.Default.MoreVert, onClick = onMorePressed)
+            IconButton(
+                imageVector = Icons.Default.MoreVert,
+                onClick = onMorePressed,
+                tint = tint
+            )
         }
     )
 }

@@ -1,5 +1,6 @@
 package com.ssafy.board.board
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -40,13 +44,14 @@ import com.ssafy.board.board.data.CardData
 import com.ssafy.board.board.data.ListData
 import com.ssafy.board.board.data.ReorderCardData
 import com.ssafy.board.board.data.toReorderCardData
+import com.ssafy.board.search.BoardSearchScreen
+import com.ssafy.designsystem.isLight
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.toColor
 import com.ssafy.model.background.Cover
 import com.ssafy.model.board.Visibility
-import com.ssafy.model.search.SearchParameters
 import com.ssafy.model.with.CoverType
 import com.ssafy.ui.uistate.ErrorScreen
 import com.ssafy.ui.uistate.LoadingScreen
@@ -57,15 +62,15 @@ import kotlinx.coroutines.launch
 fun BoardScreen(
     modifier: Modifier = Modifier,
     viewModel: BoardViewModel = hiltViewModel(),
-    searchParameters: SearchParameters,
     popBack: () -> Unit,
-    navigateToFilterScreen: (SearchParameters) -> Unit,
     navigateToNotificationScreen: () -> Unit,
     navigateToBoardMenuScreen: (boardId: Long, workspaceId: Long) -> Unit,
     navigateToCardScreen: (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val boardData by viewModel.boardData.collectAsStateWithLifecycle()
+
+    var isFilterScreenShow by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
@@ -76,7 +81,7 @@ fun BoardScreen(
                 title = boardData?.name ?: "",
                 onBackPressed = popBack,
                 onBoardNameChanged = viewModel::updateBoardName,
-                onFilterPressed = { navigateToFilterScreen(searchParameters) },
+                onFilterPressed = { isFilterScreenShow = true },
                 onNotificationPressed = navigateToNotificationScreen,
                 onMorePressed = {
                     boardData?.let { navigateToBoardMenuScreen(it.id, it.workspaceId) }
@@ -86,7 +91,7 @@ fun BoardScreen(
     ) { paddingValues ->
 
         boardData?.let {
-            Box(modifier = Modifier.padding(paddingValues)) {
+            Box {
                 when (it.cover.type) {
 
                     CoverType.IMAGE -> {
@@ -99,6 +104,14 @@ fun BoardScreen(
                     }
 
                     CoverType.COLOR -> {
+                        with(LocalContext.current as Activity) {
+                            val color = it.cover.value.toColor()
+                            WindowCompat.getInsetsController(window, window.decorView).apply {
+                                isAppearanceLightStatusBars = !color.isLight
+                                window.statusBarColor = color.toArgb()
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -110,7 +123,9 @@ fun BoardScreen(
                 }
 
                 BoardScreen(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     boardData = it,
                     onListTitleChanged = viewModel::updateListName,
                     onCardReordered = viewModel::updateCardOrder,
@@ -122,6 +137,10 @@ fun BoardScreen(
                 )
             }
         } ?: LoadingScreen()
+    }
+
+    if (isFilterScreenShow) BoardSearchScreen(viewModel.boardSearchController) {
+        isFilterScreenShow = false
     }
 
     when (uiState) {

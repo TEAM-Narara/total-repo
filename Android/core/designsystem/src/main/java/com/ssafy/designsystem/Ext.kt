@@ -13,9 +13,11 @@ import java.util.Locale
 
 val BaseDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("M월 d일 a h:mm")
 
-fun Long.millisecondsToZonedDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+fun Long.millisecondsToZonedDateTime(): LocalDateTime =
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
-fun LocalDateTime.formatDefault(formatter: DateTimeFormatter = BaseDateFormatter): String = format(formatter)
+fun LocalDateTime.formatDefault(formatter: DateTimeFormatter = BaseDateFormatter): String =
+    format(formatter)
 
 fun Long.formatTimestamp(): String = millisecondsToZonedDateTime().formatDefault()
 
@@ -28,10 +30,10 @@ fun formatRangeTimeStamp(start: Long, end: Long): String {
         Locale.getDefault()
     )
     val endFormatter = DateTimeFormatter.ofPattern(
-        (if(startDate.year != endDate.year || startDate.month != endDate.month || startDate.dayOfMonth != endDate.dayOfMonth) " ~ " else "") +
-        (if (startDate.year != endDate.year) "y년 " else "") +
-        (if (startDate.month != endDate.month) "M월 " else "") +
-        (if (startDate.dayOfMonth != endDate.dayOfMonth) "d일" else ""),
+        (if (startDate.year != endDate.year || startDate.month != endDate.month || startDate.dayOfMonth != endDate.dayOfMonth) " ~ " else "") +
+                (if (startDate.year != endDate.year) "y년 " else "") +
+                (if (startDate.month != endDate.month) "M월 " else "") +
+                (if (startDate.dayOfMonth != endDate.dayOfMonth) "d일" else ""),
         Locale.getDefault()
     )
     return "${startFormatter.format(startDate)}${endFormatter.format(endDate)}"
@@ -64,6 +66,8 @@ fun formatUnixTimeStamp(start: Long, end: Long): String {
 fun getContrastingTextColor(backgroundColor: Color): Color {
     if (backgroundColor == Transparent) return Color.Black
 
-    val brightness = backgroundColor.run { (red * 299 + green * 587 + blue * 114) }
-    return if (brightness > 384) Color.Black else Color.White
+    return if (backgroundColor.isLight) Color.Black
+    else Color.White
 }
+
+val Color.isLight get() = (red * 299 + green * 587 + blue * 114) < 384

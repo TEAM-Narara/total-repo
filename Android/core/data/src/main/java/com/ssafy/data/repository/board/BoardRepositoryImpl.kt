@@ -26,6 +26,7 @@ import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.LabelDTO
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.model.member.SimpleMemberDto
+import com.ssafy.model.user.User
 import com.ssafy.model.with.BoardInListDTO
 import com.ssafy.model.with.BoardMemberAlarmDTO
 import com.ssafy.model.with.BoardMemberDTO
@@ -508,4 +509,15 @@ class BoardRepositoryImpl @Inject constructor(
             )
         }
     ).flow.flowOn(ioDispatcher)
+
+    override suspend fun getAllBoardAndWorkspaceMember(
+        workspaceId: Long,
+        boardId: Long
+    ): Flow<List<User>> =
+        withContext(ioDispatcher) {
+            boardMemberDao.getAllBoardAndWorkspaceMember(
+                workspaceId = workspaceId,
+                boardId = boardId
+            ).map { it.map { it.toDTO() } }
+        }
 }

@@ -1,6 +1,5 @@
 package com.ssafy.data.repository.order
 
-import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.repository.order.MoveConst.DEFAULT_TOP_ORDER
 import com.ssafy.data.repository.order.MoveConst.HALF_DIVIDER
 import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
@@ -12,7 +11,7 @@ import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.ListEntity
-import kotlinx.coroutines.CoroutineDispatcher
+import java.util.concurrent.ThreadLocalRandom
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.max
@@ -23,15 +22,14 @@ import kotlin.random.Random
 @Singleton
 class CardMyOrderRepositoryImpl @Inject constructor(
     private val cardDao: CardDao,
-    private val listDao: ListDao,
+    private val listDao: ListDao
 ) : CardMyOrderRepository {
     override suspend fun moveCardToTop(
         cardId: Long,
         targetListId: Long,
-        isConnection: Boolean
     ): CardMoveResult? {
         // 이동할 카드 조회
-        var targetCard = cardDao.getCard(cardId) ?: return null
+        val targetCard = cardDao.getCard(cardId) ?: return null
 
         // targetListId가 0L이면 현재 카드의 리스트를 사용
         val targetList = if (targetListId == 0L) {
@@ -49,7 +47,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
-                        listId = targetListId,
+                        listId = targetList.id,
                         cardId = targetCard.id,
                         myOrder = DEFAULT_TOP_ORDER
                     )
@@ -94,34 +92,17 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 nextOrder = topCard.myOrder
             )
 
-            if (orderInfoList.size > 1) {
-                // 재배치 필요 - 전체 리스트 반환
-                CardMoveResult.ReorderedCardMove(orderInfoList)
-            } else {
-                // 단일 카드 이동
-                val newOrder = orderInfoList.first().myOrder
-
-                CardMoveResult.ReorderedCardMove(
-                    listOf(
-                        CardMoveResponseDto(
-                            listId = targetListId,
-                            cardId = targetCard.id,
-                            myOrder = newOrder
-                        )
-                    )
-                )
-            }
+            CardMoveResult.ReorderedCardMove(orderInfoList)
         }
     }
 
     override suspend fun moveCardToBottom(
         cardId: Long,
-        targetListId: Long,
-        isConnection: Boolean
+        targetListId: Long
     ): CardMoveResult? {
 
         // 이동할 카드 조회
-        var targetCard = cardDao.getCard(cardId) ?: return null
+        val targetCard = cardDao.getCard(cardId) ?: return null
 
         // targetListId가 0L이면 현재 카드의 리스트를 사용
         val targetList = if (targetListId == 0L) {
@@ -139,7 +120,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             CardMoveResult.ReorderedCardMove(
                 listOf(
                     CardMoveResponseDto(
-                        listId = targetListId,
+                        listId = targetList.id,
                         cardId = targetCard.id,
                         myOrder = DEFAULT_TOP_ORDER
                     )
@@ -184,33 +165,17 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 nextOrder = null
             )
 
-            if (orderInfoList.size > 1) {
-                CardMoveResult.ReorderedCardMove(orderInfoList)
-            } else {
-                // 단일 카드 이동
-                val newOrder = orderInfoList.first().myOrder
-
-                CardMoveResult.ReorderedCardMove(
-                    listOf(
-                        CardMoveResponseDto(
-                            listId = targetListId,
-                            cardId = targetCard.id,
-                            myOrder = newOrder
-                        )
-                    )
-                )
-            }
+            CardMoveResult.ReorderedCardMove(orderInfoList)
         }
     }
 
     override suspend fun moveCardBetween(
         cardId: Long,
         previousCardId: Long,
-        nextCardId: Long,
-        isConnection: Boolean
+        nextCardId: Long
     ): CardMoveResult? {
 
-        var targetCard = cardDao.getCard(cardId) ?: return null
+        val targetCard = cardDao.getCard(cardId) ?: return null
 
         // 동일한 ID가 있는지 확인하여, 동일한 경우 현재 카드의 순서 값으로 반환
         if (cardId == previousCardId || cardId == nextCardId || previousCardId == nextCardId) {
@@ -275,35 +240,19 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             )
         }
 
-        val targetList = listDao.getList(previousCard.listId) ?: return null
+        val previousList = listDao.getList(previousCard.listId) ?: return null
 
         // 고유한 순서값 생성 후 재배치 필요 여부 체크
         val orderInfoList = generateUniqueOrderWithRetry(
             targetCard = targetCard,
             targetIndex = targetIndex,
-            targetList = targetList,
+            targetList = previousList,
             baseOrder = baseOrder,
             prevOrder = prevOrder,
             nextOrder = nextOrder
         )
 
-        return if (orderInfoList.size > 1) {
-            // 재배치 필요 - 전체 리스트 반환
-            CardMoveResult.ReorderedCardMove(orderInfoList)
-        } else {
-            // 단일 카드 이동
-            val newOrder = orderInfoList.first().myOrder
-
-            CardMoveResult.ReorderedCardMove(
-                listOf(
-                    CardMoveResponseDto(
-                        listId = previousCard.listId,
-                        cardId = targetCard.id,
-                        myOrder = newOrder
-                    )
-                )
-            )
-        }
+        return CardMoveResult.ReorderedCardMove(orderInfoList)
     }
 
     /**
@@ -314,7 +263,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
      * @return 고유 순서 값
      */
     private fun generateUniqueOrder(baseOrder: Long, maxOffset: Long): Long {
-        val offset = Random.nextLong(0, maxOffset)
+        val offset = ThreadLocalRandom.current().nextLong(0, maxOffset)
         return baseOrder + offset
     }
 
@@ -329,7 +278,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
      * @param nextOrder 다음 카드의 순서 값 (없을 경우 null)
      * @return 고유 순서 값을 포함하는 CardMoveResponseDto 리스트
      */
-    private suspend fun generateUniqueOrderWithRetry(
+    private fun generateUniqueOrderWithRetry(
         targetCard: CardEntity,
         targetIndex: Int,
         targetList: ListEntity,
@@ -347,7 +296,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         }
         // 두 리스트 사이에 배치할 경우: offset이 두 리스트의 중간값을 넘지 않도록 제한
         else if (prevOrder != null && nextOrder != null) {
-            maxOffset = min(maxOffset, (nextOrder - prevOrder) / 2)
+            maxOffset = min(maxOffset, (nextOrder - prevOrder + 1) / 2)
         }
         if (maxOffset < 1) {
             maxOffset = 1
@@ -374,8 +323,8 @@ class CardMyOrderRepositoryImpl @Inject constructor(
                 )
             } else {
                 // 충돌 발생 - 새로운 순서 값 생성 시도
-                val randomOffset = Random.nextLong(50, 150)
-                newOrder = baseOrder + (attempt + 1) * 100L + randomOffset
+                val randomOffset = ThreadLocalRandom.current().nextLong(0, maxOffset)
+                newOrder = baseOrder + randomOffset
                 attempt++
             }
         }
@@ -408,7 +357,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun reorderAllCardOrders(
+    private fun reorderAllCardOrders(
         list: ListEntity,
         prevCard: CardEntity,
         targetIndex: Int
@@ -425,11 +374,7 @@ class CardMyOrderRepositoryImpl @Inject constructor(
             cards.add(targetCard) // 가장 마지막에 삽입
         } else {
             cards.remove(targetCard)
-            if (targetIndex in 0..cards.size) {
-                cards.add(targetIndex, targetCard) // 특정 위치에 삽입
-            } else {
-                throw IndexOutOfBoundsException("targetIndex ${targetIndex}가 리스트 ${list.id}의 범위를 벗어났습니다.")
-            }
+            cards.add(targetIndex, targetCard) // 특정 위치에 삽입
         }
 
         // 초기 값 설정 및 결과 리스트 생성

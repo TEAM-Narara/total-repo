@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.BoardMemberAlarmEntity
 import com.ssafy.database.dto.BoardMemberEntity
+import com.ssafy.database.dto.MemberEntity
 import com.ssafy.database.dto.with.BoardMemberWithMemberInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -44,6 +45,20 @@ interface BoardMemberDao {
         WHERE board_member.boardId = :boardId AND board_member.isStatus != 'DELETE'
     """)
     fun getBoardMembers(boardId: Long): Flow<List<BoardMemberWithMemberInfo>>
+
+    // 리스트들 내에 카드들 조회
+    @Query("""
+        SELECT DISTINCT
+            m.*
+        FROM member m
+        INNER JOIN board_member bm ON m.id = bm.memberId
+        INNER JOIN workspace_member wm ON m.id = wm.memberId
+        WHERE bm.boardId = :boardId AND wm.workspaceId = :workspaceId
+    """)
+    fun getAllBoardAndWorkspaceMember(
+        workspaceId: Long,
+        boardId: Long
+    ): Flow<List<MemberEntity>>
 
     // 서버에 연산할 보드 멤버 조회
     @Query("""

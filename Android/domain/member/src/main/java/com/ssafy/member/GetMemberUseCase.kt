@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class GetMemberUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
 ) {
 
     suspend operator fun invoke(): Flow<User?> {

@@ -1,13 +1,17 @@
 package com.ssafy.board.board
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.ssafy.board.GetBoardAndWorkspaceMemberUseCase
 import com.ssafy.board.GetBoardUseCase
+import com.ssafy.board.GetLabelUseCase
 import com.ssafy.board.UpdateBoardUseCase
 import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.BoardDataMapper
+import com.ssafy.board.search.BoardSearchController
 import com.ssafy.card.CreateCardUseCase
 import com.ssafy.list.CreateListUseCase
-import com.ssafy.list.GetListsInCardsUseCase
+import com.ssafy.list.GetLocalScreenListsInCardsFilterUseCase
 import com.ssafy.list.SetListArchiveUseCase
 import com.ssafy.list.UpdateListUseCase
 import com.ssafy.model.board.BoardDTO
@@ -35,19 +39,49 @@ import javax.inject.Inject
 class BoardViewModel @Inject constructor(
     private val getBoardUseCase: GetBoardUseCase,
     private val updateBoardUseCase: UpdateBoardUseCase,
-    private val getListsUseCase: GetListsInCardsUseCase,
+    private val getLocalScreenListsInCardsFilterUseCase: GetLocalScreenListsInCardsFilterUseCase,
     private val createListUseCase: CreateListUseCase,
     private val updatedListUseCase: UpdateListUseCase,
     private val setListArchiveUseCase: SetListArchiveUseCase,
-    private val createCardUseCase: CreateCardUseCase
+    private val createCardUseCase: CreateCardUseCase,
+    getLabelUseCase: GetLabelUseCase,
+    getBoardAndWorkspaceMemberUseCase: GetBoardAndWorkspaceMemberUseCase,
 ) : BaseViewModel() {
-    private var _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    private val _workspaceId: MutableStateFlow<Long?> = MutableStateFlow(null)
+    fun setWorkspaceId(workspaceId: Long) = _workspaceId.update { workspaceId }
+    private val _boardId: MutableStateFlow<Long?> = MutableStateFlow(null)
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
 
-    val boardData: StateFlow<BoardData?> = _boardId.filterNotNull().flatMapLatest { boardId ->
+    init {
+        viewModelScope.launch {
+            combine(_workspaceId, _boardId) { workspaceId, boardId ->
+                if (workspaceId == null || boardId == null) null
+                else Pair(workspaceId, boardId)
+            }.filterNotNull().collect {
+                val (workspaceId, boardId) = it
+                boardSearchController.setSearchParams(workspaceId, boardId)
+            }
+        }
+    }
+
+    val boardSearchController = BoardSearchController(
+        viewModelScope,
+        getLabelUseCase,
+        getBoardAndWorkspaceMemberUseCase
+    )
+
+    val boardData: StateFlow<BoardData?> = combine(
+        _boardId,
+        boardSearchController.searchParameters
+    ) { boardId, searchParameters ->
+        if (boardId == null) null
+        else Pair(boardId, searchParameters)
+    }.filterNotNull().flatMapLatest {
+        val (boardId, searchParameters) = it
+        Log.d("TAG", "searchParameters: ${searchParameters.searchText}")
         combine(
             getBoardUseCase(boardId),
-            getListsUseCase(boardId)
+            getLocalScreenListsInCardsFilterUseCase(boardId, searchParameters)
         ) { board: BoardDTO?, lists: List<ListInCard> ->
             val filteredList = lists.filter { !it.isArchived }
             board?.let { BoardDataMapper.fromDto(board, filteredList) }
