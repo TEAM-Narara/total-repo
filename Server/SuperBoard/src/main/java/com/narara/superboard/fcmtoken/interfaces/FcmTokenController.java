@@ -1,5 +1,9 @@
 package com.narara.superboard.fcmtoken.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
@@ -12,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "h. FCM 토큰")
@@ -33,6 +36,19 @@ public class FcmTokenController implements FcmTokenAPI {
                         FcmTokenResponseDto.of(fcmToken)))
                 , HttpStatus.CREATED
         );
+    }
+
+    @PostMapping("test")
+    public ResponseEntity<Void> testAlarm(@RequestParam String token) throws FirebaseMessagingException {
+        String message = FirebaseMessaging.getInstance().send(Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle("asdf")
+                        .setBody("asdf")
+                        .build())
+                .setToken(token)  // 대상 디바이스의 등록 토큰
+                .build());
+
+        return ResponseEntity.ok().build();
     }
 
     @Override

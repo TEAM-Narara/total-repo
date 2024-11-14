@@ -45,6 +45,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    implementation 'com.google.firebase:firebase-admin:9.2.0'           // Google Firebase Admin
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'     // Jackson Data Bind
+
     // junit
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -125,6 +128,14 @@ tasks.register('copyTestYML', Copy) {
     include "application-test.yml"  // 복사할 파일 지정
     into 'src/test/resources'       // 테스트 리소스 위치로 복사
 }
+
+//firebase token gradle 추가
+tasks.register('copyFirebaseToken', Copy) {
+    from 's107-secret-value/secretFirebaseKey.json'
+    into "src/main/resources"
+}
+
+processResources.dependsOn copyFirebaseToken
 
 tasks.named('build') {
     dependsOn('copyYML')
