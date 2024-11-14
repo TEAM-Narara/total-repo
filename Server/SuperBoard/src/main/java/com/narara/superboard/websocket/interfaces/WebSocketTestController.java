@@ -39,14 +39,10 @@ public class WebSocketTestController {
     @SendTo("/topic/test/{boardId}")
     public WebSocketTestDto testWebsocket(@DestinationVariable Long boardId, WebSocketBodyDto request,
                                           SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-        log.info("boardId: " + boardId);
         Long a = 123L;
 
         // 헤더에서 Authorization 토큰 가져오기 @TODO 로그인 연결 시 삭제
         String authorization = headerAccessor.getFirstNativeHeader("Authorization");
-        log.info("Authorization Token: {}", authorization);
-
-        log.info("/topic/test 입장, 비즈니스 로직 수행");
         Thread.sleep(1000);
 
 //        throw new RuntimeException("asdf");

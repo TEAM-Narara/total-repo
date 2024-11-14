@@ -271,7 +271,7 @@ public class CardServiceImpl implements CardService {
                     cardReply.getMember(), cardReply.getUpdatedAt(),
                     card.getList().getBoard(), card,
                     EventType.CREATE , EventData.COMMENT, replyInfo);
-            System.out.println(cardHistory);
+
             replyList.add(cardHistory);
         }
 

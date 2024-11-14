@@ -109,8 +109,6 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     }
 
     private WorkSpaceMember getWorkSpaceMember(Long workspaceId, Long memberId) {
-        log.info("@@@: " + workspaceId);
-        log.info("@@@: " + memberId);
         return workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스에서 멤버를 찾을 수 없습니다"));
     }

@@ -41,18 +41,14 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
-        log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
 
         listService.checkBoardMember(targetList, member, MOVE_LIST);
-        log.info("보드 접근 권한 확인 완료 - memberId: {}, boardId: {}", member.getId(), targetList.getBoard().getId());
 
         Board board = targetList.getBoard();
         Optional<List> topList = listRepository.findFirstByBoardOrderByMyOrderAsc(board);
 
-        log.info("탑 리스트 조회 완료 - targetListId: {}, currentOrder: {}", topList.get().getId(), topList.get().getMyOrder());
 
         if (targetList.getMyOrder().equals(topList.get().getMyOrder())) {
-            log.info("이미 리스트가 최상위에 위치 - listId: {}", targetList.getId());
             return new ListMoveResult.SingleListMove(
                     new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
         }
@@ -64,21 +60,16 @@ public class ListMoveServiceImpl implements ListMoveService {
             log.info("기준 순서 값 계산 - topListOrder: {}, calculatedOrder: {}", list.getMyOrder(), calculatedOrder);
             return calculatedOrder;
         }).orElse(DEFAULT_TOP_ORDER);
-        log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
         java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetList, 0, board,
                 baseOrder, null, topList.get().getMyOrder());
-        log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         if (orderInfoList.size() > 1) {
-            log.info("재배치 필요 - 전체 리스트 반환");
             return new ListMoveResult.ReorderedListMove(orderInfoList);
         }
 
         targetList.setMyOrder(orderInfoList.getFirst().myOrder());
-
-        log.info("리스트 최상위로 이동 완료 - newOrder: {}", orderInfoList.getFirst().myOrder());
 
         return new ListMoveResult.SingleListMove(orderInfoList.getFirst());
     }
@@ -89,17 +80,14 @@ public class ListMoveServiceImpl implements ListMoveService {
     public ListMoveResult moveListToBottom(Member member, Long listId) {
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
-        log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
 
         listService.checkBoardMember(targetList, member, MOVE_LIST);
-        log.info("보드 접근 권한 확인 완료 - memberId: {}, boardId: {}", member.getId(), targetList.getBoard().getId());
 
         Board board = targetList.getBoard();
         Optional<List> bottomList = listRepository.findFirstByBoardOrderByMyOrderDesc(board);
 
         // 대상 리스트가 이미 최하위에 위치한 경우
         if (bottomList.isPresent() && targetList.getMyOrder().equals(bottomList.get().getMyOrder())) {
-            log.info("이미 리스트가 최하위에 위치 - listId: {}", targetList.getId());
             return new ListMoveResult.SingleListMove(
                     new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
         }
@@ -113,24 +101,20 @@ public class ListMoveServiceImpl implements ListMoveService {
             return calculatedOrder;
         }).orElse(DEFAULT_TOP_ORDER);
 
-        log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
         // 고유한 newOrder 값을 재시도로 생성 및 재배치 체크
         java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetList, -1, board,
                 baseOrder, bottomList.get().getMyOrder(), null);
-        log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         // 재배치가 필요한 경우 전체 리스트 반환
         if (orderInfoList.size() > 1) {
-            log.info("재배치 필요 - 전체 리스트 반환");
             return new ListMoveResult.ReorderedListMove(orderInfoList);
         }
 
         // 단일 리스트 정보 설정 및 반환
         targetList.setMyOrder(orderInfoList.getFirst().myOrder());
         board.setLastListOrder(orderInfoList.getFirst().myOrder());
-        log.info("리스트 최하위로 이동 완료 - newOrder: {}", orderInfoList.getFirst().myOrder());
 
         return new ListMoveResult.SingleListMove(orderInfoList.getFirst());
     }
@@ -153,10 +137,8 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         List targetList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
-        log.info("타겟 리스트 조회 완료 - targetListId: {}, currentOrder: {}", targetList.getId(), targetList.getMyOrder());
 
         listService.checkBoardMember(targetList, member, MOVE_LIST);
-        log.info("보드 접근 권한 확인 완료 - memberId: {}, boardId: {}", member.getId(), targetList.getBoard().getId());
 
         List previousList = listRepository.findById(previousListId)
                 .orElseThrow(() -> new NotFoundEntityException(previousListId, "이전 리스트"));
@@ -165,7 +147,6 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         // 이전 이후의 리스트가 같은 보드에 있는가?
         if (!previousList.getBoard().getId().equals(nextList.getBoard().getId())) {
-            log.info("이전 List와 이후 List가 다른 Board에 있습니다.");
             return new ListMoveResult.SingleListMove(
                     new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
         }
@@ -178,7 +159,6 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         // 전체 순서에서 이전 리스트와 다음 리스트가 인접해 있는지 확인
         if (previousIndex != -1 && nextIndex != -1 && !(nextIndex == previousIndex + 1)) {
-            log.info("이전 리스트와 다음 리스트가 전체 순서에서 바로 인접해 있지 않음. - previousListId: {}, nextListId: {}", previousListId, nextListId);
             return new ListMoveResult.SingleListMove(
                     new ListMoveResponseDto(targetList.getId(), targetList.getMyOrder()));
         }
@@ -187,27 +167,22 @@ public class ListMoveServiceImpl implements ListMoveService {
         long nextOrder = nextList.getMyOrder();
         long gap = nextOrder - prevOrder;
 
-        log.info("중간 위치 계산 - prevOrder: {}, nextOrder: {}, gap: {}", prevOrder, nextOrder, gap);
 
         long baseOrder = (gap > MAX_INSERTION_DISTANCE_FOR_FIXED_GAP)
                 ? prevOrder + MAX_INSERTION_DISTANCE_FOR_FIXED_GAP
                 : (prevOrder + nextOrder) / HALF_DIVIDER;
-        log.info("기준 순서 값 설정 - baseOrder: {}", baseOrder);
 
 
         java.util.List<ListMoveResponseDto> orderInfoList = generateUniqueOrderWithRetry(
                 targetList, targetIndex, previousList.getBoard(),
                 baseOrder, prevOrder, nextOrder);
-        log.info("고유 순서 값 생성 및 재배치 체크 완료 - orderInfoList size: {}", orderInfoList.size());
 
         if (orderInfoList.size() > 1) {
-            log.info("재배치 필요 - 전체 리스트 반환");
             return new ListMoveResult.ReorderedListMove(orderInfoList);
         }
 
         targetList.setMyOrder(orderInfoList.getFirst().myOrder());
         listRepository.save(targetList);
-        log.info("리스트 중간에 성공적으로 배치 - newOrder: {}", orderInfoList.getFirst().myOrder());
 
         return new ListMoveResult.SingleListMove(orderInfoList.getFirst());
     }
