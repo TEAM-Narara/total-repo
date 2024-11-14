@@ -22,7 +22,6 @@ public class KafkaConsumerController {
     @MessageMapping("/ack")
     public void receiveAck(@Payload AckMessage ackMessage) {
 
-        System.out.println("ack 받았다!!!!!!");
         OffsetKey offsetKey = new OffsetKey(
                 ackMessage.topic(),
                 ackMessage.partition(),
@@ -35,5 +34,21 @@ public class KafkaConsumerController {
                 ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
 
         kafkaEventListenerService.processAcknowledgment(offsetKey);
+    }
+
+    @MessageMapping("/ack/all")
+    public void receiveAllAck(@Payload AckMessage ackMessage) {
+
+        OffsetKey offsetKey = new OffsetKey(
+                ackMessage.topic(),
+                ackMessage.partition(),
+                Long.parseLong(ackMessage.offset()),
+                ackMessage.groupId()
+        );
+
+        log.info("AllAck 받음: {}, partition: {}, offset: {}, groupId: {}",
+                ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
+
+        // kafkaEventListenerService.processAcknowledgment(offsetKey);
     }
 }
