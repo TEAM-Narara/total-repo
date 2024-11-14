@@ -173,7 +173,7 @@ public class KafkaEventListenerService {
                     log.warn("pendingAcks에 해당 오프셋에 대한 acknowledgment가 없습니다 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
                 }
             } else {
-                log.info("더 이상 대기 중인 ACK가 없습니다 - 토픽: {}, 그룹 ID: {}, 마지막 처리 오프셋: {}", topic, groupId, nextOffset);
+                log.info("더 이상 대기 중인 ACK가 없습니다 - 토픽: {}, 그룹 ID: {}, 앞으로 처리 할 오프셋: {}", topic, groupId, nextOffset);
                 break;
             }
         }
