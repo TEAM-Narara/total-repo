@@ -1,6 +1,9 @@
 package com.narara.superboard.common.config.kafka;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +29,12 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+
+        // Kafka 내부 로그 레벨을 강제로 ERROR로 설정
+        ((Logger) LoggerFactory.getLogger("org.apache.kafka")).setLevel(Level.ERROR);
+        ((Logger) LoggerFactory.getLogger("org.springframework.kafka")).setLevel(Level.ERROR);
+
+
         return  props;
     }
 
