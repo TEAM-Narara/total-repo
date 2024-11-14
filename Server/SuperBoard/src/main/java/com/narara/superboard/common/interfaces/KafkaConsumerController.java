@@ -29,9 +29,8 @@ public class KafkaConsumerController {
                 ackMessage.groupId()
         );
 
-        // Log the details of the ack received
-//        log.info("Received ack for topic: {}, partition: {}, offset: {}, groupId: {}",
-//                ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
+        log.info("ACK 받음: {}, partition: {}, offset: {}, groupId: {}",
+                ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
 
         kafkaEventListenerService.processAcknowledgment(offsetKey);
     }

@@ -77,7 +77,6 @@ public class EmailServiceImpl implements EmailService {
 
     private void manageRedisData(String email) {
         if (redisService.existData(email)) {
-            log.info("redis 데이터 있는 경우 삭제 :{}" ,email);
             redisService.deleteData(email); // 기존 인증 코드 삭제
         }
     }

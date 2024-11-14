@@ -51,18 +51,14 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean existData(String key) {
-        log.info("existData 메서드 시작 - 조회할 키: {}", key);
 
         if (key == null || key.isEmpty()) {
-            log.error("키가 null이거나 비어 있습니다. RedisKeyNotFoundException 예외 발생");
             throw new RedisKeyNotFoundException();
         }
 
         try {
-            log.info("Redis에서 키 존재 여부 확인 중...");
             return Boolean.TRUE.equals(redisTemplate.hasKey(key));
         } catch (Exception e) {
-            log.error("Redis에서 키 조회 중 예외 발생 - 키: {}", key, e);
             throw new RedisDataNotFoundException(key);
         }
     }
