@@ -68,8 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundEntityException(userId, "멤버"));
         CustomUserDetails customUserDetails = new CustomUserDetails(member, userId, authentication.getAuthorities());
-        System.out.println("member Email: " + member.getEmail());
-        System.out.println("member nickname: " + member.getNickname());
+//        System.out.println("Request member nickname: " + member.getNickname());
 
         // CustomUserDetails를 이용해 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
