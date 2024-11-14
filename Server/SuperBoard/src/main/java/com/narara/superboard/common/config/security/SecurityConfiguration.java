@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Spring Security 설정
  */
 
-@EnableWebSecurity(debug = true) // Spring Security사용해 웹 보안 구성시 사용
+@EnableWebSecurity // Spring Security사용해 웹 보안 구성시 사용
 @Configuration
 /**
  * @EnableMethodSecurity
