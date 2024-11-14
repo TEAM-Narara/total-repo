@@ -205,7 +205,7 @@ public class BoardOffsetService {
         }
 
         data.put(BOARD_ID_COLUMN, boardId);
-        data.put("listId", boardId);
+        data.put("listId", updatedCardCollection.get(0).getList().getId());
         data.put("updatedCard", updatedCollection);
 
         DiffInfo diffInfo = new DiffInfo(
