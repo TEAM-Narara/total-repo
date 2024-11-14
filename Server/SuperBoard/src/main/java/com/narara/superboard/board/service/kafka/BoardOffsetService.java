@@ -13,6 +13,8 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.websocket.enums.BoardAction;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class BoardOffsetService {
     public static final String BOARD = "BOARD";
     public static final String BOARD_ID_COLUMN = "boardId";
+    public static final String LIST_ID_COLUMN = "listId";
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
@@ -101,7 +104,7 @@ public class BoardOffsetService {
     public void saveAddListDiff(List list) {
         Map<String, Object> data = new HashMap<>();
 
-        data.put("listId", list.getId());
+        data.put(LIST_ID_COLUMN, list.getId());
         data.put(BOARD_ID_COLUMN, list.getBoard().getId());
         data.put("name", list.getName());
         data.put("myOrder", list.getMyOrder());
@@ -122,7 +125,7 @@ public class BoardOffsetService {
     public void saveEditListArchiveDiff(List list) {
         Map<String, Object> data = new HashMap<>();
 
-        data.put("listId", list.getId());
+        data.put(LIST_ID_COLUMN, list.getId());
         data.put(BOARD_ID_COLUMN, list.getBoard().getId());
         data.put("name", list.getName());
         data.put("myOrder", list.getMyOrder());
@@ -143,7 +146,7 @@ public class BoardOffsetService {
     public void saveEditListDiff(List list) {
         Map<String, Object> data = new HashMap<>();
 
-        data.put("listId", list.getId());
+        data.put(LIST_ID_COLUMN, list.getId());
         data.put(BOARD_ID_COLUMN, list.getBoard().getId());
         data.put("name", list.getName());
         data.put("myOrder", list.getMyOrder());
@@ -161,12 +164,67 @@ public class BoardOffsetService {
         sendMessageToKafka(list.getBoard().getId(), diffInfo);
     }
 
+    //updatedListCollection은 무조건 size가 1 이상이어야함
+    public void saveMoveListDiff(java.util.List<List> updatedListCollection, Long boardId) {
+        Map<String, Object> data = new HashMap<>();
+        java.util.List<Map<String, Object>> updatedCollection = new ArrayList<>();
+
+        // updatedListCollection의 각 List 객체에서 필요한 정보를 추출하여 list에 추가
+        for (List listObj : updatedListCollection) {
+            Map<String, Object> listMap = new HashMap<>();
+            listMap.put(LIST_ID_COLUMN, listObj.getId());
+            listMap.put("myOrder", listObj.getMyOrder());
+            updatedCollection.add(listMap);
+        }
+
+        data.put(BOARD_ID_COLUMN, boardId);
+        data.put("updatedList", updatedCollection);
+
+        DiffInfo diffInfo = new DiffInfo(
+                updatedListCollection.get(0).getUpdatedAt(),
+                BOARD,
+                BoardAction.MOVE_LIST.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(boardId, diffInfo);
+    }
+
+    public void saveMoveCardDiff(java.util.List<Card> updatedCardCollection, Long boardId) {
+        Map<String, Object> data = new HashMap<>();
+        java.util.List<Map<String, Object>> updatedCollection = new ArrayList<>();
+
+        // updatedListCollection의 각 List 객체에서 필요한 정보를 추출하여 list에 추가
+        for (Card cardObj : updatedCardCollection) {
+            Map<String, Object> cardMap = new HashMap<>();
+            cardMap.put("cardId", cardObj.getId());
+            cardMap.put("movedListId", cardObj.getList().getId());
+            cardMap.put("myOrder", cardObj.getMyOrder());
+            updatedCollection.add(cardMap);
+        }
+
+        data.put(BOARD_ID_COLUMN, boardId);
+        data.put("listId", updatedCardCollection.get(0).getList().getId());
+        data.put("updatedCard", updatedCollection);
+
+        DiffInfo diffInfo = new DiffInfo(
+                updatedCardCollection.get(0).getUpdatedAt(),
+                BOARD,
+                BoardAction.MOVE_CARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(boardId, diffInfo);
+    }
+
     public void saveAddCard(Card card) {
         Map<String, Object> data = new HashMap<>();
         Board board = card.getList().getBoard();
 
         data.put("cardId", card.getId());
-        data.put("listId", card.getList().getId());
+        data.put(LIST_ID_COLUMN, card.getList().getId());
         data.put("name", card.getName());
         data.put("description", card.getDescription());
         data.put("startAt", card.getStartAt());
@@ -192,7 +250,7 @@ public class BoardOffsetService {
         Board board = card.getList().getBoard();
 
         data.put("cardId", card.getId());
-        data.put("listId", card.getList().getId());
+        data.put(LIST_ID_COLUMN, card.getList().getId());
         data.put("name", card.getName());
         data.put("description", card.getDescription());
         data.put("startAt", card.getStartAt());
@@ -218,7 +276,7 @@ public class BoardOffsetService {
         Board board = card.getList().getBoard();
 
         data.put("cardId", card.getId());
-        data.put("listId", card.getList().getId());
+        data.put(LIST_ID_COLUMN, card.getList().getId());
         data.put("name", card.getName());
         data.put("description", card.getDescription());
         data.put("startAt", card.getStartAt());
@@ -244,7 +302,7 @@ public class BoardOffsetService {
         Board board = card.getList().getBoard();
 
         data.put("cardId", card.getId());
-        data.put("listId", card.getList().getId());
+        data.put(LIST_ID_COLUMN, card.getList().getId());
         data.put("isDeleted", card.getIsDeleted());
         data.put("isArchived", card.getIsArchived());
 
@@ -395,7 +453,7 @@ public class BoardOffsetService {
         Board board = card.getList().getBoard();
 
         data.put("cardId", card.getId());
-        data.put("listId", card.getList().getId());
+        data.put(LIST_ID_COLUMN, card.getList().getId());
         data.put("isArchived", card.getIsArchived());
 
         DiffInfo diffInfo = new DiffInfo(

@@ -1,6 +1,7 @@
 package com.narara.superboard.list.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
@@ -33,6 +34,7 @@ public class ListMoveServiceImpl implements ListMoveService {
     private final ListRepository listRepository;
     private final ListReorderService listReorderService; // ListReorderService 주입
     private final ListService listService; // ListReorderService 주입
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     @Transactional
@@ -238,6 +240,11 @@ public class ListMoveServiceImpl implements ListMoveService {
 
         //리스트 myOrder 배정 및 재배치
         java.util.List<List> updatedListCollection = insertAndRelocateList(allLists, listMoveRequests);
+
+        if (!updatedListCollection.isEmpty()) {
+            //Websocket 리스트 이동 response 보내기
+            boardOffsetService.saveMoveListDiff(updatedListCollection, testList.getBoard().getId());
+        }
 
         return new ReorderedListMove(ListMoveResponseDto.of(updatedListCollection));
     }
