@@ -1,5 +1,6 @@
 package com.narara.superboard.cardmember.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -10,12 +11,14 @@ import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDt
 import com.narara.superboard.cardmember.interfaces.dto.log.RepresentativeStatusChangeInfo;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -24,54 +27,67 @@ public class CardMemberServiceImpl implements CardMemberService {
     private final MemberRepository memberRepository;
     private final CardRepository cardRepository;
     private final CardHistoryRepository cardHistoryRepository;
+    private final BoardOffsetService boardOffsetService;
 
     @Override
-    public boolean getCardMemberIsAlert(Long memberId, Long cardId) {
+    public boolean getCardMemberIsAlert(Member member, Long cardId) {
         validateCardExists(cardId);
-        validateMemberExists(memberId);
 
-        return cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
+        return cardMemberRepository.findByCardIdAndMember(cardId, member)
                 .map(CardMember::isAlert)
                 .orElse(false);
     }
 
     @Override
-    public void setCardMemberIsAlert(Long memberId, Long cardId) {
+    public Boolean setCardMemberIsAlert(Member member, Long cardId) {
         Card card = validateCardExists(cardId);
-        Member member = validateMemberExists(memberId);
 
-        cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)
-                .ifPresentOrElse(
-                        this::toggleAlertAndSave,
-                        () -> addNewCardMember(member, card)
-                );
+        return cardMemberRepository.findByCardIdAndMember(cardId, member)
+                .map(cardMember -> {
+                    toggleAlertAndSave(cardMember);
+                    return cardMember.isAlert(); // 현재 알림 여부 반환
+                })
+                .orElseGet(() -> {
+                    addNewCardMember(member, card);
+                    return true; // 새로운 CardMember 추가 시 알림이 활성화됨
+                });
     }
 
+
     @Override
-    public void setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
+    public Boolean setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto) {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
         Member member = validateMemberExists(updateCardMemberRequestDto.memberId());
 
-        cardMemberRepository.findByCardIdAndMemberId(
+        return cardMemberRepository.findByCardIdAndMemberId(
                         updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
-                .ifPresentOrElse(
-                        cardMember -> {
-                            toggleRepresentativeAndSave(cardMember);
+                .map(cardMember -> {
+                    toggleRepresentativeAndSave(cardMember);
 
-                            // 로그 기록 추가
-                            RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
-                                    member.getId(), card.getId(), cardMember.isRepresentative());
-                            Target target = Target.of(card, repStatusChangeInfo);
+                    if (cardMember.isRepresentative()) { // Websocket 카드멤버 추가
+                        boardOffsetService.saveAddCardMember(cardMember);
+                    } else {
+                        boardOffsetService.saveDeleteCardMember(cardMember);
+                    }
 
-                            CardHistory cardHistory = CardHistory.careateCardHistory(
-                                    member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                                    EventType.UPDATE, EventData.CARD_MANAGER, target);
+                    // 로그 기록 추가
+                    RepresentativeStatusChangeInfo repStatusChangeInfo = new RepresentativeStatusChangeInfo(
+                            member.getId(), member.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
-                            cardHistoryRepository.save(cardHistory);
-                        },
-                        () -> addNewRepresentativeCardMemberWithLog(member, card)
-                );
+                    CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
+                            member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                            EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
+
+                    cardHistoryRepository.save(cardHistory);
+
+                    return cardMember.isRepresentative(); // 현재 대표자 여부 반환
+                })
+                .orElseGet(() -> {
+                    addNewRepresentativeCardMemberWithLog(member, card);
+                    return true; // 새로운 대표자 추가 시 대표자로 설정됨
+                });
     }
+
 
     // CardMember 대표 멤버 추가와 로그 저장을 함께 수행
     private void addNewRepresentativeCardMemberWithLog(Member member, Card card) {
@@ -79,25 +95,24 @@ public class CardMemberServiceImpl implements CardMemberService {
 
         // 로그 기록 추가
         RepresentativeStatusChangeInfo newRepCardMemberInfo = new RepresentativeStatusChangeInfo(
-                member.getId(), card.getId(), newCardMember.isRepresentative());
-        Target target = Target.of(card, newRepCardMemberInfo);
+                member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), card.getList().getBoard(), card,
-                EventType.ADD, EventData.CARD_MANAGER, target);
+        CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
         cardHistoryRepository.save(cardHistory);
     }
 
     // 카드 존재 확인 및 조회
     private Card validateCardExists(Long cardId) {
-        return cardRepository.findById(cardId)
+        return cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
     }
 
     // 멤버 존재 확인 및 조회
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 
@@ -107,7 +122,7 @@ public class CardMemberServiceImpl implements CardMemberService {
         cardMemberRepository.save(cardMember);
     }
 
-    // CardMember 객체의 isRepresentative 상태를 반대로 변경하고, isAlert도 동일한 값으로 설정 후 저장
+    // CardMember 객체의 isRepresentative 상태를 반대로 변경하고, isAlert 도 동일한 값으로 설정 후 저장
     private void toggleRepresentativeAndSave(CardMember cardMember) {
         cardMember.changeIsRepresentative();
         cardMember.setAlert(cardMember.isRepresentative());

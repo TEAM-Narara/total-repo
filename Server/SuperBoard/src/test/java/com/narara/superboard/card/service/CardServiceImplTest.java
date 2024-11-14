@@ -2,6 +2,7 @@ package com.narara.superboard.card.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -66,6 +67,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @InjectMocks
     private CardServiceImpl cardService; // 실제 인스턴스 생성 후 Mock 주입
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @Test
     @DisplayName("카드 생성 성공 테스트")
@@ -147,7 +151,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     void testGetCardFailure() {
         // given
         Long cardId = 999L; // 존재하지 않는 카드 ID 설정
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> {
@@ -155,7 +159,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         });
 
         assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
 
@@ -170,7 +174,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: 카드가 존재하는 경우
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
 
         // when
         Card result = cardService.getCard(cardId);
@@ -179,7 +183,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertNotNull(result);
         assertEquals(cardId, result.getId());
         assertEquals("Test Card", result.getName());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
     @ParameterizedTest
@@ -232,7 +236,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                         new CardUpdateRequestDto(null, null, null, null, new CoverDto((String)background2.get("type"), (String)background2.get("value"))),
                         "Existing Name", null, Map.of("type", "IMAGE", "value", "https://example.com/image.png"), null, null
                 ),
-                // 이름이 비어 있는 경우 기존 이름 유지
+                // 이름이 비어 있는 경우 프론트 에러, 아무 일도 발생하지 않음
                 Arguments.of(
                         new CardUpdateRequestDto("   ", "Description Updated", null, null, null),
                         "Existing Name", "Description Updated", null, null, null
@@ -264,8 +268,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L , "시현", "sisi@naver.com");
         // 리스트와 아카이브된 카드 설정
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Arrays.asList(list1, list2));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list1)).thenReturn(Collections.singletonList(card1));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list2)).thenReturn(Collections.singletonList(card2));
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list1)).thenReturn(Collections.singletonList(card1));
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list2)).thenReturn(Collections.singletonList(card2));
 
         // when: 아카이브된 카드 리스트 조회
         java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
@@ -276,8 +280,8 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertTrue(result.contains(card2));
 
         verify(listRepository, times(1)).findAllByBoardId(boardId);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list1);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list2);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list1);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list2);
     }
 
     @Test
@@ -288,7 +292,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         List list = List.builder().id(1L).name("List 1").build();
         Member member = new Member(1L , "시현", "sisi@naver.com");
         when(listRepository.findAllByBoardId(boardId)).thenReturn(Collections.singletonList(list));
-        when(cardRepository.findAllByListAndIsArchivedTrue(list)).thenReturn(Collections.emptyList());
+        when(cardRepository.findAllByListAndIsArchivedTrueAndIsDeletedFalse(list)).thenReturn(Collections.emptyList());
 
         // when: 아카이브된 카드 리스트 조회
         java.util.List<Card> result = cardService.getArchivedCardList(member, boardId);
@@ -296,7 +300,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         // then: 빈 리스트가 반환되는지 확인
         assertTrue(result.isEmpty());
         verify(listRepository, times(1)).findAllByBoardId(boardId);
-        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrue(list);
+        verify(cardRepository, times(1)).findAllByListAndIsArchivedTrueAndIsDeletedFalse(list);
     }
 
     @ParameterizedTest
@@ -333,14 +337,14 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: getCard 호출 시 모킹된 카드 반환
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
 
         // when: 카드 아카이브 상태 변경
         cardService.changeArchiveStatusByCard(member, cardId);
 
         // then: 카드의 아카이브 상태가 변경된 값인지 확인
         assertEquals(!isArchived, card.getIsArchived());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
 
 

@@ -6,10 +6,9 @@ import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.fcmtoken.infrastructure.FcmTokenRepository;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,18 +44,14 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     }
 
     @Override
-    public void deleteFcmToken(Long memberId) {
-        validateMemberExists(memberId);
-
-        FcmToken fcmToken = fcmTokenRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new NotFoundException("FcmToken", "토큰"));
-
-        fcmTokenRepository.delete(fcmToken);
+    public void deleteFcmTokenByMember(Member member) {
+        List<FcmToken> fcmTokenList = fcmTokenRepository.findAllByMember(member);
+        fcmTokenRepository.deleteAll(fcmTokenList);
     }
 
 
     private Member validateMemberExists(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버"));
     }
 

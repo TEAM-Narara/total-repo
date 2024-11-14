@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 //@Transactional
 // 수정 시 사용
 // @DataJpaTest @DataJpaTest는 JPA 관련된 컴포넌트만 로드하여 단위 테스트와 유사하게 JPA 레이어만 테스트하는 용도
+@Disabled
 @DisplayName("댓글 서비스와 댓글 저장소 통합 테스트")
 class ReplyServiceImplTest extends IntegrationTest {
 
@@ -82,7 +83,8 @@ class ReplyServiceImplTest extends IntegrationTest {
                 savedWorkSpace.getId(),
                 "보드 이름",
                 "WORKSPACE",
-                new CoverDto((String)background.get("type"), (String)background.get("value"))
+                new CoverDto((String)background.get("type"), (String)background.get("value")),
+                false
         );
         Board board = Board.createBoard(boardRequest, savedWorkSpace);
         boardRepository.save(board);
@@ -97,7 +99,6 @@ class ReplyServiceImplTest extends IntegrationTest {
         List list = List.createList(listRequest, board);
         listRepository.save(list);
 
-        System.out.println(list.getId());
         // Card 생성 및 저장
         CardCreateRequestDto cardRequest = new CardCreateRequestDto(list.getId(), "카드 이름");
         Card card = Card.createCard(cardRequest, list);

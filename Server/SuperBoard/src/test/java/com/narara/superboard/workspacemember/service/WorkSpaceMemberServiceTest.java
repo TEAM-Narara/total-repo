@@ -10,6 +10,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -50,6 +51,9 @@ class WorkSpaceMemberServiceTest {
 
     @Mock
     private KafkaConsumerService kafkaConsumerService;
+
+    @Mock
+    private WorkspaceOffsetService workspaceOffsetService;
 
     @Mock
     private MemberRepository memberRepository;
@@ -132,8 +136,8 @@ class WorkSpaceMemberServiceTest {
     @DisplayName("워크스페이스 멤버 추가 성공")
     void addMember_Success() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.empty());
         given(workSpaceMemberRepository.save(any(WorkSpaceMember.class)))
@@ -174,15 +178,15 @@ class WorkSpaceMemberServiceTest {
         // when & then
         assertThatThrownBy(() -> workSpaceMemberService.deleteMember(WORKSPACE_ID_1, MEMBER_ID_1))
                 .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("찾을 수 없습니다");
+                .hasMessage("워크스페이스에서 멤버를 찾을 수 없습니다");
     }
 
     @Test
     @DisplayName("이미 존재하는 워크스페이스 멤버 추가시 기존 멤버 반환")
     void addMember_AlreadyExists() {
         // given
-        given(workSpaceRepository.findById(1L)).willReturn(Optional.of(workSpace));
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(workSpaceRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(workSpace));
+        given(memberRepository.findByIdAndIsDeletedFalse(1L)).willReturn(Optional.of(member));
         given(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(WORKSPACE_ID_1, MEMBER_ID_1))
                 .willReturn(Optional.of(workSpaceMember));
 

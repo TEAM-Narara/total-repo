@@ -1,6 +1,8 @@
 package com.narara.superboard.listmember.service;
 
+import com.narara.superboard.member.entity.Member;
+
 public interface ListMemberService {
-    // TODO : 리스트 멤버 알림 수정
-    void setListMemberIsAlert(Long memberId, Long listId);
+    Boolean setListMemberIsAlert(Member member, Long listId);
+    Boolean getListMemberIsAlert(Member member, Long listId);
 }

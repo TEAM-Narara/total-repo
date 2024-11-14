@@ -8,14 +8,12 @@ import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
-import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import com.narara.superboard.workspacemember.service.WorkSpaceMemberService;
@@ -75,7 +73,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
         // given
 //        WorkSpaceCreateRequestDto workspaceCreateDto = new WorkSpaceCreateRequestDto(name);
 //        Member member = new Member(1L, "시현", "sisi@naver.com");
-//        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+//        when(memberRepository.findByIdAndIsDeletedFalse(member.getId())).thenReturn(Optional.of(member));
 //
 //        // when
 //        workSpaceService.createWorkSpace(member.getId(), workspaceCreateDto);
@@ -108,7 +106,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 //
 //
 ////        즉, 기존의 워크스페이스가 존재한다는 시나리오를 시뮬레이션합니다.
-//        when(workSpaceRepository.findById(workspaceId))
+//        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId))
 //                .thenReturn(Optional.of(existingWorkspace));
 //
 //        // When
@@ -119,7 +117,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
 //                () -> assertNotNull(result),
 //                () -> assertEquals(newName, result.getName()),
 ////                () -> assertEquals(newDescription, result.getDescription()),
-//                () -> verify(workSpaceRepository).findById(workspaceId)
+//                () -> verify(workSpaceRepository).findByIdAndIsDeletedFalse(workspaceId)
 //        );
     }
 
@@ -137,13 +135,13 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                 .build();
 
         // getWorkSpace 메서드가 워크스페이스를 반환하도록 설정
-        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
 
         // When
         workSpaceService.deleteWorkSpace(workspaceId);  // deleteWorkSpace 메서드 호출
 
         // Then
-        verify(workSpaceRepository, times(1)).findById(workspaceId);
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);
 //        verify(workSpaceRepository, times(1)).delete(mockWorkSpace);
     }
 
@@ -151,18 +149,18 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     @Test
     void testGetWorkSpace_NotFound() {
         // given
-        Long workSpaceId = 1L;
-        when(workSpaceRepository.findById(workSpaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
+        Long workspaceId = 1L;
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.empty());  // 빈 Optional을 반환하도록 설정
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
-                () -> workSpaceService.getWorkSpace(workSpaceId));  // 예외가 발생하는지 확인
+                () -> workSpaceService.getWorkSpace(workspaceId));  // 예외가 발생하는지 확인
 
         // 추가 검증: 예외 객체에 담긴 ID와 엔티티 타입이 정확한지 확인
-        assertEquals(workSpaceId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
+        assertEquals(workspaceId, exception.getId());  // 예외에 저장된 ID가 일치하는지 확인
         assertEquals("WorkSpace", exception.getEntity());  // 예외에 저장된 엔티티 타입이 일치하는지 확인
 
-        verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 확인
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);  // findById가 한 번 호출되었는지 확인
     }
 
 
@@ -186,16 +184,16 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     @MethodSource("provideWorkSpaces")
     void testGetWorkSpace_Success(WorkSpace workSpace) {
         // given
-        Long workSpaceId = workSpace.getId();  // WorkSpace의 ID
-        when(workSpaceRepository.findById(workSpaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
+        Long workspaceId = workSpace.getId();  // WorkSpace의 ID
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(workSpace));  // 정상적으로 WorkSpace가 반환되는 상황 설정
 
         // when
-        WorkSpace result = workSpaceService.getWorkSpace(workSpaceId);  // 실제 getWorkSpace 호출
+        WorkSpace result = workSpaceService.getWorkSpace(workspaceId);  // 실제 getWorkSpace 호출
 
         // then
         assertNotNull(result);  // 결과가 null이 아닌지 확인
         assertEquals(workSpace, result);  // 반환된 객체가 기대한 객체와 일치하는지 확인
-        verify(workSpaceRepository, times(1)).findById(workSpaceId);  // findById가 한 번 호출되었는지 검증
+        verify(workSpaceRepository, times(1)).findByIdAndIsDeletedFalse(workspaceId);  // findById가 한 번 호출되었는지 검증
     }
 
 
@@ -225,14 +223,12 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
                         BoardDetailResponseDto.builder()
                                 .id(1L)
                                 .name("나의 보드1")
-                                .backgroundType("COLOR")
-                                .backgroundValue("#fffffff")
+                                .cover(new CoverDto("COLOR", "#fffffff"))
                                 .build(),
                         BoardDetailResponseDto.builder()
                                 .id(2L)
                                 .name("나의 보드2")
-                                .backgroundType("IMAGE")
-                                .backgroundValue("https!!~~~")
+                                .cover(new CoverDto("IMAGE", "httssdfsdf"))
                                 .build()
                 ))
                 .build();
@@ -264,7 +260,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     private void mockDependencies(Long workspaceId, WorkSpace mockWorkSpace,
                                   List<BoardDetailResponseDto> mockBoardCollectionResponseDto,
                                   MemberCollectionResponseDto mockMemberCollectionResponseDto) {
-        when(workSpaceRepository.findById(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
+        when(workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)).thenReturn(Optional.of(mockWorkSpace));
         when(boardService.getBoardCollectionResponseDto(workspaceId)).thenReturn(
                 mockBoardCollectionResponseDto.stream().toList());
         when(workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId)).thenReturn(mockMemberCollectionResponseDto);
@@ -273,7 +269,7 @@ class WorkSpaceServiceTest implements MockSuperBoardUnitTests {
     private void assertWorkspaceDetail(WorkSpaceDetailResponseDto result, WorkSpace mockWorkSpace,
                                        List<BoardDetailResponseDto> mockBoardCollectionResponseDto,
                                        MemberCollectionResponseDto mockMemberCollectionResponseDto) {
-        assertEquals(mockWorkSpace.getId(), result.workSpaceId());
+        assertEquals(mockWorkSpace.getId(), result.workspaceId());
         assertEquals(mockWorkSpace.getName(), result.name());
 
         // 리스트 내용을 비교할 때는 assertIterableEquals 사용

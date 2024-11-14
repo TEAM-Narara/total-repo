@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -80,7 +81,7 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleIllegalArgumentException(TokenException ex) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token-Invalid", "");
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.UNAUTHORIZED, "유효하지 않은 JWT 토큰 때문에 예외가 발생했습니다. \n" + ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AlreadyRegisteredLoginException.class)
@@ -97,4 +98,15 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<?> handleRuntimeException(Exception ex) {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuthenticationException(Exception ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.INTERNAL_SERVER_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(Exception ex) {
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.BAD_REQUEST, ex.getMessage()) + "\n 혹시, dto를 보새실때, 대소문자를 잘못하시진 않으셨는지 확인해보세요", HttpStatus.BAD_REQUEST);
+    }
+
 }

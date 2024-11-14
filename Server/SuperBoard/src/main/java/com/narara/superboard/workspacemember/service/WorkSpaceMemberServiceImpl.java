@@ -3,6 +3,7 @@ package com.narara.superboard.workspacemember.service;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
+import com.narara.superboard.common.enums.KafkaRegisterType;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -11,6 +12,7 @@ import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
@@ -34,12 +36,11 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkSpaceValidator workSpaceValidator;
     private final MemberRepository memberRepository;
     private final KafkaConsumerService kafkaConsumerService;
-
-//    private final WorkspaceOffsetService workspaceOffsetService;
+    private final WorkspaceOffsetService workspaceOffsetService;
 
     @Override
-    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workSpaceId) {
-        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId);
+    public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId) {
+        List<WorkSpaceMember> WorkSpaceMemberList = workSpaceMemberRepository.findAllByWorkSpaceId(workspaceId);
 
         List<MemberResponseDto> workspaceDetailResponseDtoList = new ArrayList<>();
 
@@ -66,15 +67,17 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         List<WorkSpaceResponseDto> workSpaceResponseDtoList = new ArrayList<>();
 
         for (WorkSpaceMember workSpaceMember : workSpaceMemberList) {
-            WorkSpace workSpace = workSpaceMember.getWorkSpace();
-            WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
-                    .workSpaceId(workSpace.getId())
-                    .name(workSpace.getName())
-                    .build();
+            if (!workSpaceMember.getWorkSpace().getIsDeleted()) {
+                WorkSpace workSpace = workSpaceMember.getWorkSpace();
+                WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
+                        .workspaceId(workSpace.getId())
+                        .name(workSpace.getName())
+                        .authority(workSpaceMember.getAuthority())
+                        .build();
+                workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
 
-            workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
-
-            workSpaceResponseDtoList.add(workSpaceResponseDto);
+                workSpaceResponseDtoList.add(workSpaceResponseDto);
+            }
         }
 
         return WorkSpaceListResponseDto.builder()
@@ -84,7 +87,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     @Transactional
     @Override
     public WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority) {
-        WorkSpaceMember workSpaceMember = getWorkSpaceMember(memberId, workspaceId);
+        WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, memberId);
 
         if (authority.equals(Authority.MEMBER)) {
             //권한을 MEBMER로 바꾸는 경우 Workspace Admin이 한 명 이상인지 검증
@@ -98,7 +101,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.editAuthority(authority);
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-//        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
+        workspaceOffsetService.saveEditMemberDiff(workSpaceMember);
 
         workSpaceMember.getWorkSpace().addOffset();
 
@@ -106,17 +109,19 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     }
 
     private WorkSpaceMember getWorkSpaceMember(Long workspaceId, Long memberId) {
+        log.info("@@@: " + workspaceId);
+        log.info("@@@: " + memberId);
         return workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, memberId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다"));
+                .orElseThrow(() -> new NoSuchElementException("워크스페이스에서 멤버를 찾을 수 없습니다"));
     }
 
     @Transactional
     @Override
     public WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority) {
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+        WorkSpace workSpace = workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         //1. 워크스페이스에 이미 멤버가 추가되어 있으면 무시
@@ -139,7 +144,9 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpace.addOffset(); //workspace offset++
 
         // 3. 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(workSpace.getId(), member.getId());
+        // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,workSpace.getId(), member.getId());
+        // 4. 카프카에 전송
+        workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
         return workSpaceMember;
     }
@@ -158,7 +165,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workSpaceMember.deleted();
         workSpaceMember.getWorkSpace().addOffset(); //workspace offset++
 
-//        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
+        workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
 
         return workSpaceMember;
     }

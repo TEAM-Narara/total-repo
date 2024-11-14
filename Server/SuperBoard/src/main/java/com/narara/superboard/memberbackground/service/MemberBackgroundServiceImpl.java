@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class MemberBackgroundServiceImpl implements MemberBackgroundService {
@@ -32,23 +34,20 @@ public class MemberBackgroundServiceImpl implements MemberBackgroundService {
     }
 
     @Override
-    public List<MemberBackground> getAllMemberBackground(Long memberId) {
-        findMemberByIdOrThrow(memberId);
+    public List<MemberBackground> getAllMemberBackground(Member member) {
 
-        return memberBackgroundRepository.findAllByMemberId(memberId);
+        return memberBackgroundRepository.findAllByMember(member);
     }
 
     @Override
-    public void deleteMemberBackground(Long memberId, Long backgroundId) {
-        findMemberByIdOrThrow(memberId);
-
-        MemberBackground background = memberBackgroundRepository.findByIdAndMemberId(backgroundId, memberId)
+    public void deleteMemberBackground(Member member, Long backgroundId) {
+        MemberBackground background = memberBackgroundRepository.findByIdAndMember(backgroundId, member)
                 .orElseThrow(() -> new NotFoundEntityException(backgroundId, "멤버 배경"));
         memberBackgroundRepository.delete(background);
     }
 
     private Member findMemberByIdOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 }

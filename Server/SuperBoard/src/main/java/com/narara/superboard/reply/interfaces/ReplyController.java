@@ -15,14 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "댓글")
+@Tag(name = "8. 댓글")
 @CrossOrigin
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class ReplyController implements ReplyAPI {
 
@@ -40,8 +40,8 @@ public class ReplyController implements ReplyAPI {
 
     @Override
     @Operation(summary = "댓글 수정", description = "")
-    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(Member member, ReplyUpdateRequestDto updateRequestDto,
-                                                               Long replyId) {
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> updateReply(@AuthenticationPrincipal Member member, @RequestBody ReplyUpdateRequestDto updateRequestDto,
+                                                                               @PathVariable("replyId") Long replyId) {
         Reply reply = replyService.updateReply(member, replyId, updateRequestDto);
 
         ReplySimpleResponseDto replySimpleResponseDto = ReplySimpleResponseDto.of(reply);
@@ -51,7 +51,7 @@ public class ReplyController implements ReplyAPI {
 
     @Override
     @Operation(summary = "댓글 삭제", description = "")
-    public ResponseEntity<DefaultResponse<Void>> deleteReply(Member member, Long replyId) {
+    public ResponseEntity<DefaultResponse<Void>> deleteReply(@AuthenticationPrincipal Member member, @PathVariable("replyId") Long replyId) {
         replyService.deleteReply(member, replyId);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.REPLY_DELETE_SUCCESS),HttpStatus.OK);

@@ -14,7 +14,7 @@ import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceDetailResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceCreateRequestDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceUpdateRequestDto;
-import com.narara.superboard.workspace.service.mongo.WorkspaceOffsetService;
+import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
@@ -58,10 +58,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     @Transactional
-    public WorkSpace createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
+    public WorkSpaceMember createWorkSpace(Long memberId, WorkSpaceCreateRequestDto workspaceCreateRequestDto) throws WorkspaceNameNotFoundException {
         workSpaceValidator.validateNameIsPresent(workspaceCreateRequestDto);
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         WorkSpace workSpace = WorkSpace.createWorkSpace(workspaceCreateRequestDto);
@@ -70,20 +70,15 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpaceMember workspaceMemberByAdmin = WorkSpaceMember.createWorkspaceMemberByAdmin(newWorkSpace, member); //offset++
         workSpaceMemberRepository.save(workspaceMemberByAdmin);
 
-        // TODO : Kafka 토픽 생성 및 Consumer group Listener 설정
-
+        // Kafka 토픽 생성 및 Consumer group Listener 설정
         String topicName = "workspace-" + newWorkSpace.getId();
 
         // Kafka: 워크스페이스용 토픽 생성
         // 토픽 이름 : workspace-1 ,파티션 수 :10개, 복제 개수 : 1개 (단일 브로커)
-        // kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
-
         try {
-            kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
+            kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 1, (short) 1));
             // 토픽 생성 확인 후 메시지 전송토픽 생성 확인 후 메시지 전송
-            if (waitForTopicCreation(topicName)) {
-                kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
-            } else {
+            if (!waitForTopicCreation(topicName)) {
                 System.out.println("토픽 생성에 실패했거나 시간 초과가 발생했습니다.");
             }
         } catch (Exception e) {
@@ -100,11 +95,13 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //            }
         }
 
+        //워크스페이스 처음 만든 사람을 Member 추가로 넣기
+        workspaceOffsetService.saveAddMemberDiff(workspaceMemberByAdmin);
+
         // 새로운 멤버를 Kafka Consumer Group에 등록
-        kafkaConsumerService.registerMemberListener(newWorkSpace.getId(), memberId);
+        // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
-        return newWorkSpace;
-
+        return workspaceMemberByAdmin;
     }
 
     private boolean waitForTopicCreation(String topicName) {
@@ -136,9 +133,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return false;
     }
 
-
-
-
 //    public void createTopicIfNotExists(String topicName) {
 //        try {
 //            Map<String, TopicDescription> topics = kafkaAdmin.describeTopics(new String[]{topicName});
@@ -152,34 +146,33 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 //        }
 //    }
 
-
     @Override
     @Transactional
-    public void deleteWorkSpace(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public void deleteWorkSpace(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
         workSpace.deleted(); //삭제 처리 offset++
 
-//        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
+        workspaceOffsetService.saveDeleteWorkspaceDiff(workSpace);
     }
 
     @Override
-    public WorkSpace getWorkSpace(Long workSpaceId) {
-        return workSpaceRepository.findById(workSpaceId)
-                .orElseThrow(() -> new NotFoundEntityException(workSpaceId, "WorkSpace"));
+    public WorkSpace getWorkSpace(Long workspaceId) {
+        return workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
+                .orElseThrow(() -> new NotFoundEntityException(workspaceId, "WorkSpace"));
     }
 
     @Override
-    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workSpaceId) {
-        WorkSpace workSpace = getWorkSpace(workSpaceId);
+    public WorkSpaceDetailResponseDto getWorkspaceDetail(Long workspaceId) {
+        WorkSpace workSpace = getWorkSpace(workspaceId);
 
         List<BoardDetailResponseDto> boardCollectionResponseDto =
-                boardService.getBoardCollectionResponseDto(workSpaceId);
+                boardService.getBoardCollectionResponseDto(workspaceId);
 
         MemberCollectionResponseDto workspaceMemberCollectionResponseDto =
-                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+                workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId);
 
         WorkSpaceDetailResponseDto workspaceDetailResponseDto = WorkSpaceDetailResponseDto.builder()
-                .workSpaceId(workSpace.getId())
+                .workspaceId(workSpace.getId())
                 .name(workSpace.getName())
                 .boardList(boardCollectionResponseDto)
                 .workspaceMemberList(workspaceMemberCollectionResponseDto)

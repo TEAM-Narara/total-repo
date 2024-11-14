@@ -2,6 +2,7 @@ package com.narara.superboard.cardlabel.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardlabel.entity.CardLabel;
@@ -40,6 +41,9 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private CardLabelValidator cardLabelValidator;
 
+    @Mock
+    private BoardOffsetService boardOffsetService;
+
     @Test
     @DisplayName("실패 테스트: Label이 존재하지 않을 때 EntityNotFoundException 발생")
     void createCardLabel_LabelNotFound() {
@@ -71,11 +75,11 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         Label label = Label.builder().id(labelId).build();
 
         // Card가 존재하지 않는 경우 모킹
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // then
         assertThrows(EntityNotFoundException.class, () -> {
-            Card card = cardRepository.findById(cardId).orElseThrow(EntityNotFoundException::new);
+            Card card = cardRepository.findByIdAndIsDeletedFalse(cardId).orElseThrow(EntityNotFoundException::new);
             cardLabelService.createCardLabel(card, label);
         });
 
@@ -168,17 +172,16 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         // given
         Card card = Card.builder().id(1L).build();
         Label label = Label.builder().id(1L).build();
+        Boolean isActived = true;
 
         CardLabel existingCardLabel = spy(CardLabel.createCardLabel(card, label));
 
-        // 초기 상태를 false로 설정해두기 위해 토글 한 번 적용
-        existingCardLabel.changeIsActivated(); // 초기 상태 false로 설정
 
         // CardLabel이 존재하도록 모킹
         when(cardLabelRepository.findByCardAndLabel(card, label)).thenReturn(Optional.of(existingCardLabel));
 
         // when
-        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label);
+        CardLabel result = cardLabelService.changeCardLabelIsActivated(card, label,isActived);
 
         // then
         assertNotNull(result, "기존 CardLabel이 반환되어야 합니다.");
@@ -215,11 +218,17 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
                 new Label(3L,board, "Label3", 3L)
         );
 
+        List<CardLabel> cardLabelList = Arrays.asList(
+                new CardLabel(1L, boardLabels.get(0), null, true),
+                new CardLabel(2L,boardLabels.get(1), null, false),
+                new CardLabel(3L,boardLabels.get(2), null, true)
+        );
+
         when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
 
         // 카드에 사용된 라벨 ID 목록을 모킹합니다. 카드가 Label1과 Label3을 사용한다고 가정합니다.
-        Set<Long> cardLabelIds = Set.of(1L, 3L);
-        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(cardLabelIds);
+//        Set<Long> cardLabelIds = Set.of(1L, 3L);
+        when(cardLabelRepository.findByCardId(cardId)).thenReturn(cardLabelList);
 
         // Act
         List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
@@ -227,9 +236,9 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
         // Assert
         assertEquals(3, cardLabels.size());  // 보드에 있는 라벨이 총 3개이므로, 3개의 DTO가 반환됩니다.
 
-        assertTrue(cardLabels.get(0).isCardLabel());  // Label1은 카드에 사용됩니다.
-        assertFalse(cardLabels.get(1).isCardLabel()); // Label2는 사용되지 않습니다.
-        assertTrue(cardLabels.get(2).isCardLabel());  // Label3은 카드에 사용됩니다.
+        assertTrue(cardLabels.get(0).IsActivated());  // Label1은 카드에 사용됩니다.
+        assertFalse(cardLabels.get(1).IsActivated()); // Label2는 사용되지 않습니다.
+        assertTrue(cardLabels.get(2).IsActivated());  // Label3은 카드에 사용됩니다.
 
         // DTO에 라벨 정보가 정확히 포함되었는지 추가 검증
         assertEquals("Label1", cardLabels.get(0).name(), "Label1의 이름이 정확히 포함되어야 합니다.");
@@ -287,18 +296,23 @@ class CardLabelServiceImplTest implements MockSuperBoardUnitTests {
                 new Label(1L, board, "Label1", 1L),
                 new Label(2L, board, "Label2", 2L)
         );
+
+        List<CardLabel> cardLabelList = Arrays.asList(
+                new CardLabel(1L, boardLabels.get(0), null, false),
+                new CardLabel(2L,boardLabels.get(1), null, false)
+        );
         when(labelRepository.findAllByBoard(board)).thenReturn(boardLabels);
 
         // 카드에 연결된 라벨이 없도록 빈 Set을 모킹합니다.
-        when(cardLabelRepository.findLabelIdsByCardId(cardId)).thenReturn(Collections.emptySet());
+        when(cardLabelRepository.findByCardId(cardId)).thenReturn(cardLabelList);
 
         // Act
         List<CardLabelDto> cardLabels = cardLabelService.getCardLabelCollection(cardId);
 
         // Assert
         assertEquals(2, cardLabels.size(), "보드에 있는 라벨의 개수와 일치해야 합니다.");
-        assertFalse(cardLabels.get(0).isCardLabel(), "Label1은 사용되지 않아야 합니다.");
-        assertFalse(cardLabels.get(1).isCardLabel(), "Label2도 사용되지 않아야 합니다.");
+        assertFalse(cardLabels.get(0).IsActivated(), "Label1은 사용되지 않아야 합니다.");
+        assertFalse(cardLabels.get(1).IsActivated(), "Label2도 사용되지 않아야 합니다.");
     }
 
     @Test

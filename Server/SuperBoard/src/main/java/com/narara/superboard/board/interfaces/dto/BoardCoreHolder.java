@@ -6,5 +6,5 @@ import com.narara.superboard.common.interfaces.dto.NameHolder;
 public interface BoardCoreHolder extends NameHolder {
     String name();
     String visibility();
-    CoverDto background();
+    CoverDto cover();
 }

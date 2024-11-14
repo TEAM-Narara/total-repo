@@ -5,6 +5,7 @@ import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.interfaces.dto.websocket.BoardUpdateData;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.constant.enums.Authority;
+import com.narara.superboard.common.interfaces.dto.AckMessage;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.websocket.interfaces.dto.websocket.BoardAddMemberDto;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -39,6 +41,11 @@ public class WorkspaceWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final WorkSpaceService workspaceService;
     private final BoardService boardService;
+
+//    @MessageMapping("/test")
+//    public void testHandler(@Payload  AckMessage ackMessage) {
+//        System.out.println(ackMessage);
+//    }
 
     //워크스페이스 추가(웹소켓 버전, http도 있음)
     @MessageMapping("/workspaces/create")
@@ -105,7 +112,7 @@ public class WorkspaceWebSocketController {
         // workspace 브로드캐스트
         WebSocketResponse memberResponse = new WebSocketResponse(
                 WORKSPACE,
-                WorkspaceAction.ADD_MEMBER.toString(),
+                WorkspaceAction.ADD_WORKSPACE_MEMBER.toString(),
                 new WorkspaceMemberAddResponse(
                         workspaceId,
                         member.getId(),

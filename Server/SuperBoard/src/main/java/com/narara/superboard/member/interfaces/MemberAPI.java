@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "회원", description = "멤버 관련 API")
 @RequestMapping("/api/v1/members")
 public interface MemberAPI {
 

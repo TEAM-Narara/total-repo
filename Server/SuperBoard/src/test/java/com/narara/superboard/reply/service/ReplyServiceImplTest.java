@@ -2,6 +2,7 @@ package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -57,6 +58,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private CardHistoryRepository cardHistoryRepository;
 
+    @Mock
+    private BoardOffsetService boardOffsetService;
+
     @Test
     @DisplayName("댓글 생성시, 카드가 존재하지 않을 때 NotFoundEntityException 발생")
     void shouldThrowExceptionWhenCardDoesNotExist() {
@@ -65,7 +69,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Mocking: 카드가 존재하지 않도록 설정
-        when(cardRepository.findById(requestDto.cardId())).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(requestDto.cardId())).thenReturn(Optional.empty());
 
         // then
         assertThrows(NotFoundEntityException.class, () -> replyService.createReply(member, requestDto));
@@ -106,7 +110,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         // Mocking: 검증 로직을 모킹
         doNothing().when(cardService).checkBoardMember(card, member, ReplyAction.ADD_REPLY);
         doNothing().when(contentValidator).validateReplyContentIsEmpty(requestDto);
-        when(cardRepository.findById(requestDto.cardId())).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(requestDto.cardId())).thenReturn(Optional.of(card));
         when(replyRepository.save(any(Reply.class))).thenReturn(expectedReply);  // Mocking save 결과
 
         // when
@@ -118,7 +122,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(expectedReply.getCard(), result.getCard());
 
         verify(contentValidator, times(1)).validateReplyContentIsEmpty(requestDto);
-        verify(cardRepository, times(1)).findById(requestDto.cardId());
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(requestDto.cardId());
         verify(replyRepository, times(1)).save(any(Reply.class));
     }
 
@@ -130,7 +134,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Long nonExistentReplyId = 1L;
 
         // Mocking: Reply가 존재하지 않도록 설정
-        when(replyRepository.findById(nonExistentReplyId)).thenReturn(Optional.empty());
+        when(replyRepository.findByIdAndIsDeletedFalse(nonExistentReplyId)).thenReturn(Optional.empty());
 
         // then: 예외 발생 확인
         NotFoundEntityException exception = assertThrows(
@@ -139,7 +143,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         );
         assertEquals("해당하는 댓글(이)가 존재하지 않습니다. 댓글ID: " + nonExistentReplyId, exception.getMessage());
 
-        verify(replyRepository, times(1)).findById(nonExistentReplyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(nonExistentReplyId);
     }
 
     @Test
@@ -153,7 +157,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mocking: Reply가 존재하도록 설정
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(reply));
 
         // when
         Reply result = replyService.getReply(replyId);
@@ -163,7 +167,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(replyId, result.getId());
         assertEquals("This is a test reply.", result.getContent());
 
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
     }
 
     @ParameterizedTest
@@ -217,12 +221,12 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // when
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(existingReply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(existingReply));
         Reply updatedReply = replyService.updateReply(member, replyId, requestDto);
 
         // then
         assertEquals(updatedContent, updatedReply.getContent());
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
     }
 
 
@@ -263,14 +267,14 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
                 .build();
 
         // Mock 설정
-        when(replyRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(replyRepository.findByIdAndIsDeletedFalse(replyId)).thenReturn(Optional.of(reply));
         when(cardHistoryRepository.save(any(CardHistory.class))).thenReturn(null);
 
         // when
         replyService.deleteReply(member, replyId);
 
         // then
-        verify(replyRepository, times(1)).findById(replyId);
+        verify(replyRepository, times(1)).findByIdAndIsDeletedFalse(replyId);
         assertTrue(reply.getIsDeleted(), "댓글이 삭제되었는지 확인");
     }
 
@@ -280,7 +284,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     void shouldThrowExceptionWhenCardNotFound() {
         // given: cardId로 카드가 존재하지 않도록 설정
         Long cardId = 1L;
-        when(cardRepository.findById(cardId)).thenReturn(Optional.empty());
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.empty());
 
         // when & then: 예외가 발생하는지 확인
         NotFoundEntityException exception = assertThrows(
@@ -289,7 +293,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         );
 
         assertEquals("해당하는 카드(이)가 존재하지 않습니다. 카드ID: " + cardId, exception.getMessage());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(replyRepository, never()).findAllByCard(any(Card.class));
     }
 
@@ -301,7 +305,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         Card card = Card.builder().id(cardId).name("Test Card").build();
 
         // Mocking
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
         when(replyRepository.findAllByCard(card)).thenReturn(Collections.emptyList());
 
         // when
@@ -309,7 +313,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
         // then
         assertTrue(replies.isEmpty(), "댓글 리스트가 비어 있어야 합니다.");
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(replyRepository, times(1)).findAllByCard(card);
     }
 
@@ -325,7 +329,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         java.util.List<Reply> replyList = Arrays.asList(reply1, reply2);
 
         // Mocking
-        when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(cardRepository.findByIdAndIsDeletedFalse(cardId)).thenReturn(Optional.of(card));
         when(replyRepository.findAllByCard(card)).thenReturn(replyList);
 
         // when
@@ -335,7 +339,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(2, replies.size(), "댓글 리스트 크기는 2여야 합니다.");
         assertEquals("First reply", replies.get(0).getContent());
         assertEquals("Second reply", replies.get(1).getContent());
-        verify(cardRepository, times(1)).findById(cardId);
+        verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
         verify(replyRepository, times(1)).findAllByCard(card);
     }
 }

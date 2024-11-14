@@ -2,6 +2,8 @@ package com.narara.superboard.board.interfaces;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.board.service.BoardService;
 import com.narara.superboard.common.application.handler.CoverHandler;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
@@ -11,17 +13,23 @@ import com.narara.superboard.common.service.IAuthenticationFacade;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Tag(name = "보드", description = "보드 관련 API를 제공하는 인터페이스")
+@Tag(name = "5. 보드")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/boards")
@@ -40,11 +48,12 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 생성", description = "새로운 보드를 생성합니다.")
-    public ResponseEntity<DefaultResponse<Long>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<BoardDetailResponseDto>> createBoard(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
         Long memberId = getMemberId();
         Board board = boardService.createBoard(memberId, boardCreateRequestDto);
+        BoardDetailResponseDto boardDetailResponseDto = BoardDetailResponseDto.of(board);
 
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, board.getId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.CREATED, ResponseMessage.BOARD_CREATE_SUCCESS, boardDetailResponseDto), HttpStatus.CREATED);
     }
 
     private Long getMemberId() {
@@ -80,16 +89,6 @@ public class BoardController implements BoardAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ADMIN_UPDATE_SUCCESS, boardDetailResponseDto), HttpStatus.OK);
     }
 
-//    @Override //프론트 팀원의 요구사항을 반영, 어드민 보드 수정 하나로 퉁침. 백엔드 팀원 모두 확인 후, 나중에 삭제 TODO
-//    @Operation(summary = "사용자 보드 설정 수정", description = "보드 ID와 사용자 수정 정보를 사용하여 사용자가 자신의 보드 설정을 업데이트합니다.")
-//    public ResponseEntity<DefaultResponse<BoardSimpleResponseDto>> updateBoardByMember(
-//            @PathVariable Long boardId,
-//            @RequestBody BoardUpdateByMemberRequestDto boardUpdateByMemberRequestDto) {
-//        Board updatedBoard = boardService.updateBoardByMember(boardId, boardUpdateByMemberRequestDto);
-//        BoardSimpleResponseDto boardSimpleResponseDto = BoardSimpleResponseDto.of(updatedBoard, coverHandler);
-//        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_MEMBER_UPDATE_SUCCESS, boardSimpleResponseDto), HttpStatus.OK);
-//    }
-
     @Override
     @Operation(summary = "아카이브된 보드 조회", description = "워크스페이스 ID를 사용하여 아카이브된 보드 목록을 조회합니다.")
     public ResponseEntity<DefaultResponse<List<BoardSimpleResponseDto>>> getArchivedBoards(@PathVariable Long workspaceId) {
@@ -111,10 +110,35 @@ public class BoardController implements BoardAPI {
 
     @GetMapping
     @Operation(summary = "내가 권한이 있는 보드들 목록 조회", description = "권한이 있는 보드들을 모두 불러옵니다. keyword가 null이면 전체조회")
-    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false)String keyword) {
+    public ResponseEntity<DefaultResponse<MyBoardCollectionResponse>> getMyBoardList(@RequestParam(value = "keyword", required = false) String keyword) {
         Long memberId = getMemberId();
         MyBoardCollectionResponse myBoardList = boardService.getMyBoardList(memberId, keyword);
 
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_FETCH_SUCCESS, myBoardList), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "보드의 모든 로그 조회", description = "보드의 모든 로그 조회")
+    public ResponseEntity<DefaultResponse<List<BoardLogDetailResponseDto>>> getBoardLog(Long boardId) {
+        List<BoardLogDetailResponseDto> boardActivity = boardService.getAllLog(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_LOG_FETCH_SUCCESS, boardActivity), HttpStatus.OK);
+    }
+
+    @Operation(summary = "보드 액태비티(댓글+로그) 조회", description = "보드의 활동 및 댓글을 최신순으로 정렬하여 반환합니다.")
+    @Parameters({
+            @Parameter(name = "page", description = "조회할 페이지 번호 (1부터 시작)", example = "1", schema = @Schema(defaultValue = "1")),
+            @Parameter(name = "size", description = "페이지당 항목 수", example = "10", schema = @Schema(defaultValue = "10"))
+    })
+    @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
+    @Override
+    public ResponseEntity<DefaultResponse<BoardActivityPageableResponseDto>> getBoardActivity(
+            @PathVariable Long boardId,
+            @RequestParam int page, @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        BoardActivityPageableResponseDto boardActivity = boardService.getBoardActivity(boardId, pageable);
+
+        return ResponseEntity.ok(
+                DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ACTIVITY_FETCH_SUCCESS, boardActivity)
+        );
     }
 }

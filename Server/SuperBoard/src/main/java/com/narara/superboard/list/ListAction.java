@@ -11,6 +11,7 @@ public enum ListAction implements Action {
     EDIT_LIST("리스트 수정"),
     DELETE_LIST("리스트 삭제"),
     ARCHIVE_LIST("아카이브 리스트 조회"),
+    MOVE_LIST("리스트 이동"),
     CHANGE_ARCHIVED("리스트 아카이브 여부 변경");
 
     private final String value;

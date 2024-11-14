@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -8,7 +9,6 @@ import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
-import com.narara.superboard.common.document.Target;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
@@ -19,6 +19,9 @@ import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.reply.interfaces.dto.ReplyCreateRequestDto;
 import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
 import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 
-
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
@@ -41,12 +44,14 @@ public class ReplyServiceImpl implements ReplyService{
 
     private final ContentValidator contentValidator;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
     @Transactional
     public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
-        Card card = cardRepository.findById(replyCreateRequestDto.cardId())
+        Card card = cardRepository.findByIdAndIsDeletedFalse(replyCreateRequestDto.cardId())
                 .orElseThrow(() -> new NotFoundEntityException(replyCreateRequestDto.cardId(), "카드"));
 
         cardService.checkBoardMember(card,member, ReplyAction.ADD_REPLY);
@@ -55,13 +60,13 @@ public class ReplyServiceImpl implements ReplyService{
 
         Reply savedReply = replyRepository.save(reply);
 
+        boardOffsetService.saveAddReply(savedReply); //Websocket reply 추가
 
-        ReplyInfo createReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(savedReply, createReplyInfo);
+        ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
-                EventType.CREATE, EventData.COMMENT, target);
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -70,11 +75,12 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Reply getReply(Long replyId) {
-        return replyRepository.findById(replyId)
+        return replyRepository.findByIdAndIsDeletedFalse(replyId)
                 .orElseThrow(() -> new NotFoundEntityException(replyId, "댓글"));
     }
 
     @Override
+    @Transactional
     public Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyUpdateRequestDto);
 
@@ -89,14 +95,14 @@ public class ReplyServiceImpl implements ReplyService{
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
         reply.updateReply(replyUpdateRequestDto);
+        boardOffsetService.saveEditReply(reply); //Websocket reply 업데이트
 
         // 업데이트 로그 기록
-        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(reply, updateReplyInfo);
+        ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
-                EventType.UPDATE, EventData.COMMENT, target);
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -105,6 +111,7 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
+    @Transactional
     public Reply deleteReply(Member member, Long replyId) {
         Reply reply = getReply(replyId);
         if (!member.getId().equals(reply.getMember().getId())){
@@ -112,28 +119,27 @@ public class ReplyServiceImpl implements ReplyService{
         }
 
         // 삭제 로그 기록
-        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getContent());
-        Target target = Target.of(reply, deleteReplyInfo);
+        ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
-        CardHistory cardHistory = CardHistory.careateCardHistory(
-                member, System.currentTimeMillis(), reply.getCard().getList().getBoard(), reply.getCard(),
-                EventType.DELETE, EventData.COMMENT, target);
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
 
         // 삭제 수행
         reply.deleteReply();
+        boardOffsetService.saveDeleteReply(reply); //Websocket reply 삭제
 
         return reply;
     }
 
     @Override
     public List<Reply> getRepliesByCardId(Long cardId) {
-        Card card = cardRepository.findById(cardId)
+        Card card = cardRepository.findByIdAndIsDeletedFalse(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "카드"));
 
         return replyRepository.findAllByCard(card);
     }
-
 }
 

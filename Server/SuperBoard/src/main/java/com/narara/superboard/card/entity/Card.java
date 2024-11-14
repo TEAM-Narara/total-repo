@@ -7,6 +7,7 @@ import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.common.document.Identifiable;
 import com.narara.superboard.common.entity.BaseTimeEntity;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.list.entity.List;
 import jakarta.persistence.*;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import org.hibernate.type.SqlTypes;
 
 
 import java.util.Map;
+
+import static com.narara.superboard.common.constant.MoveConst.LARGE_INCREMENT;
 
 @Entity
 @Getter
@@ -30,6 +33,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Setter(value = AccessLevel.PRIVATE)
     @JoinColumn(name = "list_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
     private List list;
@@ -51,6 +55,7 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @Setter
     private Map<String, Object> cover;
 
+    @Setter
     @Column(name = "my_order", nullable = false, columnDefinition = "bigint default 0")
     private Long myOrder;
 
@@ -69,7 +74,14 @@ public class Card extends BaseTimeEntity implements Identifiable {
     @OneToMany(mappedBy = "card")
     private java.util.List<CardMember> cardMemberList;
 
+    public void updateList(List list) {
+        this.list = list;
+    }
+
     public static Card createCard(CardCreateRequestDto cardCreateRequestDto, List list) {
+        long cardListOrder = list.getLastCardOrder() + LARGE_INCREMENT;
+        list.setLastCardOrder(cardListOrder);
+
         return Card.builder()
                 .name(cardCreateRequestDto.cardName())
                 .list(list)
@@ -77,35 +89,86 @@ public class Card extends BaseTimeEntity implements Identifiable {
                     put("type", "NONE");
                     put("value", "NONE");
                 }}) //default cover 지정
-                .myOrder(list.getLastCardOrder() + 1)
-                .myOrder(0L)
+                .myOrder(cardListOrder)
                 .isDeleted(false)
                 .isArchived(false)
                 .build();
     }
 
     public Card updateCard(CardUpdateRequestDto requestDto) {
-        // 공백이면 기존 꺼 그대로 쓰게 설정.
-        if (requestDto.name() != null && !requestDto.name().isBlank()) {
-            this.name = requestDto.name();
-        }
-        if (requestDto.description() != null) {
-            this.description = requestDto.description();
-        }
-        if (requestDto.cover() != null) {
-            this.cover = new HashMap<>(){{
-                put("type", requestDto.cover().type());
-                put("value", requestDto.cover().value());
-            }};
-//            this.cover = requestDto.d();
-        }
-        if (requestDto.startAt() != null) {
-            this.startAt = requestDto.startAt();
-        }
-        if (requestDto.endAt() != null) {
-            this.endAt = requestDto.endAt();
-        }
+        updateName(requestDto.name());
+        updateDescription(requestDto.description());
+        updateCover(requestDto.cover());
+        updateStartAt(requestDto.startAt());
+        updateEndAt(requestDto.endAt());
+
         return this;
+    }
+
+    private void updateCover(CoverDto updateCover) {
+        //null로 보내면 변경하지 않음
+        if (updateCover == null) {
+            return;
+        }
+
+        this.cover = new HashMap<>(){{
+            put("type", updateCover.type());
+            put("value", updateCover.value());
+        }};
+    }
+
+    private void updateEndAt(Long updateEndAt) {
+        //null로 보내면 변경하지 않음
+        if (updateEndAt == null) {
+            return;
+        }
+
+        //-1로 오면 null로 변경
+        if (updateEndAt.equals(-1L)) {
+            this.endAt = null;
+            return;
+        }
+
+        this.endAt = updateEndAt;
+    }
+
+    private void updateStartAt(Long updateStartAt) {
+        //null로 보내면 변경하지 않음
+        if (updateStartAt == null) {
+            return;
+        }
+
+        //-1로 오면 null로 변경
+        if (updateStartAt.equals(-1L)) {
+            this.endAt = null;
+            return;
+        }
+
+        this.startAt = updateStartAt;
+    }
+
+    private void updateDescription(String updateDescription) {
+        //description 이 null 이면 수정하지 말아주세요
+        if (updateDescription == null) {
+            return;
+        }
+
+        //description 이 blank 이면 없애버리기
+        if (updateDescription.isEmpty() || updateDescription.isBlank()) {
+            this.description = null;
+            return;
+        }
+        
+        this.description = updateDescription;
+    }
+
+    private void updateName(String updateName) {
+        //null로 보내거나 빈 값이면 수정 x
+        if (updateName == null || updateName.isBlank() || updateName.isEmpty()) {
+            return;
+        }
+
+        this.name = updateName;
     }
 
     public void delete() {
@@ -114,6 +177,16 @@ public class Card extends BaseTimeEntity implements Identifiable {
 
     public void changeArchiveStatus() {
         this.isArchived = !isArchived;
+    }
+
+    public void moveToListWithOrder(List targetList, long newOrder) {
+        this.setMyOrder(newOrder);
+        this.setList(targetList);
+    }
+
+
+    public void moveToList(List targetList) {
+        this.setList(targetList);
     }
 }
 

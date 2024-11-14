@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface CardLabelService {
     CardLabel createCardLabel(Card card, Label label);
-    CardLabel changeCardLabelIsActivated(Card card, Label label);
-
-    // TODO : 카드 라벨 조회 (보드의 라벨도 포함)
+    CardLabel changeCardLabelIsActivated(Card card, Label label,Boolean isActivated);
     List<CardLabelDto> getCardLabelCollection(Long cardId);
 }

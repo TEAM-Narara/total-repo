@@ -1,6 +1,9 @@
 package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardCombinedLogResponseDto;
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.board.interfaces.dto.*;
 
 import com.narara.superboard.member.entity.Member;
@@ -12,7 +15,7 @@ import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import java.util.List;
 
 public interface BoardService {
-    List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workSpaceId);
+    List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workspaceId);
 
     Board createBoard(Long memberId, BoardCreateRequestDto boardCreateRequestDto);
 
@@ -31,4 +34,12 @@ public interface BoardService {
     void checkBoardMember(Board board, Member member, Action action);
 
     MyBoardCollectionResponse getMyBoardList(Long memberId, String keyword);
+
+
+    List<BoardLogDetailResponseDto> getAllLog(Long boardId);
+
+    BoardCombinedLogResponseDto getBoardCombinedLog(Long boardId, Pageable pageable);
+
+    BoardActivityPageableResponseDto getBoardActivity(Long boardId, Pageable pageable);
+
 }

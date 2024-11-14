@@ -10,8 +10,6 @@ import com.narara.superboard.common.exception.cover.InvalidCoverTypeFormatExcept
 import com.narara.superboard.common.interfaces.dto.CoverDto;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class BoardValidator {
 
@@ -22,12 +20,26 @@ public class BoardValidator {
     }
 
     public void validateVisibilityIsPresent(BoardCoreHolder boardCoreHolder) {
-        if (boardCoreHolder.visibility() == null || boardCoreHolder.visibility().trim().isEmpty()) {
+        //변경되지 않음, return
+        if (boardCoreHolder.visibility() == null) {
+            return;
+        }
+
+        if (boardCoreHolder.visibility().trim().isEmpty()) {
             throw new BoardVisibilityNotFoundException();
         }
     }
 
     public void validateVisibilityIsValid(BoardCoreHolder boardCoreHolder) {
+        //변경되지 않음, return
+        if (boardCoreHolder.visibility() == null) {
+            return;
+        }
+
+        if (boardCoreHolder.visibility().trim().isEmpty()) {
+            throw new BoardVisibilityNotFoundException();
+        }
+
         try {
             String visibility = boardCoreHolder.visibility();
             Visibility.fromString(visibility.toUpperCase());
@@ -37,11 +49,19 @@ public class BoardValidator {
     }
 
     public void validateBackgroundIsValid(BoardCoreHolder boardCoreHolder) {
-        CoverDto background = boardCoreHolder.background();
+        CoverDto background = boardCoreHolder.cover();
+
+        //변경되지 않음, return
+        if (background == null) {
+            return;
+        }
+
         for (CoverType type : CoverType.values()) {
             if (type.toString().equals(background.type())) {
-                throw new InvalidCoverTypeFormatException();
+                return;
             }
         }
+
+        throw new InvalidCoverTypeFormatException();
     }
 }

@@ -5,8 +5,11 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListMoveCollectionRequest;
+import com.narara.superboard.list.interfaces.dto.ListMoveResult;
 import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
+import com.narara.superboard.list.service.ListMoveService;
 import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,18 +18,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "리스트")
-@Controller
+@Tag(name = "6. 리스트")
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/list")
 public class ListController implements ListAPI {
 
     private final ListService listService;
+    private final ListMoveService listMoveService;
 
     @Override
     @Operation(summary = "리스트 생성", description = "새로운 리스트를 생성합니다.")
@@ -49,7 +54,7 @@ public class ListController implements ListAPI {
     public ResponseEntity<DefaultResponse<ListSimpleResponseDto>> changeListIsArchived(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
         List list = listService.changeListIsArchived(member, listId);
         ListSimpleResponseDto responseDto = ListSimpleResponseDto.of(list);
-        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_ARCHIVE_CHANGE_SUCCESS, responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_ARCHIVE_FETCH_SUCCESS, responseDto), HttpStatus.OK);
     }
 
     @Override
@@ -60,5 +65,48 @@ public class ListController implements ListAPI {
                 .map(ListSimpleResponseDto::of)
                 .toList();
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_GET_ARCHIVED_SUCCESS, responseDtos), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "리스트를 맨 위로 이동", description = "지정된 리스트를 보드의 맨 위로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToTop(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
+        ListMoveResult result = listMoveService.moveListToTop(member, listId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_TOP_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "리스트를 맨 아래로 이동", description = "지정된 리스트를 보드의 맨 아래로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToBottom(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
+        ListMoveResult result = listMoveService.moveListToBottom(member, listId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BOTTOM_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "리스트를 특정 위치(다른 리스트 사이)로 이동", description = "지정된 리스트를 두 리스트 사이의 위치로 이동시킵니다.")
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveListBetween(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long listId,
+            @RequestParam Long previousListId,
+            @RequestParam Long nextListId
+    ) {
+        ListMoveResult result = listMoveService.moveListBetween(member, listId, previousListId, nextListId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Operation(summary = "리스트를 지정한 위치로 이동", description = "지정된 리스트를 직접 지정한 위치로 이동시킵니다.")
+    @Override
+    public ResponseEntity<DefaultResponse<ListMoveResult>> moveList(
+            @AuthenticationPrincipal Member member,
+            @RequestBody ListMoveCollectionRequest listMoveCollectionRequest
+    ) {
+        ListMoveResult result = listMoveService.moveListVersion2(member, listMoveCollectionRequest);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BETWEEN_SUCCESS, result), HttpStatus.OK);
+    }
+
+    @Override
+    @Operation(summary = "보드 내의 리스트 조회")
+    public ResponseEntity<DefaultResponse<java.util.List<ListSimpleResponseDto>>> getListsByBoardId(@PathVariable Long boardId) {
+        java.util.List<ListSimpleResponseDto> lists = listService.getListsByBoardId(boardId);
+        return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_FETCH_SUCCESS, lists), HttpStatus.OK);
     }
 }

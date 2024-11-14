@@ -3,6 +3,7 @@ package com.narara.superboard.label.service;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
@@ -39,6 +40,9 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
     @Mock
     private ColorValidator colorValidator;
 
+    @Mock
+    private BoardOffsetService boardOffsetService;
+
     @Test
     @DisplayName("존재하지 않는 보드 ID로 라벨 생성 시 NotFoundEntityException 발생")
     void shouldThrowExceptionWhenBoardNotFound() {
@@ -47,7 +51,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         LabelCreateRequestDto requestDto = new LabelCreateRequestDto("Test Label", 0xFFFFFF00L);
 
         // Mocking: Board가 존재하지 않도록 설정
-        when(boardRepository.findById(nonExistentBoardId)).thenReturn(Optional.empty());
+        when(boardRepository.findByIdAndIsDeletedFalse(nonExistentBoardId)).thenReturn(Optional.empty());
 
         // then: 예외 발생 확인
         NotFoundEntityException exception = assertThrows(
@@ -56,7 +60,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         );
         assertEquals("해당하는 보드(이)가 존재하지 않습니다. 보드ID: " + nonExistentBoardId, exception.getMessage());
 
-        verify(boardRepository, times(1)).findById(nonExistentBoardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(nonExistentBoardId);
     }
 
     @ParameterizedTest
@@ -84,7 +88,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
         // Mocking: 검증 로직을 모킹
         doNothing().when(colorValidator).validateLabelColor(requestDto);
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
         when(labelRepository.save(any(Label.class))).thenReturn(expectedLabel);
 
         // when
@@ -97,7 +101,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(expectedLabel.getBoard(), result.getBoard());
 
         verify(colorValidator, times(1)).validateLabelColor(requestDto);
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
         verify(labelRepository, times(1)).save(any(Label.class));
     }
 
@@ -221,7 +225,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         Long nonExistentBoardId = 999L;
 
         // Mocking: 보드가 존재하지 않도록 설정
-        when(boardRepository.findById(nonExistentBoardId)).thenReturn(Optional.empty());
+        when(boardRepository.findByIdAndIsDeletedFalse(nonExistentBoardId)).thenReturn(Optional.empty());
 
         // then: 예외 발생 확인
         NotFoundEntityException exception = assertThrows(
@@ -231,7 +235,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
         assertEquals("해당하는 보드(이)가 존재하지 않습니다. 보드ID: " + nonExistentBoardId, exception.getMessage());
 
-        verify(boardRepository, times(1)).findById(nonExistentBoardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(nonExistentBoardId);
         verify(labelRepository, never()).findAllByBoard(any(Board.class));
     }
 
@@ -243,7 +247,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         Board board = Board.builder().id(boardId).name("Test Board").build();
 
         // Mocking
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
         when(labelRepository.findAllByBoard(board)).thenReturn(Collections.emptyList());
 
         // when
@@ -251,7 +255,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
         // then
         assertTrue(labels.isEmpty(), "라벨 리스트가 비어 있어야 합니다.");
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
         verify(labelRepository, times(1)).findAllByBoard(board);
     }
 
@@ -264,7 +268,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         Label label = Label.builder().id(1L).name("Label 1").color(0xFFFFFFL).board(board).build();
 
         // Mocking
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
         when(labelRepository.findAllByBoard(board)).thenReturn(List.of(label));
 
         // when
@@ -273,7 +277,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         // then
         assertEquals(1, labels.size(), "라벨 리스트 크기는 1이어야 합니다.");
         assertEquals("Label 1", labels.get(0).getName());
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
         verify(labelRepository, times(1)).findAllByBoard(board);
     }
 
@@ -289,7 +293,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         List<Label> labelList = List.of(label1, label2);
 
         // Mocking
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(boardRepository.findByIdAndIsDeletedFalse(boardId)).thenReturn(Optional.of(board));
         when(labelRepository.findAllByBoard(board)).thenReturn(labelList);
 
         // when
@@ -299,7 +303,7 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(2, labels.size(), "라벨 리스트 크기는 2여야 합니다.");
         assertEquals("Label 1", labels.get(0).getName());
         assertEquals("Label 2", labels.get(1).getName());
-        verify(boardRepository, times(1)).findById(boardId);
+        verify(boardRepository, times(1)).findByIdAndIsDeletedFalse(boardId);
         verify(labelRepository, times(1)).findAllByBoard(board);
     }
 }

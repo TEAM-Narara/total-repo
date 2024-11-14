@@ -1,6 +1,7 @@
 package com.narara.superboard.card.interfaces.dto;
 
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.common.interfaces.dto.CoverDto;
 import lombok.Builder;
 
 @Builder
@@ -11,8 +12,7 @@ public record CardDetailResponseDto(
         Long endAt,
         Long myOrder,
         Boolean isArchived,
-        String coverType,
-        String coverValue
+        CoverDto cover
 ) {
     public static CardDetailResponseDto from(Card card) {
         return from(card, null, null);
@@ -26,8 +26,7 @@ public record CardDetailResponseDto(
                 .endAt(card.getEndAt())
                 .myOrder(card.getMyOrder())
                 .isArchived(card.getIsArchived())
-                .coverType(coverType)
-                .coverValue(coverValue)
+                .cover(new CoverDto(coverType, coverValue))
                 .build();
     }
 }

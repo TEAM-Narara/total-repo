@@ -1,6 +1,7 @@
 package com.narara.superboard.workspacemember.interfaces;
 
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDeleteRequest;
 import com.narara.superboard.workspacemember.interfaces.dto.WorkspaceMemberDto;
@@ -13,6 +14,7 @@ import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "a. 워크스페이스 회원")
 @RestController
 @RequiredArgsConstructor
 public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
@@ -43,19 +46,19 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<WorkSpaceListResponseDto>> getMemberWorkspaceList(
+    public ResponseEntity<DefaultResponse<List<WorkSpaceResponseDto>>> getMemberWorkspaceList(
             @AuthenticationPrincipal Member member) {
         WorkSpaceListResponseDto responseDto = workSpaceMemberService.getMemberWorkspaceList(member);
 
         return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto)
+                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto.workSpaceResponseDtoList())
                 , HttpStatus.OK);
     }
 
     @Operation(summary = "워크스페이스 멤버 권한 수정")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 멤버권한 수정가능
     @PatchMapping("/{workspaceId}/members")
-    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDto requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> editWorkspaceMemberAuthority(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.editAuthority(requestDto.memberId(), workspaceId, requestDto.authority());
 
         return ResponseEntity.ok(
@@ -63,6 +66,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
                         StatusCode.OK,
                         ResponseMessage.WORKSPACE_UPDATE_SUCCESS,
                         new WorkspaceMemberDto(
+                            workSpaceMember.getId(),
                             workSpaceMember.getMember().getId(),
                             workSpaceMember.getAuthority()
                     )
@@ -82,8 +86,9 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
                         StatusCode.OK,
                         ResponseMessage.WORKSPACE_MEMBER_CREATE_SUCCESS,
                         new WorkspaceMemberDto(
+                            workSpaceMember.getId(),
                             workSpaceMember.getMember().getId(),
-                          workSpaceMember.getAuthority()
+                            workSpaceMember.getAuthority()
                         )
                 )
         );
@@ -97,6 +102,7 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_DELETE_SUCCESS, new WorkspaceMemberDto(
+                        workSpaceMember.getId(),
                         workSpaceMember.getMember().getId(),
                         workSpaceMember.getAuthority()
                 ))
