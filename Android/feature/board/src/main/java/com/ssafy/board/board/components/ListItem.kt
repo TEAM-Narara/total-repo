@@ -39,6 +39,7 @@ fun ListItem(
     addCard: (Long, String) -> Unit = { _, _ -> },
     addPhoto: () -> Unit = {},
     onFocus: (Long) -> Unit = {},
+    listState: MutableState<Boolean>,
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
