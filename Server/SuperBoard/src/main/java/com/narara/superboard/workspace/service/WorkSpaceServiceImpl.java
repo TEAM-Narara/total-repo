@@ -119,11 +119,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
                     // 토픽이 존재하면 준비가 완료된 것으로 간주하고 true를 반환합니다.
                     if (descriptions.containsKey(topicName)) {
-                        System.out.println("토픽 " + topicName + "이(가) 준비되었습니다.");
                         return true;
                     }
                 } catch (InterruptedException | ExecutionException | java.util.concurrent.TimeoutException e) {
-                    System.out.println("토픽 생성 대기 중입니다. 시도 횟수: " + attempts);
                     Thread.sleep(1000);
                 }
             }

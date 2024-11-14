@@ -590,6 +590,6 @@ public class BoardOffsetService {
         }
         // Kafka에 메시지 전송
         kafkaTemplate.send(topic, jsonMessage);
-        System.out.println("Message sent to Kafka: " + jsonMessage);
+        System.out.println("topic: " + topic + ", Message sent to Kafka: " + jsonMessage);
     }
 }

@@ -119,7 +119,6 @@ public class CardMoveServiceImpl implements CardMoveService {
                 .orElseGet(() -> {
                     return null; // null 반환
                 });
-        System.out.println(bottomCard);
         if (bottomCard == null) {
             targetCard.moveToListWithOrder(targetList, DEFAULT_TOP_ORDER);
             return new CardMoveResult.SingleCardMove(
@@ -162,7 +161,6 @@ public class CardMoveServiceImpl implements CardMoveService {
         // 카드의 새로운 리스트와 순서 설정 후 저장
         targetCard.moveToListWithOrder(targetList, orderInfoList.getFirst().myOrder());
         targetList.setLastCardOrder(orderInfoList.getFirst().myOrder());
-        System.out.println(orderInfoList.getFirst().myOrder());
 
         // 단일 카드 이동 결과 반환
         return new CardMoveResult.SingleCardMove(
