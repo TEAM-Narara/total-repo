@@ -46,11 +46,13 @@ public class AttachmentServiceImpl implements AttachmentService {
         boardOffsetService.saveAddAttachmentDiff(attachment); //Websocket 첨부파일 추가
 
         // 첨부 파일 추가 로그 기록
-        AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), url, isCover);
+        AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), attachment.getId(), url,
+                isCover);
 
         CardHistory<AddAttachmentInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
-                EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
+                EventType.CREATE, EventData.ATTACHMENT, addAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
 
@@ -74,10 +76,11 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         // 첨부 파일 삭제 로그 기록
         DeleteAttachmentInfo deleteAttachmentInfo = new DeleteAttachmentInfo(
-                card.getId(), card.getName(), attachmentId, attachment.getIsCover());
+                card.getId(), card.getName(), attachmentId, attachment.getUrl(), attachment.getIsCover());
 
         CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -162,21 +165,31 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setIsCover(false);
     }
 
+    public interface AttachmentInfo {
+        Long cardId();
+        String cardName();
+        Long attachmentId();
+        String url();
+        boolean isCover();
+    }
+
     // 첨부 파일 추가 관련 정보
     public record AddAttachmentInfo(
             Long cardId,
             String cardName,
+            Long attachmentId,
             String url,
             boolean isCover
-    ) {
+    ) implements AttachmentInfo{
     }
 
     // 첨부 파일 삭제 관련 정보
     public record DeleteAttachmentInfo(
             Long cardId,
             String cardName,
-            Long url,
+            Long attachmentId,
+            String url,
             boolean isCover
-    ) {
+    ) implements AttachmentInfo{
     }
 }

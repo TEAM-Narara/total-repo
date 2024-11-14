@@ -2,6 +2,7 @@ package com.narara.superboard.board.service;
 
 import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
@@ -41,6 +42,8 @@ import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import java.sql.SQLOutput;
+
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -236,6 +239,14 @@ public class BoardServiceImpl implements BoardService {
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {
                 return;
+            }
+        }
+        if (board.getVisibility().equals(Visibility.WORKSPACE)) {
+            java.util.List<WorkSpaceMember> workspaceMemberList = board.getWorkSpace().getWorkspaceMemberList();
+            for (WorkSpaceMember workSpaceMember : workspaceMemberList) {
+                if (workSpaceMember.getMember().getId().equals(member.getId())) {
+                    return;
+                }
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);

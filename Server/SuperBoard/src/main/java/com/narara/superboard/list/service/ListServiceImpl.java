@@ -2,6 +2,7 @@ package com.narara.superboard.list.service;
 
 import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
@@ -25,6 +26,8 @@ import com.narara.superboard.list.interfaces.dto.info.UpdateListInfo;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 import java.util.ArrayList;
+
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -136,10 +139,20 @@ public class ListServiceImpl implements ListService{
 
     @Override
     public void checkBoardMember(List list, Member member, Action action) {
-        java.util.List<BoardMember> boardMemberList = list.getBoard().getBoardMemberList();
+        Board board = list.getBoard();
+        java.util.List<BoardMember> boardMemberList = board.getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {
                 return;
+            }
+        }
+
+        if (board.getVisibility().equals(Visibility.WORKSPACE)) {
+            java.util.List<WorkSpaceMember> workspaceMemberList = board.getWorkSpace().getWorkspaceMemberList();
+            for (WorkSpaceMember workSpaceMember : workspaceMemberList) {
+                if (workSpaceMember.getMember().getId().equals(member.getId())) {
+                    return;
+                }
             }
         }
         throw new UnauthorizedException(member.getNickname(), action);
