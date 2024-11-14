@@ -5,6 +5,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
@@ -44,6 +45,8 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     private final MemberRepository memberRepository;
     private final WorkSpaceMemberRepository workSpaceMemberRepository;
     private final BoardHistoryRepository boardHistoryRepository;
+
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
@@ -138,6 +141,8 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember newBoardMember = BoardMember.createBoardMemberByAdmin(board, inviteMember);
         boardMemberRepository.save(newBoardMember);
 
+            boardOffsetService.saveAddBoardMemberDiff(newBoardMember); //Websocket 보드멤버 추가
+
         // 멤버 추가 로그 기록
         AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
 
@@ -146,7 +151,6 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-
 
         return newBoardMember;
     }
@@ -169,6 +173,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, editMember);
 
         boardMember.editAuthority(authority);
+        boardOffsetService.saveEditBoardMemberDiff(boardMember); //Websocket 보드멤버 권한 수정
 
         return boardMember;
     }
@@ -181,6 +186,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         BoardMember boardMember = getBoardMember(board, deleteMember);
 
         boardMember.deleted();
+        boardOffsetService.saveDeleteBoardMemberDiff(boardMember); // Websocket 보드멤버 삭제
 
         // 멤버 삭제 로그 기록
         DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
@@ -190,7 +196,6 @@ public class BoardMemberServiceImpl implements BoardMemberService {
                 , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
-
 
         return boardMember;
     }

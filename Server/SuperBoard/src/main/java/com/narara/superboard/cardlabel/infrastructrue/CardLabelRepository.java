@@ -9,13 +9,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface CardLabelRepository extends JpaRepository<CardLabel, Long> {
     Optional<CardLabel> findByCardAndLabel(Card card, Label label);
 
     List<CardLabel> findByCard(Card card);
 
-    @Query("SELECT cl.label.id FROM CardLabel cl WHERE cl.card.id = :cardId AND cl.isActivated = true")
-    Set<Long> findLabelIdsByCardId(@Param("cardId") Long cardId);
+    @Query("select cl from CardLabel cl WHERE cl.card.id = :cardId AND cl.isActivated = true")
+    List<CardLabel> findByCardId(@Param("cardId") Long cardId);
 }

@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Spring Security 설정
  */
 
-@EnableWebSecurity(debug = true) // Spring Security사용해 웹 보안 구성시 사용
+@EnableWebSecurity // Spring Security사용해 웹 보안 구성시 사용
 @Configuration
 /**
  * @EnableMethodSecurity
@@ -48,7 +48,8 @@ public class SecurityConfiguration {
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
                 .requestMatchers(
-                        "/ws/**", "/index.html" //웹소켓 엔드포인트
+                        "/ws/**", "/index.html", //웹소켓 엔드포인트
+                        "/theme-outline.css","/theme-material.css" // swagger ui
                 );
     }
 

@@ -1,24 +1,25 @@
 package com.narara.superboard.cardlabel.service;
 
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
 import com.narara.superboard.cardlabel.interfaces.dto.CardLabelDto;
 import com.narara.superboard.cardlabel.service.validator.CardLabelValidator;
-import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
 import com.narara.superboard.label.infrastructure.LabelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
-
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class CardLabelServiceImpl implements CardLabelService {
@@ -29,15 +30,30 @@ public class CardLabelServiceImpl implements CardLabelService {
     private final CardRepository cardRepository;
     private final LabelRepository labelRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
-    public CardLabel changeCardLabelIsActivated(Card card, Label label) {
+    public CardLabel changeCardLabelIsActivated(Card card, Label label,Boolean isActivated) {
+        // isActivated 유효성 체크
+        cardLabelValidator.validateIsActivated(isActivated);
+
         Optional<CardLabel> cardLabel = cardLabelRepository.findByCardAndLabel(card, label);
 
+        CardLabel changedIsActivated = null;
+
         if (cardLabel.isEmpty()) {
-            return createCardLabel(card, label);
+            changedIsActivated = createCardLabel(card, label);
+        }else{
+            changedIsActivated = cardLabel.get().changeIsActivated(isActivated);
         }
 
-        return cardLabel.get().changeIsActivated();
+        if (changedIsActivated.getIsActivated()) {
+            boardOffsetService.saveAddCardLabel(changedIsActivated); //Websocket 카드라벨 추가
+        } else {
+            boardOffsetService.saveDeleteCardLabel(changedIsActivated); //Websocket 카드라벨 삭제
+        }
+
+        return changedIsActivated;
     }
 
     @Override
@@ -49,7 +65,10 @@ public class CardLabelServiceImpl implements CardLabelService {
             throw new EntityAlreadyExistsException("카드의 라벨");
         }
 
-        return cardLabelRepository.save(CardLabel.createCardLabel(card, label));
+        CardLabel savedCardLabel = cardLabelRepository.save(CardLabel.createCardLabel(card, label)); //Websocket 카드라벨 추가
+        boardOffsetService.saveAddCardLabel(savedCardLabel);
+
+        return savedCardLabel;
     }
 
     @Override
@@ -61,19 +80,34 @@ public class CardLabelServiceImpl implements CardLabelService {
 
         List<Label> boardLabels = labelRepository.findAllByBoard(board);
 
-        Set<Long> cardLabelIds = cardLabelRepository.findLabelIdsByCardId(cardId);
+        List<CardLabel> cardLabelList = cardLabelRepository.findByCardId(cardId);
 
-        return createCardLabelDtoList(boardLabels, cardLabelIds);
+        return createCardLabelDtoList(boardLabels, cardLabelList);
     }
 
-    private List<CardLabelDto> createCardLabelDtoList(List<Label> boardLabels, Set<Long> cardLabelIds) {
+    private List<CardLabelDto> createCardLabelDtoList(List<Label> boardLabels, List<CardLabel> cardLabelList) {
+        // O(1) 검색
+        Map<Long, CardLabel> cardLabelMap = cardLabelList.stream()
+                .collect(Collectors.toMap(
+                        cardLabel -> cardLabel.getLabel().getId(),
+                        cardLabel -> cardLabel
+                ));
+
+        // boardLabels를 조회하면서, cardLabel인 경우 isActivated를 true로 설정, cardLabelId를 null이 아닌 값으로 설정
         return boardLabels.stream()
-                .map(label -> new CardLabelDto(
-                        label.getId(),
-                        label.getName(),
-                        label.getColor(),
-                        cardLabelIds.contains(label.getId())
-                ))
-                .toList();
+                .map(boardLabel -> {
+                    CardLabel cardLabel = cardLabelMap.get(boardLabel.getId());
+                    if (cardLabel != null) {
+                        return CardLabelDto.of(cardLabel);
+                    }
+                    return CardLabelDto.builder()
+                            .cardLabelId(null)
+                            .labelId(boardLabel.getId())
+                            .name(boardLabel.getName())
+                            .color(boardLabel.getColor())
+                            .IsActivated(false)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

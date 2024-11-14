@@ -33,7 +33,9 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoName")
     void testBoardEntityCreationByName(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(
+                workspaceId,
+                name, visibility, new CoverDto((String) background.get("type"), (String) background.get("value")), false);
 
         assertThrows(BoardNameNotFoundException.class, () -> boardValidator.validateNameIsPresent(boardCreateDto));
     }
@@ -49,7 +51,8 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByNoVisibility")
     void testBoardEntityCreationByVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(
+                workspaceId, name, visibility, new CoverDto((String) background.get("type"), (String) background.get("value")), false);
 
         assertThrows(BoardVisibilityNotFoundException.class, () -> boardValidator.validateVisibilityIsPresent(boardCreateDto));
     }
@@ -65,7 +68,9 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
     @ParameterizedTest
     @MethodSource("provideInvalidBoardDataByInvalidVisibility")
     void testBoardEntityCreationByInvalidVisibility(Long workspaceId, String name, String visibility, Map<String, Object> background) {
-        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")));
+        BoardCreateRequestDto boardCreateDto = new BoardCreateRequestDto(
+                workspaceId, name, visibility, new CoverDto((String)background.get("type"), (String)background.get("value")),false
+        );
 
         assertThrows(BoardInvalidVisibilityFormatException.class, () -> boardValidator.validateVisibilityIsValid(boardCreateDto));
     }
@@ -85,7 +90,8 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
                 workspaceId,
                 name,
                 visibility,
-                new CoverDto((String)background.get("type"), (String)background.get("value"))
+                new CoverDto((String)background.get("type"), (String)background.get("value")),
+                false
         );
 
         assertDoesNotThrow(() -> boardValidator.validateBackgroundIsValid(boardCreateDto));
@@ -107,7 +113,8 @@ class BoardValidatorTest implements MockSuperBoardUnitTests {
                 workspaceId,
                 name,
                 visibility,
-                new CoverDto((String)background.get("type"), (String)background.get("value"))
+                new CoverDto((String)background.get("type"), (String)background.get("value")),
+                false
         );
 
         assertThrows(InvalidCoverTypeFormatException.class, () -> boardValidator.validateBackgroundIsValid(boardCreateDto));

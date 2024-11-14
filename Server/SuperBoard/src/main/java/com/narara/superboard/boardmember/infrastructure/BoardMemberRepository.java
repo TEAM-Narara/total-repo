@@ -25,6 +25,6 @@ public interface BoardMemberRepository extends JpaRepository<BoardMember,Long> {
     Optional<BoardMember> findFirstByBoardAndMemberAndIsDeletedIsFalse(Board board, Member member);
     Optional<BoardMember> findFirstByBoard_IdAndMember_Id(Long boardId, Long memberId);
 
-    @Query("select bm from BoardMember bm join bm.board b where bm.member.id = :memberId order by b.id")
+    @Query("select bm from BoardMember bm join bm.board b where bm.member.id = :memberId and b.isDeleted = false order by b.id ")
     List<BoardMember> findByMemberId(@Param("memberId") Long memberId);
 }

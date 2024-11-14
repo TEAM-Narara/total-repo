@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    List<Board> findAllByWorkSpaceId(Long workSpaceId); // workSpaceId
-    List<Board> findAllByWorkSpaceIdAndIsArchivedTrue(Long workSpaceId);
+    List<Board> findAllByWorkSpaceId(Long workspaceId); // workspaceId
+    List<Board> findAllByWorkSpaceIdAndIsArchivedTrueAndIsDeletedFalse(Long workspaceId);
     Optional<Board> findByIdAndIsDeletedFalse(Long boardId);
 }

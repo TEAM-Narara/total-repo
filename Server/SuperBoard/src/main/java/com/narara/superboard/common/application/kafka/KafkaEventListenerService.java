@@ -57,7 +57,6 @@ public class KafkaEventListenerService {
 
         // 중복 리스너 확인
         if (activeListeners.containsKey(listenerKey)) {
-            log.info("이미 등록된 리스너가 있습니다 - 엔티티 타입: {}, ID: {}, 회원 ID: {}", entityType, primaryId, memberId);
             container = activeListeners.get(listenerKey);
 
         } else {
@@ -74,7 +73,6 @@ public class KafkaEventListenerService {
             });
 
             container.start();
-            log.info("새로운 리스너를 등록했습니다 - 엔티티 타입: {}, ID: {}, 회원 ID: {}", entityType, primaryId, memberId);
             activeListeners.put(listenerKey, container);
         }
 
@@ -163,7 +161,6 @@ public class KafkaEventListenerService {
             processRecord(record, acknowledgment, topic.split("-")[0], Long.parseLong(topic.split("-")[1]), memberId);
         });
         container.start();
-        log.info("누락된 메시지를 가져오는 중입니다 - 토픽: {}, 회원 ID: {}", topic, memberId);
     }
 
     /**
@@ -177,16 +174,14 @@ public class KafkaEventListenerService {
         Map<String, Object> headers = new HashMap<>();
         headers.put("offset", offset);
         messagingTemplate.convertAndSend(destination, record.value(), headers);
-        log.info("STOMP로 메시지 전송 완료 - 목적지: {}, 오프셋: {}", destination, offset);
 
         // 메모리 맵과 Redis에 ACK 추가
         OffsetKey offsetKey = new OffsetKey(record.topic(), record.partition(), offset, "member-" + memberId);
+
         //pendingAcks는 acknowledgment를 임시로 저장하고 있는것
         pendingAcks.put(offsetKey, acknowledgment);
         // ACK 대기 큐에 추가
         redisService.addAckToQueue(entityType+"-"+primaryId, "member-"+memberId, offset, record.value());
-
-        log.info("pendingAcks에 acknowledgment 저장 - 오프셋 키: {}", offsetKey);
     }
 
     /**
@@ -207,11 +202,9 @@ public class KafkaEventListenerService {
                 // Kafka에 오프셋 커밋
                 acknowledgment.acknowledge();
                 pendingAcks.remove(offsetKey);
-                log.info("Kafka에 오프셋 커밋 및 pendingAcks에서 제거 완료 - 오프셋 키: {}", offsetKey);
 
                 // acknowledgment가 null이 아닐 때에만 Redis에 최신 오프셋 갱신
                 redisService.setLastAcknowledgedOffset(topic, groupId, offset);
-                log.info("Redis에 최신 오프셋 갱신 완료 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, offset);
 
                 // 다음 오프셋을 대기 큐에서 처리
                 processPendingAcks(topic, groupId, offset + 1);
@@ -237,27 +230,22 @@ public class KafkaEventListenerService {
             String pendingAck = (String) redisService.getAckFromQueue(topic, groupId, nextOffset);
 
             if (pendingAck != null) {
-                log.info("대기 중인 ACK 처리 시작 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
 
                 Acknowledgment acknowledgment = pendingAcks.remove(new OffsetKey(topic, 0, nextOffset, groupId));
                 if (acknowledgment != null) {
                     acknowledgment.acknowledge(); // ACK 처리
-                    log.info("ACK 커밋 완료 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
 
                     // 최신 오프셋 갱신
                     redisService.setLastAcknowledgedOffset(topic, groupId, nextOffset); // 최신 오프셋 갱신
-                    log.info("Redis에 최신 오프셋 갱신 완료 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
 
                     // 대기 큐에서 ACK 제거
                     redisService.removeAckFromQueue(topic, groupId, nextOffset);
-                    log.info("대기 큐에서 ACK 제거 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
-
                     nextOffset++;
                 } else {
                     log.warn("pendingAcks에 해당 오프셋에 대한 acknowledgment가 없습니다 - 토픽: {}, 그룹 ID: {}, 오프셋: {}", topic, groupId, nextOffset);
                 }
             } else {
-                log.info("더 이상 대기 중인 ACK가 없습니다 - 토픽: {}, 그룹 ID: {}, 마지막 처리 오프셋: {}", topic, groupId, nextOffset);
+                log.info("더 이상 대기 중인 ACK가 없습니다 - 토픽: {}, 그룹 ID: {}, 앞으로 처리 할 오프셋: {}", topic, groupId, nextOffset);
                 break;
             }
         }
@@ -271,7 +259,6 @@ public class KafkaEventListenerService {
         scheduler.schedule(() -> {
             String pendingAck = (String) redisService.getAckFromQueue(offsetKey.topic(), offsetKey.groupId(), offsetKey.offset());
             if (pendingAck != null) {
-                log.error("지정 시간 내 ACK가 수신되지 않았습니다. 트래킹 중지 - 그룹 ID: {}, 오프셋: {}", offsetKey.groupId(), offsetKey.offset());
                 pendingAcks.remove(offsetKey);
                 redisService.removeAckFromQueue(offsetKey.topic(), offsetKey.groupId(), offsetKey.offset());
             }

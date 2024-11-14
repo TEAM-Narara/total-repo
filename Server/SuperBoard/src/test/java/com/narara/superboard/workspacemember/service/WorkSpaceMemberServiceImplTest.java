@@ -74,7 +74,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("워크스페이스에 권한이 있는 멤버 리스트 조회 성공 테스트")
     void testGetWorkspaceMemberCollectionResponseDtoSuccess() {
         // given
-        Long workSpaceId = 1L;
+        Long workspaceId = 1L;
 
         // Mock된 Member와 WorkSpaceMember 데이터 설정
         Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "","http://profile1.img");
@@ -87,10 +87,10 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         List<WorkSpaceMember> mockWorkSpaceMemberList = List.of(mockWorkSpaceMember1, mockWorkSpaceMember2);
 
         // when: workSpaceMemberRepository의 동작을 정의
-        when(workSpaceMemberRepository.findAllByWorkSpaceId(workSpaceId)).thenReturn(mockWorkSpaceMemberList);
+        when(workSpaceMemberRepository.findAllByWorkSpaceId(workspaceId)).thenReturn(mockWorkSpaceMemberList);
 
         // when: 서비스 메서드 호출
-        MemberCollectionResponseDto result = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workSpaceId);
+        MemberCollectionResponseDto result = workSpaceMemberService.getWorkspaceMemberCollectionResponseDto(workspaceId);
 
         // then: 결과 검증
         assertEquals(2, result.memberListResponse().size());
@@ -112,27 +112,27 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals("MEMBER", secondMember.authority());
 
         // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
-        verify(workSpaceMemberRepository, times(1)).findAllByWorkSpaceId(workSpaceId);
+        verify(workSpaceMemberRepository, times(1)).findAllByWorkSpaceId(workspaceId);
     }
 
     @Test
     @DisplayName("워크스페이스 멤버 권한 수정 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
     void testEditAuthorityEmptyWorkspaceMemberException() {
         // given
-        Long workSpaceId = 1L;
+        Long workspaceId = 1L;
         Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
 
         WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
 
         //when
-        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
+        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, mockMember1.getId()))
                 .thenReturn(Optional.of(mockWorkSpaceMember1));
 
         when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
                 .thenReturn(false);
 
         EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
-                () -> workSpaceMemberService.editAuthority(mockMember1.getId(), workSpaceId, Authority.MEMBER));  // 예외가 발생하는지 확인
+                () -> workSpaceMemberService.editAuthority(mockMember1.getId(), workspaceId, Authority.MEMBER));  // 예외가 발생하는지 확인
 
         // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());
@@ -142,20 +142,20 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
     @DisplayName("워크스페이스 멤버 삭제 시, 워크스페이스의 ADMIN은 항상 한 명 이상 존재하지 않으면 에러 테스트")
     void testEmptyWorkspaceMemberException() {
         // given
-        Long workSpaceId = 1L;
+        Long workspaceId = 1L;
         Member mockMember1 = new Member(1L, "닉네임1", "user1@example.com", "", "http://profile1.img");
 
         WorkSpaceMember mockWorkSpaceMember1 = new WorkSpaceMember(mockMember1, Authority.ADMIN);
 
         //when
-        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workSpaceId, mockMember1.getId()))
+        when(workSpaceMemberRepository.findFirstByWorkSpaceIdAndMemberId(workspaceId, mockMember1.getId()))
                 .thenReturn(Optional.of(mockWorkSpaceMember1));
 
         when(workSpaceMemberRepository.existsByWorkSpaceAndIsDeletedIsFalse(any()))
                 .thenReturn(false);
 
         EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
-                () -> workSpaceMemberService.deleteMember(workSpaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
+                () -> workSpaceMemberService.deleteMember(workspaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
 
         // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());

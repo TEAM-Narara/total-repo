@@ -34,22 +34,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 요청에서 JWT 토큰을 추출
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
-        System.out.println("doFilterInternal" + accessToken);
         if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-            System.out.println("doFilterInternal" + accessToken);
             setAuthenticationContext(accessToken, request);
 
             // @AuthenticationPrincipal annotation 을 사용한 인증 객체 생성
 
             Long userId = jwtTokenProvider.getMemberIdFromToken(accessToken);
-            System.out.println("doFilterInternal" + userId);
             // 사용자 ID로 UserDetails 객체 생성
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(String.valueOf(userId));
-            System.out.println("doFilterInternal" + userDetails);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             // SecurityContext에 인증 객체 저장
-            System.out.println("doFilterInternal" + authentication);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -63,20 +58,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @param request HttpServletRequest 객체
      */
     private void setAuthenticationContext(String token, HttpServletRequest request) {
-        System.out.println("setAuthenticationContext "+ token);
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
-        System.out.println("setAuthenticationContext "+ authentication);
-        System.out.println("setAuthenticationContext "+ authentication.getName());
 
         if (authentication == null) {
             return; // 인증이 null일 경우 바로 리턴
         }
 
         Long userId = Long.valueOf(authentication.getName());
-        System.out.println("setAuthenticationContext" + userId);
         Member member = memberRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundEntityException(userId, "멤버"));
         CustomUserDetails customUserDetails = new CustomUserDetails(member, userId, authentication.getAuthorities());
+//        System.out.println("Request member nickname: " + member.getNickname());
 
         // CustomUserDetails를 이용해 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -85,7 +77,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 요청 정보를 설정하여 SecurityContext에 등록
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
 
 //        // UsernamePasswordAuthenticationToken을 설정하여 인증 정보를 컨텍스트에 등록
 //        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

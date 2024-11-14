@@ -1,4 +1,4 @@
-package com.narara.superboard.common.interfaces.log;
+package com.narara.superboard.board.interfaces.dto.log;
 
 public record BoardWhereDto(
         Long boardId,

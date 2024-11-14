@@ -2,9 +2,11 @@ package com.narara.superboard.list.service;
 
 import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.BoardService;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
@@ -16,6 +18,7 @@ import com.narara.superboard.list.ListAction;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
+import com.narara.superboard.list.interfaces.dto.ListSimpleResponseDto;
 import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.list.interfaces.dto.info.ArchiveListInfo;
 import com.narara.superboard.list.interfaces.dto.info.CreateListInfo;
@@ -23,17 +26,19 @@ import com.narara.superboard.list.interfaces.dto.info.UpdateListInfo;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.constant.Action;
 import java.util.ArrayList;
+
+import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ListServiceImpl implements ListService{
-
     private final BoardService boardService;
 
     private final NameValidator nameValidator;
@@ -43,6 +48,9 @@ public class ListServiceImpl implements ListService{
     private final ListRepository listRepository;
     private final BoardHistoryRepository boardHistoryRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
+    @Transactional
     @Override
     public List createList(Member member, ListCreateRequestDto listCreateRequestDto) {
         nameValidator.validateListNameIsEmpty(listCreateRequestDto);
@@ -54,6 +62,7 @@ public class ListServiceImpl implements ListService{
         List list = List.createList(listCreateRequestDto, board);
 
         List savedlist = listRepository.save(list);
+        boardOffsetService.saveAddListDiff(savedlist); //Websocket 리스트 생성
         // 리스트 생성 로그 기록
         CreateListInfo createListInfo = new CreateListInfo(savedlist.getId(), savedlist.getName(), board.getId());
 
@@ -62,10 +71,10 @@ public class ListServiceImpl implements ListService{
 
         boardHistoryRepository.save(boardHistory);
 
-
         return savedlist;
     }
 
+    @Transactional
     @Override
     public List updateList(Member member, Long listId, ListUpdateRequestDto listUpdateRequestDto) {
         List list = getList(listId);
@@ -74,6 +83,8 @@ public class ListServiceImpl implements ListService{
         checkBoardMember(list, member, ListAction.EDIT_LIST);
 
         list.updateList(listUpdateRequestDto);
+
+        boardOffsetService.saveEditListDiff(list);  //Websocket 리스트 업데이트
 
         // 리스트 업데이트 로그 기록
         UpdateListInfo updateListInfo = new UpdateListInfo(list.getId(), list.getName());
@@ -92,12 +103,14 @@ public class ListServiceImpl implements ListService{
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
     }
 
+    @Transactional
     @Override
     public List changeListIsArchived(Member member, Long listId) {
         List list = getList(listId);
         checkBoardMember(list, member, ListAction.CHANGE_ARCHIVED);
 
         list.changeListIsArchived();
+        boardOffsetService.saveEditListArchiveDiff(list); // Websocket 리스트 아카이브화
 
         // 리스트 아카이브 상태 변경 로그 기록
         ArchiveListInfo archiveListInfo = new ArchiveListInfo(list.getId(), list.getName(), list.getIsArchived());
@@ -117,7 +130,7 @@ public class ListServiceImpl implements ListService{
                 .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
         boardService.checkBoardMember(board, member, ListAction.ARCHIVE_LIST);
 
-        java.util.List<List> archivedList = listRepository.findByBoardAndIsArchived(board, true);
+        java.util.List<List> archivedList = listRepository.findByBoardAndIsArchivedAndIsDeletedFalse(board, true);
         if (archivedList.isEmpty()) {
             return new ArrayList<>();
         }
@@ -126,12 +139,33 @@ public class ListServiceImpl implements ListService{
 
     @Override
     public void checkBoardMember(List list, Member member, Action action) {
-        java.util.List<BoardMember> boardMemberList = list.getBoard().getBoardMemberList();
+        Board board = list.getBoard();
+        java.util.List<BoardMember> boardMemberList = board.getBoardMemberList();
         for (BoardMember boardMember : boardMemberList) {
             if (boardMember.getMember().getId().equals(member.getId())) {
                 return;
             }
         }
+
+        if (board.getVisibility().equals(Visibility.WORKSPACE)) {
+            java.util.List<WorkSpaceMember> workspaceMemberList = board.getWorkSpace().getWorkspaceMemberList();
+            for (WorkSpaceMember workSpaceMember : workspaceMemberList) {
+                if (workSpaceMember.getMember().getId().equals(member.getId())) {
+                    return;
+                }
+            }
+        }
         throw new UnauthorizedException(member.getNickname(), action);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<ListSimpleResponseDto> getListsByBoardId(Long boardId) {
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
+                .orElseThrow(() -> new NotFoundEntityException(boardId, "보드"));
+
+        return listRepository.findByBoardAndIsDeletedFalseOrderByMyOrderAsc(board).stream()
+                .map(ListSimpleResponseDto::of)
+                .toList();
     }
 }

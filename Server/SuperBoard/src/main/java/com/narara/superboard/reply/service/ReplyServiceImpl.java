@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -21,7 +22,6 @@ import com.narara.superboard.websocket.enums.ReplyAction;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.narara.superboard.websocket.enums.ReplyAction.DELETE_REPLY;
 import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 
-
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
@@ -43,6 +43,8 @@ public class ReplyServiceImpl implements ReplyService{
     private final CardHistoryRepository cardHistoryRepository;
 
     private final ContentValidator contentValidator;
+
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     @Transactional
@@ -58,11 +60,12 @@ public class ReplyServiceImpl implements ReplyService{
 
         Reply savedReply = replyRepository.save(reply);
 
+        boardOffsetService.saveAddReply(savedReply); //Websocket reply 추가
 
         ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
-        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
-                member, savedReply.getUpdatedAt(), card.getList().getBoard(), card,
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -77,6 +80,7 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
+    @Transactional
     public Reply updateReply(Member member, Long replyId, ReplyUpdateRequestDto replyUpdateRequestDto) {
         contentValidator.validateReplyContentIsEmpty(replyUpdateRequestDto);
 
@@ -91,11 +95,12 @@ public class ReplyServiceImpl implements ReplyService{
             throw new UnauthorizedException(member.getNickname(), EDIT_REPLY);
         }
         reply.updateReply(replyUpdateRequestDto);
+        boardOffsetService.saveEditReply(reply); //Websocket reply 업데이트
 
         // 업데이트 로그 기록
         ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
-        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
@@ -106,6 +111,7 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
+    @Transactional
     public Reply deleteReply(Member member, Long replyId) {
         Reply reply = getReply(replyId);
         if (!member.getId().equals(reply.getMember().getId())){
@@ -115,7 +121,7 @@ public class ReplyServiceImpl implements ReplyService{
         // 삭제 로그 기록
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
-        CardHistory<ReplyInfo> cardHistory = CardHistory.careateCardHistory(
+        CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
                 member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 
@@ -123,6 +129,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         // 삭제 수행
         reply.deleteReply();
+        boardOffsetService.saveDeleteReply(reply); //Websocket reply 삭제
 
         return reply;
     }
@@ -134,6 +141,5 @@ public class ReplyServiceImpl implements ReplyService{
 
         return replyRepository.findAllByCard(card);
     }
-
 }
 

@@ -2,6 +2,7 @@ package com.narara.superboard.reply.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -56,6 +57,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private CardHistoryRepository cardHistoryRepository;
+
+    @Mock
+    private BoardOffsetService boardOffsetService;
 
     @Test
     @DisplayName("댓글 생성시, 카드가 존재하지 않을 때 NotFoundEntityException 발생")

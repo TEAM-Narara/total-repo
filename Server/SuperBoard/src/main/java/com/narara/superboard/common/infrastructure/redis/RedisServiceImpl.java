@@ -2,6 +2,7 @@ package com.narara.superboard.common.infrastructure.redis;
 
 import com.narara.superboard.common.exception.redis.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
@@ -49,6 +51,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean existData(String key) {
+
         if (key == null || key.isEmpty()) {
             throw new RedisKeyNotFoundException();
         }

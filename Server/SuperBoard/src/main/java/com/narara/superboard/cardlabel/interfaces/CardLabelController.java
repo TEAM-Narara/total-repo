@@ -4,6 +4,7 @@ import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.cardlabel.entity.CardLabel;
 import com.narara.superboard.cardlabel.interfaces.dto.CardLabelDto;
+import com.narara.superboard.cardlabel.interfaces.dto.CreateCardLabelRequest;
 import com.narara.superboard.cardlabel.service.CardLabelService;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,11 +34,10 @@ public class CardLabelController implements CardLabelAPI {
     @Override
     public ResponseEntity<DefaultResponse<CardLabelDto>> createCardLabel(
             @AuthenticationPrincipal Member member,
-            @RequestBody Long cardId,
-            @RequestBody Long labelId) {
+            @RequestBody CreateCardLabelRequest request) {
+        Card card = cardService.getCard(request.cardId());
+        Label label = labelService.getLabel(request.labelId());
 
-        Card card = cardService.getCard(cardId);
-        Label label = labelService.getLabel(labelId);
         CardLabel cardLabel = cardLabelService.createCardLabel(card, label);
         CardLabelDto cardLabelDto = CardLabelDto.of(cardLabel);
 
@@ -51,12 +50,11 @@ public class CardLabelController implements CardLabelAPI {
     @Override
     public ResponseEntity<DefaultResponse<CardLabelDto>> changeCardLabelIsActivated(
             @AuthenticationPrincipal Member member,
-            @RequestBody Long cardId,
-            @RequestBody Long labelId) {
+            @RequestBody CreateCardLabelRequest request) {
+        Card card = cardService.getCard(request.cardId());
+        Label label = labelService.getLabel(request.labelId());
 
-        Card card = cardService.getCard(cardId);
-        Label label = labelService.getLabel(labelId);
-        CardLabel updatedCardLabel = cardLabelService.changeCardLabelIsActivated(card, label);
+        CardLabel updatedCardLabel = cardLabelService.changeCardLabelIsActivated(card, label,request.isActivated());
         CardLabelDto cardLabelDto = CardLabelDto.of(updatedCardLabel);
 
         return new ResponseEntity<>(

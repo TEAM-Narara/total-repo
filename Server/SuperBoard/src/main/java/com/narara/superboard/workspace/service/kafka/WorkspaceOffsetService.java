@@ -6,24 +6,13 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.websocket.enums.WorkspaceAction;
 import com.narara.superboard.workspace.entity.WorkSpace;
-import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset;
 import com.narara.superboard.workspace.entity.mongo.WorkspaceOffset.DiffInfo;
-import com.narara.superboard.workspace.interfaces.dto.websocket.WorkspaceDiffDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -38,7 +27,16 @@ public class WorkspaceOffsetService {
     public static final String AUTHORITY_COLUMN = "authority";
     public static final String BOARD_ID_COLUMN = "boardId";
     public static final String BOARD_NAME_COLUMN = "boardName";
-    private final MongoTemplate mongoTemplate;
+    public static final String IS_DELETED_COLUMN = "isDeleted";
+    public static final String WORKSPACE_MEMBER_ID_COLUMN = "workspaceMemberId";
+    public static final String MEMBER_EMAIL_COLUMN = "memberEmail";
+    public static final String PROFILE_IMG_URL_COLUMN = "profileImgUrl";
+    public static final String COVER_TYPE_COLUMN = "coverType";
+    public static final String COVER_VALUE_COLUMN = "coverValue";
+    public static final String IS_CLOSED_COLUMN = "isClosed";
+    public static final String VISIBILITY_COLUMN = "visibility";
+    public static final String IS_ARCHIVE_COLUMN = "isArchive";
+    //    private final MongoTemplate mongoTemplate;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -48,10 +46,17 @@ public class WorkspaceOffsetService {
      * @param workspace
      */
     public void saveEditWorkspaceDiff(WorkSpace workspace) {
-
         Map<String, Object> data = new HashMap<>();
+        /*
+         * {
+         *   workspaceId: 132,
+         *   workspaceName: “새로운 웤”,
+         *   isDeleted: false
+         * }
+         */
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
         data.put(WORKSPACE_NAME_COLUMN, workspace.getName());
+        data.put(IS_DELETED_COLUMN, workspace.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
@@ -71,7 +76,14 @@ public class WorkspaceOffsetService {
      */
     public void saveDeleteWorkspaceDiff(WorkSpace workspace) {
         Map<String, Object> data = new HashMap<>();
+        /*
+         * {
+         *   workspaceId: 1,
+         *   isDeleted: true
+         * }
+         */
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(IS_DELETED_COLUMN, workspace.getIsDeleted());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
@@ -94,16 +106,21 @@ public class WorkspaceOffsetService {
         Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_MEMBER_ID_COLUMN, workspaceMember.getId());
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, member.getId());
-        data.put(MEMBER_NAME_COLUMN, member.getNickname());
+        data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
+        data.put(MEMBER_NAME_COLUMN, workspaceMember.getMember().getNickname());
+        data.put(MEMBER_EMAIL_COLUMN, workspaceMember.getMember().getEmail());
+        data.put(PROFILE_IMG_URL_COLUMN, workspaceMember.getMember().getProfileImgUrl());
+        data.put(IS_DELETED_COLUMN, workspaceMember.getMember().getIsDeleted());
+//        data.put("loginType", workspaceMember.getMember().getIsDeleted()); //로그인타입 줄까말까
         data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.ADD_MEMBER.name(),
+                WorkspaceAction.ADD_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -119,14 +136,15 @@ public class WorkspaceOffsetService {
         WorkSpace workspace = workspaceMember.getWorkSpace();
 
         Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_MEMBER_ID_COLUMN, workspaceMember.getId());
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, workspace.getId());
+        data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.DELETE_MEMBER.name(),
+                WorkspaceAction.DELETE_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -143,15 +161,16 @@ public class WorkspaceOffsetService {
         Member member = workspaceMember.getMember();
 
         Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_MEMBER_ID_COLUMN, workspaceMember.getId());
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
-        data.put(MEMBER_ID_COLUMN, member.getId());
+        data.put(MEMBER_ID_COLUMN, workspaceMember.getMember().getId());
         data.put(AUTHORITY_COLUMN, workspaceMember.getAuthority());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
                 workspace.getUpdatedAt(),
                 WORKSPACE,
-                WorkspaceAction.EDIT_MEMBER.name(),
+                WorkspaceAction.EDIT_WORKSPACE_MEMBER.name(),
                 data
         );
 
@@ -170,9 +189,10 @@ public class WorkspaceOffsetService {
         data.put(WORKSPACE_ID_COLUMN, workspace.getId());
         data.put(BOARD_ID_COLUMN, board.getId());
         data.put(BOARD_NAME_COLUMN, board.getName());
-        data.put("backgroundType", board.getCover().get("type"));
-        data.put("backgroundValue", board.getCover().get("value"));
-        data.put("isClosed", board.getIsArchived());
+        data.put(COVER_TYPE_COLUMN, board.getCover().get("type"));
+        data.put(COVER_VALUE_COLUMN, board.getCover().get("value"));
+        data.put(IS_CLOSED_COLUMN, board.getIsArchived());
+        data.put(VISIBILITY_COLUMN, board.getVisibility().name());
 
         DiffInfo diffInfo = new DiffInfo(
                 // workspace.getOffset(),
@@ -210,6 +230,63 @@ public class WorkspaceOffsetService {
         sendMessageToKafka(workspace.getId(),diffInfo);
     }
 
+    public void saveEditBoardDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(BOARD_NAME_COLUMN, board.getName());
+        data.put(COVER_TYPE_COLUMN, board.getCover().get("type"));
+        data.put(COVER_VALUE_COLUMN, board.getCover().get("value"));
+        data.put(IS_CLOSED_COLUMN, board.getIsArchived());
+        data.put(VISIBILITY_COLUMN, board.getVisibility().name());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    public void saveEditBoardArchiveDiff(Board board) {
+        WorkSpace workspace = board.getWorkSpace();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(WORKSPACE_ID_COLUMN, workspace.getId());
+        data.put(BOARD_ID_COLUMN, board.getId());
+        data.put(IS_ARCHIVE_COLUMN, board.getIsArchived());
+
+        DiffInfo diffInfo = new DiffInfo(
+                workspace.getUpdatedAt(),
+                WORKSPACE,
+                WorkspaceAction.EDIT_ARCHIVE_BOARD.name(),
+                data
+        );
+
+        // 카프카로 메시지 전송
+        sendMessageToKafka(workspace.getId(),diffInfo);
+    }
+
+    private <T> void sendMessageToKafka(Long workspaceId, T object) {
+        String topic = "workspace-" + workspaceId;
+
+        // DiffInfo 객체를 JSON 문자열로 변환
+        String jsonMessage = null;
+        try {
+            jsonMessage = objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        // Kafka에 메시지 전송
+        kafkaTemplate.send(topic, jsonMessage);
+        System.out.println("topic: " + topic + ", Message sent to Kafka: " + jsonMessage);
+    }
+
     //특정 offset 이후 변경사항 불러오는 로직
 //    public List<WorkspaceDiffDto> getDiffListFromOffset(Long workspaceId, Long fromOffset) {
 //        WorkspaceOffset workspaceOffset = getWorkspaceOffset(workspaceId);
@@ -226,24 +303,9 @@ public class WorkspaceOffsetService {
 //                .collect(Collectors.toList());
 //    }
 
-    private <T> void sendMessageToKafka(Long workspaceId, T object) {
-        String topic = "workspace-" + workspaceId;
-
-        // DiffInfo 객체를 JSON 문자열로 변환
-        String jsonMessage = null;
-        try {
-            jsonMessage = objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        // Kafka에 메시지 전송
-        kafkaTemplate.send(topic, jsonMessage);
-        System.out.println("Message sent to Kafka: " + jsonMessage);
-    }
-
-    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
-        Query query = new Query(Criteria.where("workspaceId").is(workspace));
-        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
-        return workspaceOffset;
-    }
+//    private WorkspaceOffset getWorkspaceOffset(Long workspace) {
+//        Query query = new Query(Criteria.where("workspaceId").is(workspace));
+//        WorkspaceOffset workspaceOffset = mongoTemplate.findOne(query, WorkspaceOffset.class);
+//        return workspaceOffset;
+//    }
 }

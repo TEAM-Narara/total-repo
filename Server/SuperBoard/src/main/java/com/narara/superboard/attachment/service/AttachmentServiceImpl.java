@@ -2,6 +2,7 @@ package com.narara.superboard.attachment.service;
 
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
@@ -27,6 +28,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final CardRepository cardRepository;
     private final CardHistoryRepository cardHistoryRepository;
 
+    private final BoardOffsetService boardOffsetService;
+
     @Override
     @Transactional
     public Attachment addAttachment(Member member, Long cardId, String url) {
@@ -40,15 +43,18 @@ public class AttachmentServiceImpl implements AttachmentService {
             updateCardCover(card, attachment);
         }
 
-        // 첨부 파일 추가 로그 기록
-        AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), url, isCover);
+        boardOffsetService.saveAddAttachmentDiff(attachment); //Websocket 첨부파일 추가
 
-        CardHistory<AddAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
-                EventType.ADD, EventData.ATTACHMENT, addAttachmentInfo);
+        // 첨부 파일 추가 로그 기록
+        AddAttachmentInfo addAttachmentInfo = new AddAttachmentInfo(cardId, card.getName(), attachment.getId(), url,
+                isCover);
+
+        CardHistory<AddAttachmentInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
+                EventType.CREATE, EventData.ATTACHMENT, addAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-
 
         return attachment;
     }
@@ -66,16 +72,18 @@ public class AttachmentServiceImpl implements AttachmentService {
         markAttachmentAsDeleted(attachment);
         saveAttachment(attachment);
 
+        boardOffsetService.saveDeleteAttachmentDiff(attachment); //Websocket 첨부파일 삭제
+
         // 첨부 파일 삭제 로그 기록
         DeleteAttachmentInfo deleteAttachmentInfo = new DeleteAttachmentInfo(
-                card.getId(), card.getName(), attachmentId, attachment.getIsCover());
+                card.getId(), card.getName(), attachmentId, attachment.getUrl(), attachment.getIsCover());
 
-        CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.careateCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+        CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.createCardHistory(
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                card,
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
-
     }
 
     @Override
@@ -89,7 +97,9 @@ public class AttachmentServiceImpl implements AttachmentService {
             removeCardCover(attachment.getCard());
         }
 
-        saveAttachment(attachment);
+        Attachment savedAttachment = saveAttachment(attachment);
+
+        boardOffsetService.saveEditAttachmentCoverDiff(savedAttachment); //Websocket 첨부파일 수정
     }
 
     // Helper Methods
@@ -129,8 +139,8 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .build();
     }
 
-    private void saveAttachment(Attachment attachment) {
-        attachmentRepository.save(attachment);
+    private Attachment saveAttachment(Attachment attachment) {
+        return attachmentRepository.save(attachment);
     }
 
     private void updateCardCover(Card card, Attachment attachment) {
@@ -155,22 +165,31 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setIsCover(false);
     }
 
+    public interface AttachmentInfo {
+        Long cardId();
+        String cardName();
+        Long attachmentId();
+        String url();
+        boolean isCover();
+    }
+
     // 첨부 파일 추가 관련 정보
     public record AddAttachmentInfo(
             Long cardId,
             String cardName,
+            Long attachmentId,
             String url,
             boolean isCover
-    ) {
+    ) implements AttachmentInfo{
     }
 
     // 첨부 파일 삭제 관련 정보
     public record DeleteAttachmentInfo(
             Long cardId,
             String cardName,
-            Long url,
+            Long attachmentId,
+            String url,
             boolean isCover
-    ) {
+    ) implements AttachmentInfo{
     }
-
 }

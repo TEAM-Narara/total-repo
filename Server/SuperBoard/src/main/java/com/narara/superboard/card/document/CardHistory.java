@@ -2,6 +2,7 @@ package com.narara.superboard.card.document;
 
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.cardmember.interfaces.dto.log.RepresentativeStatusChangeInfo;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 
@@ -29,7 +30,7 @@ public class CardHistory<T>{
     private EventData eventData; // 데이터 유형 (CARD, BOARD, LABEL 등) // 어떻게
     private T target; // 기타 등등...
 
-    public static <T> CardHistory<T> careateCardHistory(Member member, Long when, Board board, Card card, EventType eventType, EventData eventData, T target) {
+    public static <T> CardHistory<T> createCardHistory(Member member, Long when, Board board, Card card, EventType eventType, EventData eventData, T target) {
         return CardHistory.<T>builder()
                 .who(Who.of(member))
                 .when(when)
@@ -39,4 +40,5 @@ public class CardHistory<T>{
                 .target(target)
                 .build();
     }
+
 }
