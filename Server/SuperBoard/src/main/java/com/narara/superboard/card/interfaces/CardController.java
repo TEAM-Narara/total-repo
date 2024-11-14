@@ -39,6 +39,7 @@ public class CardController implements CardAPI {
 
     private final CardService cardService;
     private final CardMoveService cardMoveService;
+//    private final FcmTokenService fcmTokenService;
 
     private final CoverHandler coverHandler;
 
@@ -51,6 +52,8 @@ public class CardController implements CardAPI {
         Card card = cardService.createCard(member, cardCreateRequestDto);
 
         CardDetailResponseDto cardSimpleResponseDto = CardDetailResponseDto.from(card);
+
+//        fcmTokenService.sendMessage(member, "[사용자 이름] created [카드이름] in [리스트이름] on [보드이름] + [사용자 프로필사진]", "");
 
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CARD_CREATE_SUCCESS, cardSimpleResponseDto),
@@ -116,6 +119,9 @@ public class CardController implements CardAPI {
             @PathVariable Long cardId) {
 
         cardService.changeArchiveStatusByCard(member, cardId);
+
+        //        fcmTokenService.sendMessage(member, "[사용자 이름] archived the card [카드이름] on [보드이름] + [사용자 프로필사진]");
+        //        fcmTokenService.sendMessage(member, "[사용자 이름] unarchived the card [카드이름] on [보드이름] + [사용자 프로필사진]");
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_ARCHIVE_STATUS_CHANGE_SUCCESS)
@@ -200,6 +206,9 @@ public class CardController implements CardAPI {
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
             @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
         CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
+
+        //        fcmTokenService.sendMessage(member, "[사용자 이름] moved the card [카드이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]");
+
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 

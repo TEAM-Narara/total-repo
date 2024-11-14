@@ -56,6 +56,8 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         cardHistoryRepository.save(cardHistory);
 
+        //        fcmTokenService.sendMessage(member, "[사용자 이름] attached [이미지 이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]");
+
         return attachment;
     }
 
