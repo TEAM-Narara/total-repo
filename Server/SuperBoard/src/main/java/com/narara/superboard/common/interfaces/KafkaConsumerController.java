@@ -22,7 +22,6 @@ public class KafkaConsumerController {
     @MessageMapping("/ack")
     public void receiveAck(@Payload AckMessage ackMessage) {
 
-        System.out.println("ack 받았다!!!!!!");
         OffsetKey offsetKey = new OffsetKey(
                 ackMessage.topic(),
                 ackMessage.partition(),
@@ -30,8 +29,7 @@ public class KafkaConsumerController {
                 ackMessage.groupId()
         );
 
-        // Log the details of the ack received
-        log.info("Received ack for topic: {}, partition: {}, offset: {}, groupId: {}",
+        log.info("ACK 받음: {}, partition: {}, offset: {}, groupId: {}",
                 ackMessage.topic(), ackMessage.partition(), ackMessage.offset(), ackMessage.groupId());
 
         kafkaEventListenerService.processAcknowledgment(offsetKey);
