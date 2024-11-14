@@ -1,8 +1,11 @@
 package com.narara.superboard.common.config.kafka;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -88,6 +91,11 @@ public class KafkaConsumerConfig {
         // 리스너가 작업을 실행할 TaskExecutor를 설정합니다.
         // 비동기 작업 처리를 위한 실행기를 지정하여 리스너가 비동기적으로 실행됩니다.
         factory.getContainerProperties().setListenerTaskExecutor(taskExecutorConfig.executor());
+
+        // Kafka 내부 로그 레벨을 강제로 ERROR로 설정
+        ((Logger) LoggerFactory.getLogger("org.apache.kafka")).setLevel(Level.ERROR);
+        ((Logger) LoggerFactory.getLogger("org.springframework.kafka")).setLevel(Level.ERROR);
+
 
         return factory;
     }
