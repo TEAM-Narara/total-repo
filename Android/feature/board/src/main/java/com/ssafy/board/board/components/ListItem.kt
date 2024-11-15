@@ -34,7 +34,7 @@ fun ListItem(
     reorderState: ReorderState<ReorderCardData>,
     cardCollections: Map<Long, MutableState<List<ReorderCardData>>>,
     onTitleChange: (String) -> Unit = {},
-    onCardReordered: () -> Unit = {},
+    onCardReordered: (Long, Long, Long?, Long?) -> Unit = { _, _, _, _ -> },
     navigateToCardScreen: (Long) -> Unit = {},
     addCard: (Long, String) -> Unit = { _, _ -> },
     addPhoto: () -> Unit = {},
@@ -90,7 +90,15 @@ fun ListItem(
                             }
                         }
                     },
-                    onDrop = { onCardReordered() },
+                    onDrop = { state ->
+                        val cardId = state.data.cardData.id
+                        val targetListId = state.data.listId ?: return@ReorderableItem
+                        val index = collection.indexOf(state.data)
+                        val prevCardId = if (index <= 0) null else collection[index - 1].cardData.id
+                        val nextCardId = if (index < 0 || index >= collection.size - 1) null else collection[index + 1].cardData.id
+
+                        onCardReordered(cardId, targetListId, prevCardId, nextCardId)
+                    },
                 ) {
                     CardItem(
                         modifier = Modifier
