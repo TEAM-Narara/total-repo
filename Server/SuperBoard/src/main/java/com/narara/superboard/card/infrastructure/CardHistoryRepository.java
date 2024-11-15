@@ -12,7 +12,7 @@ public interface CardHistoryRepository extends MongoRepository<CardHistory, Stri
     List<CardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId);
     Page<CardHistory> findByWhere_BoardIdOrderByWhenDesc(Long boardId, Pageable pageable);
 
-    Page<CardHistory> findByWhere_BoardIdAndEventDataNotInOrderByWhenDesc(Long boardId, Pageable pageable);
+//    Page<CardHistory> findByWhere_BoardIdInOrderByWhenDesc(Long boardId, Pageable pageable);
 
     List<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId);
     Page<CardHistory> findByWhere_CardIdOrderByWhenDesc(Long cardId, Pageable pageable);

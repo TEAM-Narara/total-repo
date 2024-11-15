@@ -41,6 +41,7 @@ import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
+
 import java.sql.SQLOutput;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -56,6 +57,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -227,7 +229,7 @@ public class BoardServiceImpl implements BoardService {
                 board.getIsArchived());
 
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, 
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE,
                 EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -355,10 +357,9 @@ public class BoardServiceImpl implements BoardService {
         Page<BoardHistory> boardHistoryCollection = boardHistoryRepository
                 .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
         Page<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository
-                .findByWhere_BoardIdAndEventDataNotInOrderByWhenDesc(boardId, pageable);
+                .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
 
-        long totalElements =
-                boardHistoryCollection.getTotalElements() + cardHistoryCollectionByBoard.getTotalElements();
+        long totalElements = boardHistoryCollection.getTotalElements() + cardHistoryCollectionByBoard.getTotalElements();
         long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
 
         // 각각의 컬렉션을 DTO로 변환
@@ -372,7 +373,7 @@ public class BoardServiceImpl implements BoardService {
         // 두 리스트를 합치고 when() 기준으로 정렬 후, Pageable 사이즈에 맞게 결과를 반환
         List<BoardLogDetailResponseDto> boardActivityDetailResponseDtos = sortAndResizeBoardActivityList(boardDtoList,
                 cardDtoList, pageable);
-        return new BoardCombinedLogResponseDto(boardActivityDetailResponseDtos, totalElements, totalPages);
+        return new BoardCombinedLogResponseDto(boardActivityDetailResponseDtos, totalPages, totalElements);
     }
 
 
@@ -460,21 +461,26 @@ public class BoardServiceImpl implements BoardService {
         boardLogList = boardLogList.subList(0, toIndex);
 
         // 댓글 목록을 가져옴
-        PageBoardReplyResponseDto replyDto = getRepliesByBoardId(boardId, myPageable);
-        List<BoardReplyCollectionResponseDto> replyLogList = replyDto.boardReplyCollectionResponseDtos();
+//        PageBoardReplyResponseDto replyDto = getRepliesByBoardId(boardId, myPageable);
+//        List<BoardReplyCollectionResponseDto> replyLogList = replyDto.boardReplyCollectionResponseDtos();
 
-        toIndex = Math.min(replyLogList.size(), firstToPageableElement);
-        replyLogList = replyLogList.subList(0, toIndex);
+//        toIndex = Math.min(replyLogList.size(), firstToPageableElement);
+//        replyLogList = replyLogList.subList(0, toIndex);
 
         // 두 Page 객체의 총 페이지 수와 총 요소 수 계산
-        long totalElements = boardCombinedLog.totalElements() + replyDto.totalElements();
-        long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
+//        long totalElements = boardCombinedLog.totalElements() + replyDto.totalElements();
+        long totalPages = (long) Math.ceil((double) boardCombinedLog.totalElements() / pageable.getPageSize());
 
-        // pageable 및 정렬
-        List<BoardCombinedActivityDto> boardCombinedLogDtos =
-                mergeAndResizeSortedList(pageable, boardLogList, replyLogList);
+        List<BoardCombinedActivityDto> boardCombinedActivityDtoList = new ArrayList<>();
+
+        for (BoardLogDetailResponseDto boardLogDetailResponseDto : boardLogList) {
+            boardCombinedActivityDtoList.add(BoardCombinedActivityDto.of(boardLogDetailResponseDto));
+        }
+//        // pageable 및 정렬
+////        List<BoardCombinedActivityDto> boardCombinedLogDtos =
+////                mergeAndResizeSortedList(pageable, boardLogList, replyLogList);
         // 각각의 DTO 리스트를 CombinedBoardEvent로 변환하여 timestamp 기준으로 최신순 정렬
-        return new BoardActivityPageableResponseDto(boardCombinedLogDtos, totalPages, totalElements);
+        return new BoardActivityPageableResponseDto(boardCombinedActivityDtoList, boardCombinedLog.totalElements(), totalPages);
     }
 
     private List<BoardCombinedActivityDto> mergeAndResizeSortedList(
