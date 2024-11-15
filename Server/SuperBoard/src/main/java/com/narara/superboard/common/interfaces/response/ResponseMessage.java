@@ -26,6 +26,8 @@ public class ResponseMessage {
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 에러";
     public static final String DB_ERROR = "데이터베이스 에러";
 
+    public static final String KAFKA_READ_MESSAGE_SUCCESS = "카프카 메시지 조회 성공";
+
 
     // 워크스페이스 관련 상수
     public static final String WORKSPACE_CREATE_SUCCESS = "워크스페이스 생성 성공";

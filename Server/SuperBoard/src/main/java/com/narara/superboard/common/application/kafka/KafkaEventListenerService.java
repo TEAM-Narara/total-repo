@@ -1,5 +1,8 @@
 package com.narara.superboard.common.application.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.narara.superboard.common.enums.MessageOrigin;
 import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.common.interfaces.dto.MessageRecord;
 import com.narara.superboard.common.interfaces.dto.OffsetKey;
@@ -9,9 +12,11 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.event.ListenerContainerIdleEvent;
 import org.springframework.kafka.listener.*;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +38,7 @@ public class KafkaEventListenerService {
     private final RedisService redisService;
     private final ConsumerFactory<String, String> consumerFactory;
     // 컨슈머 리스너 중복 관리를 위한 맵
-    private final Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners = new ConcurrentHashMap<>();
+    private final Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners;
     private final Map<OffsetKey, Acknowledgment> pendingAcks = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final long WAIT_PERIOD = 3000;
@@ -73,82 +77,12 @@ public class KafkaEventListenerService {
             });
 
             container.start();
+
             activeListeners.put(listenerKey, container);
         }
 
         // 구독 시점에 필요한 Offset부터 밀린 메시지 가져오기
         fetchMissedMessages(container, topic, memberId);
-    }
-
-    /**
-     * 이미 존재하는 리스너를 사용하여 특정 오프셋에서부터 데이터를 다시 가져옴
-     *
-     * @param partition   파티션 번호
-     * @param offset      시작할 오프셋
-     * @param entityType  엔티티 타입
-     * @param primaryId   기본 ID (엔티티의 ID)
-     * @param memberId    회원 ID
-     */
-    public void seekToOffsetAndFetch(int partition, long offset, String entityType, Long primaryId, Long memberId) {
-
-        // 해당 토픽에 대한 기존 리스너 확인
-        String topic = entityType + "-" + primaryId;
-        String groupId = "member-" + memberId;
-        String listenerKey = topic + "-" + groupId;
-        ConcurrentMessageListenerContainer<String, String> container = activeListeners.get(listenerKey);
-
-        if (container == null) {
-            log.error("지정된 토픽에 대한 리스너를 찾을 수 없습니다 - 토픽: {}", topic);
-            return;
-        }
-
-        container.stop();
-        // 리스트에 offset 넣기
-        List<MessageRecord> messages = new ArrayList<>();
-        AtomicReference<Acknowledgment> lastAcknowledgment = new AtomicReference<>(); // 마지막 ack 저장용
-
-        // 리스너 설정: 오프셋 설정 후 다시 데이터 가져오기
-        container.getContainerProperties().setMessageListener(
-                (AcknowledgingConsumerAwareMessageListener<String, String>) (record, acknowledgment, consumer) -> {
-                    seekToOffset((Consumer<String,String>) consumer, topic, partition, offset);
-                    // 오프셋 이동 후 데이터 가져오기
-                    consumer.resume(Collections.singleton(new TopicPartition(topic, partition))); // 특정 파티션에서 재개
-                    // 메시지를 리스트에 추가
-                    messages.add(new MessageRecord(record.offset(),record.value()));
-                    // 마지막 acknowledgment 갱신
-                    lastAcknowledgment.set(acknowledgment);
-                }
-        );
-
-        // 메시지 리스트를 소켓 전송
-        // header에 offset을 포함해 STOMP로 메시지 전송
-        String destination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
-        Map<String, Object> headers = new HashMap<>();
-        // 마지막 오프셋 넣기
-        headers.put("offset", messages.getLast().offset());
-        messagingTemplate.convertAndSend(destination, messages, headers);
-
-        // 마지막 acknowledgment로 ACK 커밋을 위한 처리
-        Acknowledgment finalAck = lastAcknowledgment.get();
-        if (finalAck != null) {
-            OffsetKey offsetKey = new OffsetKey(topic, partition, messages.getLast().offset(), groupId);
-            // TODO : ack를 받아서 pendingAcks를 체크할때, 똑같은 ack를 받으면 오또캐?
-            // 다른 map을 해야하려나
-            pendingAcks.put(offsetKey, finalAck); // 마지막 ACK만 저장
-        }
-
-        container.start(); // 컨슈머 재시작
-        log.info("특정 오프셋으로 이동 후 메시지 가져오는 중 - 토픽: {}, 파티션: {}, 오프셋: {}", topic, partition, offset);
-    }
-
-    /**
-     * 컨슈머를 지정한 오프셋으로 이동 및 재개
-     */
-    private void seekToOffset(Consumer<String, String> consumer, String topic, int partition, long offset) {
-        TopicPartition topicPartition = new TopicPartition(topic, partition);
-        consumer.pause(Collections.singleton(topicPartition)); // 특정 파티션 일시 중지
-        consumer.seek(topicPartition, offset); // 오프셋 이동
-        log.info("컨슈머 오프셋 이동 - 토픽: {}, 파티션: {}, 오프셋: {}", topic, partition, offset);
     }
 
     /**
@@ -173,6 +107,7 @@ public class KafkaEventListenerService {
         // header에 offset을 포함해 STOMP로 메시지 전송
         Map<String, Object> headers = new HashMap<>();
         headers.put("offset", offset);
+        headers.put("type", MessageOrigin.RECEIVED.toString());
         messagingTemplate.convertAndSend(destination, record.value(), headers);
 
         // 메모리 맵과 Redis에 ACK 추가
@@ -185,7 +120,7 @@ public class KafkaEventListenerService {
     }
 
     /**
-     * 순서에 맞는 ACK가 처리되었는지 확인하고, 순서가 맞지 않으면 Redis 대기 큐에 저장하여 순서를 맞춥니다.
+     * offset 지정한 전체 데이터 받을 시에, 마지막 offset으로 ACK 받기
      */
     public void processAcknowledgment(OffsetKey offsetKey) {
         String topic = offsetKey.topic();

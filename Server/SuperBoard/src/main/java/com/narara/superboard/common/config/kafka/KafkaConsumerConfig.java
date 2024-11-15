@@ -20,6 +20,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -115,6 +116,11 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         return factory;
+    }
+
+    @Bean
+    public Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners() {
+        return new ConcurrentHashMap<>();
     }
 }
 

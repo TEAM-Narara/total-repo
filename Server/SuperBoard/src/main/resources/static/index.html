@@ -202,7 +202,20 @@
             }, JSON.stringify(ackMessage));
         }
 
-// 구독 후 메시지 수신 시 ack 전송 호출
+        // 실제 ack 데이터 전송 함수
+        function sendLastAckToServer(topic, partition, offset, groupId) {
+            const ackMessage = {
+                topic: topic,
+                partition: partition,
+                offset: offset,
+                groupId: groupId
+            };
+            stompClient.send("/app/ack/last", {
+                "content-type": "application/json"
+            }, JSON.stringify(ackMessage));
+        }
+
+        // 구독 후 메시지 수신 시 ack 전송 호출
         subscriptions[subscriptionNumber] = stompClient.subscribe(subscribeUrl, function(response) {
             console.log('수신됨:', response);
             displayMessage(response, subscriptionNumber);
@@ -215,6 +228,7 @@
             // 서버에 보낼 ack 정보 추출
             const partition = response.headers['partition'] || 0; // partition이 없다면 기본값 0 사용
             const offset = response.headers['offset']; // offset이 서버에서 전송되었는지 확인
+            const type = response.headers['type'] || "RECEIVED";
 
             // offset이 없는 경우 경고
             if (offset === undefined) {
@@ -222,8 +236,12 @@
                 return;
             }
 
+            if(type === "RECEIVED"){
+                sendAckToServer(topic, partition, offset, groupId);
+            }else{
+                sendLastAckToServer(topic, partition, offset, groupId);
+            }
             // 서버로 직접 ack 전송
-            sendAckToServer(topic, partition, offset, groupId);
         }, { ack: 'client' });
 
         alert(`${subscribeUrl} 구독 완료`);
