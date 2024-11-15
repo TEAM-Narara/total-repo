@@ -38,6 +38,7 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.board.components.AddListButton
+import com.ssafy.board.board.components.DraggableList
 import com.ssafy.board.board.components.ListItem
 import com.ssafy.board.board.components.TopAppBar
 import com.ssafy.board.board.data.BoardData
@@ -171,8 +172,6 @@ private fun BoardScreen(
     var listCollection by remember(boardData.listCollection) { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
-    val listState = remember{ mutableStateOf(true) }
-
     val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
     val cardCollections = remember {
         mutableStateMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
@@ -184,8 +183,7 @@ private fun BoardScreen(
         }
     }
 
-    // TODO : card의 onLongPressed가 내려오는 문제 해결
-    ReorderContainer(state = listReorderState, enabled = listState.value) {
+    ReorderContainer(state = listReorderState) {
         ReorderContainer(state = cardReorderState) {
             LazyRow(
                 state = listLazyListState,
@@ -201,6 +199,7 @@ private fun BoardScreen(
                         key = listData.id,
                         data = listData,
                         dropStrategy = DropStrategy.CenterDistance,
+                        requireFirstDownUnconsumed = true,
 
                         onDragEnter = { state ->
                             listCollection = listCollection.toMutableList().apply {
@@ -222,9 +221,13 @@ private fun BoardScreen(
                             val listId = state.data.id
                             val index = listCollection.indexOf(state.data)
                             val prevCardId = if (index <= 0) null else listCollection[index - 1].id
-                            val nextCardId = if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                            val nextCardId =
+                                if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
                             onListReordered(listId, prevCardId, nextCardId)
                         },
+                        draggableContent = {
+                            DraggableList(listData = listData)
+                        }
                     ) {
                         ListItem(
                             modifier = Modifier
@@ -249,7 +252,6 @@ private fun BoardScreen(
                                     )
                                 }
                             },
-                            listState = listState
                         )
                     }
                 }
