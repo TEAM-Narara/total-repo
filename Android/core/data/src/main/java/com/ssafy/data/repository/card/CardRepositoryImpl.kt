@@ -20,14 +20,12 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
-import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInMyRepresentativeCard
@@ -192,9 +190,11 @@ class CardRepositoryImpl @Inject constructor(
                 val maxMyOrder = cardMoveUpdateRequestDTO.maxByOrNull { it.myOrder }?.myOrder ?: 0L
 
                 if (list != null) {
-                    listDao.updateList(list.copy(
-                        lastCardOrder = maxMyOrder
-                    ))
+                    listDao.updateList(
+                        list.copy(
+                            lastCardOrder = maxMyOrder
+                        )
+                    )
                 }
             }
         }
@@ -605,35 +605,34 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
-            val attachment = attachmentDao.getAttachment(id)
-
-            if (attachment != null) {
-                if (isConnected) {
-                    cardDataSource.updateAttachmentToCover(id)
-                } else {
-                    val result = when (attachment.isStatus) {
-                        DataStatus.STAY ->
-                            attachmentDao.updateAttachment(
-                                attachment.copy(
-                                    isCover = !attachment.isCover,
-                                    isStatus = DataStatus.UPDATE
-                                )
-                            )
-
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            attachmentDao.updateAttachment(
-                                attachment.copy(
-                                    isCover = !attachment.isCover,
-                                )
-                            )
-
-                        DataStatus.DELETE -> {}
-                    }
-
-                    flowOf(result)
-                }
+            if (isConnected) {
+                cardDataSource.updateAttachmentToCover(id)
             } else {
-                flowOf(Unit)
+                val attachment = attachmentDao.getAttachment(id)
+                val cardId = attachment?.cardId ?: return@withContext flowOf(Unit)
+                val cardEntity = cardDao.getCard(cardId) ?: return@withContext flowOf(Unit)
+
+                val result = when (attachment.isStatus) {
+                    DataStatus.STAY ->
+                        cardDao.updateCard(
+                            cardEntity.copy(
+                                coverType = attachment.type,
+                                coverValue = attachment.url,
+                                isStatus = DataStatus.UPDATE
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        cardDao.updateCard(
+                            cardEntity.copy(
+                                coverType = attachment.type,
+                                coverValue = attachment.url
+                            )
+                        )
+
+                    DataStatus.DELETE -> {}
+                }
+                flowOf(result)
             }
         }
 

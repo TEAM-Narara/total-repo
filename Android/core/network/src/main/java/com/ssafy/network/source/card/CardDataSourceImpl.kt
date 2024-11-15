@@ -1,9 +1,8 @@
 package com.ssafy.network.source.card
 
 import com.ssafy.model.attachment.AttachmentResponseDto
-import com.ssafy.model.card.CardLabelUpdateDto
-import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardDetailDto
+import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
@@ -75,7 +74,7 @@ class CardDataSourceImpl @Inject constructor(
         safeApiCall { cardLabelAPI.updateLabelActivate(updateCardLabelActivateRequestDto) }.toFlow()
 
     override suspend fun createAttachment(attachment: AttachmentDTO): Flow<AttachmentResponseDto> {
-        val key = "${attachment.id}/${attachment.url}"
+        val key = "${attachment.id}/${attachment.url.substringBeforeLast(".jpg").substringAfterLast("/")}"
         if (attachment.url.isNotBlank()) s3ImageUtil.uploadS3Image(attachment.url, key)
         return safeApiCall { cardAPI.createAttachment(attachment.cardId, key) }.toFlow()
     }
