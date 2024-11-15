@@ -11,6 +11,7 @@ import com.ssafy.network.api.ListAPI
 import com.ssafy.network.api.MemberAPI
 import com.ssafy.network.api.UserAPI
 import com.ssafy.network.api.WorkspaceAPI
+import com.ssafy.network.api.KafkaAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,4 +68,7 @@ object ApiModule {
     @Provides
     fun provideCardLabelAPI(@UserRetrofit retrofit: Retrofit): CardLabelAPI = retrofit.create()
 
+    @Singleton
+    @Provides
+    fun provideKafkaAPI(@UserRetrofit retrofit: Retrofit): KafkaAPI = retrofit.create()
 }
