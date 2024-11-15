@@ -70,4 +70,4 @@ fun getContrastingTextColor(backgroundColor: Color): Color {
     else Color.White
 }
 
-val Color.isLight get() = (red * 299 + green * 587 + blue * 114) < 1500
+val Color.isLight get() = (red * 299 + green * 587 + blue * 114) < 384
