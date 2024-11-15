@@ -1,9 +1,8 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.alert.AlertResponse
-import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.list.CreateListRequestDto
-import com.ssafy.model.list.ListMoveUpdateRequestDTO
+import com.ssafy.model.list.ListMoveUpdateListRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.source.ApiResponse
@@ -27,7 +26,8 @@ interface ListAPI {
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/list/move")
-    suspend fun moveList(@Body listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>
+    suspend fun moveList(
+        @Body listMoveUpdateRequestDTO: ListMoveUpdateListRequestDTO
     ): Response<ApiResponse<Unit>>
 
     @PATCH("api/v1/list/{listId}")

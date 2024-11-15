@@ -39,6 +39,7 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.board.components.AddListButton
+import com.ssafy.board.board.components.DraggableList
 import com.ssafy.board.board.components.ListItem
 import com.ssafy.board.board.components.TopAppBar
 import com.ssafy.board.board.data.BoardData
@@ -159,8 +160,8 @@ private fun BoardScreen(
     modifier: Modifier = Modifier,
     boardData: BoardData,
     onListTitleChanged: (Long, String) -> Unit,
-    onCardReordered: () -> Unit,
-    onListReordered: () -> Unit,
+    onCardReordered: (Long, Long, Long?, Long?) -> Unit,
+    onListReordered: (Long, Long?, Long?) -> Unit,
     navigateToCardScreen: (Long) -> Unit,
     addList: (String) -> Unit,
     addCard: (Long, String) -> Unit,
@@ -173,7 +174,7 @@ private fun BoardScreen(
     val listLazyListState = rememberLazyListState()
 
     val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
-    val cardCollections = remember {
+    val cardCollections = remember(listCollection) {
         mutableStateMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
             listCollection.forEach { listData ->
                 this[listData.id] = mutableStateOf(listData.cardCollection.map {
@@ -183,7 +184,6 @@ private fun BoardScreen(
         }
     }
 
-    // TODO : card의 onLongPressed가 내려오는 문제 해결
     ReorderContainer(state = listReorderState) {
         LazyRow(
             state = listLazyListState,
@@ -215,8 +215,8 @@ private fun BoardScreen(
                             val index = indexOf(listData)
                             if (index == -1) return@apply
 
-                            remove(state.data)
-                            add(index, state.data)
+                                remove(state.data)
+                                add(index, state.data)
 
                             scope.launch {
                                 handleLazyListScrollToCenter(
@@ -226,7 +226,14 @@ private fun BoardScreen(
                             }
                         }
                     },
-                    onDrop = { onListReordered() },
+                    onDrop = { state ->
+                        val listId = state.data.id
+                        val index = listCollection.indexOf(state.data)
+                        val prevCardId = if (index <= 0) null else listCollection[index - 1].id
+                        val nextCardId =
+                            if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                        onListReordered(listId, prevCardId, nextCardId)
+                    },
                 ) {
                     ListItem(
                         modifier = Modifier
@@ -239,7 +246,7 @@ private fun BoardScreen(
                         reorderState = cardReorderState,
                         cardCollections = cardCollections,
                         onTitleChange = { onListTitleChanged(listData.id, it) },
-                        onCardReordered = { onCardReordered() },
+                        onCardReordered =  onCardReordered ,
                         navigateToCardScreen = { id -> navigateToCardScreen(id) },
                         addCard = addCard,
                         addPhoto = addPhoto,
@@ -255,13 +262,14 @@ private fun BoardScreen(
                 }
             }
 
-            item {
-                AddListButton(addList = addList) {
-                    scope.launch {
-                        handleLazyListScrollToCenter(
-                            lazyListState = listLazyListState,
-                            dropIndex = listCollection.size,
-                        )
+                item {
+                    AddListButton(addList = addList) {
+                        scope.launch {
+                            handleLazyListScrollToCenter(
+                                lazyListState = listLazyListState,
+                                dropIndex = listCollection.size,
+                            )
+                        }
                     }
                 }
             }
@@ -305,8 +313,8 @@ private fun BoardScreenPreview() {
             }
         ),
         onListTitleChanged = { _, _ -> },
-        onCardReordered = {},
-        onListReordered = {},
+        onCardReordered = { _, _, _, _ -> },
+        onListReordered = { _, _, _ -> },
         navigateToCardScreen = {},
         addList = {},
         addCard = { _, _ -> },

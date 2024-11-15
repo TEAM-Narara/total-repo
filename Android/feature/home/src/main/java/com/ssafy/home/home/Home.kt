@@ -27,6 +27,7 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.ssafy.designsystem.dialog.rememberDialogState
 import com.ssafy.designsystem.values.White
 import com.ssafy.home.data.SelectedWorkSpace
 import com.ssafy.home.drawer.DrawerSheet
@@ -59,6 +60,8 @@ fun HomeScreen(
         }
     }
 
+    val createDialogState = rememberDialogState<Unit>()
+
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
     homeData?.let { data ->
@@ -79,10 +82,15 @@ fun HomeScreen(
             moveToSearchScreen = moveToSearchScreen,
             moveToAlarmScreen = moveToAlarmScreen,
             moveToJoinedBoard = { /*TODO 가입한 보드 화면으로 이동 */ },
-            addNewWorkSpace = viewModel::createWorkspace,
+            addNewWorkSpace = { createDialogState.show() },
             chaneSelectedWorkSpace = viewModel::updateSelectedWorkspace
         )
     } ?: LoadingScreen()
+
+    CreateWorkspaceDialog(
+        dialogState = createDialogState,
+        onConfirm = viewModel::createWorkspace
+    )
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()

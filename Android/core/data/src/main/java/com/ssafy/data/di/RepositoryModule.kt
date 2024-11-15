@@ -16,12 +16,12 @@ import com.ssafy.data.repository.list.ListRepository
 import com.ssafy.data.repository.list.ListRepositoryImpl
 import com.ssafy.data.repository.member.MemberRepository
 import com.ssafy.data.repository.member.MemberRepositoryImpl
-import com.ssafy.data.repository.sync.SyncRepository
-import com.ssafy.data.repository.sync.SyncRepositoryImpl
 import com.ssafy.data.repository.order.CardMyOrderRepository
 import com.ssafy.data.repository.order.CardMyOrderRepositoryImpl
 import com.ssafy.data.repository.order.ListMyOrderRepository
 import com.ssafy.data.repository.order.ListMyOrderRepositoryImpl
+import com.ssafy.data.repository.sync.SyncRepository
+import com.ssafy.data.repository.sync.SyncRepositoryImpl
 import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.data.repository.user.UserRepositoryImpl
 import com.ssafy.data.repository.workspace.WorkspaceRepository
@@ -82,7 +82,7 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindListMyOrderRepository(listMyOrderRepository: ListMyOrderRepository): ListMyOrderRepository
+    abstract fun bindListMyOrderRepository(listMyOrderRepository: ListMyOrderRepositoryImpl): ListMyOrderRepository
 
     @Singleton
     @Binds

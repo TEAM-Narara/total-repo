@@ -1,6 +1,5 @@
 package com.ssafy.board.board
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.ssafy.board.GetBoardAndWorkspaceMemberUseCase
 import com.ssafy.board.GetBoardUseCase
@@ -10,8 +9,10 @@ import com.ssafy.board.board.data.BoardData
 import com.ssafy.board.board.data.BoardDataMapper
 import com.ssafy.board.search.BoardSearchController
 import com.ssafy.card.CreateCardUseCase
+import com.ssafy.card.MoveCardUseCase
 import com.ssafy.list.CreateListUseCase
 import com.ssafy.list.GetLocalScreenListsInCardsFilterUseCase
+import com.ssafy.list.MoveListUseCase
 import com.ssafy.list.SetListArchiveUseCase
 import com.ssafy.list.UpdateListUseCase
 import com.ssafy.model.board.BoardDTO
@@ -22,6 +23,7 @@ import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.ListInCard
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,6 +46,8 @@ class BoardViewModel @Inject constructor(
     private val updatedListUseCase: UpdateListUseCase,
     private val setListArchiveUseCase: SetListArchiveUseCase,
     private val createCardUseCase: CreateCardUseCase,
+    private val moveListUseCase: MoveListUseCase,
+    private val moveCardUseCase: MoveCardUseCase,
     getLabelUseCase: GetLabelUseCase,
     getBoardAndWorkspaceMemberUseCase: GetBoardAndWorkspaceMemberUseCase,
 ) : BaseViewModel() {
@@ -78,7 +82,6 @@ class BoardViewModel @Inject constructor(
         else Pair(boardId, searchParameters)
     }.filterNotNull().flatMapLatest {
         val (boardId, searchParameters) = it
-        Log.d("TAG", "searchParameters: ${searchParameters.searchText}")
         combine(
             getBoardUseCase(boardId),
             getLocalScreenListsInCardsFilterUseCase(boardId, searchParameters)
@@ -118,8 +121,33 @@ class BoardViewModel @Inject constructor(
         }
     }
 
-    fun updateListOrder() {}
-    fun updateCardOrder() {}
+    fun updateListOrder(listId: Long, prevListId: Long?, nextListId: Long?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val boardId = _boardId.value ?: return@launch
+            withSocketState { isConnected ->
+                moveListUseCase(
+                    boardId = boardId,
+                    listId = listId,
+                    prevListId = prevListId,
+                    nextListId = nextListId,
+                    isConnected = isConnected
+                )
+            }
+        }
+
+    fun updateCardOrder(cardId: Long, targetListId: Long, prevCardId: Long?, nextCardId: Long?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            withSocketState { isConnected ->
+                moveCardUseCase(
+                    cardId = cardId,
+                    prevCardId = prevCardId,
+                    nextCardId = nextCardId,
+                    targetListId = targetListId,
+                    isConnected = isConnected,
+                )
+            }
+        }
+
     fun addList(listName: String) = viewModelScope.launch {
         if (listName.isEmpty()) return@launch
         withSocketState { isConnected ->
