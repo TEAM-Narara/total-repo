@@ -35,6 +35,7 @@ import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardWithListAndBoardNameDTO
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.network.source.card.CardDataSource
@@ -584,22 +585,39 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val attachment = attachmentDao.getAttachment(id)
 
-            if (attachment != null) {
-                if (isConnected) {
-                    cardDataSource.deleteAttachment(id)
-                } else {
-                    val result = when (attachment.isStatus) {
-                        DataStatus.CREATE ->
-                            attachmentDao.deleteAttachment(attachment)
-
-                        else ->
-                            attachmentDao.updateAttachment(attachment.copy(isStatus = DataStatus.DELETE))
-                    }
-
-                    flowOf(result)
-                }
+            if (isConnected) {
+                cardDataSource.deleteAttachment(id)
             } else {
-                flowOf(Unit)
+                val cardId = attachment?.cardId ?: return@withContext flowOf(Unit)
+
+                val result = when (attachment.isStatus) {
+                    DataStatus.CREATE ->
+                        attachmentDao.deleteAttachment(attachment)
+
+                    else ->
+                        attachmentDao.updateAttachment(attachment.copy(isStatus = DataStatus.DELETE))
+                }
+
+                cardDao.getCard(cardId)?.let {
+                    if (it.isStatus == DataStatus.CREATE) {
+                        cardDao.updateCard(
+                            it.copy(
+                                coverValue = CoverType.NONE.name,
+                                coverType = CoverType.NONE.name
+                            )
+                        )
+                    } else {
+                        cardDao.updateCard(
+                            it.copy(
+                                coverValue = CoverType.NONE.name,
+                                coverType = CoverType.NONE.name,
+                                isStatus = DataStatus.UPDATE
+                            )
+                        )
+                    }
+                }
+
+                flowOf(result)
             }
         }
 
