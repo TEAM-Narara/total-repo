@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -110,16 +111,14 @@ fun CardItem(
                 if (description) Icon(
                     imageVector = Icons.AutoMirrored.Filled.Subject,
                     contentDescription = null,
-                    modifier = Modifier.size(
-                        IconSmall
-                    )
+                    modifier = Modifier.size(IconSmall),
+                    tint = Color.Gray
                 )
                 if (attachment) Icon(
                     imageVector = Icons.Default.AttachFile,
                     contentDescription = null,
-                    modifier = Modifier.size(
-                        IconSmall
-                    )
+                    modifier = Modifier.size(IconSmall),
+                    tint = Color.Gray
                 )
                 if (commentCount != 0) IconText(
                     icon = Icons.Default.ChatBubbleOutline,
