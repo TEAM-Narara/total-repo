@@ -2,25 +2,32 @@ package com.ssafy.data.socket
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ssafy.data.repository.sync.SyncRepository
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.manager.ConnectManager
 import com.ssafy.model.socket.AckMessage
 import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.BuildConfig
+import com.ssafy.network.api.KafkaAPI
 import com.ssafy.network.socket.StompClientManager
 import com.ssafy.network.socket.StompFetchMessage
 import com.ssafy.network.socket.StompMessage
 import com.ssafy.network.socket.StompResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 @Singleton
 class BaseStompManager @Inject constructor(
     private val stompClientManager: StompClientManager,
     private val dataStoreRepository: DataStoreRepository,
     private val syncRepository: SyncRepository,
+    private val kafkaAPI: KafkaAPI,
     private val gson: Gson
 ) {
     val state = stompClientManager.observeConnectionState(SOCKET_ID)
@@ -43,16 +50,17 @@ class BaseStompManager @Inject constructor(
                             )
                         )
 
-                        "FETCHED" -> stompClientManager.send(
-                            SOCKET_ID, ACK_LAST_URL, AckMessage(
-                                offset = gson.fromJson(response.data, List::class.java).map {
-                                    gson.fromJson(it.toString(), StompFetchMessage::class.java)
-                                }.last().offset,
-                                topic = topic.split("/").joinToString("-"),
-                                partition = response.partition,
-                                groupId = "member-$memberId"
+                        "FETCHED" -> {
+                            val type = object : TypeToken<List<StompFetchMessage>>() {}.type
+                            stompClientManager.send(
+                                SOCKET_ID, ACK_LAST_URL, AckMessage(
+                                    offset = gson.fromJson<List<StompFetchMessage>>(response.data, type).last().offset,
+                                    topic = topic.split("/").joinToString("-"),
+                                    partition = response.partition,
+                                    groupId = "member-$memberId"
+                                )
                             )
-                        )
+                        }
 
                         else -> return
                     }
@@ -64,13 +72,28 @@ class BaseStompManager @Inject constructor(
                     when (response.type) {
                         "RECEIVED" -> emit(gson.fromJson(response.data, StompMessage::class.java))
                         "FETCHED" -> gson.fromJson(response.data, List::class.java).forEach {
-                            emit(gson.fromJson(it.toString(), StompFetchMessage::class.java).message)
+                            Log.d("TAG", "onDataReleased: ${it.toString()}")
+                            emit(
+                                gson.fromJson(
+                                    it.toString(),
+                                    StompFetchMessage::class.java
+                                ).message
+                            )
                         }
                     }
                 }
 
                 override fun onTimeout(lastOffset: Long) {
-                    TODO("Timeout시 http 요청 보내기")
+                    val (entityType, primaryId) = topic.split("/")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        Log.d("TAG", "onTimeout: $topic $lastOffset")
+                        kafkaAPI.sync(
+                            partition = 0,
+                            offset = lastOffset + 1,
+                            entityType = entityType,
+                            primaryId = primaryId.toLong()
+                        )
+                    }
                 }
             }
         )

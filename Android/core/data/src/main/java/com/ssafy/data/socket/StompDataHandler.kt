@@ -1,5 +1,6 @@
 package com.ssafy.data.socket
 
+import android.util.Log
 import com.ssafy.network.socket.StompResponse
 import java.util.PriorityQueue
 import java.util.Timer
@@ -16,6 +17,11 @@ class StompDataHandler(
 
     private var lastOffset = startOffset
     private var timer: Timer? = null
+
+    init {
+        Log.d("TAG", "startOffset: $startOffset")
+        if (lastOffset < 0) callback.onTimeout(lastOffset)
+    }
 
     private val onTimeout
         get() = object : TimerTask() {
