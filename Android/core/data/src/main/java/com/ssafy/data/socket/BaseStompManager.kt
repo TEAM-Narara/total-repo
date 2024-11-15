@@ -54,7 +54,10 @@ class BaseStompManager @Inject constructor(
                             val type = object : TypeToken<List<StompFetchMessage>>() {}.type
                             stompClientManager.send(
                                 SOCKET_ID, ACK_LAST_URL, AckMessage(
-                                    offset = gson.fromJson<List<StompFetchMessage>>(response.data, type).last().offset,
+                                    offset = gson.fromJson<List<StompFetchMessage>>(
+                                        response.data,
+                                        type
+                                    ).last().offset,
                                     topic = topic.split("/").joinToString("-"),
                                     partition = response.partition,
                                     groupId = "member-$memberId"
@@ -86,13 +89,14 @@ class BaseStompManager @Inject constructor(
                 override fun onTimeout(lastOffset: Long) {
                     val (entityType, primaryId) = topic.split("/")
                     CoroutineScope(Dispatchers.IO).launch {
-                        Log.d("TAG", "onTimeout: $topic $lastOffset")
-                        kafkaAPI.sync(
-                            partition = 0,
-                            offset = lastOffset + 1,
-                            entityType = entityType,
-                            primaryId = primaryId.toLong()
-                        )
+                        runCatching {
+                            kafkaAPI.sync(
+                                partition = 0,
+                                offset = lastOffset + 1,
+                                entityType = entityType,
+                                primaryId = primaryId.toLong()
+                            )
+                        }
                     }
                 }
             }
