@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static com.narara.superboard.card.CardAction.MOVE_CARD;
 import static com.narara.superboard.common.constant.MoveConst.*;
@@ -268,8 +270,22 @@ public class CardMoveServiceImpl implements CardMoveService {
         listService.checkBoardMember(currentList, member, MOVE_LIST);
 
         //리스트의 전체 카드를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
-        //request로 들어온 애들이 모두 같은 보드에 있는지 검증해야하나?
         java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(currentList);
+
+        //다른 리스트로의 이동인지 확인 - 원래 카드 리스트에 없으면 다른 리스트로의 이동임
+//        Set<Long> moveRequestCardIds = cardMoveRequests.stream()
+//                .map(CardMoveRequest::cardId)
+//                .collect(Collectors.toSet());
+//
+//        boolean isMoveAnotherList = false;
+//        Card oneCard = null;
+//        for (Card card : allCards) {
+//            if (!moveRequestCardIds.contains(card.getId())) {
+//                isMoveAnotherList = true;
+//                oneCard = card;
+//                break;
+//            }
+//        }
 
         //카드 myOrder 배정 및 재배치
         java.util.List<Card> updatedCardCollection = insertAndRelocateCard(allCards, currentList, cardMoveRequests);
@@ -280,12 +296,16 @@ public class CardMoveServiceImpl implements CardMoveService {
         }
 
         //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
-//        String title = String.format(
-//                "%s moved the card [카드이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]",
-//                member.getNickname(),
-//
-//        );
-//        fcmTokenService.sendMessage(member, title, "");
+//        if (isMoveAnotherList) {
+//            String title = String.format(
+//                    "%s moved the card %s to %s on %s + [사용자 프로필사진]",
+//                    member.getNickname(),
+//                    oneCard.getName(),
+//                    currentList.getName(),
+//                    currentList.getBoard().getName()
+//                    );
+//            fcmTokenService.sendMessage(member, title, "");
+//        }
 
         return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
     }
