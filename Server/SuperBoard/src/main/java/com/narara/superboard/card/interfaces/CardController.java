@@ -15,6 +15,7 @@ import com.narara.superboard.member.entity.Member;
 import java.util.ArrayList;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -148,6 +149,7 @@ public class CardController implements CardAPI {
         );
     }
 
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 맨 위로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 위로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTop(
@@ -162,7 +164,7 @@ public class CardController implements CardAPI {
                 HttpStatus.OK);
     }
 
-
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 맨 아래로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 아래로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottom(
@@ -178,6 +180,7 @@ public class CardController implements CardAPI {
                 HttpStatus.OK);
     }
 
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 카드들 사이로 이동", description = "특정 카드를 지정된 이동할 리스트의 두 카드 사이에 위치시킵니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetween(

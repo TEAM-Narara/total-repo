@@ -1,5 +1,6 @@
 package com.narara.superboard.card.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardMoveCollectionRequest;
@@ -35,6 +36,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardReorderService cardReorderService; // CardReorderService 주입
     private final CardService cardService; // CardService 주입
     private final ListService listService;
+    private final BoardOffsetService boardOffsetService;
 
     @Override
     @Transactional
@@ -270,6 +272,11 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         //카드 myOrder 배정 및 재배치
         java.util.List<Card> updatedCardCollection = insertAndRelocateCard(allCards, currentList, cardMoveRequests);
+
+        if (!updatedCardCollection.isEmpty()) {
+            //Websocket 카드 이동 response 보내기
+            boardOffsetService.saveMoveCardDiff(updatedCardCollection, currentList.getBoard().getId());
+        }
 
         return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
     }
