@@ -41,6 +41,7 @@ import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
+
 import java.sql.SQLOutput;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -56,6 +57,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -227,7 +229,7 @@ public class BoardServiceImpl implements BoardService {
                 board.getIsArchived());
 
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE, 
+                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE,
                 EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -372,7 +374,7 @@ public class BoardServiceImpl implements BoardService {
         // 두 리스트를 합치고 when() 기준으로 정렬 후, Pageable 사이즈에 맞게 결과를 반환
         List<BoardLogDetailResponseDto> boardActivityDetailResponseDtos = sortAndResizeBoardActivityList(boardDtoList,
                 cardDtoList, pageable);
-        return new BoardCombinedLogResponseDto(boardActivityDetailResponseDtos, totalElements, totalPages);
+        return new BoardCombinedLogResponseDto(boardActivityDetailResponseDtos, totalPages, totalElements);
     }
 
 
