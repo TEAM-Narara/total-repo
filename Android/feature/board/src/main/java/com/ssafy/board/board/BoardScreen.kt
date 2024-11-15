@@ -203,8 +203,7 @@ private fun BoardScreen(
                     draggableContent = {
                         ListItemShell(
                             modifier = Modifier
-                                .alpha(0.7f)
-                            ,
+                                .alpha(0.7f),
                             title = listData.name,
                             isWatching = listData.isWatching,
                             cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
@@ -215,8 +214,8 @@ private fun BoardScreen(
                             val index = indexOf(listData)
                             if (index == -1) return@apply
 
-                                remove(state.data)
-                                add(index, state.data)
+                            remove(state.data)
+                            add(index, state.data)
 
                             scope.launch {
                                 handleLazyListScrollToCenter(
@@ -246,7 +245,7 @@ private fun BoardScreen(
                         reorderState = cardReorderState,
                         cardCollections = cardCollections,
                         onTitleChange = { onListTitleChanged(listData.id, it) },
-                        onCardReordered =  onCardReordered ,
+                        onCardReordered = onCardReordered,
                         navigateToCardScreen = { id -> navigateToCardScreen(id) },
                         addCard = addCard,
                         addPhoto = addPhoto,
@@ -262,14 +261,13 @@ private fun BoardScreen(
                 }
             }
 
-                item {
-                    AddListButton(addList = addList) {
-                        scope.launch {
-                            handleLazyListScrollToCenter(
-                                lazyListState = listLazyListState,
-                                dropIndex = listCollection.size,
-                            )
-                        }
+            item {
+                AddListButton(addList = addList) {
+                    scope.launch {
+                        handleLazyListScrollToCenter(
+                            lazyListState = listLazyListState,
+                            dropIndex = listCollection.size,
+                        )
                     }
                 }
             }
