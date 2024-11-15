@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
@@ -200,14 +201,13 @@ private fun BoardScreen(
                     data = listData,
                     dropStrategy = DropStrategy.CenterDistance,
                     draggableContent = {
-                        com.ssafy.designsystem.component.ListItem(
-                            modifier = modifier,
+                        ListItemShell(
+                            modifier = Modifier
+                                .alpha(0.7f)
+                            ,
                             title = listData.name,
-                            onTitleChange = {},
-                            addCard = { cardName -> addCard(listData.id, cardName) },
-                            addPhoto = addPhoto,
                             isWatching = listData.isWatching,
-                            onFocus = {  }
+                            cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
                         )
                     },
                     onDragEnter = { state ->
