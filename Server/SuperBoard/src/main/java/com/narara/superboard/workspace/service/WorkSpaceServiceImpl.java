@@ -76,9 +76,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         // Kafka: 워크스페이스용 토픽 생성
         // 토픽 이름 : workspace-1 ,파티션 수 :10개, 복제 개수 : 1개 (단일 브로커)
         try {
-            kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 1, (short) 1));
+            kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 10, (short) 1));
             // 토픽 생성 확인 후 메시지 전송토픽 생성 확인 후 메시지 전송
-            if (!waitForTopicCreation(topicName)) {
+            if (waitForTopicCreation(topicName)) {
+                kafkaTemplate.send(topicName, "Workspace " + newWorkSpace.getId() + " created by member " + memberId);
+            } else {
                 System.out.println("토픽 생성에 실패했거나 시간 초과가 발생했습니다.");
             }
         } catch (Exception e) {
@@ -99,7 +101,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workspaceOffsetService.saveAddMemberDiff(workspaceMemberByAdmin);
 
         // 새로운 멤버를 Kafka Consumer Group에 등록
-        // kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
+        kafkaConsumerService.registerListener(KafkaRegisterType.WORKSPACE,newWorkSpace.getId(), memberId);
 
         return workspaceMemberByAdmin;
     }
