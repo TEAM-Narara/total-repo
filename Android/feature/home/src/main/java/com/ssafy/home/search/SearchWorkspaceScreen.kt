@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -53,7 +53,7 @@ fun SearchWorkspaceScreen(
     onBackPressed: () -> Unit,
     moveToCardScreen: (Any) -> Unit
 ) {
-    val (keyword, onValueChanged) = remember { mutableStateOf("Search") }
+    val (keyword, onValueChanged) = remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
     Column(
@@ -68,7 +68,7 @@ fun SearchWorkspaceScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "뒤로 아이콘",
                 onClick = onBackPressed
             )
@@ -80,6 +80,7 @@ fun SearchWorkspaceScreen(
                 },
                 modifier = Modifier.weight(1f),
                 maxTitleLength = 40,
+                placeholder = "검색어를 입력하세요."
             )
             IconButton(
                 imageVector = Icons.Default.Search,
