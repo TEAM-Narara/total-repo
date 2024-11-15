@@ -80,7 +80,9 @@ class CardRepositoryImpl @Inject constructor(
                     id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE
+                    isStatus = DataStatus.CREATE,
+                    coverType = CoverType.NONE.name,
+                    coverValue = "NONE",
                 )
             )
 
