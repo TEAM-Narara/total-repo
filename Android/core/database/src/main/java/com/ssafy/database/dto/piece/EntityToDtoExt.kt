@@ -73,7 +73,6 @@ import com.ssafy.model.with.ReplyWithMemberDTO
 import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.with.WorkspaceMemberDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
-import kotlin.concurrent.thread
 
 // Member
 fun MemberEntity.toDTO(): User {
@@ -413,8 +412,8 @@ fun CardAllInfo.toDTO(): CardAllInfoDTO {
         startAt = this.card.startAt,
         endAt = this.card.endAt,
         cover = Cover(
-            type = CoverType.valueOf(card.coverType ?: "COLOR"),
-            value = card.coverValue ?: "0xff000000"
+            type = CoverType.valueOf(card.coverType ?: "NONE"),
+            value = card.coverValue ?: "NONE"
         ),
         myOrder = this.card.myOrder,
         isArchived = this.card.isArchived,

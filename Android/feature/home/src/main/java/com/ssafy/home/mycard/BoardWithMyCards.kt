@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.component.CardItem
+import com.ssafy.designsystem.values.CardWidth
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.Gray
 import com.ssafy.designsystem.values.LabelHeight
@@ -87,6 +89,7 @@ fun BoardWithMyCards(
 
         LazyRow(
             modifier = Modifier
+                .fillMaxSize()
                 .background(color = Transparent)
                 .padding(vertical = PaddingSemiLarge),
             horizontalArrangement = Arrangement.spacedBy(PaddingSemiLarge),
@@ -99,12 +102,18 @@ fun BoardWithMyCards(
                     .getOrDefault(CoverType.NONE)
 
                 CardItem(
-                    modifier = modifier,
+                    modifier = Modifier.width(CardWidth),
                     title = card.name,
                     image = {
-                        card.coverValue?.let {
-                            if (type == CoverType.IMAGE) CardCoverImage(imgPath = it)
-                            else CardCoverColor(color = it.toColor())
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(1.7f)
+                        ) {
+                            card.coverValue?.let {
+                                if (type == CoverType.IMAGE) CardCoverImage(imgPath = it)
+                                else CardCoverColor(color = it.toColor())
+                            }
                         }
                     },
                     labels = {
@@ -124,7 +133,7 @@ fun BoardWithMyCards(
                         card.cardMembers.forEach { member ->
                             AsyncImage(
                                 model = member.memberProfileImgUrl,
-                                modifier = modifier.size(48.dp),
+                                modifier = Modifier.size(48.dp),
                                 contentDescription = null,
                                 contentScale = ContentScale.FillWidth,
                                 error = rememberVectorPainter(Icons.Default.AccountCircle)
