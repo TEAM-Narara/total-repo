@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.ssafy.data.socket.board.model.list.AddListRequestDto
 import com.ssafy.data.socket.board.model.list.EditListArchiveRequestDto
 import com.ssafy.data.socket.board.model.list.EditListRequestDto
+import com.ssafy.data.socket.board.model.list.MoveListRequestDto
 import com.ssafy.database.dao.ListDao
 import com.ssafy.database.dto.ListEntity
 import com.ssafy.model.with.DataStatus
@@ -53,5 +54,13 @@ class ListService @Inject constructor(
                 columnUpdate = 0,
             )
         )
+    }
+
+    suspend fun moveList(data: JsonObject) {
+        val dto = gson.fromJson(data, MoveListRequestDto::class.java)
+        dto.updatedList.forEach {
+            val before = listDao.getList(it.listId) ?: return
+            listDao.updateList(before.copy(myOrder = it.myOrder))
+        }
     }
 }
