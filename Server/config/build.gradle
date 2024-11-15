@@ -44,7 +44,11 @@ dependencyManagement {
 }
 
 tasks.register('copyTestYML', Copy) {
+<<<<<<< Updated upstream
     from '../SuperBoard/s107-secret-value' // 상대 경로
+=======
+    from 's107-secruet-value'
+>>>>>>> Stashed changes
     include "application-test.yml"  // 복사할 파일 지정
     into 'src/test/resources'       // 테스트 리소스 위치로 복사
 }
