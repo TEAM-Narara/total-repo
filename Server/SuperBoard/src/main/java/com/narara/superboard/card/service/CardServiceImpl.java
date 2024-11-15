@@ -71,6 +71,7 @@ public class CardServiceImpl implements CardService {
     private final LastOrderValidator lastOrderValidator;
 
     private final BoardOffsetService boardOffsetService;
+//    private final FcmTokenService fcmTokenService;
 
     @Override
     public Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) {
@@ -189,6 +190,17 @@ public class CardServiceImpl implements CardService {
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
         cardHistoryRepository.save(cardHistory);
+
+        //알림
+//        if (card.getIsArchived()) {
+//            String formatString = "%s archived the card %s on %s + [사용자 프로필사진]";
+//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
+//            fcmTokenService.sendMessage(member, title, "");
+//        } else {
+//            String formatString = "%s unarchived the card %s on %s + [사용자 프로필사진]";
+//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
+//            fcmTokenService.sendMessage(member, title, "");
+//        }
     }
 
     @Override

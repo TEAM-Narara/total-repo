@@ -52,6 +52,16 @@ public class CardController implements CardAPI {
 
         CardDetailResponseDto cardSimpleResponseDto = CardDetailResponseDto.from(card);
 
+//        String title = String.format(
+//                "%s created %s in %s on %s + %s",
+//                member.getNickname(),
+//                card.getName(),
+//                card.getList().getName(),
+//                card.getList().getBoard().getName(),
+//                member.getProfileImgUrl()
+//        );
+//        fcmTokenService.sendMessage(member, title, "");
+
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CARD_CREATE_SUCCESS, cardSimpleResponseDto),
                 HttpStatus.CREATED
@@ -200,6 +210,7 @@ public class CardController implements CardAPI {
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
             @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
         CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
+
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 

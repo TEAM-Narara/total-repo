@@ -1,5 +1,9 @@
 package com.narara.superboard.fcmtoken.service;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.fcmtoken.entity.FcmToken;
@@ -35,7 +39,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
         validateMemberExists(memberId);
         validateRegistrationToken(registrationToken);
 
-        FcmToken fcmToken = fcmTokenRepository.findByMemberId(memberId)
+        FcmToken fcmToken = fcmTokenRepository.findFirstByMemberId(memberId)
                 .orElseThrow(() -> new NotFoundException("fcm토큰", "토큰"));
 
         fcmToken.changeRegistrationToken(registrationToken);
@@ -49,6 +53,19 @@ public class FcmTokenServiceImpl implements FcmTokenService {
         fcmTokenRepository.deleteAll(fcmTokenList);
     }
 
+    @Override
+    public void sendMessage(Member member, String title, String body) throws FirebaseMessagingException {
+        FcmToken fcmToken = fcmTokenRepository.findFirstByMemberId(member.getId())
+                .orElseThrow(() -> new NotFoundException("fcm토큰", "토큰"));
+
+        String message = FirebaseMessaging.getInstance().send(Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
+                .setToken(fcmToken.getRegistrationToken())  // 대상 디바이스의 등록 토큰
+                .build());
+    }
 
     private Member validateMemberExists(Long memberId) {
         return memberRepository.findByIdAndIsDeletedFalse(memberId)
