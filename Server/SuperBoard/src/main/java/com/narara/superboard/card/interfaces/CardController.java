@@ -1,5 +1,6 @@
 package com.narara.superboard.card.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
@@ -46,7 +47,7 @@ public class CardController implements CardAPI {
     @Operation(summary = "카드 생성", description = "")
     public ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
-            @RequestBody CardCreateRequestDto cardCreateRequestDto) {
+            @RequestBody CardCreateRequestDto cardCreateRequestDto) throws FirebaseMessagingException {
 
         Card card = cardService.createCard(member, cardCreateRequestDto);
 

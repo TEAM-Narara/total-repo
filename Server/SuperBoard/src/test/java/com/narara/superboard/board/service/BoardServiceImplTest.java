@@ -1,5 +1,6 @@
 package com.narara.superboard.board.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
@@ -579,12 +580,13 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
             "1, true",
             "2, false"
     })
-    void testUpdateArchiveStatus_Success(Long boardId, boolean isArchived) {
+    void testUpdateArchiveStatus_Success(Long boardId, boolean isArchived) throws FirebaseMessagingException {
         // given: 보드 모킹
         Board board = Board.builder()
                 .id(boardId)
                 .name("Test Board")
                 .isArchived(isArchived)
+                .workSpace(new WorkSpace(1L, "asdf", 1L))
                 .build();
         Member member = new Member(1L , "시현", "sisi@naver.com");
 
