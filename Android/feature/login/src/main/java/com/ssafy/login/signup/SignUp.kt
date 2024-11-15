@@ -112,6 +112,7 @@ private fun SignUpScreen(
         EditText(
             title = "비밀번호",
             text = password,
+            isPassword = true,
             onTextChange = setPassword,
             modifier = Modifier.fillMaxWidth()
         )

@@ -115,6 +115,7 @@ private fun LoginScreen(
 
         EditText(
             title = "비밀번호",
+            isPassword = true,
             text = password,
             onTextChange = setPassword,
             modifier = Modifier
