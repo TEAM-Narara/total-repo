@@ -173,7 +173,7 @@ private fun BoardScreen(
     val listLazyListState = rememberLazyListState()
 
     val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
-    val cardCollections = remember {
+    val cardCollections = remember(listCollection) {
         mutableStateMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
             listCollection.forEach { listData ->
                 this[listData.id] = mutableStateOf(listData.cardCollection.map {
