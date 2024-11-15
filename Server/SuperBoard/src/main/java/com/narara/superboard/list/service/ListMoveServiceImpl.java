@@ -211,6 +211,11 @@ public class ListMoveServiceImpl implements ListMoveService {
         //dto에 바뀐 리스트 값 매핑
         java.util.List<ListMoveResponseDto> orderInfoList = ListMoveResponseDto.of(updatedListCollection);
 
+        if (!updatedListCollection.isEmpty()) {
+            //Websocket 리스트 이동 response 보내기
+            boardOffsetService.saveMoveListDiff(updatedListCollection, targetList.getBoard().getId());
+        }
+
         return new ListMoveResult.ReorderedListMove(orderInfoList);
     }
 
