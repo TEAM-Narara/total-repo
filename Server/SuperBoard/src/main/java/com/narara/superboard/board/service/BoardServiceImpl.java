@@ -355,7 +355,7 @@ public class BoardServiceImpl implements BoardService {
         Page<BoardHistory> boardHistoryCollection = boardHistoryRepository
                 .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
         Page<CardHistory> cardHistoryCollectionByBoard = cardHistoryRepository
-                .findByWhere_BoardIdAndEventDataNotInOrderByWhenDesc(boardId, pageable);
+                .findByWhere_BoardIdOrderByWhenDesc(boardId, pageable);
 
         long totalElements =
                 boardHistoryCollection.getTotalElements() + cardHistoryCollectionByBoard.getTotalElements();
@@ -460,21 +460,28 @@ public class BoardServiceImpl implements BoardService {
         boardLogList = boardLogList.subList(0, toIndex);
 
         // 댓글 목록을 가져옴
-        PageBoardReplyResponseDto replyDto = getRepliesByBoardId(boardId, myPageable);
-        List<BoardReplyCollectionResponseDto> replyLogList = replyDto.boardReplyCollectionResponseDtos();
+//        PageBoardReplyResponseDto replyDto = getRepliesByBoardId(boardId, myPageable);
+//        List<BoardReplyCollectionResponseDto> replyLogList = replyDto.boardReplyCollectionResponseDtos();
 
-        toIndex = Math.min(replyLogList.size(), firstToPageableElement);
-        replyLogList = replyLogList.subList(0, toIndex);
+//        toIndex = Math.min(replyLogList.size(), firstToPageableElement);
+//        replyLogList = replyLogList.subList(0, toIndex);
 
         // 두 Page 객체의 총 페이지 수와 총 요소 수 계산
-        long totalElements = boardCombinedLog.totalElements() + replyDto.totalElements();
-        long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
+//        long totalElements = boardCombinedLog.totalElements() + replyDto.totalElements();
+//        long totalPages = (long) Math.ceil((double) totalElements / pageable.getPageSize());
 
-        // pageable 및 정렬
-        List<BoardCombinedActivityDto> boardCombinedLogDtos =
-                mergeAndResizeSortedList(pageable, boardLogList, replyLogList);
+        List<BoardCombinedActivityDto> boardCombinedActivityDtoList = new ArrayList<>();
+
+        for (BoardLogDetailResponseDto boardLogDetailResponseDto : boardLogList) {
+            boardCombinedActivityDtoList.add(BoardCombinedActivityDto.of(boardLogDetailResponseDto));
+        }
+//        // pageable 및 정렬
+////        List<BoardCombinedActivityDto> boardCombinedLogDtos =
+////                mergeAndResizeSortedList(pageable, boardLogList, replyLogList);
         // 각각의 DTO 리스트를 CombinedBoardEvent로 변환하여 timestamp 기준으로 최신순 정렬
-        return new BoardActivityPageableResponseDto(boardCombinedLogDtos, totalPages, totalElements);
+        System.out.println(boardCombinedActivityDtoList.size());
+        System.out.println();
+        return new BoardActivityPageableResponseDto(boardCombinedActivityDtoList, boardCombinedLog.totalElements(), boardCombinedLog.totalPages());
     }
 
     private List<BoardCombinedActivityDto> mergeAndResizeSortedList(

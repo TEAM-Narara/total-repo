@@ -1,5 +1,6 @@
 package com.narara.superboard.board.interfaces.dto.activity;
 
+import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.interfaces.dto.ReplySimpleResponseDto;
 import lombok.Builder;
@@ -38,6 +39,13 @@ public record BoardCombinedActivityDto(
         return BoardCombinedActivityDto.builder()
                 .activity(replySimpleResponseDto)
                 .when(replySimpleResponseDto.lastUpdatedAt())
+                .build();
+    }
+
+    public static BoardCombinedActivityDto of(BoardLogDetailResponseDto boardLogDetailResponseDto){
+        return BoardCombinedActivityDto.builder()
+                .activity(boardLogDetailResponseDto)
+                .when(boardLogDetailResponseDto.when())
                 .build();
     }
 
