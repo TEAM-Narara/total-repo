@@ -1,7 +1,9 @@
 package com.ssafy.board.board
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -154,7 +157,6 @@ fun BoardScreen(
     }
 }
 
-
 @Composable
 private fun BoardScreen(
     modifier: Modifier = Modifier,
@@ -214,14 +216,18 @@ private fun BoardScreen(
                             val index = indexOf(listData)
                             if (index == -1) return@apply
 
+                            Log.d("TAG", "BoardScreen1: $index")
                             remove(state.data)
+                            Log.d("TAG", "BoardScreen2: $index")
                             add(index, state.data)
+                            Log.d("TAG", "BoardScreen3: $index")
 
                             scope.launch {
                                 handleLazyListScrollToCenter(
                                     lazyListState = listLazyListState,
                                     dropIndex = index,
                                 )
+                                Log.d("TAG", "BoardScreen4: $index")
                             }
                         }
                     },
