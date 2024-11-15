@@ -287,7 +287,7 @@ public class CardMoveServiceImpl implements CardMoveService {
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "리스트"));
 
-        boolean isChangeList = !(targetCard.getList().getId().equals(targetList.getId()));
+//        boolean isChangeList = !(targetCard.getList().getId().equals(targetList.getId()));
 
         //유저의 보드 접근 권한을 확인
         cardService.checkBoardMember(targetCard, member, MOVE_LIST);
@@ -304,9 +304,10 @@ public class CardMoveServiceImpl implements CardMoveService {
         //dto에 바뀐 리스트 값 매핑
         java.util.List<CardMoveResponseDto> orderInfoCard = CardMoveResponseDto.of(updatedCardCollection);
 
-//        if (isChangeList) {
-//            boardOffsetService.saveMoveCardDiff(Card, targetCard.getList().getBoard().getId());
-//        }
+        if (!updatedCardCollection.isEmpty()) {
+            //Websocket 카드 이동 response 보내기
+            boardOffsetService.saveMoveCardDiff(updatedCardCollection, targetCard.getList().getBoard().getId());
+        }
 
         return new CardMoveResult.ReorderedCardMove(orderInfoCard);
     }
