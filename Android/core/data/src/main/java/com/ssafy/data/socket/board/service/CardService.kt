@@ -78,6 +78,20 @@ class CardService @Inject constructor(
                     )
                 )
             }
+        }else{
+            cardDao.updateCard(
+                before.copy(
+                    name = dto.name,
+                    description = dto.description,
+                    startAt = dto.startAt,
+                    endAt = dto.endAt,
+                    isArchived = dto.isArchived,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                    coverValue = dto.coverValue,
+                    coverType = dto.coverType,
+                )
+            )
         }
     }
 
