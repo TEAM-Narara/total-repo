@@ -20,6 +20,7 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.card.CardMoveUpdateListRequestDTO
 import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
