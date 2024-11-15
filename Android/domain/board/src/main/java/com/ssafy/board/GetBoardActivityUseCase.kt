@@ -41,6 +41,9 @@ class GetBoardActivityUseCase @Inject constructor(
 
         val classValue: KClass<*> = getClass(eventData = eventData, eventType = eventType)
         val eventInfo = try {
+            if(classValue == Void::class) throw Exception("classValue is Void")
+            if(classValue == Unit::class) throw Exception("classValue is Unit")
+
             val gson = Gson()
             val jsonString = gson.toJson(target)
             val event = gson.fromJson(jsonString, classValue.java).toString()

@@ -4,14 +4,12 @@ import com.ssafy.database.dto.CardEntity
 import com.ssafy.database.dto.CardLabelEntity
 import com.ssafy.database.dto.bitmask.UpdateCardBitmaskDTO
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
-import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInMyRepresentativeCard
@@ -41,10 +39,11 @@ interface CardRepository {
         isConnected: Boolean
     ): Flow<Unit>
 
-    suspend fun moveCard(listId: Long,
-                         cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>,
-                         isConnected: Boolean
-    ) : Flow<Unit>
+    suspend fun moveCard(
+        targetListId: Long,
+        cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>,
+        isConnected: Boolean
+    ): Flow<Unit>
 
     suspend fun updateCard(cardId: Long, dto: UpdateCardBitmaskDTO): Flow<Unit>
 

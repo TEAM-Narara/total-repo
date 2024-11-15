@@ -158,8 +158,8 @@ private fun BoardScreen(
     modifier: Modifier = Modifier,
     boardData: BoardData,
     onListTitleChanged: (Long, String) -> Unit,
-    onCardReordered: () -> Unit,
-    onListReordered: () -> Unit,
+    onCardReordered: (Long, Long, Long?, Long?) -> Unit,
+    onListReordered: (Long, Long?, Long?) -> Unit,
     navigateToCardScreen: (Long) -> Unit,
     addList: (String) -> Unit,
     addCard: (Long, String) -> Unit,
@@ -218,7 +218,13 @@ private fun BoardScreen(
                                 }
                             }
                         },
-                        onDrop = { onListReordered() },
+                        onDrop = { state ->
+                            val listId = state.data.id
+                            val index = listCollection.indexOf(state.data)
+                            val prevCardId = if (index <= 0) null else listCollection[index - 1].id
+                            val nextCardId = if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                            onListReordered(listId, prevCardId, nextCardId)
+                        },
                     ) {
                         ListItem(
                             modifier = Modifier
@@ -231,7 +237,7 @@ private fun BoardScreen(
                             reorderState = cardReorderState,
                             cardCollections = cardCollections,
                             onTitleChange = { onListTitleChanged(listData.id, it) },
-                            onCardReordered = { onCardReordered() },
+                            onCardReordered = onCardReordered,
                             navigateToCardScreen = { id -> navigateToCardScreen(id) },
                             addCard = addCard,
                             addPhoto = addPhoto,
@@ -299,8 +305,8 @@ private fun BoardScreenPreview() {
             }
         ),
         onListTitleChanged = { _, _ -> },
-        onCardReordered = {},
-        onListReordered = {},
+        onCardReordered = { _, _, _, _ -> },
+        onListReordered = { _, _, _ -> },
         navigateToCardScreen = {},
         addList = {},
         addCard = { _, _ -> },

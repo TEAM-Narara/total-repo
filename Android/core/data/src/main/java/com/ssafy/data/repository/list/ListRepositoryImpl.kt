@@ -21,6 +21,7 @@ import com.ssafy.database.dto.piece.toDto
 import com.ssafy.model.board.MemberResponseDTO
 import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.list.CreateListRequestDto
+import com.ssafy.model.list.ListMoveUpdateListRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.model.with.DataStatus
@@ -129,7 +130,7 @@ class ListRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
             if (isConnected) {
-                listDataSource.moveList(listMoveUpdateRequestDTO)
+                listDataSource.moveList(ListMoveUpdateListRequestDTO(listMoveUpdateRequestDTO))
             } else {
                 listMoveUpdateRequestDTO.forEach {
                     val list = listDao.getList(it.listId) ?: return@forEach

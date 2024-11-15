@@ -2,7 +2,7 @@ package com.ssafy.network.source.list
 
 import com.ssafy.model.alert.AlertResponse
 import com.ssafy.model.list.CreateListRequestDto
-import com.ssafy.model.list.ListMoveUpdateRequestDTO
+import com.ssafy.model.list.ListMoveUpdateListRequestDTO
 import com.ssafy.model.list.ListResponseDto
 import com.ssafy.model.list.UpdateListRequestDto
 import com.ssafy.network.api.ListAPI
@@ -17,16 +17,19 @@ class ListDataSourceImpl @Inject constructor(private val listAPI: ListAPI) : Lis
     override suspend fun createList(createListRequestDto: CreateListRequestDto): Flow<ListResponseDto> =
         safeApiCall { listAPI.createList(createListRequestDto) }.toFlow()
 
-    override suspend fun updateList(listId: Long, updateListRequestDto: UpdateListRequestDto): Flow<Unit> =
+    override suspend fun updateList(
+        listId: Long,
+        updateListRequestDto: UpdateListRequestDto
+    ): Flow<Unit> =
         safeApiCall { listAPI.updateList(listId, updateListRequestDto) }.toFlow()
 
     override suspend fun updateList(
         listId: Long,
         updateListWithNull: UpdateListWithNull
-    ): Flow<Unit>  = safeApiCall { listAPI.updateList(listId, updateListWithNull) }.toFlow()
+    ): Flow<Unit> = safeApiCall { listAPI.updateList(listId, updateListWithNull) }.toFlow()
 
     // 리스트는 삭제가 없습니다.
-    override suspend fun moveList(listMoveUpdateRequestDTO: List<ListMoveUpdateRequestDTO>): Flow<Unit> =
+    override suspend fun moveList(listMoveUpdateRequestDTO: ListMoveUpdateListRequestDTO): Flow<Unit> =
         safeApiCall { listAPI.moveList(listMoveUpdateRequestDTO) }.toFlow()
 
     override suspend fun deleteList(listId: Long): Flow<Unit> {
