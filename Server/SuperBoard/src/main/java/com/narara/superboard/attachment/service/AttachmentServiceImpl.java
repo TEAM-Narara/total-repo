@@ -13,6 +13,7 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
@@ -43,6 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             updateCardCover(card, attachment);
         }
 
+        boardOffsetService.saveEditCard(card); //Websocket 카드에 첨부파일 추가
         boardOffsetService.saveAddAttachmentDiff(attachment); //Websocket 첨부파일 추가
 
         // 첨부 파일 추가 로그 기록

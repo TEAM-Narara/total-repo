@@ -39,7 +39,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final BoardOffsetService boardOffsetService;
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardToTop(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
@@ -103,7 +103,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     }
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardToBottom(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
@@ -170,7 +170,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     }
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
         log.info("moveCardBetween 메서드 시작 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId,
                 nextCardId);
@@ -287,6 +287,8 @@ public class CardMoveServiceImpl implements CardMoveService {
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "리스트"));
 
+        boolean isChangeList = !(targetCard.getList().getId().equals(targetList.getId()));
+
         //유저의 보드 접근 권한을 확인
         cardService.checkBoardMember(targetCard, member, MOVE_LIST);
 
@@ -301,6 +303,10 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         //dto에 바뀐 리스트 값 매핑
         java.util.List<CardMoveResponseDto> orderInfoCard = CardMoveResponseDto.of(updatedCardCollection);
+
+//        if (isChangeList) {
+//            boardOffsetService.saveMoveCardDiff(Card, targetCard.getList().getBoard().getId());
+//        }
 
         return new CardMoveResult.ReorderedCardMove(orderInfoCard);
     }
