@@ -46,6 +46,7 @@ import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.util.HashMap;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -252,8 +253,12 @@ public class BoardServiceImpl implements BoardService {
 
         String title = String.format("*%s* closed the board *%s*", manOfAction.getNickname(), board.getName());
 
-        //모든 board watch 인원에게 TODO
-//        fcmTokenService.sendMessage(manOfAction, title, "", data);
+        //모든 board watch 인원에게
+        Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
+                board.getId());
+        for (Member toMember: allMemberByBoardAndWatchTrue) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
     }
 
     @Override

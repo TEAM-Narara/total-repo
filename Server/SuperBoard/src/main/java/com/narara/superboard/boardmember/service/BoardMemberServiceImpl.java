@@ -173,7 +173,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
-        //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
+        //"*사용자이름* made you an admin on the board *보드이름*"
         String title = String.format("*%s* made you an %s on the board *%s*", manOfAction.getNickname(), boardMember.getAuthority().name(), board.getName());
 
         //대상자에게만 알람
