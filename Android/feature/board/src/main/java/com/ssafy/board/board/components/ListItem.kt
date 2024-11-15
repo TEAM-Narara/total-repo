@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
+import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.ssafy.board.board.components.card.CardItem
@@ -39,7 +40,6 @@ fun ListItem(
     addCard: (Long, String) -> Unit = { _, _ -> },
     addPhoto: () -> Unit = {},
     onFocus: (Long) -> Unit = {},
-    listState: MutableState<Boolean>,
 ) {
     val cardLazyListState = rememberLazyListState()
     val collectionState = cardCollections[listData.id] ?: return
@@ -47,64 +47,66 @@ fun ListItem(
 
     val scope = rememberCoroutineScope()
 
-    ListItem(
-        modifier = modifier,
-        title = listData.name,
-        onTitleChange = onTitleChange,
-        addCard = { cardName -> addCard(listData.id, cardName) },
-        addPhoto = addPhoto,
-        isWatching = listData.isWatching,
-        onFocus = { onFocus(listData.id) }
-    ) {
-        LazyColumn(
-            state = cardLazyListState,
-            verticalArrangement = Arrangement.spacedBy(PaddingMedium),
-            contentPadding = PaddingValues(vertical = PaddingDefault)
+    ReorderContainer(state = reorderState) {
+        ListItem(
+            modifier = modifier,
+            title = listData.name,
+            onTitleChange = onTitleChange,
+            addCard = { cardName -> addCard(listData.id, cardName) },
+            addPhoto = addPhoto,
+            isWatching = listData.isWatching,
+            onFocus = { onFocus(listData.id) }
         ) {
-            items(collection, key = { it.cardData.id }) { cardData ->
-                ReorderableItem(
-                    state = reorderState,
-                    key = cardData.cardData.id,
-                    data = cardData,
-                    dropStrategy = DropStrategy.CenterDistance,
-                    onDragEnter = { state ->
-                        collectionState.value = collection.toMutableList().apply {
-                            val targetIndex = indexOf(cardData)
-                            if (targetIndex == -1) return@apply
+            LazyColumn(
+                state = cardLazyListState,
+                verticalArrangement = Arrangement.spacedBy(PaddingMedium),
+                contentPadding = PaddingValues(vertical = PaddingDefault)
+            ) {
+                items(collection, key = { it.cardData.id }) { cardData ->
+                    ReorderableItem(
+                        state = reorderState,
+                        key = cardData.cardData.id,
+                        data = cardData,
+                        dropStrategy = DropStrategy.CenterDistance,
+                        onDragEnter = { state ->
+                            collectionState.value = collection.toMutableList().apply {
+                                val targetIndex = indexOf(cardData)
+                                if (targetIndex == -1) return@apply
 
-                            if (!remove(state.data)) {
-                                cardCollections[state.data.listId]?.let {
-                                    it.value = it.value.toMutableList().apply {
-                                        remove(state.data)
+                                if (!remove(state.data)) {
+                                    cardCollections[state.data.listId]?.let {
+                                        it.value = it.value.toMutableList().apply {
+                                            remove(state.data)
+                                        }
+                                        onFocus(listData.id)
                                     }
-                                    onFocus(listData.id)
+                                }
+
+                                add(targetIndex, state.data.apply { this.listId = listData.id })
+
+                                scope.launch {
+                                    handleLazyListScroll(
+                                        lazyListState = cardLazyListState,
+                                        dropIndex = targetIndex,
+                                    )
                                 }
                             }
-
-                            add(targetIndex, state.data.apply { this.listId = listData.id })
-
-                            scope.launch {
-                                handleLazyListScroll(
-                                    lazyListState = cardLazyListState,
-                                    dropIndex = targetIndex,
-                                )
-                            }
-                        }
-                    },
-                    onDrop = { onCardReordered() },
-                ) {
-                    CardItem(
-                        modifier = Modifier
-                            .graphicsLayer {
-                                alpha = if (isDragging) 0f else 1f
-                            }
-                            .shadow(
-                                if (isDragging) ElevationLarge else 0.dp,
-                                shape = RoundedCornerShape(CornerMedium),
-                            ),
-                        cardData = cardData,
-                        onClick = { navigateToCardScreen(cardData.cardData.id) },
-                    )
+                        },
+                        onDrop = { onCardReordered() },
+                    ) {
+                        CardItem(
+                            modifier = Modifier
+                                .graphicsLayer {
+                                    alpha = if (isDragging) 0f else 1f
+                                }
+                                .shadow(
+                                    if (isDragging) ElevationLarge else 0.dp,
+                                    shape = RoundedCornerShape(CornerMedium),
+                                ),
+                            cardData = cardData,
+                            onClick = { navigateToCardScreen(cardData.cardData.id) },
+                        )
+                    }
                 }
             }
         }
