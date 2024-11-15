@@ -1,6 +1,7 @@
 package com.ssafy.data.socket
 
 import android.util.Log
+import com.google.gson.Gson
 import com.ssafy.data.repository.sync.SyncRepository
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.manager.ConnectManager
@@ -18,7 +19,8 @@ import javax.inject.Singleton
 class BaseStompManager @Inject constructor(
     private val stompClientManager: StompClientManager,
     private val dataStoreRepository: DataStoreRepository,
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
+    private val gson: Gson
 ) {
     val state = stompClientManager.observeConnectionState(SOCKET_ID)
 
@@ -26,10 +28,10 @@ class BaseStompManager @Inject constructor(
         val memberId = dataStoreRepository.getUser().memberId
         val lastOffset = dataStoreRepository.getStompOffset(topic)
 
-        val dataHandler = StompDataHandler<StompData>(
+        val dataHandler = StompDataHandler(
             lastOffset,
-            object : StompDataHandler.Callback<StompData> {
-                override suspend fun ack(data: StompResponse<StompData>) {
+            object : StompDataHandler.Callback {
+                override suspend fun ack(data: StompResponse) {
                     val ack = AckMessage(
                         offset = data.offset,
                         topic = topic.split("/").joinToString("-"),
@@ -37,12 +39,22 @@ class BaseStompManager @Inject constructor(
                         groupId = "member-$memberId"
                     )
 
-                    stompClientManager.send(SOCKET_ID, ACK_URL, ack)
+                    when (data.type) {
+                        "RECEIVED" -> stompClientManager.send(SOCKET_ID, ACK_URL, ack)
+                        "FETCHED" -> stompClientManager.send(SOCKET_ID, ACK_LAST_URL, ack)
+                        else -> return
+                    }
+
                     dataStoreRepository.saveStompOffset(topic, data.offset)
                 }
 
-                override suspend fun onDataReleased(data: StompResponse<StompData>) {
-                    emit(data.data)
+                override suspend fun onDataReleased(data: StompResponse) {
+                    when(data.type) {
+                        "RECEIVED" -> emit(gson.fromJson(data.data, StompData::class.java))
+                        "FETCHED" -> gson.fromJson(data.data, List::class.java).forEach {
+                            emit(gson.fromJson(it.toString(), StompData::class.java))
+                        }
+                    }
                 }
             }
         )
@@ -52,7 +64,6 @@ class BaseStompManager @Inject constructor(
                 ConnectionState.Connected -> stompClientManager.subscribe(
                     SOCKET_ID,
                     "/topic/$topic/member/$memberId",
-                    StompData::class.java
                 ).collect(dataHandler::handleSocketData)
 
                 ConnectionState.Disconnected -> connect()
@@ -77,5 +88,6 @@ class BaseStompManager @Inject constructor(
         private const val BASE_URL = BuildConfig.BASE_URL
         private const val SOCKET_URL = "$BASE_URL/ws/websocket"
         private const val ACK_URL = "/app/ack"
+        private const val ACK_LAST_URL = "/app/ack/last"
     }
 }

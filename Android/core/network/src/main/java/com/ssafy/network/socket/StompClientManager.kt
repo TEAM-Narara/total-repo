@@ -53,11 +53,10 @@ class StompClientManager @Inject constructor(
         }
     }
 
-    suspend fun <T> subscribe(
+    suspend fun subscribe(
         id: String,
         topic: String,
-        clazz: Class<T>,
-    ): Flow<StompResponse<T>> {
+    ): Flow<StompResponse> {
         Log.i(TAG, "subscribe: $id $topic")
         val session = sessions[id] ?: throw Exception("연결된 소켓이 없습니다.")
         return session.subscribe(topic).map {
@@ -65,12 +64,12 @@ class StompClientManager @Inject constructor(
             Log.i(TAG, "offset : ${it.headers["offset"]?.toLong()}")
             Log.i(TAG, "data: ${it.bodyAsText}")
             Log.i(TAG, "<------ receive end")
-            val data = gson.fromJson(it.bodyAsText, clazz)
 
             StompResponse(
                 offset = it.headers["offset"]?.toLong() ?: throw Exception("offset이 존재하지 않습니다."),
                 partition = 0, // it.headers["partition"]?.toLong() ?: 0,
-                data = data
+                type = it.headers["type"] ?: "RECEIVED",
+                data = it.bodyAsText
             )
         }.catch { exception ->
             exception.printStackTrace()

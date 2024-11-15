@@ -8,8 +8,9 @@ data class StompData(
     val data: JsonObject
 )
 
-data class StompResponse<T>(
+data class StompResponse(
     val offset: Long,
     val partition: Long,
-    val data: T,
+    val type: String,
+    val data: String,
 )
