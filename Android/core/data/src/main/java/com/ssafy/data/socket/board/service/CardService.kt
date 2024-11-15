@@ -11,6 +11,7 @@ import com.ssafy.data.socket.board.model.card.DeleteCardLabelRequestDto
 import com.ssafy.data.socket.board.model.card.DeleteCardMemberRequestDto
 import com.ssafy.data.socket.board.model.card.DeleteCardRequestDto
 import com.ssafy.data.socket.board.model.card.EditCardRequestDto
+import com.ssafy.data.socket.board.model.card.MoveCardRequestDto
 import com.ssafy.database.dao.CardDao
 import com.ssafy.database.dao.CardLabelDao
 import com.ssafy.database.dao.CardMemberDao
@@ -117,7 +118,8 @@ class CardService @Inject constructor(
 
     suspend fun deleteCardMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardMemberRequestDto::class.java)
-        val before = cardMemberDao.getCardMember(dto.cardId, dto.memberId) ?: throw Exception("존재하지 않는 사용자 입니다.")
+        val before = cardMemberDao.getCardMember(dto.cardId, dto.memberId)
+            ?: throw Exception("존재하지 않는 사용자 입니다.")
         cardMemberDao.updateCardMember(
             before.copy(isRepresentative = false, isStatus = DataStatus.STAY)
         )
@@ -144,5 +146,13 @@ class CardService @Inject constructor(
                 isStatus = DataStatus.STAY,
             )
         )
+    }
+
+    suspend fun moveCard(data: JsonObject) {
+        val dto = gson.fromJson(data, MoveCardRequestDto::class.java)
+        dto.updatedCard.forEach {
+            val before = cardDao.getCard(it.cardId) ?: return
+            cardDao.updateCard(before.copy(listId = it.movedListId, myOrder = it.myOrder))
+        }
     }
 }

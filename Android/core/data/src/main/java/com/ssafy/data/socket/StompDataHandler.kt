@@ -6,11 +6,11 @@ import java.util.Timer
 import java.util.TimerTask
 
 
-class StompDataHandler<T>(
+class StompDataHandler(
     startOffset: Long = 0L,
-    private val callback: Callback<T>,
+    private val callback: Callback,
 ) {
-    private val priorityQueue = PriorityQueue<StompResponse<T>> { a, b ->
+    private val priorityQueue = PriorityQueue<StompResponse> { a, b ->
         a.offset.compareTo(b.offset)
     }
 
@@ -20,11 +20,12 @@ class StompDataHandler<T>(
     private val onTimeout
         get() = object : TimerTask() {
             override fun run() {
-                throw RuntimeException("offset ${lastOffset + 1}번 데이터가 누락되었습니다.")
+                priorityQueue.clear()
+                callback.onTimeout(lastOffset)
             }
         }
 
-    suspend fun handleSocketData(data: StompResponse<T>) {
+    suspend fun handleSocketData(data: StompResponse) {
         if (data.offset <= lastOffset) return callback.ack(data)
         priorityQueue.offer(data)
         checkAndReleaseData()
@@ -55,8 +56,9 @@ class StompDataHandler<T>(
         timer = null
     }
 
-    interface Callback<T> {
-        suspend fun ack(data: StompResponse<T>)
-        suspend fun onDataReleased(data: StompResponse<T>)
+    interface Callback {
+        suspend fun ack(response: StompResponse)
+        suspend fun onDataReleased(response: StompResponse)
+        fun onTimeout(lastOffset: Long)
     }
 }

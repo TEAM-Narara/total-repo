@@ -20,6 +20,7 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.MemberResponseDTO
+import com.ssafy.model.card.CardMoveUpdateListRequestDTO
 import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
@@ -154,24 +155,25 @@ class CardRepositoryImpl @Inject constructor(
     }
 
     override suspend fun moveCard(
-        listId: Long,
+        targetListId: Long,
         cardMoveUpdateRequestDTO: List<CardMoveUpdateRequestDTO>,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.moveCard(listId, cardMoveUpdateRequestDTO)
+            cardDataSource.moveCard(targetListId, CardMoveUpdateListRequestDTO(cardMoveUpdateRequestDTO))
         } else {
+            val recalculatedListId = mutableSetOf<Long>()
+
             cardMoveUpdateRequestDTO.forEach {
                 val card = cardDao.getCard(it.cardId) ?: return@forEach
-
-                val newCard = card.copy(myOrder = it.myOrder)
+                recalculatedListId.add(card.listId)
+                val newCard = card.copy(listId = targetListId, myOrder = it.myOrder)
                 val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
 
                 val result = when (card.isStatus) {
                     DataStatus.STAY, DataStatus.UPDATE ->
                         cardDao.updateCard(
-                            card.copy(
-                                myOrder = it.myOrder,
+                            newCard.copy(
                                 isStatus = DataStatus.UPDATE,
                                 columnUpdate = newBit
                             )
@@ -183,7 +185,9 @@ class CardRepositoryImpl @Inject constructor(
                     DataStatus.DELETE -> {}
                 }
                 flowOf(result)
-            }.also {
+            }
+
+            recalculatedListId.forEach { listId ->
                 val list = listDao.getList(listId)
 
                 val maxMyOrder = cardMoveUpdateRequestDTO.maxByOrNull { it.myOrder }?.myOrder ?: 0L
