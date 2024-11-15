@@ -2,10 +2,15 @@ package com.ssafy.network.socket
 
 import com.google.gson.JsonObject
 
-data class StompData(
+data class StompMessage(
     val target: String,
     val action: String,
     val data: JsonObject
+)
+
+data class StompFetchMessage(
+    val offset: Long,
+    val message: StompMessage
 )
 
 data class StompResponse(

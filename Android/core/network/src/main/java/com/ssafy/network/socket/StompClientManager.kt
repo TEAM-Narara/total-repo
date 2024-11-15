@@ -39,6 +39,7 @@ class StompClientManager @Inject constructor(
             } catch (e: Exception) {
                 e.printStackTrace()
                 updateConnectionState(id, ConnectionState.Error(e))
+                sessions.remove(id)
             }
         }
     }

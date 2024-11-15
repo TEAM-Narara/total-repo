@@ -6,10 +6,11 @@ import com.ssafy.data.repository.sync.SyncRepository
 import com.ssafy.datastore.DataStoreRepository
 import com.ssafy.model.manager.ConnectManager
 import com.ssafy.model.socket.AckMessage
-import com.ssafy.network.BuildConfig
 import com.ssafy.model.socket.ConnectionState
+import com.ssafy.network.BuildConfig
 import com.ssafy.network.socket.StompClientManager
-import com.ssafy.network.socket.StompData
+import com.ssafy.network.socket.StompFetchMessage
+import com.ssafy.network.socket.StompMessage
 import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -31,30 +32,45 @@ class BaseStompManager @Inject constructor(
         val dataHandler = StompDataHandler(
             lastOffset,
             object : StompDataHandler.Callback {
-                override suspend fun ack(data: StompResponse) {
-                    val ack = AckMessage(
-                        offset = data.offset,
-                        topic = topic.split("/").joinToString("-"),
-                        partition = data.partition,
-                        groupId = "member-$memberId"
-                    )
+                override suspend fun ack(response: StompResponse) {
+                    when (response.type) {
+                        "RECEIVED" -> stompClientManager.send(
+                            SOCKET_ID, ACK_URL, AckMessage(
+                                offset = response.offset,
+                                topic = topic.split("/").joinToString("-"),
+                                partition = response.partition,
+                                groupId = "member-$memberId"
+                            )
+                        )
 
-                    when (data.type) {
-                        "RECEIVED" -> stompClientManager.send(SOCKET_ID, ACK_URL, ack)
-                        "FETCHED" -> stompClientManager.send(SOCKET_ID, ACK_LAST_URL, ack)
+                        "FETCHED" -> stompClientManager.send(
+                            SOCKET_ID, ACK_LAST_URL, AckMessage(
+                                offset = gson.fromJson(response.data, List::class.java).map {
+                                    gson.fromJson(it.toString(), StompFetchMessage::class.java)
+                                }.last().offset,
+                                topic = topic.split("/").joinToString("-"),
+                                partition = response.partition,
+                                groupId = "member-$memberId"
+                            )
+                        )
+
                         else -> return
                     }
 
-                    dataStoreRepository.saveStompOffset(topic, data.offset)
+                    dataStoreRepository.saveStompOffset(topic, response.offset)
                 }
 
-                override suspend fun onDataReleased(data: StompResponse) {
-                    when(data.type) {
-                        "RECEIVED" -> emit(gson.fromJson(data.data, StompData::class.java))
-                        "FETCHED" -> gson.fromJson(data.data, List::class.java).forEach {
-                            emit(gson.fromJson(it.toString(), StompData::class.java))
+                override suspend fun onDataReleased(response: StompResponse) {
+                    when (response.type) {
+                        "RECEIVED" -> emit(gson.fromJson(response.data, StompMessage::class.java))
+                        "FETCHED" -> gson.fromJson(response.data, List::class.java).forEach {
+                            emit(gson.fromJson(it.toString(), StompFetchMessage::class.java).message)
                         }
                     }
+                }
+
+                override fun onTimeout(lastOffset: Long) {
+                    TODO("Timeout시 http 요청 보내기")
                 }
             }
         )

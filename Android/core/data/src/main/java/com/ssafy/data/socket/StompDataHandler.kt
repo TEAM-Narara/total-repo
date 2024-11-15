@@ -20,7 +20,8 @@ class StompDataHandler(
     private val onTimeout
         get() = object : TimerTask() {
             override fun run() {
-                throw RuntimeException("offset ${lastOffset + 1}번 데이터가 누락되었습니다.")
+                priorityQueue.clear()
+                callback.onTimeout(lastOffset)
             }
         }
 
@@ -56,7 +57,8 @@ class StompDataHandler(
     }
 
     interface Callback {
-        suspend fun ack(data: StompResponse)
-        suspend fun onDataReleased(data: StompResponse)
+        suspend fun ack(response: StompResponse)
+        suspend fun onDataReleased(response: StompResponse)
+        fun onTimeout(lastOffset: Long)
     }
 }
