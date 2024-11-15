@@ -140,8 +140,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         //보드멤버가 없으면 새로 만들기
         BoardMember newBoardMember = BoardMember.createBoardMemberByAdmin(board, inviteMember);
         boardMemberRepository.save(newBoardMember);
-
-            boardOffsetService.saveAddBoardMemberDiff(newBoardMember); //Websocket 보드멤버 추가
+        boardOffsetService.saveAddBoardMemberDiff(newBoardMember); //Websocket 보드멤버 추가
 
         // 멤버 추가 로그 기록
         AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
