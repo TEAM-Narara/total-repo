@@ -198,8 +198,13 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         data.put("goTo", "WORKSPACE");
         data.put("workspaceId", String.valueOf(workSpaceMember.getWorkSpace().getId()));
 
-        //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
-        String title = String.format("*%s* removed you from the Workspace *%s*", manOfAction.getNickname(), workSpaceMember.getWorkSpace().getName());
+        //"*사용자이름* added you to the Workspace *워크스페이스이름* as an admin"
+        String title = String.format(
+                "*%s* added you to the Workspace *%s* as an %s",
+                manOfAction.getNickname(),
+                workSpaceMember.getWorkSpace().getName(),
+                workSpaceMember.getAuthority().name()
+        );
 
         //대상자에게만 알람
         fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);

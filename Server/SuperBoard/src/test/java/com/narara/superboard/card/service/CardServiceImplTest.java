@@ -1,5 +1,6 @@
 package com.narara.superboard.card.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
@@ -73,7 +74,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Test
     @DisplayName("카드 생성 성공 테스트")
-    void testCreateCardSuccess() {
+    void testCreateCardSuccess() throws FirebaseMessagingException {
         // given
         Long cardId = 1L;
         String cardName = "Test Card";
