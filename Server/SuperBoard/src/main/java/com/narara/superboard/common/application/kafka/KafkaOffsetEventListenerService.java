@@ -2,6 +2,7 @@ package com.narara.superboard.common.application.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.narara.superboard.common.enums.MessageOrigin;
+import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.infrastructure.redis.RedisService;
 import com.narara.superboard.common.interfaces.dto.MessageRecord;
 import com.narara.superboard.common.interfaces.dto.OffsetKey;
@@ -27,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -39,6 +41,7 @@ public class KafkaOffsetEventListenerService {
     // 컨슈머 리스너 중복 관리를 위한 맵
     private final Map<String, ConcurrentMessageListenerContainer<String, String>> activeListeners;
     private final Map<OffsetKey, Acknowledgment> pendingLastAcks = new ConcurrentHashMap<>();
+
 
     /**
      * 특정 오프셋부터 데이터를 가져오는 메서드
@@ -56,19 +59,24 @@ public class KafkaOffsetEventListenerService {
         ConcurrentMessageListenerContainer<String, String> container = activeListeners.get(listenerKey);
         if (container == null) {
             log.error("지정된 토픽에 대한 리스너를 찾을 수 없습니다 - listenerKey: {}", listenerKey);
+            throw new NotFoundException("카프카의 토픽에 대한 리스너");
         }
 
         List<MessageRecord> messages = new ArrayList<>();
 
         container.stop();
 
+        // 플래그를 사용하여 일시적으로 동작
+        AtomicBoolean shouldSeek = new AtomicBoolean(true);
         // 컨슈머 오프셋 설정
         container.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
             @Override
             public void onPartitionsAssigned(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
                 TopicPartition topicPartition = new TopicPartition(topic, partition);
-                if (partitions.contains(topicPartition)) {
+                if (shouldSeek.get() && partitions.contains(topicPartition)) {
                     consumer.seek(topicPartition, startOffset);
+                    // 한 번 실행 후 플래그를 false로 설정
+                    shouldSeek.set(false);
                 }
             }
         });
@@ -80,7 +88,6 @@ public class KafkaOffsetEventListenerService {
                         MessageRecord messageRecord = MessageRecord.of(record.offset(), record.value());
                         if (messageRecord != null) {
                             messages.add(messageRecord);
-                            // lastAcknowledgment.set(acknowledgment);
 
                             // 마지막 오프셋인지 확인
                             long endOffset = getEndOffset(consumer, topic, partition);
@@ -91,7 +98,7 @@ public class KafkaOffsetEventListenerService {
                                 // 메모리 맵과 Redis에 ACK 추가
                                 OffsetKey offsetKey = new OffsetKey(record.topic(), record.partition(), record.offset(), "member-" + memberId);
 
-                                //pendingAcks는 acknowledgment를 임시로 저장하고 있는것
+                                //pendingLastAcks는 acknowledgment를 임시로 저장하고 있는것
                                 pendingLastAcks.put(offsetKey, acknowledgment);
                             }
                         }
