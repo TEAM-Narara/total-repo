@@ -127,12 +127,12 @@ class CardRepositoryImpl @Inject constructor(
             val card = cardDao.getCard(cardId) ?: return@withContext flowOf(Unit)
             // 변경 사항 확인하고 비트마스킹
             val newCard = card.copy(
-                name = card.name,
-                description = card.description,
-                startAt = card.startAt,
-                endAt = card.endAt,
-                coverType = card.coverType,
-                coverValue = card.coverValue
+                name = cardUpdateRequestDto.name,
+                description = cardUpdateRequestDto.description,
+                startAt = cardUpdateRequestDto.startAt,
+                endAt = cardUpdateRequestDto.endAt,
+                coverType = cardUpdateRequestDto.cover.type.name,
+                coverValue = cardUpdateRequestDto.cover.value
             )
             val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
 
