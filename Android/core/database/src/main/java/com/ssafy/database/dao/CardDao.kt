@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.ssafy.database.dto.CardEntity
-import com.ssafy.database.dto.ListEntity
 import com.ssafy.database.dto.with.CardAllInfo
 import com.ssafy.database.dto.with.CardWithListAndBoardName
 import kotlinx.coroutines.flow.Flow
@@ -119,7 +118,7 @@ interface CardDao {
 
     // 리스트들 내에 카드들 조회
     @Query("""
-        SELECT c.*
+        SELECT distinct c.*
             FROM card c
             LEFT JOIN card_member cm ON c.id = cm.cardId AND cm.isStatus != 'DELETE' AND isRepresentative = 1
             LEFT JOIN card_label cl ON c.id = cl.cardId AND cl.isStatus != 'DELETE'

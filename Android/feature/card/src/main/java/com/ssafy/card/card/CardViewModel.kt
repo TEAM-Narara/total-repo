@@ -199,14 +199,13 @@ class CardViewModel @Inject constructor(
     fun addAttachment(filePath: String) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
         withSocketState { isConnected ->
-            createAttachmentUseCase(cardId, filePath, isConnected)
+            createAttachmentUseCase(cardId, filePath, isConnected).collect()
         }
     }
 
-    // TODO 확인 필요
     fun updateAttachmentToCover(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
-            updateAttachmentToCoverUseCase(id, isConnected)
+            updateAttachmentToCoverUseCase(id, isConnected).withUiState().collect()
         }
     }
 

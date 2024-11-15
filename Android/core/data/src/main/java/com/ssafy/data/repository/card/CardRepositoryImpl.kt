@@ -20,14 +20,12 @@ import com.ssafy.database.dto.piece.toDTO
 import com.ssafy.database.dto.piece.toDto
 import com.ssafy.database.dto.piece.toEntity
 import com.ssafy.model.board.MemberResponseDTO
-import com.ssafy.model.card.CardLabelUpdateDto
 import com.ssafy.model.card.CardMoveUpdateRequestDTO
 import com.ssafy.model.card.CardRequestDto
 import com.ssafy.model.card.CardResponseDto
 import com.ssafy.model.card.CardUpdateRequestDto
 import com.ssafy.model.label.CreateCardLabelRequestDto
 import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
-import com.ssafy.model.list.ListMoveUpdateRequestDTO
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.BoardInMyRepresentativeCard
@@ -37,6 +35,7 @@ import com.ssafy.model.with.CardLabelWithLabelDTO
 import com.ssafy.model.with.CardMemberAlarmDTO
 import com.ssafy.model.with.CardMemberDTO
 import com.ssafy.model.with.CardWithListAndBoardNameDTO
+import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 import com.ssafy.model.with.MemberWithRepresentativeDTO
 import com.ssafy.network.source.card.CardDataSource
@@ -81,7 +80,9 @@ class CardRepositoryImpl @Inject constructor(
                     id = localCardId,
                     name = cardRequestDto.cardName,
                     listId = cardRequestDto.listId,
-                    isStatus = DataStatus.CREATE
+                    isStatus = DataStatus.CREATE,
+                    coverType = CoverType.NONE.name,
+                    coverValue = "NONE",
                 )
             )
 
@@ -118,41 +119,37 @@ class CardRepositoryImpl @Inject constructor(
         cardUpdateRequestDto: CardUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val card = cardDao.getCard(cardId)
 
-        if (card != null) {
-            if (isConnected) {
-                cardDataSource.updateCard(cardId, cardUpdateRequestDto)
-            } else {
-                // 변경 사항 확인하고 비트마스킹
-                val newCard = card.copy(
-                    name = card.name,
-                    description = card.description,
-                    startAt = card.startAt,
-                    endAt = card.endAt,
-                    coverType = card.coverType,
-                    coverValue = card.coverValue
-                )
-                val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
-
-                val result = when (card.isStatus) {
-                    DataStatus.STAY, DataStatus.UPDATE ->
-                        cardDao.updateCard(
-                            newCard.copy(
-                                columnUpdate = newBit,
-                                isStatus = DataStatus.UPDATE
-                            )
-                        )
-
-                    DataStatus.CREATE ->
-                        cardDao.updateCard(newCard)
-
-                    DataStatus.DELETE -> {}
-                }
-                flowOf(result)
-            }
+        if (isConnected) {
+            cardDataSource.updateCard(cardId, cardUpdateRequestDto)
         } else {
-            flowOf(Unit)
+            val card = cardDao.getCard(cardId) ?: return@withContext flowOf(Unit)
+            // 변경 사항 확인하고 비트마스킹
+            val newCard = card.copy(
+                name = card.name,
+                description = card.description,
+                startAt = card.startAt,
+                endAt = card.endAt,
+                coverType = card.coverType,
+                coverValue = card.coverValue
+            )
+            val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
+
+            val result = when (card.isStatus) {
+                DataStatus.STAY, DataStatus.UPDATE ->
+                    cardDao.updateCard(
+                        newCard.copy(
+                            columnUpdate = newBit,
+                            isStatus = DataStatus.UPDATE
+                        )
+                    )
+
+                DataStatus.CREATE ->
+                    cardDao.updateCard(newCard)
+
+                DataStatus.DELETE -> {}
+            }
+            flowOf(result)
         }
     }
 
@@ -192,9 +189,11 @@ class CardRepositoryImpl @Inject constructor(
                 val maxMyOrder = cardMoveUpdateRequestDTO.maxByOrNull { it.myOrder }?.myOrder ?: 0L
 
                 if (list != null) {
-                    listDao.updateList(list.copy(
-                        lastCardOrder = maxMyOrder
-                    ))
+                    listDao.updateList(
+                        list.copy(
+                            lastCardOrder = maxMyOrder
+                        )
+                    )
                 }
             }
         }
@@ -584,56 +583,72 @@ class CardRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val attachment = attachmentDao.getAttachment(id)
 
-            if (attachment != null) {
-                if (isConnected) {
-                    cardDataSource.deleteAttachment(id)
-                } else {
-                    val result = when (attachment.isStatus) {
-                        DataStatus.CREATE ->
-                            attachmentDao.deleteAttachment(attachment)
-
-                        else ->
-                            attachmentDao.updateAttachment(attachment.copy(isStatus = DataStatus.DELETE))
-                    }
-
-                    flowOf(result)
-                }
+            if (isConnected) {
+                cardDataSource.deleteAttachment(id)
             } else {
-                flowOf(Unit)
+                val cardId = attachment?.cardId ?: return@withContext flowOf(Unit)
+
+                val result = when (attachment.isStatus) {
+                    DataStatus.CREATE ->
+                        attachmentDao.deleteAttachment(attachment)
+
+                    else ->
+                        attachmentDao.updateAttachment(attachment.copy(isStatus = DataStatus.DELETE))
+                }
+
+                cardDao.getCard(cardId)?.let {
+                    if (it.isStatus == DataStatus.CREATE) {
+                        cardDao.updateCard(
+                            it.copy(
+                                coverValue = CoverType.NONE.name,
+                                coverType = CoverType.NONE.name
+                            )
+                        )
+                    } else {
+                        cardDao.updateCard(
+                            it.copy(
+                                coverValue = CoverType.NONE.name,
+                                coverType = CoverType.NONE.name,
+                                isStatus = DataStatus.UPDATE
+                            )
+                        )
+                    }
+                }
+
+                flowOf(result)
             }
         }
 
     override suspend fun updateAttachmentToCover(id: Long, isConnected: Boolean): Flow<Unit> =
         withContext(ioDispatcher) {
-            val attachment = attachmentDao.getAttachment(id)
-
-            if (attachment != null) {
-                if (isConnected) {
-                    cardDataSource.updateAttachmentToCover(id)
-                } else {
-                    val result = when (attachment.isStatus) {
-                        DataStatus.STAY ->
-                            attachmentDao.updateAttachment(
-                                attachment.copy(
-                                    isCover = !attachment.isCover,
-                                    isStatus = DataStatus.UPDATE
-                                )
-                            )
-
-                        DataStatus.CREATE, DataStatus.UPDATE ->
-                            attachmentDao.updateAttachment(
-                                attachment.copy(
-                                    isCover = !attachment.isCover,
-                                )
-                            )
-
-                        DataStatus.DELETE -> {}
-                    }
-
-                    flowOf(result)
-                }
+            if (isConnected) {
+                cardDataSource.updateAttachmentToCover(id)
             } else {
-                flowOf(Unit)
+                val attachment = attachmentDao.getAttachment(id)
+                val cardId = attachment?.cardId ?: return@withContext flowOf(Unit)
+                val cardEntity = cardDao.getCard(cardId) ?: return@withContext flowOf(Unit)
+
+                val result = when (attachment.isStatus) {
+                    DataStatus.STAY ->
+                        cardDao.updateCard(
+                            cardEntity.copy(
+                                coverType = attachment.type,
+                                coverValue = attachment.url,
+                                isStatus = DataStatus.UPDATE
+                            )
+                        )
+
+                    DataStatus.CREATE, DataStatus.UPDATE ->
+                        cardDao.updateCard(
+                            cardEntity.copy(
+                                coverType = attachment.type,
+                                coverValue = attachment.url
+                            )
+                        )
+
+                    DataStatus.DELETE -> {}
+                }
+                flowOf(result)
             }
         }
 

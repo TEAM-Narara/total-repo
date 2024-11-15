@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.card.label.data.LabelData
 import com.ssafy.designsystem.component.IconButton
-import com.ssafy.designsystem.getContrastingTextColor
+import com.ssafy.designsystem.values.Black
 import com.ssafy.designsystem.values.CornerSmall
 import com.ssafy.designsystem.values.IconMedium
 import com.ssafy.designsystem.values.PaddingSmall
@@ -85,7 +85,7 @@ fun EditableLabelItem(
             Text(
                 text = description,
                 fontSize = TextSmall,
-                color = getContrastingTextColor(color),
+                color = Black,
                 overflow = TextOverflow.Ellipsis,
             )
             if (isSelected) {
