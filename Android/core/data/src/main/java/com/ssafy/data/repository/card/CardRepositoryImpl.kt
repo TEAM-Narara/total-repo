@@ -117,41 +117,37 @@ class CardRepositoryImpl @Inject constructor(
         cardUpdateRequestDto: CardUpdateRequestDto,
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
-        val card = cardDao.getCard(cardId)
 
-        if (card != null) {
-            if (isConnected) {
-                cardDataSource.updateCard(cardId, cardUpdateRequestDto)
-            } else {
-                // 변경 사항 확인하고 비트마스킹
-                val newCard = card.copy(
-                    name = card.name,
-                    description = card.description,
-                    startAt = card.startAt,
-                    endAt = card.endAt,
-                    coverType = card.coverType,
-                    coverValue = card.coverValue
-                )
-                val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
-
-                val result = when (card.isStatus) {
-                    DataStatus.STAY, DataStatus.UPDATE ->
-                        cardDao.updateCard(
-                            newCard.copy(
-                                columnUpdate = newBit,
-                                isStatus = DataStatus.UPDATE
-                            )
-                        )
-
-                    DataStatus.CREATE ->
-                        cardDao.updateCard(newCard)
-
-                    DataStatus.DELETE -> {}
-                }
-                flowOf(result)
-            }
+        if (isConnected) {
+            cardDataSource.updateCard(cardId, cardUpdateRequestDto)
         } else {
-            flowOf(Unit)
+            val card = cardDao.getCard(cardId) ?: return@withContext flowOf(Unit)
+            // 변경 사항 확인하고 비트마스킹
+            val newCard = card.copy(
+                name = card.name,
+                description = card.description,
+                startAt = card.startAt,
+                endAt = card.endAt,
+                coverType = card.coverType,
+                coverValue = card.coverValue
+            )
+            val newBit = bitmaskColumn(card.columnUpdate, card, newCard)
+
+            val result = when (card.isStatus) {
+                DataStatus.STAY, DataStatus.UPDATE ->
+                    cardDao.updateCard(
+                        newCard.copy(
+                            columnUpdate = newBit,
+                            isStatus = DataStatus.UPDATE
+                        )
+                    )
+
+                DataStatus.CREATE ->
+                    cardDao.updateCard(newCard)
+
+                DataStatus.DELETE -> {}
+            }
+            flowOf(result)
         }
     }
 

@@ -11,6 +11,7 @@ import com.ssafy.model.label.UpdateCardLabelActivateRequestDto
 import com.ssafy.model.member.SimpleCardMemberDto
 import com.ssafy.model.with.AttachmentDTO
 import com.ssafy.model.with.CardLabelDTO
+import com.ssafy.model.with.CoverType
 import com.ssafy.network.api.CardAPI
 import com.ssafy.network.api.CardLabelAPI
 import com.ssafy.network.source.safeApiCall
@@ -35,12 +36,34 @@ class CardDataSourceImpl @Inject constructor(
     override suspend fun updateCard(
         cardId: Long,
         cardUpdateRequestDto: CardUpdateRequestDto
-    ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, cardUpdateRequestDto) }.toFlow()
+    ): Flow<Unit> {
+        val coverValue = cardUpdateRequestDto.cover.value
+        val key = getAttachmentKey(cardId, coverValue)
+        if (coverValue.isNotBlank()) {
+            s3ImageUtil.uploadS3Image(coverValue, key)
+            val newDto =
+                cardUpdateRequestDto.copy(cover = cardUpdateRequestDto.cover.copy(value = key))
+            return safeApiCall { cardAPI.updateCard(cardId, newDto) }.toFlow()
+        } else {
+            return safeApiCall { cardAPI.updateCard(cardId, cardUpdateRequestDto) }.toFlow()
+        }
+    }
 
     override suspend fun updateCard(
         cardId: Long,
         updateCardWithNull: UpdateCardWithNull
-    ): Flow<Unit> = safeApiCall { cardAPI.updateCard(cardId, updateCardWithNull) }.toFlow()
+    ): Flow<Unit> {
+        updateCardWithNull.cover?.let {
+            if (it.type == CoverType.IMAGE) {
+                val coverValue = it.value ?: return@let
+                val key = getAttachmentKey(cardId, coverValue)
+                s3ImageUtil.uploadS3Image(coverValue, key)
+                val newDto = updateCardWithNull.copy(cover = it.copy(value = key))
+                return safeApiCall { cardAPI.updateCard(cardId, newDto) }.toFlow()
+            }
+        }
+        return safeApiCall { cardAPI.updateCard(cardId, updateCardWithNull) }.toFlow()
+    }
 
     override suspend fun moveCard(
         listId: Long,
@@ -74,7 +97,7 @@ class CardDataSourceImpl @Inject constructor(
         safeApiCall { cardLabelAPI.updateLabelActivate(updateCardLabelActivateRequestDto) }.toFlow()
 
     override suspend fun createAttachment(attachment: AttachmentDTO): Flow<AttachmentResponseDto> {
-        val key = "${attachment.id}/${attachment.url.substringBeforeLast(".jpg").substringAfterLast("/")}"
+        val key = getAttachmentKey(attachment.cardId, attachment.url)
         if (attachment.url.isNotBlank()) s3ImageUtil.uploadS3Image(attachment.url, key)
         return safeApiCall { cardAPI.createAttachment(attachment.cardId, key) }.toFlow()
     }
@@ -97,4 +120,11 @@ class CardDataSourceImpl @Inject constructor(
         safeApiCall {
             cardAPI.setRepresentativeCard(mapOf("cardId" to cardId, "memberId" to memberId))
         }.toFlow()
+
+
+    private fun getAttachmentKey(cardId: Long, path: String): String {
+        val lastPath = path.substringAfterLast("/").substringBeforeLast(".jpg")
+        return "$cardId/$lastPath"
+    }
+
 }
