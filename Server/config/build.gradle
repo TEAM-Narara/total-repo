@@ -44,7 +44,7 @@ dependencyManagement {
 }
 
 tasks.register('copyTestYML', Copy) {
-    from '../SuperBoard/s107-secret-value'
+    from '../SuperBoard/s107-secret-value' // 상대 경로
     include "application-test.yml"  // 복사할 파일 지정
     into 'src/test/resources'       // 테스트 리소스 위치로 복사
 }
