@@ -37,6 +37,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardService cardService; // CardService 주입
     private final ListService listService;
     private final BoardOffsetService boardOffsetService;
+//    private final FcmTokenService fcmTokenService;
 
     @Override
     @Transactional
@@ -278,6 +279,14 @@ public class CardMoveServiceImpl implements CardMoveService {
             boardOffsetService.saveMoveCardDiff(updatedCardCollection, currentList.getBoard().getId());
         }
 
+        //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
+//        String title = String.format(
+//                "%s moved the card [카드이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]",
+//                member.getNickname(),
+//
+//        );
+//        fcmTokenService.sendMessage(member, title, "");
+
         return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
     }
 
@@ -290,6 +299,8 @@ public class CardMoveServiceImpl implements CardMoveService {
         //유저의 보드 접근 권한을 확인
         cardService.checkBoardMember(targetCard, member, MOVE_LIST);
 
+        boolean isMoveAnotherList = !(targetCard.getList().getId().equals(targetList.getId()));
+
         // 보드의 전체 카드를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
         java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(targetList);
 
@@ -301,6 +312,20 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         //dto에 바뀐 리스트 값 매핑
         java.util.List<CardMoveResponseDto> orderInfoCard = CardMoveResponseDto.of(updatedCardCollection);
+
+        //알림
+//        if (isMoveAnotherList) {
+//            //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
+//            String title = String.format(
+//                    "%s moved the card %s to %s on %s + [사용자 프로필사진]",
+//                    member.getNickname(),
+//                    targetCard.getName(),
+//                    targetCard.getList().getName(),
+//                    targetCard.getList().getBoard().getName()
+//            );
+//
+//            fcmTokenService.sendMessage(member, title, "");
+//        }
 
         return new CardMoveResult.ReorderedCardMove(orderInfoCard);
     }
