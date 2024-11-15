@@ -17,4 +17,6 @@ public interface CardLabelRepository extends JpaRepository<CardLabel, Long> {
 
     @Query("select cl from CardLabel cl WHERE cl.card.id = :cardId AND cl.isActivated = true")
     List<CardLabel> findByCardId(@Param("cardId") Long cardId);
+
+    List<CardLabel> findByLabel(Label label);
 }
