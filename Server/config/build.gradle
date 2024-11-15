@@ -44,13 +44,13 @@ dependencyManagement {
 }
 
 tasks.register('copyTestYML', Copy) {
-    from 's107-secret-value'
+    from '../SuperBoard/s107-secret-value'
     include "application-test.yml"  // 복사할 파일 지정
     into 'src/test/resources'       // 테스트 리소스 위치로 복사
 }
 
 tasks.register('copyYML', Copy) {
-    from 's107-secret-value'
+    from '../SuperBoard/s107-secret-value'
     include "config-dev.yml"  // 원하는 YML 파일만 복사
     into 'src/main/resources'  // 파일을 복사할 위치
     rename 'config-dev.yml', 'application.yml'  // 파일명 변경
