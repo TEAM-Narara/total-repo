@@ -82,6 +82,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         markAttachmentAsDeleted(attachment);
         saveAttachment(attachment);
 
+        boardOffsetService.saveEditCard(card);
         boardOffsetService.saveDeleteAttachmentDiff(attachment); //Websocket 첨부파일 삭제
 
         // 첨부 파일 삭제 로그 기록
@@ -162,7 +163,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private void removeCardCover(Card card) {
-        card.setCover(null);
+        card.setCover(new HashMap<>(){{
+            put("type", "NONE");
+            put("value", "NONE");
+        }});
         saveCard(card);
     }
 
