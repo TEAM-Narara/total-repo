@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,7 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.board.components.AddListButton
+import com.ssafy.board.board.components.DraggableList
 import com.ssafy.board.board.components.ListItem
 import com.ssafy.board.board.components.TopAppBar
 import com.ssafy.board.board.data.BoardData
@@ -166,24 +168,23 @@ private fun BoardScreen(
 ) {
     val scope = rememberCoroutineScope()
 
-    val listDndState = rememberReorderState<ListData>(dragAfterLongPress = true)
+    val listReorderState = rememberReorderState<ListData>(dragAfterLongPress = true)
     var listCollection by remember(boardData.listCollection) { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
-    val cardDndState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
-    val cardCollections = mutableMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
-        boardData.listCollection.forEach { listData ->
-            this[listData.id] = remember(listData) {
-                mutableStateOf(listData.cardCollection.map {
+    val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
+    val cardCollections = remember {
+        mutableStateMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
+            listCollection.forEach { listData ->
+                this[listData.id] = mutableStateOf(listData.cardCollection.map {
                     it.toReorderCardData(listData.id)
                 })
             }
         }
     }
 
-    // TODO : card의 onLongPressed가 내려오는 문제 해결
-    ReorderContainer(state = listDndState) {
-        ReorderContainer(state = cardDndState) {
+    ReorderContainer(state = listReorderState) {
+        ReorderContainer(state = cardReorderState) {
             LazyRow(
                 state = listLazyListState,
                 horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
@@ -194,10 +195,12 @@ private fun BoardScreen(
             ) {
                 items(listCollection, key = { it.id }) { listData ->
                     ReorderableItem(
-                        state = listDndState,
+                        state = listReorderState,
                         key = listData.id,
                         data = listData,
                         dropStrategy = DropStrategy.CenterDistance,
+                        requireFirstDownUnconsumed = true,
+
                         onDragEnter = { state ->
                             listCollection = listCollection.toMutableList().apply {
                                 val index = indexOf(listData)
@@ -218,9 +221,13 @@ private fun BoardScreen(
                             val listId = state.data.id
                             val index = listCollection.indexOf(state.data)
                             val prevCardId = if (index <= 0) null else listCollection[index - 1].id
-                            val nextCardId = if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                            val nextCardId =
+                                if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
                             onListReordered(listId, prevCardId, nextCardId)
                         },
+                        draggableContent = {
+                            DraggableList(listData = listData)
+                        }
                     ) {
                         ListItem(
                             modifier = Modifier
@@ -230,7 +237,7 @@ private fun BoardScreen(
                                     shape = RoundedCornerShape(CornerMedium),
                                 ),
                             listData = listData,
-                            reorderState = cardDndState,
+                            reorderState = cardReorderState,
                             cardCollections = cardCollections,
                             onTitleChange = { onListTitleChanged(listData.id, it) },
                             onCardReordered = onCardReordered,

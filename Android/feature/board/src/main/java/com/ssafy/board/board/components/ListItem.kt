@@ -1,7 +1,9 @@
 package com.ssafy.board.board.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -95,7 +97,8 @@ fun ListItem(
                         val targetListId = state.data.listId ?: return@ReorderableItem
                         val index = collection.indexOf(state.data)
                         val prevCardId = if (index <= 0) null else collection[index - 1].cardData.id
-                        val nextCardId = if (index < 0 || index >= collection.size - 1) null else collection[index + 1].cardData.id
+                        val nextCardId =
+                            if (index < 0 || index >= collection.size - 1) null else collection[index + 1].cardData.id
 
                         onCardReordered(cardId, targetListId, prevCardId, nextCardId)
                     },
@@ -115,5 +118,23 @@ fun ListItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DraggableList(
+    modifier: Modifier = Modifier,
+    listData: ListData,
+) {
+    ListItem(
+        modifier = modifier,
+        title = listData.name,
+        onTitleChange = {},
+        addCard = { },
+        addPhoto = { },
+        isWatching = listData.isWatching,
+        onFocus = { }
+    ) {
+        Box(modifier = Modifier.padding(vertical = PaddingMedium))
     }
 }
