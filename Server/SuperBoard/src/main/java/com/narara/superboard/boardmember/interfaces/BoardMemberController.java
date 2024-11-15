@@ -1,5 +1,6 @@
 package com.narara.superboard.boardmember.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.*;
 import com.narara.superboard.boardmember.service.BoardMemberService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "b. 보드 회원")
@@ -51,8 +53,9 @@ public class BoardMemberController implements BoardMemberAPI{
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<BoardMemberDto>> addBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
-        BoardMember boardMember = boardMemberService.addBoardMember(boardId, dto.memberId());
+    public ResponseEntity<DefaultResponse<BoardMemberDto>> addBoardMember(@AuthenticationPrincipal Member member, @PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto)
+            throws FirebaseMessagingException {
+        BoardMember boardMember = boardMemberService.addBoardMember(member, boardId, dto.memberId());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(

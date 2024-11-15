@@ -29,6 +29,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.fcmtoken.service.FcmTokenService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -38,14 +39,13 @@ import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.websocket.constant.Action;
 
+import com.narara.superboard.workspace.entity.WorkSpace;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,7 +71,7 @@ public class CardServiceImpl implements CardService {
     private final LastOrderValidator lastOrderValidator;
 
     private final BoardOffsetService boardOffsetService;
-//    private final FcmTokenService fcmTokenService;
+    private final FcmTokenService fcmTokenService;
 
     @Override
     public Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) {
@@ -102,7 +102,29 @@ public class CardServiceImpl implements CardService {
 
         cardHistoryRepository.save(cardHistory);
 
+        //[알림]
+        sendAddCardAlarm(member, card);
+
         return savedCard;
+    }
+
+    private void sendAddCardAlarm(Member manOfAction, Card card) {
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ADD_CARD");
+        data.put("goTo", "CARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+        data.put("listId", String.valueOf(card.getList().getId()));
+        data.put("cardId", String.valueOf(card.getId()));
+
+        //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
+        String title = String.format("*%s* created %s in *%s* on *%s*", manOfAction.getNickname(), card.getName(), card.getList().getName(), board.getName());
+
+        //모든 카드 watch 인원에게 TODO
+//        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
     }
 
     @Override

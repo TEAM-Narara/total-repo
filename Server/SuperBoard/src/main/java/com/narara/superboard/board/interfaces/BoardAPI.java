@@ -1,5 +1,6 @@
 package com.narara.superboard.board.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
 import com.narara.superboard.board.interfaces.dto.log.BoardLogDetailResponseDto;
@@ -59,7 +60,8 @@ public interface BoardAPI {
     @PatchMapping("/{boardId}/archive")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'MEMBER')")
     @Operation(summary = "보드 아카이브 상태 변경")
-    ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId);
+    ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId)
+            throws FirebaseMessagingException;
 
     @GetMapping("{boardId}/log")
     @Operation(summary = "보드의 모든 로그 목록 조회", description = "보드의 모든 로그 목록 조회")

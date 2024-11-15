@@ -1,5 +1,6 @@
 package com.narara.superboard.workspacemember.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -77,7 +78,8 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 추가")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 추가가능
     @PostMapping("/{workspaceId}/members")
-    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto) {
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto)
+            throws FirebaseMessagingException {
         WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
                 requestDto.authority());
 
@@ -97,8 +99,9 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 삭제")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 삭제가능
     @DeleteMapping("/{workspaceId}/members")
-    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> deleteWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto) {
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(workspaceId, requestDto.memberId());
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> deleteWorkspaceMember(@AuthenticationPrincipal Member member, @PathVariable Long workspaceId, @RequestBody WorkspaceMemberDeleteRequest requestDto)
+            throws FirebaseMessagingException {
+        WorkSpaceMember workSpaceMember = workSpaceMemberService.deleteMember(member, workspaceId, requestDto.memberId());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.WORKSPACE_MEMBER_DELETE_SUCCESS, new WorkspaceMemberDto(
