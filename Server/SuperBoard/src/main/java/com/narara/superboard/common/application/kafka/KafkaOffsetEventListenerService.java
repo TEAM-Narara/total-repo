@@ -132,7 +132,7 @@ public class KafkaOffsetEventListenerService {
         String destination = "/topic/" + entityType + "/" + primaryId + "/member/" + memberId;
         Map<String, Object> headers = new HashMap<>();
         // startOffset으로 보내기
-        headers.put("offset", messages.getFirst().offset());
+        headers.put("offset", messages.getLast().offset());
         headers.put("type", MessageOrigin.FETCHED.toString());
 
         messagingTemplate.convertAndSend(destination, messages, headers);
