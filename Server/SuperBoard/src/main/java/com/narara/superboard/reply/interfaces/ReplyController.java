@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
@@ -30,7 +31,8 @@ public class ReplyController implements ReplyAPI {
 
     @Override
     @Operation(summary = "댓글 생성", description = "")
-    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto) {
+    public ResponseEntity<DefaultResponse<ReplySimpleResponseDto>> createReply(@AuthenticationPrincipal Member member, @RequestBody ReplyCreateRequestDto replyCreateRequestDto)
+            throws FirebaseMessagingException {
         Reply reply = replyService.createReply(member, replyCreateRequestDto);
 
         ReplySimpleResponseDto replySimpleResponseDto = ReplySimpleResponseDto.of(reply);

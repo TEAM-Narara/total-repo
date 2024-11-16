@@ -37,7 +37,6 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardService cardService; // CardService 주입
     private final ListService listService;
     private final BoardOffsetService boardOffsetService;
-//    private final FcmTokenService fcmTokenService;
 
     @Override
     @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!

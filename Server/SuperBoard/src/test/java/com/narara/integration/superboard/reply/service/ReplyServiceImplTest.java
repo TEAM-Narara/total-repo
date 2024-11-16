@@ -1,5 +1,6 @@
 package com.narara.integration.superboard.reply.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.integration.IntegrationTest;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
@@ -72,7 +73,7 @@ class ReplyServiceImplTest extends IntegrationTest {
     @Disabled
     @Test
     @DisplayName("댓글 생성 요청시 정상적으로 저장되는지 테스트")
-    void createReply_Success() {
+    void createReply_Success() throws FirebaseMessagingException {
         // WorkSpace 생성 및 저장
         WorkSpace workSpace = WorkSpace.createWorkSpace(new WorkSpaceCreateRequestDto("워크스페이스 이름"));
         WorkSpace savedWorkSpace = workSpaceRepository.save(workSpace);

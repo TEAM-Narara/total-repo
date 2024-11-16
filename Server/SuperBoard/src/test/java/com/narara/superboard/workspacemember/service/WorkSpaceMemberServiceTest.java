@@ -5,7 +5,7 @@ import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponse
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
 import com.narara.superboard.common.constant.enums.Authority;
-import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
@@ -61,7 +61,7 @@ class WorkSpaceMemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private FcmTokenService fcmTokenService;
+    private AlarmService alarmService;
 
     private WorkSpace workSpace;
     private Member member;
