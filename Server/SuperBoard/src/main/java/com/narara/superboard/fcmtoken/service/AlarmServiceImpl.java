@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,19 +96,7 @@ public class AlarmServiceImpl implements AlarmService {
 
         //대상자에게만 알람
         Member toMember = workSpaceMember.getMember();
-        AlarmDto alarmDto = AlarmDto.builder()
-                .toMemberId(String.valueOf(toMember.getId()))
-                .title(title)
-                .body("")
-                .type(data.get("type"))
-                .goTo(data.get("goTo"))
-                .manOfActionId(String.valueOf(manOfAction.getId()))
-                .workspaceId(String.valueOf(workSpaceMember.getWorkSpace().getId()))
-                .time(createdAt)
-                .build();
-
-        saveAlarm(alarmDto);
-
+        saveMongo(toMember, title, "", data);
         fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
@@ -241,8 +230,28 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
+    }
+
+    private void saveMongo(Member toMember, String title, String body, Map<String, String> data) {
+        AlarmDto alarmDto = AlarmDto.builder()
+                .toMemberId(String.valueOf(toMember.getId()))
+                .title(title)
+                .body(body)
+                .type(data.get("type"))
+                .goTo(data.get("goTo"))
+                .manOfActionId(data.get("manOfActionId"))
+                .workspaceId(data.get("workspaceId"))
+                .boardId(data.get("boardId"))
+                .listId(data.get("listId"))
+                .cardId(data.get("cardId"))
+                .time(data.get("time"))
+                .build();
+
+        saveAlarm(alarmDto);
     }
 
     @Override
