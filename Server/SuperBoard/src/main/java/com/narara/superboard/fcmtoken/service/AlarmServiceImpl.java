@@ -8,16 +8,25 @@ import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
+import com.narara.superboard.fcmtoken.entity.Alarm;
+import com.narara.superboard.fcmtoken.infrastructure.AlarmRepository;
+import com.narara.superboard.fcmtoken.interfaces.dto.AlarmDto;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
-import com.narara.superboard.reply.service.ReplyServiceImpl;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -25,18 +34,56 @@ import org.springframework.stereotype.Service;
 public class AlarmServiceImpl implements AlarmService {
     private final FcmTokenService fcmTokenService;
 
+    private final AlarmRepository alarmRepository;
+
     private final BoardMemberRepository boardMemberRepository;
     private final CardMemberRepository cardMemberRepository;
-    private final ReplyServiceImpl replyServiceImpl;
+
+    public Alarm saveAlarm(AlarmDto alarmDto) {
+        Alarm alarm = Alarm.builder()
+                .toMemberId(alarmDto.getToMemberId())
+                .title(alarmDto.getTitle())
+                .body(alarmDto.getBody())
+                .type(alarmDto.getType())
+                .goTo(alarmDto.getGoTo())
+                .manOfActionId(alarmDto.getManOfActionId())
+                .workspaceId(alarmDto.getWorkspaceId())
+                .boardId(alarmDto.getBoardId())
+                .listId(alarmDto.getListId())
+                .cardId(alarmDto.getCardId())
+                .build();
+
+        return alarmRepository.save(alarm);
+    }
+
+    public List<Alarm> getAlarmsByMemberId(String toMemberId) {
+        return alarmRepository.findByToMemberId(
+                toMemberId,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+    }
+
+    // 페이징 처리가 필요한 경우
+    public Page<Alarm> getAlarmsByMemberIdWithPaging(String toMemberId, int page, int size) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        return alarmRepository.findByToMemberId(toMemberId, pageable);
+    }
 
     @Override
     public void sendAddWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember)
             throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_WORKSPACE_MEMBER");
         data.put("goTo", "WORKSPACE");
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpaceMember.getWorkSpace().getId()));
+        data.put("time", createdAt);
 
         //주효림이 당신을 날아라 워크스페이스에 admin으로 추가하였습니다
         String title = String.format(
@@ -47,16 +94,33 @@ public class AlarmServiceImpl implements AlarmService {
         );
 
         //대상자에게만 알람
-        fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
+        Member toMember = workSpaceMember.getMember();
+        AlarmDto alarmDto = AlarmDto.builder()
+                .toMemberId(String.valueOf(toMember.getId()))
+                .title(title)
+                .body("")
+                .type(data.get("type"))
+                .goTo(data.get("goTo"))
+                .manOfActionId(String.valueOf(manOfAction.getId()))
+                .workspaceId(String.valueOf(workSpaceMember.getWorkSpace().getId()))
+                .time(createdAt)
+                .build();
+
+        saveAlarm(alarmDto);
+
+        fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
     @Override
     public void sendDeleteWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember)
             throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_REMOVE_WORKSPACE_MEMBER");
         data.put("goTo", "HOME");
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
+        data.put("time", createdAt);
 
         //주효림이 당신을 날아라 워크스페이스에서 삭제하였습니다
         String title = String.format(
@@ -66,16 +130,20 @@ public class AlarmServiceImpl implements AlarmService {
         );
 
         //대상자에게만 알람
-        fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
+        Member toMember = workSpaceMember.getMember();
+        fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
     @Override
     public void sendArchiveBoard(Member manOfAction, Board board) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "CLOSE_BOARD");
         data.put("goTo", "WORKSPACE");
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(board.getWorkSpace().getId()));
+        data.put("time", createdAt);
 
         String title = String.format("*%s*님이 *%s* 보드를 닫았습니다", manOfAction.getNickname(), board.getName());
 
@@ -89,6 +157,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddBoardMemberAlarm(Member manOfAction, BoardMember boardMember) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = boardMember.getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -98,6 +168,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
+        data.put("time", createdAt);
 
         //주효림이 당신을 백엔드 보드에 admin으로 추가하였습니다.
         String title = String.format(
@@ -108,12 +179,15 @@ public class AlarmServiceImpl implements AlarmService {
         );
 
         //대상자에게만 알람
-        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
+        Member toMember = boardMember.getMember();
+        fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
     @Override
     public void sendDeleteBoardMemberAlarm(Member manOfAction, BoardMember boardMember)
             throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = boardMember.getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -123,6 +197,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
+        data.put("time", createdAt);
 
         //주효림이 당신을 백엔드 보드에서 삭제하였습니다
         String title = String.format(
@@ -132,11 +207,14 @@ public class AlarmServiceImpl implements AlarmService {
         );
 
         //대상자에게만 알람
-        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
+        Member toMember = boardMember.getMember();
+        fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
     @Override
     public void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -148,6 +226,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //남경민님이 백엔드 보드 오늘할일 리스트에 QA하기 카드를 만들었습니다.
         String title = String.format(
@@ -168,6 +247,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendMoveCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -179,6 +260,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //여창민님이 QA하기 카드를 백엔드 보드의 내일 할 일 리스트로 이동하였습니다.
         String title = String.format(
@@ -200,6 +282,8 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment)
             throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Card card = attachment.getCard();
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -212,6 +296,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //박준식님이 백엔드 보드의 알림만들기 카드에 이미지를 추가하였습니다
         String title = String.format(
@@ -231,6 +316,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddReplyAlarm(Member manOfAction, Reply reply) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Card card = reply.getCard();
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -243,6 +330,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //조시현님이 백엔드 보드의 알림만들기 카드에 댓글을 달았습니다.
         String title = String.format(
@@ -262,6 +350,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Card card = cardMember.getCard();
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -274,6 +364,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //여창민님이 백엔드 보드의 알림만들기 카드에 나를 추가하였습니다.
         String title = String.format(
@@ -293,6 +384,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendDeleteCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Card card = cardMember.getCard();
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -305,6 +398,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //여창민님이 백엔드 보드의 알림만들기 카드에서 나를 삭제하였습니다.
         String title = String.format(
@@ -324,6 +418,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendArchiveCard(Member manOfAction, Card card) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -333,6 +429,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
+        data.put("time", createdAt);
 
         String title;
         if (card.getIsArchived()) {
@@ -363,6 +460,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddCardDueDateAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
+        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
 
@@ -374,6 +473,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
+        data.put("time", createdAt);
 
         //남경민님이 백엔드 보드 QA하기 카드에 due date를 추가하였습니다.
         String title = String.format(
