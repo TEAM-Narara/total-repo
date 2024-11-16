@@ -122,4 +122,7 @@ public class ResponseMessage {
     public static final String FCM_TOKEN_CREATE_SUCCESS = "FCM 토큰 생성 성공";
     public static final String FCM_TOKEN_UPDATE_SUCCESS = "FCM 토큰 수정 성공";
     public static final String FCM_TOKEN_DELETE_SUCCESS = "FCM 토큰 삭제 성공";
+
+    //알람
+    public static final String ALARM_FETCH_SUCCESS = "나의 알람 리스트 조회 성공";
 }

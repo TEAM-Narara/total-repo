@@ -6,11 +6,19 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.cardmember.entity.CardMember;
+import com.narara.superboard.fcmtoken.entity.Alarm;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface AlarmService {
+    List<Alarm> getAlarmsByMember(Member member);
+
+    // 페이징 처리가 필요한 경우
+    Page<Alarm> getAlarmsByMemberIdWithPaging(Member toMember, int page, int size);
+
     void sendAddWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember) throws FirebaseMessagingException;
 
     void sendDeleteWorkspaceMemberAlarm(Member manOfAction,

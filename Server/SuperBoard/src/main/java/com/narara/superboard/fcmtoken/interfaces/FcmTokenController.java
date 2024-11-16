@@ -7,11 +7,14 @@ import com.google.firebase.messaging.Notification;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
+import com.narara.superboard.fcmtoken.entity.Alarm;
 import com.narara.superboard.fcmtoken.entity.FcmToken;
 import com.narara.superboard.fcmtoken.interfaces.dto.FcmTokenResponseDto;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.fcmtoken.service.FcmTokenService;
 import com.narara.superboard.member.entity.Member;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +26,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FcmTokenController implements FcmTokenAPI {
 
+    private final AlarmService alarmService;
     private final FcmTokenService fcmTokenService;
+
+    @GetMapping("myAlarm")
+    public ResponseEntity<DefaultResponse<List<Alarm>>> getMyAlarm(@AuthenticationPrincipal Member member) {
+        List<Alarm> alarmsByMember = alarmService.getAlarmsByMember(member);
+
+        return new ResponseEntity<>(
+                DefaultResponse.res(
+                        StatusCode.OK,
+                        ResponseMessage.ALARM_FETCH_SUCCESS,
+                        alarmsByMember
+                ),
+                HttpStatus.CREATED
+        );
+    }
 
     @Override
     public ResponseEntity<DefaultResponse<FcmTokenResponseDto>> createFcmToken(
