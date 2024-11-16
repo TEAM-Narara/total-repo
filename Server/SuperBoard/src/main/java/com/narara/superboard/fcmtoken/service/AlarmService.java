@@ -1,6 +1,7 @@
 package com.narara.superboard.fcmtoken.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -19,6 +20,8 @@ public interface AlarmService {
     void sendAddBoardMemberAlarm(Member manOfAction, BoardMember boardMember) throws FirebaseMessagingException;
 
     void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException;
+
+    void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment) throws FirebaseMessagingException;
 
     void sendAddReplyAlarm(Member manOfAction, Reply reply) throws FirebaseMessagingException;
 }

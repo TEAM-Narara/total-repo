@@ -1,6 +1,7 @@
 package com.narara.superboard.fcmtoken.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
@@ -114,6 +115,36 @@ public class AlarmServiceImpl implements AlarmService {
         // "*사용자이름* created *카드이름* in *리스트이름* on *보드이름*"
         String title = String.format("*%s* created *%s* in *%s* on *%s*", manOfAction.getNickname(), card.getName(),
                 card.getList().getName(), board.getName());
+
+        //모든 카드, 보드 watch 인원에게
+        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
+
+        for (Member toMember : cardAndBoardMembers) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
+    }
+
+    @Override
+    public void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment) throws FirebaseMessagingException {
+        Card card = attachment.getCard();
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ADD_CARD_ATTACHMENT");
+        data.put("goTo", "CARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+        data.put("listId", String.valueOf(card.getList().getId()));
+        data.put("cardId", String.valueOf(card.getId()));
+
+        //"%s attached image to %s on %s + [사용자 프로필사진]",
+        String title = String.format(
+                "*%s* attached image to *%s* on *%s*",
+                manOfAction.getNickname(),
+                card.getName(),
+                board.getName()
+        );
 
         //모든 카드, 보드 watch 인원에게
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
