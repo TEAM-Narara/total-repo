@@ -80,7 +80,7 @@ public interface CardAPI {
     ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
-            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest);
+            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) throws FirebaseMessagingException;
 
     @GetMapping("/{listId}/cards")
     ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(

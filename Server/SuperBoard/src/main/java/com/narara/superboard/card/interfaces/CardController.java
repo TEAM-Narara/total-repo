@@ -209,7 +209,7 @@ public class CardController implements CardAPI {
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
-            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
+            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) throws FirebaseMessagingException {
         CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
 
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
