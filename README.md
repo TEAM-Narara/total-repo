@@ -1,5 +1,7 @@
-# SuperBoard <br>실시간 WorkFlow 관리 서비스
-SSAFY 11기 삼성 SDI 연계 프로젝트 
+# 🌟 **실시간 WorkFlow 관리 서비스: SuperBoard**  
+
+### 🚀 **SSAFY 11기 X 삼성 SDI 프로젝트**
+
 
 ## 📜 Contents
  1. [프로젝트 개요](#1️⃣-프로젝트-개요)
@@ -34,20 +36,19 @@ SuperBoard는 직관적이고 접근성이 높은 프로젝트 관리 도구로,
 |   TYPE    | SKILL           | VERSION          |
 | :-------: | :-------------- | :--------------- |
 | LANGUAGES | Java            | 21               |
-|           | Kotlin          | 2.0.21.          |
+|           | Kotlin          | 2.0.21           |
 |    BE     | Spring Boot     | 3.3.5            |
 |           | Spring Data JPA |                  |
 |           | QueryDSL        | 5.0.0            |
-|    FE     | Android (Kotlin) | ?               |
+|    FE     | Android         |                 |
 | DATABASE  | PostgreSQL(RDS) | 16.0             |
 |           | MongoDB           | 4.0            |
 |           | ElasticCache Redis| 7.1            |
-|   INFRA   | AWS EC2         | ubuntu(x86)      |
+|   INFRA   | AWS EC2         | ubuntu           |
 |           | Jenkins         | 2.479            |
 |           | Nginx           |                  |
 |           | Docker          | 24.0.7           |
 |           | Kafka           | bitnami/kafka:3.8|
-|           | kafka-WebUi     | provectuslabs/kafka-ui|
 |           | sonarqube       |                  |
 
 ## 4️⃣ 기술 특이점
