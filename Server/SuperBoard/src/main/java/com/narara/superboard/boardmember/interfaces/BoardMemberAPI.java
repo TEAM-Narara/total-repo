@@ -45,7 +45,8 @@ public interface BoardMemberAPI {
     @Operation(summary = "보드 멤버 삭제", description = "삭제한 친구를 보내줌")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능
     @DeleteMapping("/member")
-    ResponseEntity<DefaultResponse<BoardMemberDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto);
+    ResponseEntity<DefaultResponse<BoardMemberDto>> deleteBoardMember(@AuthenticationPrincipal Member member, @PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto)
+            throws FirebaseMessagingException;
 
     @Operation(summary = "보드 멤버 권한 수정", description = "수정한 결과값을 보내줌. ADMIN만 다른 멤버의 권한 수정이 가능함")
     @PreAuthorize("hasPermission(#boardId, 'BOARD', 'ADMIN')") //boardMember 추가는 ADMIN만 가능

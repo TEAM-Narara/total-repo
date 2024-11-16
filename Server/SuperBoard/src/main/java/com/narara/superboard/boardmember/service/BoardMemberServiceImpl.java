@@ -187,7 +187,8 @@ public class BoardMemberServiceImpl implements BoardMemberService {
 
     @Override
     @Transactional
-    public BoardMember deleteMember(Long boardId, Long deleteMemberId) {
+    public BoardMember deleteMember(Member manOfAction, Long boardId, Long deleteMemberId)
+            throws FirebaseMessagingException {
         Board board = getBoard(boardId);
         Member deleteMember = getMember(deleteMemberId);
         BoardMember boardMember = getBoardMember(board, deleteMember);
@@ -204,7 +205,9 @@ public class BoardMemberServiceImpl implements BoardMemberService {
 
         boardHistoryRepository.save(boardHistory);
 
+        //[알림]
+        alarmService.sendDeleteBoardMemberAlarm(manOfAction, boardMember);
+
         return boardMember;
     }
-
 }
