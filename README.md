@@ -50,7 +50,7 @@ SuperBoard는 직관적이고 접근성이 높은 프로젝트 관리 도구로,
 |           | kafka-WebUi     | provectuslabs/kafka-ui|
 |           | sonarqube       |                  |
 
-## 4️⃣ 기술 특이점
+## 4️⃣기술 특이점
 
 ---
 
