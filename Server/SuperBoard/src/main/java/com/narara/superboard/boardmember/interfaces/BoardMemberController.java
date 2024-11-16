@@ -76,8 +76,9 @@ public class BoardMemberController implements BoardMemberAPI{
     }
 
     @Override
-    public ResponseEntity<DefaultResponse<BoardMemberDto>> deleteBoardMember(@PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto) {
-        BoardMember boardMember = boardMemberService.deleteMember(boardId, dto.memberId());
+    public ResponseEntity<DefaultResponse<BoardMemberDto>> deleteBoardMember(@AuthenticationPrincipal Member member, @PathVariable("boardId") Long boardId, @RequestBody AddMemberDto dto)
+            throws FirebaseMessagingException {
+        BoardMember boardMember = boardMemberService.deleteMember(member, boardId, dto.memberId());
 
         return ResponseEntity.ok(
                 DefaultResponse.res(

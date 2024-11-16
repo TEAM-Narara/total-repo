@@ -12,5 +12,5 @@ public interface BoardMemberService {
     void updateWatchStatus(Long boardId, Member member);
     BoardMember addBoardMember(Member member, Long boardId, Long inviteMemberId) throws FirebaseMessagingException;
     BoardMember editBoardMemberAuthority(Long boardId, Long editMember, Authority authority);
-    BoardMember deleteMember(Long boardId, Long deleteMemberId);
+    BoardMember deleteMember(Member manOfAction, Long boardId, Long deleteMemberId) throws FirebaseMessagingException;
 }

@@ -17,9 +17,10 @@ public interface CardService {
     Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) throws FirebaseMessagingException;
     Card getCard(Long cardId);
     void deleteCard(Member member, Long cardId);
-    Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto);
+    Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto)
+            throws FirebaseMessagingException;
     List<Card> getArchivedCardList(Member member, Long boardId);
-    void changeArchiveStatusByCard(Member member, Long cardId);
+    void changeArchiveStatusByCard(Member member, Long cardId) throws FirebaseMessagingException;
     void checkBoardMember(Card card, Member member, Action action);
     List<CardLogDetailResponseDto> getCardActivity(Long cardId);
     CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable);

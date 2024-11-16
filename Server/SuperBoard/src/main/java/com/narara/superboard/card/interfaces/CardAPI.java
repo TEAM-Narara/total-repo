@@ -31,7 +31,7 @@ public interface CardAPI {
     ResponseEntity<DefaultResponse<CardDetailResponseDto>> updateCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequestDto cardUpdateRequestDto);
+            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) throws FirebaseMessagingException;
 
     @GetMapping("/archived/{boardId}")
     ResponseEntity<DefaultResponse<CardArchiveCollectionResponseDto>> getArchivedCardList(
@@ -41,7 +41,7 @@ public interface CardAPI {
     @PatchMapping("/{cardId}/archive")
     ResponseEntity<DefaultResponse<Void>> changeArchiveStatusByCard(
             @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId);
+            @PathVariable Long cardId) throws FirebaseMessagingException;
 
     @GetMapping("/{cardId}/log")
     @Operation(summary = "카드 로그 조회")
@@ -80,7 +80,7 @@ public interface CardAPI {
     ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
-            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest);
+            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) throws FirebaseMessagingException;
 
     @GetMapping("/{listId}/cards")
     ResponseEntity<DefaultResponse<List<CardSimpleResponseDto>>> getCardsByListId(

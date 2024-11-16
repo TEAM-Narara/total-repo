@@ -1,5 +1,6 @@
 package com.narara.superboard.card.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -8,6 +9,7 @@ import com.narara.superboard.card.interfaces.dto.CardMoveRequest;
 import com.narara.superboard.card.interfaces.dto.CardMoveResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardMoveResult;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -37,7 +39,8 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardService cardService; // CardService 주입
     private final ListService listService;
     private final BoardOffsetService boardOffsetService;
-//    private final FcmTokenService fcmTokenService;
+
+    private final AlarmService alarmService;
 
     @Override
     @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
@@ -249,7 +252,8 @@ public class CardMoveServiceImpl implements CardMoveService {
     @Override
     @Transactional
     public CardMoveResult moveCardVersion2(Member member, Long listId,
-                                           CardMoveCollectionRequest cardMoveCollectionRequest) {
+                                           CardMoveCollectionRequest cardMoveCollectionRequest)
+            throws FirebaseMessagingException {
         //현재 리스트 조회
         List currentList = listRepository.findById(listId)
                 .orElseThrow(() -> new NotFoundEntityException(listId, "리스트"));
@@ -271,6 +275,25 @@ public class CardMoveServiceImpl implements CardMoveService {
         //request로 들어온 애들이 모두 같은 보드에 있는지 검증해야하나?
         java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(currentList);
 
+        //완전히 다른 리스트로의 이동인지 확인
+        Card fromAnotherListCard = null;
+        boolean isAnotherListMove = false;
+        for (Card tmpCard: allCards) {
+            boolean find = false;
+            for (CardMoveRequest cardMoveRequest: cardMoveRequests) {
+                if (tmpCard.getId().equals(cardMoveRequest.cardId())) {
+                    find = true;
+                    break;
+                }
+            }
+
+            if (!find) {
+                isAnotherListMove = true;
+                fromAnotherListCard = tmpCard;
+                break;
+            }
+        }
+
         //카드 myOrder 배정 및 재배치
         java.util.List<Card> updatedCardCollection = insertAndRelocateCard(allCards, currentList, cardMoveRequests);
 
@@ -280,23 +303,19 @@ public class CardMoveServiceImpl implements CardMoveService {
         }
 
         //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
-//        String title = String.format(
-//                "%s moved the card [카드이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]",
-//                member.getNickname(),
-//
-//        );
-//        fcmTokenService.sendMessage(member, title, "");
+        if (isAnotherListMove) {
+            alarmService.sendMoveCardAlarm(member, fromAnotherListCard);
+        }
 
         return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
     }
 
     @Transactional
-    public CardMoveResult moveCardVersion1(Member member, List targetList, Long cardId, Long myOrder) {
+    public CardMoveResult moveCardVersion1(Member member, List targetList, Long cardId, Long myOrder)
+            throws FirebaseMessagingException {
         //바꿀 리스트 조회
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "리스트"));
-
-//        boolean isChangeList = !(targetCard.getList().getId().equals(targetList.getId()));
 
         //유저의 보드 접근 권한을 확인
         cardService.checkBoardMember(targetCard, member, MOVE_LIST);
@@ -321,18 +340,10 @@ public class CardMoveServiceImpl implements CardMoveService {
         }
 
         //알림
-//        if (isMoveAnotherList) {
-//            //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
-//            String title = String.format(
-//                    "%s moved the card %s to %s on %s + [사용자 프로필사진]",
-//                    member.getNickname(),
-//                    targetCard.getName(),
-//                    targetCard.getList().getName(),
-//                    targetCard.getList().getBoard().getName()
-//            );
-//
-//            fcmTokenService.sendMessage(member, title, "");
-//        }
+        if (isMoveAnotherList) {
+            //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
+            alarmService.sendMoveCardAlarm(member, targetCard);
+        }
 
         return new CardMoveResult.ReorderedCardMove(orderInfoCard);
     }

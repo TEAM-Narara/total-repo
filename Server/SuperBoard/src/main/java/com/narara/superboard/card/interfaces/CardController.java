@@ -85,7 +85,7 @@ public class CardController implements CardAPI {
     public ResponseEntity<DefaultResponse<CardDetailResponseDto>> updateCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) {
+            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) throws FirebaseMessagingException {
 
         Card card = cardService.updateCard(member, cardId, cardUpdateRequestDto);
         Map<String, Object> cover = card.getCover();
@@ -124,7 +124,7 @@ public class CardController implements CardAPI {
     @Operation(summary = "카드 아카이브 여부 변경", description = "")
     public ResponseEntity<DefaultResponse<Void>> changeArchiveStatusByCard(
             @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId) {
+            @PathVariable Long cardId) throws FirebaseMessagingException {
 
         cardService.changeArchiveStatusByCard(member, cardId);
 
@@ -209,7 +209,7 @@ public class CardController implements CardAPI {
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCard(
             @Parameter(description = "현재 사용자 정보", required = true) @AuthenticationPrincipal Member member,
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
-            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
+            @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) throws FirebaseMessagingException {
         CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
 
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));

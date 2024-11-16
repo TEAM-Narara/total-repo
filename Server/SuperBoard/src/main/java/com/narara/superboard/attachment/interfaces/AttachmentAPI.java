@@ -1,5 +1,6 @@
 package com.narara.superboard.attachment.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.attachment.interfaces.dto.AttachmentDto;
 import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.member.entity.Member;
@@ -16,7 +17,7 @@ public interface AttachmentAPI {
     ResponseEntity<DefaultResponse<AttachmentDto>> addAttachment(
             @AuthenticationPrincipal Member member,
             @RequestParam Long cardId,
-            @RequestParam String url);
+            @RequestParam String url) throws FirebaseMessagingException;
 
     @DeleteMapping("/{attachmentId}")
     @Operation(summary = "첨부파일 삭제", description = "특정 첨부파일을 삭제합니다.")

@@ -28,7 +28,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
-import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -38,16 +38,11 @@ import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.websocket.constant.Action;
 
-import com.narara.superboard.workspace.entity.WorkSpace;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardServiceImpl implements CardService {
 
     private final ListService listService;
+    private final AlarmService alarmService;
 
     private final CardRepository cardRepository;
     private final ListRepository listRepository;
@@ -73,7 +69,6 @@ public class CardServiceImpl implements CardService {
     private final LastOrderValidator lastOrderValidator;
 
     private final BoardOffsetService boardOffsetService;
-    private final FcmTokenService fcmTokenService;
     private final BoardMemberRepository boardMemberRepository;
 
     @Override
@@ -106,44 +101,9 @@ public class CardServiceImpl implements CardService {
         cardHistoryRepository.save(cardHistory);
 
         //[알림]
-        sendAddCardAlarm(member, card);
+        alarmService.sendAddCardAlarm(member, card);
 
         return savedCard;
-    }
-
-    private void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
-        Board board = card.getList().getBoard();
-        WorkSpace workSpace = board.getWorkSpace();
-
-        HashMap<String, String> data = new HashMap<>();
-        data.put("type", "ADD_CARD");
-        data.put("goTo", "CARD");
-        data.put("workspaceId", String.valueOf(workSpace.getId()));
-        data.put("boardId", String.valueOf(board.getId()));
-        data.put("listId", String.valueOf(card.getList().getId()));
-        data.put("cardId", String.valueOf(card.getId()));
-
-        // "*사용자이름* created *카드이름* in *리스트이름* on *보드이름*"
-        String title = String.format("*%s* created *%s* in *%s* on *%s*", manOfAction.getNickname(), card.getName(),
-                card.getList().getName(), board.getName());
-
-        //모든 카드, 보드 watch 인원에게
-        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
-
-        for (Member toMember : cardAndBoardMembers) {
-            fcmTokenService.sendMessage(toMember, title, "", data);
-        }
-    }
-
-    private Set<Member> getCardAndBoardMembers(Card card, Board board) {
-        Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
-                board.getId());
-        Set<Member> allMemberByCardAndWatchTrue = cardMemberRepository.findAllMemberByCardAndWatchTrue(card.getId());
-
-        return Stream.concat(
-                allMemberByBoardAndWatchTrue.stream(),
-                allMemberByCardAndWatchTrue.stream()
-        ).collect(Collectors.toSet());
     }
 
     @Override
@@ -173,9 +133,16 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto) {
+    public Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto)
+            throws FirebaseMessagingException {
         Card card = getCard(cardId);
         checkBoardMember(card, member, EDIT_CARD);
+
+        boolean sendAlarm = false;
+        //due date를 완전히 새로 추가할 때만 알림이 옴
+        if (card.getEndAt() == null && cardUpdateRequestDto.endAt() != null) {
+            sendAlarm = true;
+        }
 
         //cover 검증
         coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
@@ -194,6 +161,10 @@ public class CardServiceImpl implements CardService {
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
+
+        if (sendAlarm) {
+            alarmService.sendAddCardDueDateAlarm(member, card);
+        }
 
         return updatedCard;
     }
@@ -214,7 +185,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void changeArchiveStatusByCard(Member member, Long cardId) {
+    public void changeArchiveStatusByCard(Member member, Long cardId) throws FirebaseMessagingException {
         Card card = getCard(cardId);
         checkBoardMember(card, member, ARCHIVE_CARD);
         card.changeArchiveStatus();
@@ -233,15 +204,7 @@ public class CardServiceImpl implements CardService {
         cardHistoryRepository.save(cardHistory);
 
         //알림
-//        if (card.getIsArchived()) {
-//            String formatString = "%s archived the card %s on %s + [사용자 프로필사진]";
-//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
-//            fcmTokenService.sendMessage(member, title, "");
-//        } else {
-//            String formatString = "%s unarchived the card %s on %s + [사용자 프로필사진]";
-//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
-//            fcmTokenService.sendMessage(member, title, "");
-//        }
+        alarmService.sendArchiveCard(member, card);
     }
 
     @Override

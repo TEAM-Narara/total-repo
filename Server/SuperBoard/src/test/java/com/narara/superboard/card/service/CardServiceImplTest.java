@@ -18,6 +18,7 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -58,6 +59,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardMemberRepository boardMemberRepository;
+
+    @Mock
+    private AlarmService alarmService;
 
     @Mock
     private LastOrderValidator lastOrderValidator;
@@ -316,7 +320,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
             "1, true",
             "2, false"
     })
-    void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) {
+    void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) throws FirebaseMessagingException {
         // given: 카드 모킹
         Member member = new Member(1L , "시현", "sisi@naver.com");
 
@@ -353,6 +357,4 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(!isArchived, card.getIsArchived());
         verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
-
-
 }

@@ -6,5 +6,5 @@ import com.narara.superboard.member.entity.Member;
 public interface CardMemberService {
     boolean getCardMemberIsAlert(Member member, Long cardId);
     Boolean setCardMemberIsAlert(Member member, Long cardId);
-    Boolean setCardMemberIsRepresentative(UpdateCardMemberRequestDto updateCardMemberRequestDto);
+    Boolean setCardMemberIsRepresentative(Member manOfAction, UpdateCardMemberRequestDto updateCardMemberRequestDto);
 }

@@ -1,5 +1,6 @@
 package com.narara.superboard.attachment.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.interfaces.dto.AttachmentDto;
 import com.narara.superboard.attachment.service.AttachmentService;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "9. 첨부파일")
@@ -26,7 +26,7 @@ public class AttachmentController implements AttachmentAPI {
     public ResponseEntity<DefaultResponse<AttachmentDto>> addAttachment(
             @AuthenticationPrincipal Member member,
             @RequestParam Long cardId,
-            @RequestParam String url) {
+            @RequestParam String url) throws FirebaseMessagingException {
 
         Attachment attachment = attachmentService.addAttachment(member, cardId, url);
         AttachmentDto attachmentDto = AttachmentDto.of(attachment);
