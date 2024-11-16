@@ -52,26 +52,30 @@ public class AlarmServiceImpl implements AlarmService {
                 .boardId(alarmDto.getBoardId())
                 .listId(alarmDto.getListId())
                 .cardId(alarmDto.getCardId())
+                .time(alarmDto.getTime())
                 .build();
 
         return alarmRepository.save(alarm);
     }
 
-    public List<Alarm> getAlarmsByMemberId(String toMemberId) {
+    @Override
+    public List<Alarm> getAlarmsByMember(Member toMember) {
         return alarmRepository.findByToMemberId(
-                toMemberId,
+                String.valueOf(toMember.getId()),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
     }
 
     // 페이징 처리가 필요한 경우
-    public Page<Alarm> getAlarmsByMemberIdWithPaging(String toMemberId, int page, int size) {
+    @Override
+    public Page<Alarm> getAlarmsByMemberIdWithPaging(Member toMember, int page, int size) {
         Pageable pageable = PageRequest.of(
                 page,
                 size,
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
-        return alarmRepository.findByToMemberId(toMemberId, pageable);
+
+        return alarmRepository.findByToMemberId(String.valueOf(toMember.getId()), pageable);
     }
 
     @Override
