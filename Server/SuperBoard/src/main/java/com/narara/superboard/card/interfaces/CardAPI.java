@@ -31,7 +31,7 @@ public interface CardAPI {
     ResponseEntity<DefaultResponse<CardDetailResponseDto>> updateCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequestDto cardUpdateRequestDto);
+            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) throws FirebaseMessagingException;
 
     @GetMapping("/archived/{boardId}")
     ResponseEntity<DefaultResponse<CardArchiveCollectionResponseDto>> getArchivedCardList(

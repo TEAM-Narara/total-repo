@@ -38,16 +38,11 @@ import com.narara.superboard.reply.infrastructure.ReplyRepository;
 import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.websocket.constant.Action;
 
-import com.narara.superboard.workspace.entity.WorkSpace;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -138,9 +133,16 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto) {
+    public Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto)
+            throws FirebaseMessagingException {
         Card card = getCard(cardId);
         checkBoardMember(card, member, EDIT_CARD);
+
+        boolean sendAlarm = false;
+        //due date를 완전히 새로 추가할 때만 알림이 옴
+        if (card.getEndAt() == null && cardUpdateRequestDto.endAt() != null) {
+            sendAlarm = true;
+        }
 
         //cover 검증
         coverValidator.validateCoverTypeIsValid(cardUpdateRequestDto.cover());
@@ -159,6 +161,10 @@ public class CardServiceImpl implements CardService {
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
         cardHistoryRepository.save(cardHistory);
+
+        if (sendAlarm) {
+            alarmService.sendAddCardDueDateAlarm(member, card);
+        }
 
         return updatedCard;
     }

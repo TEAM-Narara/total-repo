@@ -156,7 +156,8 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment) throws FirebaseMessagingException {
+    public void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment)
+            throws FirebaseMessagingException {
         Card card = attachment.getCard();
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -304,6 +305,35 @@ public class AlarmServiceImpl implements AlarmService {
                     card.getList().getBoard().getName()
             );
         }
+
+        //모든 카드, 보드 watch 인원에게
+        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
+
+        for (Member toMember : cardAndBoardMembers) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
+    }
+
+    @Override
+    public void sendAddCardDueDateAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "EDIT_CARD_DUE_DATE");
+        data.put("goTo", "CARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+        data.put("listId", String.valueOf(card.getList().getId()));
+        data.put("cardId", String.valueOf(card.getId()));
+
+        //"*사용자이름* added a due date to the card *카드이름* on *보드이름*"
+        String title = String.format(
+                "*%s* added a due date to the card *%s* on *%s*",
+                manOfAction.getNickname(),
+                card.getName(),
+                board.getName()
+        );
 
         //모든 카드, 보드 watch 인원에게
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
