@@ -35,7 +35,6 @@ public class AuthServiceImpl implements AuthService {
 
         Member newMember = createNewMember(memberCreateRequestDto);
 
-        System.out.println(newMember.getId());
         // 워크 스페이스 생성
         workSpaceService.createWorkSpace(newMember.getId(),
                 new WorkSpaceCreateRequestDto(newMember.getNickname()+"의 워크스페이스"));
