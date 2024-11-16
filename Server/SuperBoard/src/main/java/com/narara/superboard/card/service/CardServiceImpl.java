@@ -179,7 +179,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void changeArchiveStatusByCard(Member member, Long cardId) {
+    public void changeArchiveStatusByCard(Member member, Long cardId) throws FirebaseMessagingException {
         Card card = getCard(cardId);
         checkBoardMember(card, member, ARCHIVE_CARD);
         card.changeArchiveStatus();
@@ -198,15 +198,7 @@ public class CardServiceImpl implements CardService {
         cardHistoryRepository.save(cardHistory);
 
         //알림
-//        if (card.getIsArchived()) {
-//            String formatString = "%s archived the card %s on %s + [사용자 프로필사진]";
-//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
-//            fcmTokenService.sendMessage(member, title, "");
-//        } else {
-//            String formatString = "%s unarchived the card %s on %s + [사용자 프로필사진]";
-//            String title = String.format(formatString, member.getNickname(), card.getName(), card.getList().getBoard().getName());
-//            fcmTokenService.sendMessage(member, title, "");
-//        }
+        alarmService.sendArchiveCard(member, card);
     }
 
     @Override
