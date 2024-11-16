@@ -9,6 +9,7 @@ import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.cardmember.interfaces.dto.UpdateCardMemberRequestDto;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -39,6 +40,9 @@ class CardMemberServiceImplTest {
 
     @Mock
     private BoardOffsetService boardOffsetService;
+
+    @Mock
+    private AlarmService alarmService;
 
     @InjectMocks
     private CardMemberServiceImpl cardMemberService;
@@ -239,7 +243,7 @@ class CardMemberServiceImplTest {
         when(cardMemberRepository.findByCardIdAndMemberId(cardId, memberId)).thenReturn(Optional.of(cardMember));
 
         // when
-        cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
+        cardMemberService.setCardMemberIsRepresentative(member, updateCardMemberRequestDto);
 
         // then
         if (cardMemberRepository.findByCardIdAndMemberId(cardId, memberId).isEmpty()) {
@@ -249,7 +253,6 @@ class CardMemberServiceImplTest {
             assertEquals(!isRepresentative, cardMember.isRepresentative()); // 대표 상태가 반대로 변경되었는지 확인
         }
     }
-
 
     @Test
     @DisplayName("카드가 존재하지 않을 때 예외 발생 테스트")
@@ -266,7 +269,7 @@ class CardMemberServiceImplTest {
 
         // when & then
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
+            cardMemberService.setCardMemberIsRepresentative(member, updateCardMemberRequestDto);
         });
 
         verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
@@ -292,7 +295,7 @@ class CardMemberServiceImplTest {
 
         // when & then
         Exception exception = assertThrows(NotFoundEntityException.class, () -> {
-            cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
+            cardMemberService.setCardMemberIsRepresentative(member, updateCardMemberRequestDto);
         });
 
         verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
