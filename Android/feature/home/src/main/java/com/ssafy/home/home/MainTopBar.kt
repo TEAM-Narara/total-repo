@@ -46,12 +46,12 @@ fun MainTopBar(
             Text(text = title, fontSize = TextMedium)
         },
         actions = {
-            IconButton(
-                onClick = { onSearchClick() },
-                modifier = Modifier.then(Modifier.size(IconLarge))
-            ) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "검색 창")
-            }
+//            IconButton(
+//                onClick = { onSearchClick() },
+//                modifier = Modifier.then(Modifier.size(IconLarge))
+//            ) {
+//                Icon(imageVector = Icons.Default.Search, contentDescription = "검색 창")
+//            }
 
             IconButton(
                 onClick = { onAlarmClick() },

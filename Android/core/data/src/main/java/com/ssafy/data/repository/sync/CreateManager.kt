@@ -113,7 +113,7 @@ class CreateManager @Inject constructor(
             )
 
             cardRepository.updateCard(cardId, dto, isConnected)
-            createCardMembers(cardId, card.cardMembers)
+//            createCardMembers(cardId, card.cardMembers)
             createCardLabels(cardId, card.cardLabels)
             if (card.cardMemberAlarm) cardRepository.setCardAlertStatus(cardId, memberId)
 

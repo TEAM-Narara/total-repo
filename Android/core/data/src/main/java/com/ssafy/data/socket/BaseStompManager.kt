@@ -90,6 +90,8 @@ class BaseStompManager @Inject constructor(
                     val (entityType, primaryId) = topic.split("/")
                     CoroutineScope(Dispatchers.IO).launch {
                         runCatching {
+                            val user = dataStoreRepository.getUser()
+                            if (user.memberId == 0L && user.email.isEmpty() && user.nickname.isEmpty()) return@runCatching
                             kafkaAPI.sync(
                                 partition = 0,
                                 offset = lastOffset + 1,

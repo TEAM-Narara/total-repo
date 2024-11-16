@@ -1,9 +1,11 @@
 package com.ssafy.network.api
 
 import com.ssafy.model.fcm.FcmDTO
+import com.ssafy.model.fcm.FcmMessageResponse
 import com.ssafy.network.source.ApiResponse
 import retrofit2.Response
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -27,5 +29,8 @@ interface FcmAPI {
     suspend fun deleteFcmToken(
         @Path("memberId") memberId: Long
     ): Response<ApiResponse<Unit>>
+
+    @GET("api/v1/fcm-token/myAlarm")
+    suspend fun getMyAlarmList(): Response<ApiResponse<List<FcmMessageResponse>>>
 
 }
