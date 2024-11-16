@@ -10,12 +10,14 @@ import com.ssafy.model.socket.AckMessage
 import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.BuildConfig
 import com.ssafy.network.api.KafkaAPI
+import com.ssafy.network.networkstate.NetworkState
 import com.ssafy.network.socket.StompClientManager
 import com.ssafy.network.socket.StompFetchMessage
 import com.ssafy.network.socket.StompMessage
 import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -104,6 +106,8 @@ class BaseStompManager @Inject constructor(
             }
         )
 
+        if (state.first() is ConnectionState.Error) connect()
+
         state.collect {
             when (it) {
                 ConnectionState.Connected -> stompClientManager.subscribe(
@@ -119,12 +123,18 @@ class BaseStompManager @Inject constructor(
     }
 
     suspend fun connect() {
-        stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
-            Log.d("TAG", "subscribe: Socket is connected")
-            ConnectManager.sendConnectingEvent(true)
-            syncRepository.syncAll()
-            Log.d("TAG", "subscribe: Sync all")
-            ConnectManager.sendConnectingEvent(false)
+        NetworkState.isConnected.collect {
+            if (it) {
+                stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
+                    Log.d("TAG", "subscribe: Socket is connected")
+                    ConnectManager.sendConnectingEvent(true)
+                    syncRepository.syncAll()
+                    Log.d("TAG", "subscribe: Sync all")
+                    ConnectManager.sendConnectingEvent(false)
+                }
+            } else {
+                stompClientManager.disconnect(SOCKET_ID)
+            }
         }
     }
 

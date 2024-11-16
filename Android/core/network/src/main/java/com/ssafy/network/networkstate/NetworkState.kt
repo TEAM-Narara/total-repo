@@ -1,4 +1,4 @@
-package com.ssafy.ui.networkstate
+package com.ssafy.network.networkstate
 
 import kotlinx.coroutines.flow.MutableStateFlow
 

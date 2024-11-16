@@ -7,7 +7,6 @@ import com.ssafy.model.board.BoardDTO
 import com.ssafy.model.board.Visibility
 import com.ssafy.model.with.CoverType
 import com.ssafy.model.workspace.WorkSpaceDTO
-import com.ssafy.ui.networkstate.NetworkState
 import com.ssafy.ui.viewmodel.BaseViewModel
 import com.ssafy.workspace.GetWorkspaceListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,9 +35,10 @@ class CreateBoardViewModel @Inject constructor(
     val workspace = _workspace.asStateFlow()
 
     fun createBoard(onSuccess: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        val iscConnected = NetworkState.isConnected.value
-        createBoardUseCase(boardData, iscConnected).withUiState().collect {
-            withMain { onSuccess() }
+        withSocketState { isConnected ->
+            createBoardUseCase(boardData, isConnected).withUiState().collect {
+                withMain { onSuccess() }
+            }
         }
     }
 

@@ -32,7 +32,7 @@ import com.ssafy.fcm.data.FcmDirection
 import com.ssafy.splash.SplashViewModel
 import com.ssafy.superboard.navigation.SuperBoardNavHost
 import com.ssafy.superboard.ui.theme.SuperBoardTheme
-import com.ssafy.ui.networkstate.NetworkState
+import com.ssafy.network.networkstate.NetworkState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.update
 
@@ -78,11 +78,11 @@ class MainActivity : ComponentActivity() {
 
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                NetworkState.isConnected.update { true }
+                com.ssafy.network.networkstate.NetworkState.isConnected.update { true }
             }
 
             override fun onLost(network: Network) {
-                NetworkState.isConnected.update { false }
+                com.ssafy.network.networkstate.NetworkState.isConnected.update { false }
             }
         }
 
