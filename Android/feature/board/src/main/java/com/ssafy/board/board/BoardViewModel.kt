@@ -59,7 +59,7 @@ class BoardViewModel @Inject constructor(
     fun setBoardId(boardId: Long) = _boardId.update { boardId }
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             combine(_workspaceId, _boardId) { workspaceId, boardId ->
                 if (workspaceId == null || boardId == null) null
                 else Pair(workspaceId, boardId)
@@ -97,7 +97,7 @@ class BoardViewModel @Inject constructor(
         initialValue = null,
     )
 
-    fun updateBoardName(boardName: String) = viewModelScope.launch {
+    fun updateBoardName(boardName: String) = viewModelScope.launch(Dispatchers.IO) {
         boardData.value?.let {
             withSocketState { isConnected ->
                 updateBoardUseCase(
@@ -113,7 +113,7 @@ class BoardViewModel @Inject constructor(
         }
     }
 
-    fun updateListName(listId: Long, listName: String) = viewModelScope.launch {
+    fun updateListName(listId: Long, listName: String) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
             updatedListUseCase(
                 listId = listId,
@@ -150,7 +150,7 @@ class BoardViewModel @Inject constructor(
             }
         }
 
-    fun addList(listName: String) = viewModelScope.launch {
+    fun addList(listName: String) = viewModelScope.launch(Dispatchers.IO) {
         if (listName.isEmpty()) return@launch
         withSocketState { isConnected ->
             createListUseCase(
@@ -163,7 +163,7 @@ class BoardViewModel @Inject constructor(
         }
     }
 
-    fun addCard(listId: Long, cardName: String) = viewModelScope.launch {
+    fun addCard(listId: Long, cardName: String) = viewModelScope.launch(Dispatchers.IO) {
         if (cardName.isEmpty()) return@launch
         withSocketState { isConnected ->
             createCardUseCase(

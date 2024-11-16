@@ -35,7 +35,7 @@ class MoveCardUseCase @Inject constructor(
     }
 }
 
-private fun CardMoveResult.toCardMoveUpdateRequestDTO(): List<CardMoveUpdateRequestDTO> =
+fun CardMoveResult.toCardMoveUpdateRequestDTO(): List<CardMoveUpdateRequestDTO> =
     when (this) {
         is CardMoveResult.ReorderedCardMove -> response.map {
             CardMoveUpdateRequestDTO(

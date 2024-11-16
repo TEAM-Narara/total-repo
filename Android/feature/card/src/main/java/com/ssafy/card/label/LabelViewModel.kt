@@ -13,6 +13,7 @@ import com.ssafy.model.label.CreateLabelRequestDto
 import com.ssafy.model.label.UpdateLabelRequestDto
 import com.ssafy.ui.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,7 +57,7 @@ class LabelViewModel @Inject constructor(
         initialValue = null,
     )
 
-    fun createLabel(color: Color, description: String) = viewModelScope.launch {
+    fun createLabel(color: Color, description: String) = viewModelScope.launch(Dispatchers.IO) {
         val boardId = _boardId.value ?: return@launch
         withSocketState { isConnected ->
             createLabelUseCase(
@@ -72,7 +73,7 @@ class LabelViewModel @Inject constructor(
 
     private fun Color.toLong() = (value shr 32).toLong()
 
-    fun updateLabel(id: Long, color: Color, description: String) = viewModelScope.launch {
+    fun updateLabel(id: Long, color: Color, description: String) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
             updateLabelUseCase(
                 boardId = id,
@@ -85,13 +86,13 @@ class LabelViewModel @Inject constructor(
         }
     }
 
-    fun deleteLabel(id: Long) = viewModelScope.launch {
+    fun deleteLabel(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
             deleteLabelUseCase(id, isConnected)
         }
     }
 
-    fun selectLabel(id: Long, isSelected: Boolean) = viewModelScope.launch {
+    fun selectLabel(id: Long, isSelected: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         val cardId = _cardId.value ?: return@launch
         withSocketState { isConnected ->
             updateCardLabelUseCase(

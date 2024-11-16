@@ -38,7 +38,7 @@ open class BaseViewModel : ViewModel() {
     lateinit var connectSocketUseCase: ConnectSocketUseCase
 
     val socketState by lazy {
-        viewModelScope.launch { connectSocketUseCase() }
+        viewModelScope.launch(Dispatchers.IO) { connectSocketUseCase() }
         getSocketStateUseCase().filterNotNull().flatMapLatest {
             when (it) {
                 ConnectionState.Disconnected, ConnectionState.Connecting -> _uiState.update { UiState.Loading }
