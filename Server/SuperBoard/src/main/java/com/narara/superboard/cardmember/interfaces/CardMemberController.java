@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "d. 카드 회원")
@@ -47,9 +46,10 @@ public class CardMemberController implements CardMemberAPI {
 
     @Override
     public ResponseEntity<DefaultResponse<Boolean>> setCardMemberIsRepresentative(
+            @AuthenticationPrincipal Member member,
             @RequestBody UpdateCardMemberRequestDto updateCardMemberRequestDto) {
 
-        Boolean isRepresentative = cardMemberService.setCardMemberIsRepresentative(updateCardMemberRequestDto);
+        Boolean isRepresentative = cardMemberService.setCardMemberIsRepresentative(member, updateCardMemberRequestDto);
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MEMBER_REPRESENTATIVE_UPDATE_SUCCESS, isRepresentative),
                 HttpStatus.OK

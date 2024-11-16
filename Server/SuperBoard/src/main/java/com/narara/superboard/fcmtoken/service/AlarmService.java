@@ -5,6 +5,7 @@ import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -24,4 +25,8 @@ public interface AlarmService {
     void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment) throws FirebaseMessagingException;
 
     void sendAddReplyAlarm(Member manOfAction, Reply reply) throws FirebaseMessagingException;
+
+    void sendAddCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException;
+
+    void sendDeleteCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException;
 }

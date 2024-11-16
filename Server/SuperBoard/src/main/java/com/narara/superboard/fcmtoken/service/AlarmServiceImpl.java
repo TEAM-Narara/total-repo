@@ -6,6 +6,7 @@ import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.card.entity.Card;
+import com.narara.superboard.cardmember.entity.CardMember;
 import com.narara.superboard.cardmember.infrastructure.CardMemberRepository;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
@@ -181,6 +182,66 @@ public class AlarmServiceImpl implements AlarmService {
 
         for (Member toMember : cardAndBoardMembers) {
             fcmTokenService.sendMessage(toMember, title, reply.getContent(), data);
+        }
+    }
+
+    @Override
+    public void sendAddCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
+        Card card = cardMember.getCard();
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ME_ADD_CARD_MEMBER");
+        data.put("goTo", "CARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+        data.put("listId", String.valueOf(card.getList().getId()));
+        data.put("cardId", String.valueOf(card.getId()));
+
+        //"*사용자이름* added you to the card *카드이름* on *보드이름*"
+        String title = String.format(
+                "*%s* added you to the card *%s* on *%s*",
+                manOfAction.getNickname(),
+                card.getName(),
+                board.getName()
+        );
+
+        //모든 카드, 보드 watch 인원에게
+        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
+
+        for (Member toMember : cardAndBoardMembers) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
+    }
+
+    @Override
+    public void sendDeleteCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
+        Card card = cardMember.getCard();
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ME_ADD_CARD_MEMBER");
+        data.put("goTo", "CARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+        data.put("listId", String.valueOf(card.getList().getId()));
+        data.put("cardId", String.valueOf(card.getId()));
+
+        //"*사용자이름* added you to the card *카드이름* on *보드이름*"
+        String title = String.format(
+                "*%s* removed you from the card *%s* on *%s*",
+                manOfAction.getNickname(),
+                card.getName(),
+                board.getName()
+        );
+
+        //모든 카드, 보드 watch 인원에게
+        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
+
+        for (Member toMember : cardAndBoardMembers) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
 
