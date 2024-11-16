@@ -9,21 +9,25 @@ class AutoLogInUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
 
-    suspend operator fun invoke(isOnline: Boolean): Boolean = if (isOnline) {
-        val refreshToken = dataStoreRepository.getRefreshToken()
-        runCatching { authRepository.reissue(refreshToken) }.fold(
-            onSuccess = { token ->
-                token?.let {
-                    dataStoreRepository.saveAccessToken(it)
-                    return@fold true
-                } ?: return@fold false
-            },
-            onFailure = {
-                return@fold false
-            }
-        )
-    } else {
-        val user = dataStoreRepository.getUser()
-        !(user.memberId == 0L && user.nickname.isEmpty() && user.email.isEmpty())
+    suspend operator fun invoke(isOnline: Boolean): Boolean {
+        return if (isOnline) {
+            val refreshToken = dataStoreRepository.getRefreshToken()
+            if(refreshToken.isBlank()) return false
+
+            runCatching { authRepository.reissue(refreshToken) }.fold(
+                onSuccess = { token ->
+                    token?.let {
+                        dataStoreRepository.saveAccessToken(it)
+                        return@fold true
+                    } ?: return@fold false
+                },
+                onFailure = {
+                    return@fold false
+                }
+            )
+        } else {
+            val user = dataStoreRepository.getUser()
+            !(user.memberId == 0L && user.nickname.isEmpty() && user.email.isEmpty())
+        }
     }
 }

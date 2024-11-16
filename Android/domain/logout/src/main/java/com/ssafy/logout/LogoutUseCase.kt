@@ -18,8 +18,6 @@ class LogoutUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(): Flow<Unit> = flow {
-        val memberId = dataStoreRepository.getUser().memberId
-        fcmRepository.deleteFcmToken(memberId)
         dataStoreRepository.clearAll()
         clearRoomRepository.clearAll()
         emit(Unit)
@@ -27,8 +25,11 @@ class LogoutUseCase @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun logout(): Flow<Unit> {
-        return userRepository.logout().flatMapConcat {
-            invoke()
+        val memberId = dataStoreRepository.getUser().memberId
+        return fcmRepository.deleteFcmToken(memberId).also {
+            userRepository.logout().flatMapConcat {
+                invoke()
+            }
         }
     }
 }
