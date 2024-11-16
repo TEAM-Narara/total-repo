@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -37,10 +38,22 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":domain:fcm"))
+    implementation(project(":domain:member"))
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":domain:socket"))
+
+    // FCM
+    implementation (libs.firebase.messaging.ktx)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+
+
+    // Gson
+    implementation(libs.gson)
 
     // Coil
     implementation(libs.coil.compose)
