@@ -85,7 +85,7 @@ public class CardController implements CardAPI {
     public ResponseEntity<DefaultResponse<CardDetailResponseDto>> updateCard(
             @AuthenticationPrincipal Member member,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) {
+            @RequestBody CardUpdateRequestDto cardUpdateRequestDto) throws FirebaseMessagingException {
 
         Card card = cardService.updateCard(member, cardId, cardUpdateRequestDto);
         Map<String, Object> cover = card.getCover();
