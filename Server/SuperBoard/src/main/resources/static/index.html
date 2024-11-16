@@ -207,7 +207,7 @@
             const ackMessage = {
                 topic: topic,
                 partition: partition,
-                offset: 2,
+                offset: offset,
                 groupId: groupId
             };
             stompClient.send("/app/ack/last", {
@@ -230,45 +230,16 @@
             const offset = response.headers['offset']; // offset이 서버에서 전송되었는지 확인
             const type = response.headers['type'] || "RECEIVED";
 
-            // REPLY ack 처리
-            if (type === "RECEIVED") {
-                if (offset === undefined) {
-                    console.warn("메시지에서 offset이 누락되었습니다.");
-                    return;
-                }
-                sendAckToServer(topic, partition, offset, groupId);
+            if (offset === undefined) {
+                console.warn("메시지에서 offset이 누락되었습니다.");
                 return;
             }
-            // LAST ack 처리
-            try {
-                // response body 파싱
-                if (!response.body) {
-                    console.warn("response.body가 비어 있습니다.");
-                    return;
-                }
 
-                const responseBody = JSON.parse(response.body);
-
-                // 배열 여부와 길이 확인
-                if (!Array.isArray(responseBody) || responseBody.length === 0) {
-                    console.warn("responseBody가 배열이 아니거나 빈 배열입니다.");
-                    return;
-                }
-
-                // 마지막 항목에서 offset 추출
-                const lastElement = responseBody[responseBody.length - 1];
-                if (!lastElement || typeof lastElement.offset === "undefined") {
-                    console.warn("responseBody의 마지막 항목에서 offset을 찾을 수 없습니다.", lastElement);
-                    return;
-                }
-
-                const lastOffset = lastElement.offset;
-                console.log("마지막 offset:", lastOffset);
-
-                sendLastAckToServer(topic, partition, lastOffset, groupId);
-
-            } catch (e) {
-                console.error("response.body를 처리하는 중 오류 발생:", e);
+            // REPLY ack 처리
+            if (type === "RECEIVED") {
+                sendAckToServer(topic, partition, offset, groupId);
+            }else{
+                sendLastAckToServer(topic, partition, offset, groupId);
             }
 
             // 서버로 직접 ack 전송
