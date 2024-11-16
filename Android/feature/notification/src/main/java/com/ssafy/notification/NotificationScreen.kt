@@ -59,10 +59,11 @@ fun NotificationScreen(
             modifier = Modifier.padding(paddingValues),
             notificationList = notificationList,
             moveToDetail = { notification ->
-                Intent(context, Class.forName(MAIN_CLASS)).apply {
+                val intent = Intent(context, Class.forName(MAIN_CLASS)).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     putExtra(FCM_KEY, notification)
                 }
+                context.startActivity(intent)
             }
         )
     }
