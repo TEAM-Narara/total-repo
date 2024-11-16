@@ -150,7 +150,7 @@ class SyncRepositoryImpl @Inject constructor(
         runCatching {
             create.groupBy { it.memberId }
                 .forEach { (cardId, cardMemberList) ->
-                    createManager.createCardMembers(cardId, cardMemberList)
+//                    createManager.createCardMembers(cardId, cardMemberList)
                 }
 
         }

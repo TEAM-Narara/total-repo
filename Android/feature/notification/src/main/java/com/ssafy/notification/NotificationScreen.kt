@@ -70,7 +70,13 @@ fun NotificationScreen(
 
     when (uiState) {
         is UiState.Loading -> LoadingScreen()
-        is UiState.Error -> uiState.errorMessage?.let { ErrorScreen(errorMessage = it) }
+        is UiState.Error -> uiState.errorMessage?.let {
+            ErrorScreen(
+                errorMessage = it,
+                afterAction = popBackStack
+            )
+        }
+
         is UiState.Success -> {}
         is UiState.Idle -> {}
     }

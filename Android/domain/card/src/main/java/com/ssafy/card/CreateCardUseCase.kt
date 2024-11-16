@@ -17,16 +17,14 @@ class CreateCardUseCase @Inject constructor(
     suspend operator fun invoke(cardRequestDto: CardRequestDto, isConnected: Boolean): Flow<Long> {
         val memberId = dataStoreRepository.getUser().memberId
         return cardRepository.createCard(memberId, cardRequestDto, isConnected).also {
-            if (!isConnected) {
-                val id = it.first()
-                val cardMoveResult = cardMyOrderRepository.moveCardToBottom(id, cardRequestDto.listId)
-                if (cardMoveResult != null) {
-                    cardRepository.moveCard(
-                        cardRequestDto.listId,
-                        cardMoveResult.toCardMoveUpdateRequestDTO(),
-                        isConnected = isConnected
-                    )
-                }
+            val id = it.first()
+            val cardMoveResult = cardMyOrderRepository.moveCardToBottom(id, cardRequestDto.listId)
+            if (cardMoveResult != null) {
+                cardRepository.moveCard(
+                    cardRequestDto.listId,
+                    cardMoveResult.toCardMoveUpdateRequestDTO(),
+                    isConnected = isConnected
+                )
             }
         }
     }
