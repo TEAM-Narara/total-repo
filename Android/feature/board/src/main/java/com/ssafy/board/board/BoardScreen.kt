@@ -39,7 +39,6 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.board.components.AddListButton
-import com.ssafy.board.board.components.DraggableList
 import com.ssafy.board.board.components.ListItem
 import com.ssafy.board.board.components.TopAppBar
 import com.ssafy.board.board.data.BoardData
@@ -185,89 +184,91 @@ private fun BoardScreen(
     }
 
     ReorderContainer(state = listReorderState) {
-        LazyRow(
-            state = listLazyListState,
-            horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
-            modifier = modifier
-                .fillMaxSize()
-                .padding(vertical = PaddingDefault),
-            contentPadding = PaddingValues(horizontal = PaddingDefault)
-        ) {
-            items(listCollection, key = { it.id }) { listData ->
-                ReorderableItem(
-                    requireFirstDownUnconsumed = true,
-                    state = listReorderState,
-                    key = listData.id,
-                    data = listData,
-                    dropStrategy = DropStrategy.CenterDistance,
-                    draggableContent = {
-                        ListItemShell(
-                            modifier = Modifier
-                                .alpha(0.7f),
-                            title = listData.name,
-                            isWatching = listData.isWatching,
-                            cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
-                        )
-                    },
-                    onDragEnter = { state ->
-                        listCollection = listCollection.toMutableList().apply {
-                            val index = indexOf(listData)
-                            if (index == -1) return@apply
+        ReorderContainer(state = cardReorderState) {
+            LazyRow(
+                state = listLazyListState,
+                horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(vertical = PaddingDefault),
+                contentPadding = PaddingValues(horizontal = PaddingDefault)
+            ) {
+                items(listCollection, key = { it.id }) { listData ->
+                    ReorderableItem(
+                        requireFirstDownUnconsumed = true,
+                        state = listReorderState,
+                        key = listData.id,
+                        data = listData,
+                        dropStrategy = DropStrategy.CenterDistance,
+                        draggableContent = {
+                            ListItemShell(
+                                modifier = Modifier
+                                    .alpha(0.7f),
+                                title = listData.name,
+                                isWatching = listData.isWatching,
+                                cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
+                            )
+                        },
+                        onDragEnter = { state ->
+                            listCollection = listCollection.toMutableList().apply {
+                                val index = indexOf(listData)
+                                if (index == -1) return@apply
 
-                            remove(state.data)
-                            add(index, state.data)
+                                remove(state.data)
+                                add(index, state.data)
 
-                            scope.launch {
-                                handleLazyListScrollToCenter(
-                                    lazyListState = listLazyListState,
-                                    dropIndex = index,
-                                )
-                            }
-                        }
-                    },
-                    onDrop = { state ->
-                        val listId = state.data.id
-                        val index = listCollection.indexOf(state.data)
-                        val prevCardId = if (index <= 0) null else listCollection[index - 1].id
-                        val nextCardId =
-                            if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
-                        onListReordered(listId, prevCardId, nextCardId)
-                    },
-                ) {
-                    ListItem(
-                        modifier = Modifier
-                            .graphicsLayer { alpha = if (isDragging) 0f else 1f }
-                            .shadow(
-                                if (isDragging) ElevationLarge else 0.dp,
-                                shape = RoundedCornerShape(CornerMedium),
-                            ),
-                        listData = listData,
-                        reorderState = cardReorderState,
-                        cardCollections = cardCollections,
-                        onTitleChange = { onListTitleChanged(listData.id, it) },
-                        onCardReordered = onCardReordered,
-                        navigateToCardScreen = { id -> navigateToCardScreen(id) },
-                        addCard = addCard,
-                        addPhoto = addPhoto,
-                        onFocus = { listId ->
-                            scope.launch {
-                                handleLazyListScrollToCenter(
-                                    lazyListState = listLazyListState,
-                                    dropIndex = listCollection.indexOfFirst { it.id == listId },
-                                )
+                                scope.launch {
+                                    handleLazyListScrollToCenter(
+                                        lazyListState = listLazyListState,
+                                        dropIndex = index,
+                                    )
+                                }
                             }
                         },
-                    )
-                }
-            }
-
-            item {
-                AddListButton(addList = addList) {
-                    scope.launch {
-                        handleLazyListScrollToCenter(
-                            lazyListState = listLazyListState,
-                            dropIndex = listCollection.size,
+                        onDrop = { state ->
+                            val listId = state.data.id
+                            val index = listCollection.indexOf(state.data)
+                            val prevCardId = if (index <= 0) null else listCollection[index - 1].id
+                            val nextCardId =
+                                if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                            onListReordered(listId, prevCardId, nextCardId)
+                        },
+                    ) {
+                        ListItem(
+                            modifier = Modifier
+                                .graphicsLayer { alpha = if (isDragging) 0f else 1f }
+                                .shadow(
+                                    if (isDragging) ElevationLarge else 0.dp,
+                                    shape = RoundedCornerShape(CornerMedium),
+                                ),
+                            listData = listData,
+                            reorderState = cardReorderState,
+                            cardCollections = cardCollections,
+                            onTitleChange = { onListTitleChanged(listData.id, it) },
+                            onCardReordered = onCardReordered,
+                            navigateToCardScreen = { id -> navigateToCardScreen(id) },
+                            addCard = addCard,
+                            addPhoto = addPhoto,
+                            onFocus = { listId ->
+                                scope.launch {
+                                    handleLazyListScrollToCenter(
+                                        lazyListState = listLazyListState,
+                                        dropIndex = listCollection.indexOfFirst { it.id == listId },
+                                    )
+                                }
+                            },
                         )
+                    }
+                }
+
+                item {
+                    AddListButton(addList = addList) {
+                        scope.launch {
+                            handleLazyListScrollToCenter(
+                                lazyListState = listLazyListState,
+                                dropIndex = listCollection.size,
+                            )
+                        }
                     }
                 }
             }
