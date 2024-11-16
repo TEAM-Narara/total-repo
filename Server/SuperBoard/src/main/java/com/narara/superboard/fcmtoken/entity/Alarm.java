@@ -1,7 +1,6 @@
 package com.narara.superboard.fcmtoken.entity;
 
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,12 +30,12 @@ public class Alarm {
     private String cardId;
 
     @Indexed
-    private LocalDateTime createdAt;
+    private String time;
 
     @Builder
     public Alarm(String toMemberId, String title, String body, String type,
                  String goTo, String manOfActionId, String workspaceId,
-                 String boardId, String listId, String cardId) {
+                 String boardId, String listId, String cardId, String time) {
         this.toMemberId = toMemberId;
         this.title = title;
         this.body = body;
@@ -47,6 +46,6 @@ public class Alarm {
         this.boardId = boardId;
         this.listId = listId;
         this.cardId = cardId;
-        this.createdAt = LocalDateTime.now();
+        this.time = time;
     }
 }
