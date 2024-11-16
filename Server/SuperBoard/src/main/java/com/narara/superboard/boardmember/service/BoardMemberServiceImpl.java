@@ -12,11 +12,10 @@ import com.narara.superboard.boardmember.interfaces.dto.BoardMemberResponseDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 
-import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +50,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
 
     private final BoardOffsetService boardOffsetService;
 
-    private final FcmTokenService fcmTokenService;
+    private final AlarmService alarmService;
 
     @Override
     public BoardMemberResponseDto getBoardMemberCollectionResponseDto(Long boardId) {
@@ -158,26 +157,9 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         boardHistoryRepository.save(boardHistory);
 
         //[알림]
-        sendAddMemberAlarm(member, boardMember);
+        alarmService.sendAddBoardMemberAlarm(member, boardMember);
 
         return newBoardMember;
-    }
-
-    private void sendAddMemberAlarm(Member manOfAction, BoardMember boardMember) throws FirebaseMessagingException {
-        Board board = boardMember.getBoard();
-        WorkSpace workSpace = board.getWorkSpace();
-
-        HashMap<String, String> data = new HashMap<>();
-        data.put("type", "ME_ADD_BOARD_MEMBER");
-        data.put("goTo", "BOARD");
-        data.put("workspaceId", String.valueOf(workSpace.getId()));
-        data.put("boardId", String.valueOf(board.getId()));
-
-        //"*사용자이름* made you an admin on the board *보드이름*"
-        String title = String.format("*%s* made you an %s on the board *%s*", manOfAction.getNickname(), boardMember.getAuthority().name(), board.getName());
-
-        //대상자에게만 알람
-        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
     }
 
     private Board getBoard(Long boardId) {

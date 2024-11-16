@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
@@ -11,6 +12,7 @@ import com.narara.superboard.card.service.CardService;
 import com.narara.superboard.common.application.validator.ContentValidator;
 import com.narara.superboard.common.exception.NotFoundContentException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.interfaces.dto.ListCreateRequestDto;
 import com.narara.superboard.member.entity.Member;
@@ -22,7 +24,6 @@ import com.narara.superboard.websocket.enums.ReplyAction;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,6 +57,9 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
     private CardService cardService;
 
     @Mock
+    private AlarmService alarmService;
+
+    @Mock
     private CardHistoryRepository cardHistoryRepository;
 
     @Mock
@@ -77,7 +81,7 @@ class ReplyServiceImplTest implements MockSuperBoardUnitTests {
 
     @Test
     @DisplayName("유효한 데이터로 Reply 생성 성공")
-    void shouldCreateReplySuccessfullyWhenValidDataIsGiven() {
+    void shouldCreateReplySuccessfullyWhenValidDataIsGiven() throws FirebaseMessagingException {
         // given
         ReplyCreateRequestDto requestDto = new ReplyCreateRequestDto(1L, "Valid content");
 

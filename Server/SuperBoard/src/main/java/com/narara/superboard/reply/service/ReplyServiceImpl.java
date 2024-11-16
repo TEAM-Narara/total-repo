@@ -1,5 +1,6 @@
 package com.narara.superboard.reply.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
 import com.narara.superboard.card.entity.Card;
@@ -12,6 +13,7 @@ import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.DeletedEntityException;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.reply.infrastructure.ReplyRepository;
@@ -35,7 +37,6 @@ import static com.narara.superboard.websocket.enums.ReplyAction.EDIT_REPLY;
 @Service
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
-
     private final CardService cardService;
 
     private final ReplyRepository replyRepository;
@@ -45,10 +46,12 @@ public class ReplyServiceImpl implements ReplyService{
     private final ContentValidator contentValidator;
 
     private final BoardOffsetService boardOffsetService;
+    private final AlarmService alarmService;
 
     @Override
     @Transactional
-    public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto) {
+    public Reply createReply(Member member, ReplyCreateRequestDto replyCreateRequestDto)
+            throws FirebaseMessagingException {
         contentValidator.validateReplyContentIsEmpty(replyCreateRequestDto);
 
         Card card = cardRepository.findByIdAndIsDeletedFalse(replyCreateRequestDto.cardId())
@@ -70,7 +73,7 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
-        //        fcmTokenService.sendMessage(member, "[사용자 이름] commented on the card [카드 이름] on [보드이름] + [댓글 내용] + [사용자 프로필사진]", "[댓글 내용]");
+        alarmService.sendAddReplyAlarm(member, savedReply);
 
         return savedReply;
     }

@@ -6,7 +6,6 @@ import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
 import com.narara.superboard.board.exception.BoardInvalidVisibilityFormatException;
-import com.narara.superboard.board.exception.BoardNameNotFoundException;
 import com.narara.superboard.board.exception.BoardNotFoundException;
 import com.narara.superboard.board.infrastructure.BoardHistoryRepository;
 import com.narara.superboard.board.infrastructure.BoardRepository;
@@ -21,11 +20,11 @@ import com.narara.superboard.common.application.validator.CoverValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
-import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverTypeException;
 import com.narara.superboard.common.exception.cover.NotFoundCoverValueException;
 
 import com.narara.superboard.common.interfaces.dto.CoverDto;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import java.util.Optional;
@@ -113,6 +112,9 @@ class BoardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private Board board;
+
+    @Mock
+    private AlarmService alarmService;
 
     @Test
     @DisplayName("보드와 관련된 보드에 대한 조회 성공 테스트")
