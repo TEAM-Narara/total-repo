@@ -70,6 +70,8 @@ public class ReplyServiceImpl implements ReplyService{
 
         cardHistoryRepository.save(cardHistory);
 
+        //        fcmTokenService.sendMessage(member, "[사용자 이름] commented on the card [카드 이름] on [보드이름] + [댓글 내용] + [사용자 프로필사진]", "[댓글 내용]");
+
         return savedReply;
     }
 

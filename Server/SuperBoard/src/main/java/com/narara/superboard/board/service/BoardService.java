@@ -1,5 +1,6 @@
 package com.narara.superboard.board.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
 import com.narara.superboard.board.interfaces.dto.log.BoardCombinedLogResponseDto;
@@ -27,7 +28,7 @@ public interface BoardService {
 
     List<Board> getArchivedBoards(Long workspaceId);
 
-    void changeArchiveStatus(Member member, Long boardId);
+    void changeArchiveStatus(Member member, Long boardId) throws FirebaseMessagingException;
 
     PageBoardReplyResponseDto getRepliesByBoardId(Long boardId, Pageable pageable);
 

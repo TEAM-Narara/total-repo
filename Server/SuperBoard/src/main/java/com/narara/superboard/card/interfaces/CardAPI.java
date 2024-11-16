@@ -1,5 +1,6 @@
 package com.narara.superboard.card.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
@@ -19,7 +20,7 @@ public interface CardAPI {
     @PostMapping
     ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
-            @RequestBody CardCreateRequestDto cardCreateRequestDto);
+            @RequestBody CardCreateRequestDto cardCreateRequestDto) throws FirebaseMessagingException;
 
     @DeleteMapping("/{cardId}")
     ResponseEntity<DefaultResponse<Void>> deleteCard(

@@ -12,6 +12,7 @@ import com.narara.superboard.list.interfaces.dto.ListUpdateRequestDto;
 import com.narara.superboard.list.service.ListMoveService;
 import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,7 @@ public class ListController implements ListAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.LIST_GET_ARCHIVED_SUCCESS, responseDtos), HttpStatus.OK);
     }
 
+    @Hidden
     @Override
     @Operation(summary = "리스트를 맨 위로 이동", description = "지정된 리스트를 보드의 맨 위로 이동시킵니다.")
     public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToTop(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
@@ -74,6 +76,7 @@ public class ListController implements ListAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_TOP_SUCCESS, result), HttpStatus.OK);
     }
 
+    @Hidden
     @Override
     @Operation(summary = "리스트를 맨 아래로 이동", description = "지정된 리스트를 보드의 맨 아래로 이동시킵니다.")
     public ResponseEntity<DefaultResponse<ListMoveResult>> moveListToBottom(@AuthenticationPrincipal Member member, @PathVariable Long listId) {
@@ -81,6 +84,7 @@ public class ListController implements ListAPI {
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.MOVE_LIST_BOTTOM_SUCCESS, result), HttpStatus.OK);
     }
 
+    @Hidden
     @Override
     @Operation(summary = "리스트를 특정 위치(다른 리스트 사이)로 이동", description = "지정된 리스트를 두 리스트 사이의 위치로 이동시킵니다.")
     public ResponseEntity<DefaultResponse<ListMoveResult>> moveListBetween(

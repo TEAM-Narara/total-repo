@@ -196,7 +196,6 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
         // Assert
         assertTrue(testAttachment.getIsDeleted());
         assertFalse(testAttachment.getIsCover());
-        assertNull(testCard.getCover());
         verify(attachmentRepository, times(1)).save(testAttachment);
         verify(cardRepository, times(1)).save(testCard);
     }
@@ -278,7 +277,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
 
         // Assert
         assertFalse(testAttachment.getIsCover());
-        assertNull(testCard.getCover());
+        assertEquals(testCard.getCover().get("type"), "NONE");
         verify(attachmentRepository, times(1)).save(testAttachment);
         verify(cardRepository, times(1)).save(testCard);
     }

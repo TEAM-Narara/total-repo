@@ -1,5 +1,6 @@
 package com.narara.superboard.board.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.interfaces.dto.*;
 import com.narara.superboard.board.interfaces.dto.activity.BoardActivityPageableResponseDto;
@@ -103,7 +104,8 @@ public class BoardController implements BoardAPI {
 
     @Override
     @Operation(summary = "보드 아카이브 상태 변경", description = "보드 ID를 사용하여 특정 보드의 아카이브 상태를 변경합니다.")
-    public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId) {
+    public ResponseEntity<DefaultResponse<Void>> changeArchiveStatus(@AuthenticationPrincipal Member member, @PathVariable Long boardId)
+            throws FirebaseMessagingException {
         boardService.changeArchiveStatus(member, boardId);
         return new ResponseEntity<>(DefaultResponse.res(StatusCode.OK, ResponseMessage.BOARD_ARCHIVE_STATUS_CHANGED), HttpStatus.OK);
     }

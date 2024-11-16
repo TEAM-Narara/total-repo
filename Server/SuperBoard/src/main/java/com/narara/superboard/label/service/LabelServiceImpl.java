@@ -3,6 +3,8 @@ package com.narara.superboard.label.service;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
+import com.narara.superboard.cardlabel.entity.CardLabel;
+import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
 import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
@@ -25,6 +27,7 @@ public class LabelServiceImpl implements LabelService {
 
     private final ColorValidator colorValidator;
     private final BoardOffsetService boardOffsetService;
+    private final CardLabelRepository cardLabelRepository;
 
     @Transactional
     @Override
@@ -63,6 +66,11 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public void deleteLabel(Long labelId) {
         Label label = getLabel(labelId);
+
+        //관련 카드라벨 다 삭제
+        List<CardLabel> cardLabelList = cardLabelRepository.findByLabel(label);
+        cardLabelRepository.deleteAll(cardLabelList);
+
         labelRepository.delete(label);
 
         boardOffsetService.saveDeleteLabel(label); //Websocket 라벨 삭제

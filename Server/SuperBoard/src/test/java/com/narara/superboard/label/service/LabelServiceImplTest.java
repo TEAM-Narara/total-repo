@@ -4,6 +4,7 @@ import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.infrastructure.BoardRepository;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
+import com.narara.superboard.cardlabel.infrastructrue.CardLabelRepository;
 import com.narara.superboard.common.application.validator.ColorValidator;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.label.entity.Label;
@@ -36,6 +37,9 @@ class LabelServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private LabelRepository labelRepository;
+
+    @Mock
+    private CardLabelRepository cardLabelRepository;
 
     @Mock
     private ColorValidator colorValidator;

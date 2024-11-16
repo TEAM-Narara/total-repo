@@ -13,6 +13,7 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
@@ -43,6 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             updateCardCover(card, attachment);
         }
 
+        boardOffsetService.saveEditCard(card); //Websocket 카드에 첨부파일 추가
         boardOffsetService.saveAddAttachmentDiff(attachment); //Websocket 첨부파일 추가
 
         // 첨부 파일 추가 로그 기록
@@ -55,6 +58,16 @@ public class AttachmentServiceImpl implements AttachmentService {
                 EventType.CREATE, EventData.ATTACHMENT, addAttachmentInfo);
 
         cardHistoryRepository.save(cardHistory);
+
+        //알림 보내기 TODO attachment에 이름이 있나? 사진이름
+//        String title = String.format(
+//                "%s attached %s to %s on %s + [사용자 프로필사진]",
+//                member.getNickname(),
+//                "이미지 이름",
+//                card.getList().getName(),
+//                card.getList().getBoard().getName()
+//        );
+//        fcmTokenService.sendMessage(member, title, "");
 
         return attachment;
     }
@@ -72,6 +85,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         markAttachmentAsDeleted(attachment);
         saveAttachment(attachment);
 
+        boardOffsetService.saveEditCard(card); //Websocket 카드 첨부파일 삭제
         boardOffsetService.saveDeleteAttachmentDiff(attachment); //Websocket 첨부파일 삭제
 
         // 첨부 파일 삭제 로그 기록
@@ -99,6 +113,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         Attachment savedAttachment = saveAttachment(attachment);
 
+        boardOffsetService.saveEditCard(attachment.getCard()); //Websocket 카드 첨부파일 수정
         boardOffsetService.saveEditAttachmentCoverDiff(savedAttachment); //Websocket 첨부파일 수정
     }
 
@@ -152,7 +167,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private void removeCardCover(Card card) {
-        card.setCover(null);
+        card.setCover(new HashMap<>(){{
+            put("type", "NONE");
+            put("value", "NONE");
+        }});
         saveCard(card);
     }
 

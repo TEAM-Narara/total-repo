@@ -1,5 +1,6 @@
 package com.narara.superboard.card.service;
 
+import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.card.interfaces.dto.CardMoveCollectionRequest;
@@ -35,9 +36,11 @@ public class CardMoveServiceImpl implements CardMoveService {
     private final CardReorderService cardReorderService; // CardReorderService 주입
     private final CardService cardService; // CardService 주입
     private final ListService listService;
+    private final BoardOffsetService boardOffsetService;
+//    private final FcmTokenService fcmTokenService;
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardToTop(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
@@ -101,7 +104,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     }
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardToBottom(Member member, Long cardId, Long targetListId) {
         // 이동할 카드 조회
         Card targetCard = cardRepository.findById(cardId)
@@ -168,7 +171,7 @@ public class CardMoveServiceImpl implements CardMoveService {
     }
 
     @Override
-    @Transactional
+    @Transactional //websocket response 관련한 코드가 없으니 사용하지 말것!
     public CardMoveResult moveCardBetween(Member member, Long cardId, Long previousCardId, Long nextCardId) {
         log.info("moveCardBetween 메서드 시작 - cardId: {}, previousCardId: {}, nextCardId: {}", cardId, previousCardId,
                 nextCardId);
@@ -271,6 +274,19 @@ public class CardMoveServiceImpl implements CardMoveService {
         //카드 myOrder 배정 및 재배치
         java.util.List<Card> updatedCardCollection = insertAndRelocateCard(allCards, currentList, cardMoveRequests);
 
+        if (!updatedCardCollection.isEmpty()) {
+            //Websocket 카드 이동 response 보내기
+            boardOffsetService.saveMoveCardDiff(updatedCardCollection, currentList.getBoard().getId());
+        }
+
+        //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
+//        String title = String.format(
+//                "%s moved the card [카드이름] to [리스트이름] on [보드이름] + [사용자 프로필사진]",
+//                member.getNickname(),
+//
+//        );
+//        fcmTokenService.sendMessage(member, title, "");
+
         return new CardMoveResult.ReorderedCardMove(CardMoveResponseDto.of(updatedCardCollection));
     }
 
@@ -280,8 +296,12 @@ public class CardMoveServiceImpl implements CardMoveService {
         Card targetCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new NotFoundEntityException(cardId, "리스트"));
 
+//        boolean isChangeList = !(targetCard.getList().getId().equals(targetList.getId()));
+
         //유저의 보드 접근 권한을 확인
         cardService.checkBoardMember(targetCard, member, MOVE_LIST);
+
+        boolean isMoveAnotherList = !(targetCard.getList().getId().equals(targetList.getId()));
 
         // 보드의 전체 카드를 myOrder 순서로 정렬하여 가져옴 - 그냥 락 걸었음 TODO 락 범위관련 성능개선
         java.util.List<Card> allCards = cardRepository.findAllByListOrderByMyOrderAsc(targetList);
@@ -294,6 +314,25 @@ public class CardMoveServiceImpl implements CardMoveService {
 
         //dto에 바뀐 리스트 값 매핑
         java.util.List<CardMoveResponseDto> orderInfoCard = CardMoveResponseDto.of(updatedCardCollection);
+
+        if (!updatedCardCollection.isEmpty()) {
+            //Websocket 카드 이동 response 보내기
+            boardOffsetService.saveMoveCardDiff(updatedCardCollection, targetCard.getList().getBoard().getId());
+        }
+
+        //알림
+//        if (isMoveAnotherList) {
+//            //카드를 완전히 다른 리스트로 옮길 때만 알림이 옴
+//            String title = String.format(
+//                    "%s moved the card %s to %s on %s + [사용자 프로필사진]",
+//                    member.getNickname(),
+//                    targetCard.getName(),
+//                    targetCard.getList().getName(),
+//                    targetCard.getList().getBoard().getName()
+//            );
+//
+//            fcmTokenService.sendMessage(member, title, "");
+//        }
 
         return new CardMoveResult.ReorderedCardMove(orderInfoCard);
     }

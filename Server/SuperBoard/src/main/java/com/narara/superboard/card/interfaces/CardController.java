@@ -1,5 +1,6 @@
 package com.narara.superboard.card.interfaces;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.*;
 import com.narara.superboard.card.interfaces.dto.log.CardLogDetailResponseDto;
@@ -15,6 +16,7 @@ import com.narara.superboard.member.entity.Member;
 import java.util.ArrayList;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -45,11 +47,21 @@ public class CardController implements CardAPI {
     @Operation(summary = "카드 생성", description = "")
     public ResponseEntity<DefaultResponse<CardDetailResponseDto>> createCard(
             @AuthenticationPrincipal Member member,
-            @RequestBody CardCreateRequestDto cardCreateRequestDto) {
+            @RequestBody CardCreateRequestDto cardCreateRequestDto) throws FirebaseMessagingException {
 
         Card card = cardService.createCard(member, cardCreateRequestDto);
 
         CardDetailResponseDto cardSimpleResponseDto = CardDetailResponseDto.from(card);
+
+//        String title = String.format(
+//                "%s created %s in %s on %s + %s",
+//                member.getNickname(),
+//                card.getName(),
+//                card.getList().getName(),
+//                card.getList().getBoard().getName(),
+//                member.getProfileImgUrl()
+//        );
+//        fcmTokenService.sendMessage(member, title, "");
 
         return new ResponseEntity<>(
                 DefaultResponse.res(StatusCode.CREATED, ResponseMessage.CARD_CREATE_SUCCESS, cardSimpleResponseDto),
@@ -148,6 +160,7 @@ public class CardController implements CardAPI {
         );
     }
 
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 맨 위로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 위로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToTop(
@@ -162,7 +175,7 @@ public class CardController implements CardAPI {
                 HttpStatus.OK);
     }
 
-
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 맨 아래로 카드 이동", description = "특정 카드를 지정된 이동할 리스트의 맨 아래로 이동합니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardToBottom(
@@ -178,6 +191,7 @@ public class CardController implements CardAPI {
                 HttpStatus.OK);
     }
 
+    @Hidden
     @Override
     @Operation(summary = "다른 리스트의 카드들 사이로 이동", description = "특정 카드를 지정된 이동할 리스트의 두 카드 사이에 위치시킵니다.")
     public ResponseEntity<DefaultResponse<CardMoveResult>> moveCardBetween(
@@ -197,6 +211,7 @@ public class CardController implements CardAPI {
             @Parameter(description = "이동할 리스트 Id", required = true) @PathVariable Long listId,
             @RequestBody CardMoveCollectionRequest cardMoveCollectionRequest) {
         CardMoveResult result = cardMoveService.moveCardVersion2(member, listId, cardMoveCollectionRequest);
+
         return ResponseEntity.ok(DefaultResponse.res(StatusCode.OK, ResponseMessage.CARD_MOVE_SUCCESS, result));
     }
 

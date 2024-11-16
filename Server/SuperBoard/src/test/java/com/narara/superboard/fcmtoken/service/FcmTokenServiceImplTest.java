@@ -102,7 +102,7 @@ class FcmTokenServiceImplTest {
     @DisplayName("성공적으로 FCM 토큰을 업데이트")
     void testUpdateFcmToken_Success() {
         // Arrange
-        when(fcmTokenRepository.findByMemberId(testMember.getId())).thenReturn(Optional.of(testFcmToken));
+        when(fcmTokenRepository.findFirstByMemberId(testMember.getId())).thenReturn(Optional.of(testFcmToken));
         when(fcmTokenRepository.save(any(FcmToken.class))).thenReturn(testFcmToken);
         when(memberRepository.findByIdAndIsDeletedFalse(any(Long.class))).thenReturn(Optional.of(testMember));
 
@@ -112,7 +112,7 @@ class FcmTokenServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals("updated_registration_token", result.getRegistrationToken());
-        verify(fcmTokenRepository, times(1)).findByMemberId(testMember.getId());
+        verify(fcmTokenRepository, times(1)).findFirstByMemberId(testMember.getId());
         verify(fcmTokenRepository, times(1)).save(any(FcmToken.class));
     }
 
@@ -123,13 +123,13 @@ class FcmTokenServiceImplTest {
 
         Long nonExistentMemberId = 999L;
         when(memberRepository.findByIdAndIsDeletedFalse(any(Long.class))).thenReturn(Optional.empty());
-        when(fcmTokenRepository.findByMemberId(nonExistentMemberId)).thenReturn(Optional.empty());
+        when(fcmTokenRepository.findFirstByMemberId(nonExistentMemberId)).thenReturn(Optional.empty());
 
         // Act & Assert
         Exception exception = assertThrows(NotFoundEntityException.class, () ->
                 fcmTokenService.updateFcmToken(nonExistentMemberId, "updated_registration_token"));
 
-        verify(fcmTokenRepository, never()).findByMemberId(nonExistentMemberId);
+        verify(fcmTokenRepository, never()).findFirstByMemberId(nonExistentMemberId);
         verify(fcmTokenRepository, never()).delete(any(FcmToken.class));
     }
 
