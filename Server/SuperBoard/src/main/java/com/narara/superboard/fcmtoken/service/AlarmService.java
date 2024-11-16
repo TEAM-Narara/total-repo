@@ -22,6 +22,8 @@ public interface AlarmService {
 
     void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException;
 
+    void sendMoveCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException;
+
     void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment) throws FirebaseMessagingException;
 
     void sendAddReplyAlarm(Member manOfAction, Reply reply) throws FirebaseMessagingException;
