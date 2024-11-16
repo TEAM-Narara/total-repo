@@ -101,6 +101,7 @@ public class AlarmServiceImpl implements AlarmService {
         //대상자에게만 알람
         Member toMember = workSpaceMember.getMember();
         saveMongo(toMember, title, "", data);
+
         fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
@@ -124,6 +125,8 @@ public class AlarmServiceImpl implements AlarmService {
 
         //대상자에게만 알람
         Member toMember = workSpaceMember.getMember();
+        saveMongo(toMember, title, "", data);
+
         fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
@@ -144,6 +147,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
                 board.getId());
         for (Member toMember : allMemberByBoardAndWatchTrue) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -173,6 +178,8 @@ public class AlarmServiceImpl implements AlarmService {
 
         //대상자에게만 알람
         Member toMember = boardMember.getMember();
+        saveMongo(toMember, title, "", data);
+
         fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
@@ -201,6 +208,8 @@ public class AlarmServiceImpl implements AlarmService {
 
         //대상자에게만 알람
         Member toMember = boardMember.getMember();
+        saveMongo(toMember, title, "", data);
+
         fcmTokenService.sendMessage(toMember, title, "", data);
     }
 
@@ -288,6 +297,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -323,6 +334,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -357,6 +370,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, reply.getContent(), data);
         }
     }
@@ -391,6 +406,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -425,6 +442,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -467,6 +486,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
@@ -500,6 +521,8 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
 
         for (Member toMember : cardAndBoardMembers) {
+            saveMongo(toMember, title, "", data);
+
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
     }
