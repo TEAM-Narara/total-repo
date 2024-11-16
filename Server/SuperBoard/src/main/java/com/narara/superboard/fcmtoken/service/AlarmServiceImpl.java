@@ -101,6 +101,29 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
+    public void sendDeleteBoardMemberAlarm(Member manOfAction, BoardMember boardMember)
+            throws FirebaseMessagingException {
+        Board board = boardMember.getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ME_DELETE_BOARD_MEMBER");
+        data.put("goTo", "BOARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+
+        //"*사용자이름* made you an admin on the board *보드이름*"
+        String title = String.format(
+                "*%s* removed you from the Board *%s*",
+                manOfAction.getNickname(),
+                board.getName()
+        );
+
+        //대상자에게만 알람
+        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
+    }
+
+    @Override
     public void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
