@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.text.SpannableString
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -52,6 +53,7 @@ class SuperBoardFcmService : FirebaseMessagingService() {
     }
 
     private fun handleMessage(remoteMessage: RemoteMessage) {
+        Log.d("FCM", "message: $remoteMessage")
         remoteMessage.notification
         remoteMessage.data
         val message = remoteMessage.notification?.title.toString().toSpanString()
