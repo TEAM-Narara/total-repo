@@ -27,7 +27,6 @@ public class AlarmServiceImpl implements AlarmService {
 
     private final BoardMemberRepository boardMemberRepository;
     private final CardMemberRepository cardMemberRepository;
-    private final ReplyServiceImpl replyServiceImpl;
 
     @Override
     public void sendAddWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember)
