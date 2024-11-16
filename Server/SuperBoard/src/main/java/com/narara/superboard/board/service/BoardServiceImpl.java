@@ -1,5 +1,6 @@
 package com.narara.superboard.board.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.board.document.BoardHistory;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.enums.Visibility;
@@ -30,6 +31,7 @@ import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
+import com.narara.superboard.fcmtoken.service.FcmTokenService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -42,9 +44,9 @@ import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse;
 import com.narara.superboard.workspace.interfaces.dto.MyBoardCollectionResponse.MyBoardWorkspaceCollectionDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 
-import java.sql.SQLOutput;
-
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
+import java.util.HashMap;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -82,6 +84,8 @@ public class BoardServiceImpl implements BoardService {
 
     private final ReplyRepository replyRepository;
     private final BoardSearchRepository boardSearchRepository;
+
+    private final FcmTokenService fcmTokenService;
 
     @Override
     public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workspaceId) {
@@ -218,7 +222,7 @@ public class BoardServiceImpl implements BoardService {
 
     // 보드 아카이브 상태 변경
     @Override
-    public void changeArchiveStatus(Member member, Long boardId) {
+    public void changeArchiveStatus(Member member, Long boardId) throws FirebaseMessagingException {
         Board board = getBoard(boardId);
         board.changeArchiveStatus();
 
@@ -233,6 +237,28 @@ public class BoardServiceImpl implements BoardService {
                 EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);
+
+        //[알림]
+        if (board.getIsArchived()) {
+            //보드를 닫을 때만 알람
+            sendArchiveBoard(member, board);
+        }
+    }
+
+    private void sendArchiveBoard(Member manOfAction, Board board) throws FirebaseMessagingException {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "CLOSE_BOARD");
+        data.put("goTo", "WORKSPACE");
+        data.put("workspaceId", String.valueOf(board.getWorkSpace().getId()));
+
+        String title = String.format("*%s* closed the board *%s*", manOfAction.getNickname(), board.getName());
+
+        //모든 board watch 인원에게
+        Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
+                board.getId());
+        for (Member toMember: allMemberByBoardAndWatchTrue) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
     }
 
     @Override

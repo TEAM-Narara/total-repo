@@ -1,8 +1,8 @@
 package com.narara.superboard.card.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.interfaces.dto.CardSimpleResponseDto;
-import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityDto;
 import com.narara.superboard.card.interfaces.dto.activity.CardCombinedActivityResponseDto;
 import com.narara.superboard.card.interfaces.dto.CardCreateRequestDto;
 import com.narara.superboard.card.interfaces.dto.CardUpdateRequestDto;
@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CardService {
-    Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto);
+    Card createCard(Member member, CardCreateRequestDto cardCreateRequestDto) throws FirebaseMessagingException;
     Card getCard(Long cardId);
     void deleteCard(Member member, Long cardId);
     Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto);

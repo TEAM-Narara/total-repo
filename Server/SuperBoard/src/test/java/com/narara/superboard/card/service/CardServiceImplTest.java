@@ -1,8 +1,10 @@
 package com.narara.superboard.card.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.board.entity.Board;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
 import com.narara.superboard.boardmember.entity.BoardMember;
 import com.narara.superboard.card.entity.Card;
@@ -20,6 +22,7 @@ import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
 import com.narara.superboard.member.entity.Member;
+import com.narara.superboard.workspace.entity.WorkSpace;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,6 +57,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
     private CardMemberRepository cardMemberRepository;
 
     @Mock
+    private BoardMemberRepository boardMemberRepository;
+
+    @Mock
     private LastOrderValidator lastOrderValidator;
 
     @Mock
@@ -73,7 +79,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Test
     @DisplayName("카드 생성 성공 테스트")
-    void testCreateCardSuccess() {
+    void testCreateCardSuccess() throws FirebaseMessagingException {
         // given
         Long cardId = 1L;
         String cardName = "Test Card";
@@ -83,6 +89,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         Board board = Board.builder()
                 .id(1L)
                 .name("Test Board")
+                .workSpace(new WorkSpace(1L, "asdf", 1L))
                 .build();
 
         // List 객체 생성 시 Board 설정

@@ -155,7 +155,7 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
                 .thenReturn(false);
 
         EmptyWorkspaceMemberException exception = assertThrows(EmptyWorkspaceMemberException.class,
-                () -> workSpaceMemberService.deleteMember(workspaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
+                () -> workSpaceMemberService.deleteMember(mockMember1, workspaceId, mockMember1.getId()));  // 예외가 발생하는지 확인
 
         // verify: workSpaceMemberRepository가 정확히 한 번 호출되었는지 확인
         verify(workSpaceMemberRepository, times(1)).existsByWorkSpaceAndIsDeletedIsFalse(any());

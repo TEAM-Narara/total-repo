@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,10 @@ public interface BoardMemberRepository extends JpaRepository<BoardMember,Long> {
     @Query("select bm.member from BoardMember bm " +
             "where bm.board.id = :boardId and bm.isDeleted = false")
     List<Member> findAllMembersByBoardId(@Param("boardId") Long boardId);
+
+    @Query("select bm.member from BoardMember bm " +
+            "where bm.board.id = :boardId and bm.isDeleted = false and bm.isAlert = true")
+    Set<Member> findAllMemberByBoardAndWatchTrue(@Param("boardId") Long boardId);
 
     Optional<BoardMember> findByBoardIdAndMemberAndIsDeletedIsFalse(Long boardId, Member member);
     Optional<BoardMember> findFirstByBoardAndMemberAndIsDeletedIsFalse(Board board, Member member);
