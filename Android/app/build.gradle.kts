@@ -62,7 +62,6 @@ dependencies {
     implementation(project(":feature:card"))
     implementation(project(":feature:notification"))
     implementation(project(":feature:splash"))
-    implementation(project(":feature:fcm"))
     implementation(project(":domain:logout"))
 
     // DTO

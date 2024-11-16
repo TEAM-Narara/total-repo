@@ -20,11 +20,11 @@ import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.card.label.Label
 import com.ssafy.card.label.labelScreen
-import com.ssafy.fcm.FcmEffect
-import com.ssafy.fcm.data.BoardMessage
-import com.ssafy.fcm.data.CardMessage
-import com.ssafy.fcm.data.HomeMessage
-import com.ssafy.fcm.data.WorkspaceMessage
+import com.ssafy.notification.fcm.FcmEffect
+import com.ssafy.notification.fcm.data.BoardMessage
+import com.ssafy.notification.fcm.data.CardMessage
+import com.ssafy.notification.fcm.data.HomeMessage
+import com.ssafy.notification.fcm.data.WorkspaceMessage
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
@@ -47,8 +47,8 @@ import com.ssafy.login.signup.signupScreen
 import com.ssafy.model.background.Cover
 import com.ssafy.model.manager.AuthManager
 import com.ssafy.model.manager.ConnectManager
-import com.ssafy.notification.notification.Notification
-import com.ssafy.notification.notification.notificationScreen
+import com.ssafy.notification.Notification
+import com.ssafy.notification.notificationScreen
 import com.ssafy.splash.StartDirection
 import com.ssafy.superboard.MainViewModel
 import com.ssafy.ui.safetype.coverType

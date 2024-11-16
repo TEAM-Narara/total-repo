@@ -52,7 +52,7 @@
             android:resource="@color/primary" />
 
         <service
-            android:name="com.ssafy.fcm.SuperBoardFcmService"
+            android:name="com.ssafy.notification.fcm.SuperBoardFcmService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
