@@ -28,12 +28,19 @@ public class FcmTokenServiceImpl implements FcmTokenService {
         Member member = validateMemberExists(memberId);
         validateRegistrationToken(registrationToken);
 
-        FcmToken fcmToken = FcmToken.builder()
-                .member(member)
-                .registrationToken(registrationToken)
-                .build();
+        FcmToken fcmToken = fcmTokenRepository.findFirstByMemberAndRegistrationToken(member, registrationToken)
+                .orElseGet(() -> null);
 
-        return fcmTokenRepository.save(fcmToken);
+        if (fcmToken == null) {
+            fcmToken = FcmToken.builder()
+                    .member(member)
+                    .registrationToken(registrationToken)
+                    .build();
+
+            fcmToken = fcmTokenRepository.save(fcmToken);
+        }
+
+        return fcmToken;
     }
 
     @Override

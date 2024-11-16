@@ -125,6 +125,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
     @Override
     @Transactional
     public void updateWatchStatus(Long boardId, Member member) {
+        //워크스페이스 멤버가 boardWatch를 요청하면 자동으로 만들어져야함
         BoardMember boardMember = getBoardMember(boardId, member);
         boardMember.changeIsAlert();
     }
