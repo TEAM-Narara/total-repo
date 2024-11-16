@@ -38,9 +38,9 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpaceMember.getWorkSpace().getId()));
 
-        //"*사용자이름* added you to the Workspace *워크스페이스이름* as an admin"
+        //주효림이 당신을 날아라 워크스페이스에 admin으로 추가하였습니다
         String title = String.format(
-                "*%s* added you to the Workspace *%s* as an %s",
+                "*%s*님이 당신을 *%s* 워크스페이스에 %s 권한으로 추가하였습니다",
                 manOfAction.getNickname(),
                 workSpaceMember.getWorkSpace().getName(),
                 workSpaceMember.getAuthority().name()
@@ -58,9 +58,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("goTo", "HOME");
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
 
-        //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
-        String title = String.format("*%s* removed you from the Workspace *%s*", manOfAction.getNickname(),
-                workSpaceMember.getWorkSpace().getName());
+        //주효림이 당신을 날아라 워크스페이스에서 삭제하였습니다
+        String title = String.format(
+                "*%s*님이 당신을 *%s* 워크스페이스에서 삭제하였습니다",
+                manOfAction.getNickname(),
+                workSpaceMember.getWorkSpace().getName()
+        );
 
         //대상자에게만 알람
         fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
@@ -74,7 +77,7 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(board.getWorkSpace().getId()));
 
-        String title = String.format("*%s* closed the board *%s*", manOfAction.getNickname(), board.getName());
+        String title = String.format("*%s*님이 *%s* 보드를 닫았습니다", manOfAction.getNickname(), board.getName());
 
         //모든 board watch 인원에게
         Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
@@ -96,9 +99,13 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
-        //"*사용자이름* made you an admin on the board *보드이름*"
-        String title = String.format("*%s* made you an %s on the board *%s*", manOfAction.getNickname(),
-                boardMember.getAuthority().name(), board.getName());
+        //주효림이 당신을 백엔드 보드에 admin으로 추가하였습니다.
+        String title = String.format(
+                "*%s*님이 당신을 *%s* 보드에 %s 권한으로 추가하였습니다",
+                manOfAction.getNickname(),
+                board.getName(),
+                boardMember.getAuthority().name()
+        );
 
         //대상자에게만 알람
         fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
@@ -117,9 +124,9 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
-        //"*사용자이름* made you an admin on the board *보드이름*"
+        //주효림이 당신을 백엔드 보드에서 삭제하였습니다
         String title = String.format(
-                "*%s* removed you from the Board *%s*",
+                "*%s*님이 당신을 *%s* 보드에서 삭제하였습니다",
                 manOfAction.getNickname(),
                 board.getName()
         );
@@ -142,9 +149,14 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        // "*사용자이름* created *카드이름* in *리스트이름* on *보드이름*"
-        String title = String.format("*%s* created *%s* in *%s* on *%s*", manOfAction.getNickname(), card.getName(),
-                card.getList().getName(), board.getName());
+        //남경민님이 백엔드 보드 오늘할일 리스트에 QA하기 카드를 만들었습니다.
+        String title = String.format(
+                "*%s*님이 *%s* 보드 *%s* 리스트에 *%s* 카드를 만들었습니다",
+                manOfAction.getNickname(),
+                board.getName(),
+                card.getList().getName(),
+                card.getName()
+        );
 
         //모든 카드, 보드 watch 인원에게
         Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
@@ -168,13 +180,13 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"*사용자이름* moved the card *카드이름* to *리스트이름* on *보드이름*"
+        //여창민님이 QA하기 카드를 백엔드 보드의 내일 할 일 리스트로 이동하였습니다.
         String title = String.format(
-                "*%s* moved the card *%s* in *%s* on *%s*",
+                "*%s*님이 *%s* 카드를 *%s* 보드의 *%s* 리스트로 이동하였습니다",
                 manOfAction.getNickname(),
                 card.getName(),
-                card.getList().getName(),
-                board.getName()
+                board.getName(),
+                card.getList().getName()
         );
 
         //모든 카드, 보드 watch 인원에게
@@ -201,12 +213,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"%s attached image to %s on %s + [사용자 프로필사진]",
+        //박준식님이 백엔드 보드의 알림만들기 카드에 이미지를 추가하였습니다
         String title = String.format(
-                "*%s* attached image to *%s* on *%s*",
+                "*%s*님이 *%s* 보드의 *%s* 카드에 이미지를 추가하였습니다",
                 manOfAction.getNickname(),
-                card.getName(),
-                board.getName()
+                board.getName(),
+                card.getName()
         );
 
         //모든 카드, 보드 watch 인원에게
@@ -232,12 +244,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"[사용자 이름] commented on the card [카드 이름] on [보드이름] + [사용자 프로필사진]", "[댓글 내용]"
+        //조시현님이 백엔드 보드의 알림만들기 카드에 댓글을 달았습니다.
         String title = String.format(
-                "*%s* commented on the card *%s* on *%s*",
+                "*%s*님이 *%s* 보드의 *%s* 키드에 댓글을 달았습니다",
                 manOfAction.getNickname(),
-                card.getName(),
-                board.getName()
+                board.getName(),
+                card.getName()
         );
 
         //모든 카드, 보드 watch 인원에게
@@ -263,12 +275,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"*사용자이름* added you to the card *카드이름* on *보드이름*"
+        //여창민님이 백엔드 보드의 알림만들기 카드에 나를 추가하였습니다.
         String title = String.format(
-                "*%s* added you to the card *%s* on *%s*",
+                "*%s*님이 *%s* 보드의 *%s* 카드에 나를 추가하였습니다",
                 manOfAction.getNickname(),
-                card.getName(),
-                board.getName()
+                board.getName(),
+                card.getName()
         );
 
         //모든 카드, 보드 watch 인원에게
@@ -294,12 +306,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"*사용자이름* added you to the card *카드이름* on *보드이름*"
+        //여창민님이 백엔드 보드의 알림만들기 카드에서 나를 삭제하였습니다.
         String title = String.format(
-                "*%s* removed you from the card *%s* on *%s*",
+                "*%s*님이 *%s* 보드의 *%s* 카드에서 나를 삭제하였습니다",
                 manOfAction.getNickname(),
-                card.getName(),
-                board.getName()
+                board.getName(),
+                card.getName()
         );
 
         //모든 카드, 보드 watch 인원에게
@@ -324,20 +336,20 @@ public class AlarmServiceImpl implements AlarmService {
 
         String title;
         if (card.getIsArchived()) {
-            //"%s archived the card %s on %s + [사용자 프로필사진]"
+            //남경민님이 백엔드 보드에서 QA하기 카드를 아카이브로 보냈습니다.
             title = String.format(
-                    "%s archived the card %s on %s",
+                    "*%s*님이 *%s* 보드에서 *%s* 카드를 아카이브로 보냈습니다",
                     manOfAction.getNickname(),
-                    card.getName(),
-                    card.getList().getBoard().getName()
+                    card.getList().getBoard().getName(),
+                    card.getName()
             );
         } else {
-            //"%s unarchived the card %s on %s + [사용자 프로필사진]"
+            //남경민님이 백엔드 보드에서 QA하기 카드를 아카이브에서 복구하였습니다.
             title = String.format(
-                    "%s unarchived the card %s on %s",
+                    "*%s*님이 *%s* 보드에서 *%s* 카드를 아카이브에서 복구하였습니다",
                     manOfAction.getNickname(),
-                    card.getName(),
-                    card.getList().getBoard().getName()
+                    card.getList().getBoard().getName(),
+                    card.getName()
             );
         }
 
@@ -363,12 +375,12 @@ public class AlarmServiceImpl implements AlarmService {
         data.put("listId", String.valueOf(card.getList().getId()));
         data.put("cardId", String.valueOf(card.getId()));
 
-        //"*사용자이름* added a due date to the card *카드이름* on *보드이름*"
+        //남경민님이 백엔드 보드 QA하기 카드에 due date를 추가하였습니다.
         String title = String.format(
-                "*%s* added a due date to the card *%s* on *%s*",
+                "*%s*님이 *%s* 보드 *%s* 카드에 due date를 추가하였습니다",
                 manOfAction.getNickname(),
-                card.getName(),
-                board.getName()
+                board.getName(),
+                card.getName()
         );
 
         //모든 카드, 보드 watch 인원에게
