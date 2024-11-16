@@ -1,5 +1,6 @@
 package com.narara.superboard.attachment.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.MockSuperBoardUnitTests;
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
@@ -10,6 +11,7 @@ import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +39,9 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardOffsetService boardOffsetService;
+
+    @Mock
+    private AlarmService alarmService;
 
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
@@ -81,7 +86,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
      */
     @Test
     @DisplayName("성공적으로 첨부파일을 추가")
-    void testAddAttachment_Success() {
+    void testAddAttachment_Success() throws FirebaseMessagingException {
         Member member = new Member(1L, "시현", "sisi@naver.com");
 
         // Arrange
@@ -102,7 +107,7 @@ class AttachmentServiceImplTest implements MockSuperBoardUnitTests {
 
     @Test
     @DisplayName("첨부파일 추가시, 이미 첨부파일이 있는 경우 isCover = false로 등록")
-    void testAddAttachment_Success2() {
+    void testAddAttachment_Success2() throws FirebaseMessagingException {
         // Arrange
         when(cardRepository.findByIdAndIsDeletedFalse(testCard.getId())).thenReturn(Optional.of(testCard));
         when(attachmentRepository.existsByCardIdAndIsDeletedFalse(testCard.getId())).thenReturn(true);

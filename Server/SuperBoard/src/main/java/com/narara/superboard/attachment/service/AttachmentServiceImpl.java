@@ -1,5 +1,6 @@
 package com.narara.superboard.attachment.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
@@ -11,6 +12,7 @@ import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.NotFoundException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +33,11 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final CardHistoryRepository cardHistoryRepository;
 
     private final BoardOffsetService boardOffsetService;
+    private final AlarmService alarmService;
 
     @Override
     @Transactional
-    public Attachment addAttachment(Member member, Long cardId, String url) {
+    public Attachment addAttachment(Member member, Long cardId, String url) throws FirebaseMessagingException {
         validateUrl(url);
         Card card = getCardById(cardId);
         boolean isCover = isFirstAttachment(cardId);
@@ -59,15 +62,8 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         cardHistoryRepository.save(cardHistory);
 
-        //알림 보내기 TODO attachment에 이름이 있나? 사진이름
-//        String title = String.format(
-//                "%s attached %s to %s on %s + [사용자 프로필사진]",
-//                member.getNickname(),
-//                "이미지 이름",
-//                card.getList().getName(),
-//                card.getList().getBoard().getName()
-//        );
-//        fcmTokenService.sendMessage(member, title, "");
+        //알림
+        alarmService.sendAddCardAttachmentAlarm(member, attachment);
 
         return attachment;
     }
