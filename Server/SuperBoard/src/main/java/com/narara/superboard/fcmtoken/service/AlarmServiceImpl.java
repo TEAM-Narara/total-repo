@@ -102,10 +102,10 @@ public class AlarmServiceImpl implements AlarmService {
         Member toMember = workSpaceMember.getMember();
         saveMongo(toMember, title, "", data);
 
-//        if (!toMember.getId().equals(manOfAction.getId())) {
-//            //내가 한 짓은 알림이 오지 않아야함
+        if (!toMember.getId().equals(manOfAction.getId())) {
+            //내가 한 짓은 알림이 오지 않아야함
             fcmTokenService.sendMessage(toMember, title, "", data);
-//        }
+        }
     }
 
     @Override
@@ -130,10 +130,10 @@ public class AlarmServiceImpl implements AlarmService {
         Member toMember = workSpaceMember.getMember();
         saveMongo(toMember, title, "", data);
 
-//        if (!toMember.getId().equals(manOfAction.getId())) {
-//            //내가 한 짓은 알림이 오지 않아야함
+        if (!toMember.getId().equals(manOfAction.getId())) {
+            //내가 한 짓은 알림이 오지 않아야함
             fcmTokenService.sendMessage(toMember, title, "", data);
-//        }
+        }
     }
 
     @Override
@@ -155,10 +155,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : allMemberByBoardAndWatchTrue) {
             saveMongo(toMember, title, "", data);
 
-//        if (!toMember.getId().equals(manOfAction.getId())) {
-//            //내가 한 짓은 알림이 오지 않아야함
-            fcmTokenService.sendMessage(toMember, title, "", data);
-//        }
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -189,7 +189,10 @@ public class AlarmServiceImpl implements AlarmService {
         Member toMember = boardMember.getMember();
         saveMongo(toMember, title, "", data);
 
-        fcmTokenService.sendMessage(toMember, title, "", data);
+        if (!toMember.getId().equals(manOfAction.getId())) {
+            //내가 한 짓은 알림이 오지 않아야함
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
     }
 
     @Override
@@ -219,7 +222,10 @@ public class AlarmServiceImpl implements AlarmService {
         Member toMember = boardMember.getMember();
         saveMongo(toMember, title, "", data);
 
-        fcmTokenService.sendMessage(toMember, title, "", data);
+        if (!toMember.getId().equals(manOfAction.getId())) {
+            //내가 한 짓은 알림이 오지 않아야함
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
     }
 
     @Override
@@ -254,7 +260,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -308,7 +317,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -345,7 +357,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -381,7 +396,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, reply.getContent(), data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, reply.getContent(), data);
+            }
         }
     }
 
@@ -417,7 +435,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -453,7 +474,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -497,7 +521,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
@@ -532,7 +559,10 @@ public class AlarmServiceImpl implements AlarmService {
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
 
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            if (!toMember.getId().equals(manOfAction.getId())) {
+                //내가 한 짓은 알림이 오지 않아야함
+                fcmTokenService.sendMessage(toMember, title, "", data);
+            }
         }
     }
 
