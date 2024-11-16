@@ -19,7 +19,7 @@ public interface CardService {
     void deleteCard(Member member, Long cardId);
     Card updateCard(Member member, Long cardId, CardUpdateRequestDto cardUpdateRequestDto);
     List<Card> getArchivedCardList(Member member, Long boardId);
-    void changeArchiveStatusByCard(Member member, Long cardId);
+    void changeArchiveStatusByCard(Member member, Long cardId) throws FirebaseMessagingException;
     void checkBoardMember(Card card, Member member, Action action);
     List<CardLogDetailResponseDto> getCardActivity(Long cardId);
     CardCombinedActivityResponseDto getCardCombinedLog(Long cardId, Pageable pageable);

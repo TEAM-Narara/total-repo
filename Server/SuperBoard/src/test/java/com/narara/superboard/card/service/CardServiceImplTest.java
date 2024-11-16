@@ -320,7 +320,7 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
             "1, true",
             "2, false"
     })
-    void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) {
+    void testChangeArchiveStatusByCard_Success(Long cardId, boolean isArchived) throws FirebaseMessagingException {
         // given: 카드 모킹
         Member member = new Member(1L , "시현", "sisi@naver.com");
 
@@ -357,6 +357,4 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
         assertEquals(!isArchived, card.getIsArchived());
         verify(cardRepository, times(1)).findByIdAndIsDeletedFalse(cardId);
     }
-
-
 }

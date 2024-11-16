@@ -41,7 +41,7 @@ public interface CardAPI {
     @PatchMapping("/{cardId}/archive")
     ResponseEntity<DefaultResponse<Void>> changeArchiveStatusByCard(
             @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId);
+            @PathVariable Long cardId) throws FirebaseMessagingException;
 
     @GetMapping("/{cardId}/log")
     @Operation(summary = "카드 로그 조회")
