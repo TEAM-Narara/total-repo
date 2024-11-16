@@ -20,17 +20,15 @@ class CreateListUseCase @Inject constructor(
     ): Flow<Long> {
         val memberId = dataStoreRepository.getUser().memberId
         return listRepository.createList(memberId, createListRequestDto, isConnected).also {
-            if (!isConnected) {
-                val id = it.first()
-                val listMoveResult = listMyOrderRepository.moveListToBottom(id)
+            val id = it.first()
+            val listMoveResult = listMyOrderRepository.moveListToBottom(id)
 
-                if (listMoveResult != null) {
-                    listRepository.moveList(
-                        boardId = createListRequestDto.boardId,
-                        listMoveUpdateRequestDTO = listMoveResult.toListMoveUpdateRequestDto(),
-                        isConnected = isConnected,
-                    )
-                }
+            if (listMoveResult != null) {
+                listRepository.moveList(
+                    boardId = createListRequestDto.boardId,
+                    listMoveUpdateRequestDTO = listMoveResult.toListMoveUpdateRequestDto(),
+                    isConnected = isConnected,
+                )
             }
         }
     }
