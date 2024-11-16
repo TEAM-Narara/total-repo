@@ -5,13 +5,14 @@ import com.ssafy.network.api.BoardAPI
 import com.ssafy.network.api.CardAPI
 import com.ssafy.network.api.CardLabelAPI
 import com.ssafy.network.api.CommentAPI
+import com.ssafy.network.api.FcmAPI
 import com.ssafy.network.api.GitHubAPI
+import com.ssafy.network.api.KafkaAPI
 import com.ssafy.network.api.LabelAPI
 import com.ssafy.network.api.ListAPI
 import com.ssafy.network.api.MemberAPI
 import com.ssafy.network.api.UserAPI
 import com.ssafy.network.api.WorkspaceAPI
-import com.ssafy.network.api.KafkaAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -71,4 +72,9 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideKafkaAPI(@UserRetrofit retrofit: Retrofit): KafkaAPI = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideFcmAPI(@UserRetrofit retrofit: Retrofit): FcmAPI = retrofit.create()
+
 }

@@ -20,6 +20,11 @@ import com.ssafy.card.card.Card
 import com.ssafy.card.card.cardScreen
 import com.ssafy.card.label.Label
 import com.ssafy.card.label.labelScreen
+import com.ssafy.fcm.data.BoardMessage
+import com.ssafy.fcm.data.CardMessage
+import com.ssafy.fcm.data.FcmDirection
+import com.ssafy.fcm.data.HomeMessage
+import com.ssafy.fcm.data.WorkspaceMessage
 import com.ssafy.home.createboard.CreateBoard
 import com.ssafy.home.createboard.createBoardScreen
 import com.ssafy.home.home.Home
@@ -55,7 +60,8 @@ fun SuperBoardNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: MainViewModel,
-    direction: StartDirection = StartDirection.LOGIN
+    direction: StartDirection = StartDirection.LOGIN,
+    fcmDirection: FcmDirection? = null
 ) {
     val authEvent by viewModel.authEvent.collectAsStateWithLifecycle(false)
     val connectingEvent by ConnectManager.connectingEvent.collectAsStateWithLifecycle(false)
@@ -69,18 +75,48 @@ fun SuperBoardNavHost(
         LoadingScreen(text = ConnectManager.CONNECTING)
     }
 
+    when (fcmDirection) {
+        is HomeMessage -> {
+            navController.navigate(Home()) { popUpAll(navController) }
+        }
+
+        is WorkspaceMessage -> {
+            with(fcmDirection) {
+                navController.navigate(Home(workspaceId)) { popUpAll(navController) }
+            }
+        }
+
+        is BoardMessage -> {
+            with(fcmDirection) {
+                navController.navigate(Home(workspaceId)) { popUpAll(navController) }
+                navController.navigate(Board(workspaceId, boardId))
+            }
+        }
+
+        is CardMessage -> {
+            with(fcmDirection) {
+                navController.navigate(Home(workspaceId)) { popUpAll(navController) }
+                navController.navigate(Board(workspaceId, boardId))
+                navController.navigate(Card(workspaceId, boardId, cardId))
+            }
+        }
+
+        null -> {}
+    }
+
     NavHost(
         navController = navController,
-        startDestination = if (direction == StartDirection.LOGIN) LogIn else Home,
+        startDestination = if (direction == StartDirection.LOGIN) LogIn else Home(),
         modifier = modifier
     ) {
         loginScreen(
             moveToSignUpScreen = { navController.navigate(SignUp) },
-            moveToHomeScreen = { navController.navigate(Home) { popUpAll(navController) } }
+            moveToHomeScreen = { navController.navigate(Home()) { popUpAll(navController) } }
         )
 
         signupScreen(
-            moveToHomeScreen = { navController.navigate(Home) }
+
+            moveToHomeScreen = { navController.navigate(Home()) }
         )
 
         homeScreen(

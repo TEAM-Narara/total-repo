@@ -10,6 +10,8 @@ import com.ssafy.data.repository.clear.ClearRoomRepository
 import com.ssafy.data.repository.clear.ClearRoomRepositoryImpl
 import com.ssafy.data.repository.comment.CommentRepository
 import com.ssafy.data.repository.comment.CommentRepositoryImpl
+import com.ssafy.data.repository.fcm.FcmRepository
+import com.ssafy.data.repository.fcm.FcmRepositoryImpl
 import com.ssafy.data.repository.github.GitHubRepository
 import com.ssafy.data.repository.github.GitHubRepositoryImpl
 import com.ssafy.data.repository.list.ListRepository
@@ -87,4 +89,8 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindCardMyOrderRepository(cardMyOrderRepositoryImpl: CardMyOrderRepositoryImpl): CardMyOrderRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindFcmRepository(fcmRepositoryImpl: FcmRepositoryImpl): FcmRepository
 }

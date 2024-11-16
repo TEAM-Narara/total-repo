@@ -8,6 +8,8 @@ import com.ssafy.network.source.card.CardDataSource
 import com.ssafy.network.source.card.CardDataSourceImpl
 import com.ssafy.network.source.comment.CommentDataSource
 import com.ssafy.network.source.comment.CommentDataSourceImpl
+import com.ssafy.network.source.fcm.FcmDataSource
+import com.ssafy.network.source.fcm.FcmDataSourceImpl
 import com.ssafy.network.source.github.GitHubDataSource
 import com.ssafy.network.source.github.GitHubDataSourceImpl
 import com.ssafy.network.source.list.ListDataSource
@@ -63,5 +65,10 @@ abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindListDataSource(listDataSourceImpl: ListDataSourceImpl): ListDataSource
+
+
+    @Singleton
+    @Binds
+    abstract fun bindFcmDataSource(fcmDataSourceImpl: FcmDataSourceImpl): FcmDataSource
 
 }

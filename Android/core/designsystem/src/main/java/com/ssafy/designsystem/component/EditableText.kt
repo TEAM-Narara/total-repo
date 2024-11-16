@@ -1,7 +1,6 @@
 package com.ssafy.designsystem.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
@@ -62,10 +61,10 @@ fun EditableText(
             },
         ),
         decorationBox = { innerTextField ->
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.CenterStart
-            ) {
+            val alignment =
+                if (alignStyle == TextAlign.Start) Alignment.TopStart else Alignment.TopEnd
+
+            Box(contentAlignment = alignment) {
                 if (value.isEmpty() && placeholder != null) {
                     Text(
                         text = placeholder,

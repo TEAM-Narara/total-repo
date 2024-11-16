@@ -1,6 +1,7 @@
 package com.ssafy.logout
 
 import com.ssafy.data.repository.clear.ClearRoomRepository
+import com.ssafy.data.repository.fcm.FcmRepository
 import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.datastore.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,10 +13,13 @@ import javax.inject.Inject
 class LogoutUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val userRepository: UserRepository,
+    private val fcmRepository: FcmRepository,
     private val clearRoomRepository: ClearRoomRepository
 ) {
 
     suspend operator fun invoke(): Flow<Unit> = flow {
+        val memberId = dataStoreRepository.getUser().memberId
+        fcmRepository.deleteFcmToken(memberId)
         dataStoreRepository.clearAll()
         clearRoomRepository.clearAll()
         emit(Unit)

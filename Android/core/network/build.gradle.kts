@@ -70,6 +70,10 @@ dependencies {
     implementation(libs.aws.android.sdk.mobile.client)
     implementation(libs.aws.android.sdk.s3)
 
+    // FCM
+    implementation (libs.firebase.messaging.ktx)
+    implementation(platform(libs.firebase.bom))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

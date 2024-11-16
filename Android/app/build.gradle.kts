@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -61,6 +62,7 @@ dependencies {
     implementation(project(":feature:card"))
     implementation(project(":feature:notification"))
     implementation(project(":feature:splash"))
+    implementation(project(":feature:fcm"))
     implementation(project(":domain:logout"))
 
     // DTO
@@ -69,6 +71,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.appcompat)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -78,6 +81,10 @@ dependencies {
     // Splash
     implementation (libs.androidx.core.splashscreen)
     implementation(project(":core:designsystem"))
+
+    // FCM
+    implementation (libs.firebase.messaging.ktx)
+    implementation(platform(libs.firebase.bom))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

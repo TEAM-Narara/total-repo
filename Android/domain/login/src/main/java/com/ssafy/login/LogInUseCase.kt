@@ -1,5 +1,6 @@
 package com.ssafy.login
 
+import com.ssafy.data.repository.fcm.FcmRepository
 import com.ssafy.data.repository.github.GitHubRepository
 import com.ssafy.data.repository.member.MemberRepository
 import com.ssafy.data.repository.user.UserRepository
@@ -16,7 +17,8 @@ class LogInUseCase @Inject constructor(
     private val gitHubRepository: GitHubRepository,
     private val userRepository: UserRepository,
     private val dataStoreRepository: DataStoreRepository,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val fcmRepository: FcmRepository
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,6 +32,7 @@ class LogInUseCase @Inject constructor(
             is OAuth.GitHub -> userRepository.loginWithGitHub(oAuth.token)
             is OAuth.Naver -> userRepository.loginWithNaver(oAuth.token)
         }.map { user ->
+            fcmRepository.registerFcmToken(user.memberId)
             memberRepository.addMember(user)
             dataStoreRepository.saveUser(user)
             true
@@ -39,6 +42,7 @@ class LogInUseCase @Inject constructor(
     suspend operator fun invoke(email: String, password: String): Flow<Boolean> {
         return userRepository.login(email, password)
             .map { userInfo ->
+                fcmRepository.registerFcmToken(userInfo.memberId)
                 memberRepository.addMember(userInfo)
                 dataStoreRepository.saveUser(userInfo)
                 true

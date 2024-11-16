@@ -5,14 +5,18 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -22,6 +26,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
+import com.ssafy.fcm.SuperBoardFcmService
+import com.ssafy.fcm.data.FcmDirection
 import com.ssafy.splash.SplashViewModel
 import com.ssafy.superboard.navigation.SuperBoardNavHost
 import com.ssafy.superboard.ui.theme.SuperBoardTheme
@@ -32,9 +39,17 @@ import kotlinx.coroutines.flow.update
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val splashViewModel: SplashViewModel by viewModels()
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (!isGranted) {
+                Toast.makeText(this, NO_ALARM_PERMISSION, Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
+        requestPermission()
 
         installSplashScreen().setKeepOnScreenCondition {
             splashViewModel.isLoading
@@ -78,19 +93,34 @@ class MainActivity : ComponentActivity() {
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
 
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     @Composable
+    @Suppress("DEPRECATION")
     fun SuperBoardApp(
         navController: NavHostController = rememberNavController(),
         viewModel: MainViewModel = hiltViewModel()
     ) {
         val direction by splashViewModel.direction.collectAsStateWithLifecycle()
+        val fcmDirection = remember {
+            intent.getParcelableExtra<FcmDirection?>(SuperBoardFcmService.FCM_KEY)
+        }
 
         direction?.let {
             SuperBoardNavHost(
                 navController = navController,
                 viewModel = viewModel,
-                direction = it
+                direction = it,
+                fcmDirection = fcmDirection
             )
         }
+    }
+
+    companion object {
+        const val NO_ALARM_PERMISSION = "권한을 허용하지 않으면 알람을 받을 수 없습니다."
     }
 }
