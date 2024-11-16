@@ -17,7 +17,7 @@ import com.ssafy.network.socket.StompMessage
 import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -79,7 +79,7 @@ class BaseStompManager @Inject constructor(
                                 response.data,
                                 object : TypeToken<List<StompFetchMessage>>() {}.type
                             ).forEach {
-                                Log.d("TAG", "onDataReleased: ${it.message}")
+                                delay(50)
                                 emit(it.message)
                             }
                         }
@@ -106,8 +106,6 @@ class BaseStompManager @Inject constructor(
             }
         )
 
-        if (state.first() is ConnectionState.Error) connect()
-
         state.collect {
             when (it) {
                 ConnectionState.Connected -> stompClientManager.subscribe(
@@ -115,25 +113,25 @@ class BaseStompManager @Inject constructor(
                     "/topic/$topic/member/$memberId",
                 ).collect(dataHandler::handleSocketData)
 
-                ConnectionState.Disconnected -> connect()
-
                 else -> {}
             }
         }
     }
 
-    suspend fun connect() {
-        NetworkState.isConnected.collect {
-            if (it) {
-                stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
-                    Log.d("TAG", "subscribe: Socket is connected")
-                    ConnectManager.sendConnectingEvent(true)
-                    syncRepository.syncAll()
-                    Log.d("TAG", "subscribe: Sync all")
-                    ConnectManager.sendConnectingEvent(false)
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            NetworkState.isConnected.collect {
+                if (it) {
+                    stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
+                        Log.i("TAG", "subscribe: Socket is connected")
+                        ConnectManager.sendConnectingEvent(true)
+                        syncRepository.syncAll()
+                        Log.i("TAG", "subscribe: Sync all")
+                        ConnectManager.sendConnectingEvent(false)
+                    }
+                } else {
+                    stompClientManager.disconnect(SOCKET_ID)
                 }
-            } else {
-                stompClientManager.disconnect(SOCKET_ID)
             }
         }
     }

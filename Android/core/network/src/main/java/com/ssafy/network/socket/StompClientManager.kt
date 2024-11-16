@@ -6,6 +6,7 @@ import com.ssafy.model.socket.ConnectionState
 import com.ssafy.network.module.AuthInterceptorOkHttpClient
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -27,7 +28,7 @@ class StompClientManager @Inject constructor(
 ) {
     private val client = StompClient(OkHttpWebSocketClient(okHttpClient))
     private val sessions = mutableMapOf<String, StompSession>()
-    private val connectionStates = MutableStateFlow<Map<String, ConnectionState>>(emptyMap())
+    private val connectionStates = mutableMapOf<String, MutableStateFlow<ConnectionState>>()
 
     suspend fun connect(id: String, url: String, onConnect: suspend () -> Unit = {}) {
         if (sessions[id] == null) {
@@ -44,15 +45,15 @@ class StompClientManager @Inject constructor(
         }
     }
 
-    fun observeConnectionState(id: String): Flow<ConnectionState> = connectionStates.map {
-        it[id] ?: ConnectionState.Disconnected
-    }
-
-    private fun updateConnectionState(id: String, state: ConnectionState) {
-        connectionStates.update { states ->
-            states.toMutableMap().apply { put(id, state) }
+    fun observeConnectionState(id: String): StateFlow<ConnectionState> = connectionStates[id]
+        ?: MutableStateFlow<ConnectionState>(ConnectionState.Disconnected).also {
+            connectionStates[id] = it
         }
-    }
+
+    private fun updateConnectionState(id: String, state: ConnectionState) =
+        connectionStates[id]?.update { state } ?: MutableStateFlow(state).also {
+            connectionStates[id] = it
+        }
 
     suspend fun subscribe(
         id: String,

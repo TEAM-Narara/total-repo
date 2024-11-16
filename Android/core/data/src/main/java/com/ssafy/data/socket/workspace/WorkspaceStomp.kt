@@ -6,6 +6,7 @@ import com.ssafy.data.socket.workspace.service.WorkspaceService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class WorkspaceStomp @Inject constructor(
 
         _job = CoroutineScope(ioDispatcher).launch {
             runCatching {
-                stomp.subscribe("workspace/$workspaceId").produceIn(CoroutineScope(ioDispatcher)).receiveAsFlow().collect {
+                stomp.subscribe("workspace/$workspaceId").produceIn(CoroutineScope(ioDispatcher)).receiveAsFlow().buffer().collect {
                     when (it.action) {
                         "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(it.data)
                         "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(it.data)

@@ -6,6 +6,7 @@ import com.ssafy.data.repository.user.UserRepository
 import com.ssafy.datastore.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -29,7 +30,7 @@ class LogoutUseCase @Inject constructor(
         return fcmRepository.deleteFcmToken(memberId).also {
             userRepository.logout().flatMapConcat {
                 invoke()
-            }
+            }.collect()
         }
     }
 }

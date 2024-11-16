@@ -110,9 +110,7 @@ class WorkspaceRepositoryImpl @Inject constructor(
 
             if (workspace != null) {
                 if (isConnected) {
-                    workspaceDataSource.deleteWorkspace(workspaceId).map {
-                        workspaceDao.updateWorkspace(workspace.copy(isStatus = DataStatus.DELETE))
-                    }
+                    workspaceDataSource.deleteWorkspace(workspaceId)
                 } else {
                     when (workspace.isStatus) {
                         DataStatus.CREATE ->

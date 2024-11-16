@@ -1,5 +1,6 @@
 package com.ssafy.home.setting
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.ssafy.home.GetDetailWorkspaceUseCase
 import com.ssafy.home.data.DetailWorkspaceData
@@ -35,6 +36,7 @@ class HomeSettingViewModel @Inject constructor(
         backHome: () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         withSocketState { isConnected ->
+            Log.d("TAG", "deleteWorkspace: $isConnected")
             deleteWorkspaceUseCase(workspaceId, isConnected).safeCollect {
                 withMain { backHome() }
             }

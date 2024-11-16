@@ -60,7 +60,13 @@ class ListService @Inject constructor(
         val dto = gson.fromJson(data, MoveListRequestDto::class.java)
         dto.updatedList.forEach {
             val before = listDao.getList(it.listId) ?: return
-            listDao.updateList(before.copy(myOrder = it.myOrder))
+            listDao.updateList(
+                before.copy(
+                    myOrder = it.myOrder,
+                    isStatus = DataStatus.STAY,
+                    columnUpdate = 0,
+                )
+            )
         }
     }
 }

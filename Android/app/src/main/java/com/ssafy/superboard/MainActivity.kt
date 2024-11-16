@@ -7,6 +7,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,10 +27,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
+import com.ssafy.network.networkstate.NetworkState
 import com.ssafy.splash.SplashViewModel
 import com.ssafy.superboard.navigation.SuperBoardNavHost
 import com.ssafy.superboard.ui.theme.SuperBoardTheme
-import com.ssafy.network.networkstate.NetworkState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.update
 
@@ -75,11 +76,13 @@ class MainActivity : ComponentActivity() {
 
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                com.ssafy.network.networkstate.NetworkState.isConnected.update { true }
+                Log.d("TAG", "onAvailable: ")
+                NetworkState.isConnected.update { true }
             }
 
             override fun onLost(network: Network) {
-                com.ssafy.network.networkstate.NetworkState.isConnected.update { false }
+                Log.d("TAG", "onLost: ")
+                NetworkState.isConnected.update { false }
             }
         }
 

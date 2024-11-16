@@ -1,6 +1,7 @@
 package com.ssafy.home.createboard
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -33,6 +34,8 @@ fun CreateBoardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val workspaceList by viewModel.workspace.collectAsStateWithLifecycle()
+
+    Log.d("TAG", "CreateBoardScreen: $workspaceList")
 
     LaunchedEffect(Unit) {
         viewModel.resetUiState()
