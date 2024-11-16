@@ -7,4 +7,5 @@ import kotlinx.parcelize.Parcelize
 data class HomeMessage(
     override val type: String,
     override val goTo: FcmDestination,
+    override val manOfActionId: Long?,
 ) : FcmDirection
