@@ -54,16 +54,9 @@ class BaseStompManager @Inject constructor(
                         }
 
                         "FETCHED" -> {
-                            val type = object : TypeToken<List<StompFetchMessage>>() {}.type
-                            val offset = gson.fromJson<List<StompFetchMessage>>(
-                                response.data,
-                                type
-                            ).last().offset
-                            dataStoreRepository.saveStompOffset(topic, offset)
-
                             stompClientManager.send(
                                 SOCKET_ID, ACK_LAST_URL, AckMessage(
-                                    offset = offset,
+                                    offset = response.offset,
                                     topic = topic.split("/").joinToString("-"),
                                     partition = response.partition,
                                     groupId = "member-$memberId"
@@ -79,11 +72,13 @@ class BaseStompManager @Inject constructor(
                     when (response.type) {
                         "RECEIVED" -> emit(gson.fromJson(response.data, StompMessage::class.java))
                         "FETCHED" -> {
-                            val type = object : TypeToken<List<StompFetchMessage>>() {}.type
                             gson.fromJson<List<StompFetchMessage>>(
                                 response.data,
-                                type
-                            ).forEach { emit(it.message) }
+                                object : TypeToken<List<StompFetchMessage>>() {}.type
+                            ).forEach {
+                                Log.d("TAG", "onDataReleased: ${it.message}")
+                                emit(it.message)
+                            }
                         }
                     }
                 }
@@ -100,6 +95,10 @@ class BaseStompManager @Inject constructor(
                             )
                         }
                     }
+                }
+
+                override fun superPass(response: StompResponse): Boolean {
+                    return response.type == "FETCHED"
                 }
             }
         )

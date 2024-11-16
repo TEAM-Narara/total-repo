@@ -20,7 +20,7 @@ class StompDataHandler(
 
     init {
         Log.d("TAG", "startOffset: $startOffset")
-        if (lastOffset < 0) callback.onTimeout(lastOffset)
+        if (startOffset < 0) callback.onTimeout(startOffset)
     }
 
     private val onTimeout
@@ -31,17 +31,18 @@ class StompDataHandler(
             }
         }
 
-    suspend fun handleSocketData(data: StompResponse) {
-        if (data.offset <= lastOffset) return callback.ack(data)
-        priorityQueue.offer(data)
+    suspend fun handleSocketData(response: StompResponse) {
+        if (response.offset <= lastOffset) return callback.ack(response)
+        priorityQueue.offer(response)
         checkAndReleaseData()
         if (priorityQueue.isNotEmpty()) startTimer()
     }
 
     private suspend fun checkAndReleaseData() {
         while (priorityQueue.isNotEmpty()) {
-            val currentOffset = priorityQueue.peek()?.offset
-            if (currentOffset != lastOffset + 1) break
+            val response = priorityQueue.peek() ?: break
+            val currentOffset = response.offset
+            if (currentOffset != lastOffset + 1 && !callback.superPass(response)) break
 
             val released = priorityQueue.poll() ?: break
             lastOffset = released.offset
@@ -66,5 +67,6 @@ class StompDataHandler(
         suspend fun ack(response: StompResponse)
         suspend fun onDataReleased(response: StompResponse)
         fun onTimeout(lastOffset: Long)
+        fun superPass(response: StompResponse): Boolean
     }
 }

@@ -10,7 +10,8 @@ import com.ssafy.data.socket.board.service.ReplyService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +32,7 @@ class BoardStomp @Inject constructor(
         disconnect()
         _job = CoroutineScope(ioDispatcher).launch {
             runCatching {
-                stomp.subscribe("board/$boardId").stateIn(this).collect {
+                stomp.subscribe("board/$boardId").produceIn(CoroutineScope(ioDispatcher)).receiveAsFlow().collect {
                     when (it.action) {
                         "ADD_BOARD_MEMBER" -> boardService.addBoardMember(it.data)
                         "EDIT_BOARD_MEMBER" -> boardService.editBoardMember(it.data)
