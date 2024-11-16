@@ -50,7 +50,6 @@ class BaseStompManager @Inject constructor(
                                     groupId = "member-$memberId"
                                 )
                             )
-                            dataStoreRepository.saveStompOffset(topic, response.offset)
                         }
 
                         "FETCHED" -> {
@@ -66,6 +65,8 @@ class BaseStompManager @Inject constructor(
 
                         else -> return
                     }
+
+                    dataStoreRepository.saveStompOffset(topic, response.offset)
                 }
 
                 override suspend fun onDataReleased(response: StompResponse) {
