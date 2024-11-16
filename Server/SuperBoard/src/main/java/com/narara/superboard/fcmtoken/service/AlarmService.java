@@ -35,4 +35,6 @@ public interface AlarmService {
     void sendArchiveCard(Member manOfAction, Card card) throws FirebaseMessagingException;
 
     void sendAddCardDueDateAlarm(Member manOfAction, Card card) throws FirebaseMessagingException;
+
+    void sendDeleteBoardMemberAlarm(Member manOfAction, BoardMember boardMember) throws FirebaseMessagingException;
 }
