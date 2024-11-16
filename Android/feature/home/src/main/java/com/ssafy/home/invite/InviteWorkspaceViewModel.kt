@@ -58,7 +58,7 @@ class InviteWorkspaceViewModel @Inject constructor(
             }
         }.cachedIn(viewModelScope)
 
-    fun getWorkspace(workspaceId: Long) = viewModelScope.launch {
+    fun getWorkspace(workspaceId: Long) = viewModelScope.launch(Dispatchers.IO) {
         getWorkspaceUseCase(workspaceId).safeCollect { it?.let { _workspace.emit(it) } }
     }
 
