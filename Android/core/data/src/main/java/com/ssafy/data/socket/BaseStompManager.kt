@@ -41,23 +41,29 @@ class BaseStompManager @Inject constructor(
             object : StompDataHandler.Callback {
                 override suspend fun ack(response: StompResponse) {
                     when (response.type) {
-                        "RECEIVED" -> stompClientManager.send(
-                            SOCKET_ID, ACK_URL, AckMessage(
-                                offset = response.offset,
-                                topic = topic.split("/").joinToString("-"),
-                                partition = response.partition,
-                                groupId = "member-$memberId"
+                        "RECEIVED" -> {
+                            stompClientManager.send(
+                                SOCKET_ID, ACK_URL, AckMessage(
+                                    offset = response.offset,
+                                    topic = topic.split("/").joinToString("-"),
+                                    partition = response.partition,
+                                    groupId = "member-$memberId"
+                                )
                             )
-                        )
+                            dataStoreRepository.saveStompOffset(topic, response.offset)
+                        }
 
                         "FETCHED" -> {
                             val type = object : TypeToken<List<StompFetchMessage>>() {}.type
+                            val offset = gson.fromJson<List<StompFetchMessage>>(
+                                response.data,
+                                type
+                            ).last().offset
+                            dataStoreRepository.saveStompOffset(topic, offset)
+
                             stompClientManager.send(
                                 SOCKET_ID, ACK_LAST_URL, AckMessage(
-                                    offset = gson.fromJson<List<StompFetchMessage>>(
-                                        response.data,
-                                        type
-                                    ).last().offset,
+                                    offset = offset,
                                     topic = topic.split("/").joinToString("-"),
                                     partition = response.partition,
                                     groupId = "member-$memberId"
@@ -67,21 +73,17 @@ class BaseStompManager @Inject constructor(
 
                         else -> return
                     }
-
-                    dataStoreRepository.saveStompOffset(topic, response.offset)
                 }
 
                 override suspend fun onDataReleased(response: StompResponse) {
                     when (response.type) {
                         "RECEIVED" -> emit(gson.fromJson(response.data, StompMessage::class.java))
-                        "FETCHED" -> gson.fromJson(response.data, List::class.java).forEach {
-                            Log.d("TAG", "onDataReleased: ${it.toString()}")
-                            emit(
-                                gson.fromJson(
-                                    it.toString(),
-                                    StompFetchMessage::class.java
-                                ).message
-                            )
+                        "FETCHED" -> {
+                            val type = object : TypeToken<List<StompFetchMessage>>() {}.type
+                            gson.fromJson<List<StompFetchMessage>>(
+                                response.data,
+                                type
+                            ).forEach { emit(it.message) }
                         }
                     }
                 }
