@@ -6,4 +6,5 @@ import com.ssafy.fcm.FcmDestination
 sealed interface FcmDirection : Parcelable {
     val type: String
     val goTo: FcmDestination
+    val manOfActionId: Long?
 }
