@@ -18,6 +18,7 @@ import com.narara.superboard.common.application.validator.LastOrderValidator;
 import com.narara.superboard.common.application.validator.NameValidator;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.common.exception.NotFoundEntityException;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.list.entity.List;
 import com.narara.superboard.list.infrastructure.ListRepository;
 import com.narara.superboard.list.service.ListService;
@@ -58,6 +59,9 @@ class CardServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private BoardMemberRepository boardMemberRepository;
+
+    @Mock
+    private AlarmService alarmService;
 
     @Mock
     private LastOrderValidator lastOrderValidator;

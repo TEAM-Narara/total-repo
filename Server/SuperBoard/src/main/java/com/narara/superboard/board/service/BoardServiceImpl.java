@@ -31,7 +31,7 @@ import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.common.exception.authority.UnauthorizedException;
 import com.narara.superboard.common.interfaces.dto.CoverDto;
-import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
@@ -85,7 +85,7 @@ public class BoardServiceImpl implements BoardService {
     private final ReplyRepository replyRepository;
     private final BoardSearchRepository boardSearchRepository;
 
-    private final FcmTokenService fcmTokenService;
+    private final AlarmService alarmService;
 
     @Override
     public List<BoardDetailResponseDto> getBoardCollectionResponseDto(Long workspaceId) {
@@ -241,23 +241,7 @@ public class BoardServiceImpl implements BoardService {
         //[알림]
         if (board.getIsArchived()) {
             //보드를 닫을 때만 알람
-            sendArchiveBoard(member, board);
-        }
-    }
-
-    private void sendArchiveBoard(Member manOfAction, Board board) throws FirebaseMessagingException {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("type", "CLOSE_BOARD");
-        data.put("goTo", "WORKSPACE");
-        data.put("workspaceId", String.valueOf(board.getWorkSpace().getId()));
-
-        String title = String.format("*%s* closed the board *%s*", manOfAction.getNickname(), board.getName());
-
-        //모든 board watch 인원에게
-        Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
-                board.getId());
-        for (Member toMember: allMemberByBoardAndWatchTrue) {
-            fcmTokenService.sendMessage(toMember, title, "", data);
+            alarmService.sendArchiveBoard(member, board);
         }
     }
 

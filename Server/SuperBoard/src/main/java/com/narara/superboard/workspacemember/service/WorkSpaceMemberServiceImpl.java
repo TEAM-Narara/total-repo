@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
-import com.narara.superboard.fcmtoken.service.FcmTokenService;
+import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.exception.MemberNotFoundException;
@@ -18,7 +18,6 @@ import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
-import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final KafkaConsumerService kafkaConsumerService;
     private final WorkspaceOffsetService workspaceOffsetService;
 
-    private final FcmTokenService fcmTokenService;
+    private final AlarmService alarmService;
 
     @Override
     public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId) {
@@ -152,7 +151,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
         //[알림]
-        sendAddMemberAlarm(member, workspaceMember);
+        alarmService.sendAddWorkspaceMemberAlarm(member, workspaceMember);
 
         return workSpaceMember;
     }
@@ -175,39 +174,9 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workspaceOffsetService.saveDeleteMemberDiff(workSpaceMember);
 
         //[알림]
-        sendDeleteMemberAlarm(member, workSpaceMember);
+        alarmService.sendDeleteWorkspaceMemberAlarm(member, workSpaceMember);
 
         return workSpaceMember;
-    }
-
-    private void sendDeleteMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember) throws FirebaseMessagingException {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("type", "ME_REMOVE_WORKSPACE_MEMBER");
-        data.put("goTo", "HOME");
-
-        //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
-        String title = String.format("*%s* removed you from the Workspace *%s*", manOfAction.getNickname(), workSpaceMember.getWorkSpace().getName());
-
-        //대상자에게만 알람
-        fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
-    }
-
-    private void sendAddMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember) throws FirebaseMessagingException {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("type", "ME_ADD_WORKSPACE_MEMBER");
-        data.put("goTo", "WORKSPACE");
-        data.put("workspaceId", String.valueOf(workSpaceMember.getWorkSpace().getId()));
-
-        //"*사용자이름* added you to the Workspace *워크스페이스이름* as an admin"
-        String title = String.format(
-                "*%s* added you to the Workspace *%s* as an %s",
-                manOfAction.getNickname(),
-                workSpaceMember.getWorkSpace().getName(),
-                workSpaceMember.getAuthority().name()
-        );
-
-        //대상자에게만 알람
-        fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
     }
 
     @Override
