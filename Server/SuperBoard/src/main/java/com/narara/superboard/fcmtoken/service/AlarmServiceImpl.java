@@ -35,6 +35,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_WORKSPACE_MEMBER");
         data.put("goTo", "WORKSPACE");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpaceMember.getWorkSpace().getId()));
 
         //"*사용자이름* added you to the Workspace *워크스페이스이름* as an admin"
@@ -55,6 +56,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_REMOVE_WORKSPACE_MEMBER");
         data.put("goTo", "HOME");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
 
         //"*사용자이름* removed you from the Workspace *워크스페이스이름*"
         String title = String.format("*%s* removed you from the Workspace *%s*", manOfAction.getNickname(),
@@ -69,6 +71,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "CLOSE_BOARD");
         data.put("goTo", "WORKSPACE");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(board.getWorkSpace().getId()));
 
         String title = String.format("*%s* closed the board *%s*", manOfAction.getNickname(), board.getName());
@@ -89,6 +92,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_BOARD_MEMBER");
         data.put("goTo", "BOARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
@@ -109,6 +113,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_DELETE_BOARD_MEMBER");
         data.put("goTo", "BOARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
@@ -131,6 +136,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ADD_CARD");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -156,6 +162,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "MOVE_CARD");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -188,6 +195,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ADD_CARD_ATTACHMENT");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -218,6 +226,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ADD_REPLY");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -248,6 +257,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_CARD_MEMBER");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -278,6 +288,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_CARD_MEMBER");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
@@ -307,6 +318,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ARCHIVE_CARD");
         data.put("goTo", "BOARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
 
@@ -345,6 +357,7 @@ public class AlarmServiceImpl implements AlarmService {
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "EDIT_CARD_DUE_DATE");
         data.put("goTo", "CARD");
+        data.put("manOfActionId", String.valueOf(manOfAction.getId()));
         data.put("workspaceId", String.valueOf(workSpace.getId()));
         data.put("boardId", String.valueOf(board.getId()));
         data.put("listId", String.valueOf(card.getList().getId()));
