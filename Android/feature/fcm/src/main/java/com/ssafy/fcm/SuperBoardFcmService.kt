@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.media.RingtoneManager
 import android.text.Spannable
@@ -19,9 +20,12 @@ import com.ssafy.fcm.data.CardMessage
 import com.ssafy.fcm.data.FcmDirection
 import com.ssafy.fcm.data.HomeMessage
 import com.ssafy.fcm.data.WorkspaceMessage
+import com.ssafy.member.GetMemberUseCase
+import com.ssafy.model.user.User
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
@@ -31,6 +35,9 @@ class SuperBoardFcmService : FirebaseMessagingService() {
 
     @Inject
     lateinit var updateFcmTokenUseCase: UpdateFcmTokenUseCase
+
+    @Inject
+    lateinit var getMemberUseCase: GetMemberUseCase
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -46,8 +53,9 @@ class SuperBoardFcmService : FirebaseMessagingService() {
     }
 
     private fun handleMessage(remoteMessage: RemoteMessage) {
-        val title = remoteMessage.notification?.title.toString().toSpanString()
-        val body = remoteMessage.notification?.body.toString().toSpanString()
+        remoteMessage.notification
+        remoteMessage.data
+        val message = remoteMessage.notification?.title.toString().toSpanString()
         val data = remoteMessage.data
 
         val goTo = runCatching {
@@ -61,10 +69,11 @@ class SuperBoardFcmService : FirebaseMessagingService() {
         val uniId = Random.nextInt(0, Int.MAX_VALUE)
         val fcmDirection = convertToMessage(goTo, data)
         val pendingIntent = setPendingIntent(fcmDirection, uniId)
-        sendNotification(pendingIntent, title, body, uniId)
+        sendNotification(pendingIntent, message, fcmDirection.manOfActionId, uniId)
     }
 
     private fun convertToMessage(goTo: FcmDestination, data: Map<String, String>): FcmDirection {
+        println(data)
         val gson = Gson()
         val jsonString = gson.toJson(data)
 
@@ -103,39 +112,55 @@ class SuperBoardFcmService : FirebaseMessagingService() {
 
     private fun sendNotification(
         intent: PendingIntent,
-        title: SpannableString,
-        body: SpannableString,
+        message: SpannableString,
+        manOfActionId: Long?,
         uniId: Int
     ) {
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setSmallIcon(R.drawable.mascot)
-            .setAutoCancel(true)
-            .setSound(soundUri)
-            .setContentIntent(intent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+        CoroutineScope(Dispatchers.IO).launch {
+            val member: User? = manOfActionId?.let { getMemberUseCase(it) }?.firstOrNull()
+            val url = member?.profileImgUrl ?: ""
+            val bitmap = BitmapFactory.decodeFile(url) ?: BitmapFactory.decodeResource(
+                resources,
+                R.drawable.alarm
+            )
 
-        notificationManager.notify(uniId, notificationBuilder.build())
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val notificationBuilder =
+                NotificationCompat.Builder(this@SuperBoardFcmService, CHANNEL_ID)
+                    .setContentTitle(TITLE)
+                    .setSmallIcon(R.drawable.mascot)
+                    .setAutoCancel(true)
+                    .setSound(soundUri)
+                    .setLargeIcon(bitmap)
+                    .setContentIntent(intent)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    .setContentText(message)
+
+
+            notificationManager.notify(uniId, notificationBuilder.build())
+        }
     }
 
     private fun String.toSpanString(): SpannableString {
-        val spannableString = SpannableString(this.replace("**", ""))
-        val pattern = "\\*\\*(.*?)\\*\\*".toRegex()
+        val spannableString = SpannableString(this.replace("*", ""))
+        val pattern = "\\*(.*?)\\*".toRegex()
 
+        var offset = 0
         pattern.findAll(this).forEach { matchResult ->
             val boldText = matchResult.groupValues[1]
-            val start = this.indexOf(boldText)
+            val start = matchResult.range.first - offset
             val end = start + boldText.length
+
             spannableString.setSpan(
                 StyleSpan(Typeface.BOLD),
                 start,
                 end,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
+
+            offset += 2
         }
 
         return spannableString
@@ -147,5 +172,6 @@ class SuperBoardFcmService : FirebaseMessagingService() {
         const val CHANNEL_DESCRIPTION = "SuperBoard Notification"
         const val MAIN_CLASS = "com.ssafy.superboard.MainActivity"
         const val FCM_KEY = "MESSAGE"
+        const val TITLE = "슈퍼보드"
     }
 }

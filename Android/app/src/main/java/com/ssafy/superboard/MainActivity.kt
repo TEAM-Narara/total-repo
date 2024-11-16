@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -27,8 +26,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
-import com.ssafy.fcm.SuperBoardFcmService
-import com.ssafy.fcm.data.FcmDirection
 import com.ssafy.splash.SplashViewModel
 import com.ssafy.superboard.navigation.SuperBoardNavHost
 import com.ssafy.superboard.ui.theme.SuperBoardTheme
@@ -100,22 +97,17 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    @Suppress("DEPRECATION")
     fun SuperBoardApp(
         navController: NavHostController = rememberNavController(),
         viewModel: MainViewModel = hiltViewModel()
     ) {
         val direction by splashViewModel.direction.collectAsStateWithLifecycle()
-        val fcmDirection = remember {
-            intent.getParcelableExtra<FcmDirection?>(SuperBoardFcmService.FCM_KEY)
-        }
 
         direction?.let {
             SuperBoardNavHost(
                 navController = navController,
                 viewModel = viewModel,
                 direction = it,
-                fcmDirection = fcmDirection
             )
         }
     }

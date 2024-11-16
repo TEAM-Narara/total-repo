@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class WorkspaceMessage(
     override val type: String,
     override val goTo: FcmDestination,
+    override val manOfActionId: Long?,
     val workspaceId: Long,
 ) : FcmDirection
