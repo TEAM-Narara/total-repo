@@ -124,7 +124,7 @@ public class CardController implements CardAPI {
     @Operation(summary = "카드 아카이브 여부 변경", description = "")
     public ResponseEntity<DefaultResponse<Void>> changeArchiveStatusByCard(
             @AuthenticationPrincipal Member member,
-            @PathVariable Long cardId) {
+            @PathVariable Long cardId) throws FirebaseMessagingException {
 
         cardService.changeArchiveStatusByCard(member, cardId);
 

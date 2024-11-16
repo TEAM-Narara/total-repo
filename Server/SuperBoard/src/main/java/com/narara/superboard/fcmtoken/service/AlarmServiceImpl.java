@@ -275,6 +275,44 @@ public class AlarmServiceImpl implements AlarmService {
         }
     }
 
+    @Override
+    public void sendArchiveCard(Member manOfAction, Card card) throws FirebaseMessagingException {
+        Board board = card.getList().getBoard();
+        WorkSpace workSpace = board.getWorkSpace();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("type", "ARCHIVE_CARD");
+        data.put("goTo", "BOARD");
+        data.put("workspaceId", String.valueOf(workSpace.getId()));
+        data.put("boardId", String.valueOf(board.getId()));
+
+        String title;
+        if (card.getIsArchived()) {
+            //"%s archived the card %s on %s + [사용자 프로필사진]"
+            title = String.format(
+                    "%s archived the card %s on %s",
+                    manOfAction.getNickname(),
+                    card.getName(),
+                    card.getList().getBoard().getName()
+            );
+        } else {
+            //"%s unarchived the card %s on %s + [사용자 프로필사진]"
+            title = String.format(
+                    "%s unarchived the card %s on %s",
+                    manOfAction.getNickname(),
+                    card.getName(),
+                    card.getList().getBoard().getName()
+            );
+        }
+
+        //모든 카드, 보드 watch 인원에게
+        Set<Member> cardAndBoardMembers = getCardAndBoardMembers(card, board);
+
+        for (Member toMember : cardAndBoardMembers) {
+            fcmTokenService.sendMessage(toMember, title, "", data);
+        }
+    }
+
     private Set<Member> getCardAndBoardMembers(Card card, Board board) {
         Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
                 board.getId());
