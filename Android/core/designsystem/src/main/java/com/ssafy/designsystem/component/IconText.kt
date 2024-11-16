@@ -44,7 +44,7 @@ fun IconText(
         Icon(
             imageVector = icon,
             contentDescription = iconDescription,
-            modifier = modifier.size(IconSmall),
+            modifier = Modifier.size(IconSmall),
             tint = tint
         )
         Spacer(modifier = Modifier.width(space))

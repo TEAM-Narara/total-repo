@@ -10,6 +10,7 @@ import com.ssafy.board.board.data.BoardDataMapper
 import com.ssafy.board.search.BoardSearchController
 import com.ssafy.card.CreateCardUseCase
 import com.ssafy.card.MoveCardUseCase
+import com.ssafy.card.SetCardArchiveUseCase
 import com.ssafy.list.CreateListUseCase
 import com.ssafy.list.GetLocalScreenListsInCardsFilterUseCase
 import com.ssafy.list.MoveListUseCase
@@ -48,6 +49,7 @@ class BoardViewModel @Inject constructor(
     private val createCardUseCase: CreateCardUseCase,
     private val moveListUseCase: MoveListUseCase,
     private val moveCardUseCase: MoveCardUseCase,
+    private val setCardArchiveUseCase: SetCardArchiveUseCase,
     getLabelUseCase: GetLabelUseCase,
     getBoardAndWorkspaceMemberUseCase: GetBoardAndWorkspaceMemberUseCase,
 ) : BaseViewModel() {
@@ -175,4 +177,16 @@ class BoardViewModel @Inject constructor(
     }
 
     fun addPhoto() {}
+
+    fun onListArchived(listId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        withSocketState { isConnected ->
+            setListArchiveUseCase(listId, isConnected)
+        }
+    }
+
+    fun onCardArchived(cardId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        withSocketState { isConnected ->
+            setCardArchiveUseCase(cardId, isConnected)
+        }
+    }
 }

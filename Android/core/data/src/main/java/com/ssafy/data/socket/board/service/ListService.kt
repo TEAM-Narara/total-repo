@@ -35,7 +35,7 @@ class ListService @Inject constructor(
         val before = listDao.getList(dto.listId) ?: throw Exception("존재하지 않는 리스트입니다.")
         listDao.updateList(
             before.copy(
-                isArchived = dto.isArchived,
+                isArchived = true,
                 isStatus = DataStatus.STAY,
                 columnUpdate = 0,
             )

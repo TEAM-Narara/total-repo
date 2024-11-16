@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mohamedrejeb.compose.dnd.drag.DropStrategy
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
+import com.mohamedrejeb.compose.dnd.reorder.ReorderState
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.ssafy.board.board.components.AddListButton
@@ -76,69 +77,83 @@ fun BoardScreen(
 
     LaunchedEffect(Unit) { viewModel.resetUiState() }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = boardData?.name ?: "",
-                onBackPressed = popBack,
-                onBoardNameChanged = viewModel::updateBoardName,
-                onFilterPressed = { isFilterScreenShow = true },
-                onNotificationPressed = navigateToNotificationScreen,
-                onMorePressed = {
-                    boardData?.let { navigateToBoardMenuScreen(it.id, it.workspaceId) }
+    val listReorderState = rememberReorderState<ListData>(dragAfterLongPress = true)
+    val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
+
+    ReorderContainer(state = listReorderState) {
+        ReorderContainer(state = cardReorderState) {
+            Scaffold(
+                modifier = modifier,
+                topBar = {
+                    TopAppBar(
+                        title = boardData?.name ?: "",
+                        onBackPressed = popBack,
+                        onBoardNameChanged = viewModel::updateBoardName,
+                        onFilterPressed = { isFilterScreenShow = true },
+                        onNotificationPressed = navigateToNotificationScreen,
+                        onMorePressed = {
+                            boardData?.let { navigateToBoardMenuScreen(it.id, it.workspaceId) }
+                        },
+                        listReorderState = listReorderState,
+                        onListArchived = viewModel::onListArchived,
+                        cardReorderState = cardReorderState,
+                        onCardArchived = viewModel::onCardArchived
+                    )
                 },
-            )
-        },
-    ) { paddingValues ->
+            ) { paddingValues ->
 
-        boardData?.let {
-            Box {
-                when (it.cover.type) {
+                boardData?.let {
+                    Box {
+                        when (it.cover.type) {
 
-                    CoverType.IMAGE -> {
-                        AsyncImage(
-                            model = it.cover.value,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "Board Cover",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    CoverType.COLOR -> {
-                        with(LocalContext.current as Activity) {
-                            val color = it.cover.value.toColor()
-                            WindowCompat.getInsetsController(window, window.decorView).apply {
-                                isAppearanceLightStatusBars = !color.isLight
-                                window.statusBarColor = color.toArgb()
+                            CoverType.IMAGE -> {
+                                AsyncImage(
+                                    model = it.cover.value,
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "Board Cover",
+                                    modifier = Modifier.fillMaxSize()
+                                )
                             }
+
+                            CoverType.COLOR -> {
+                                with(LocalContext.current as Activity) {
+                                    val color = it.cover.value.toColor()
+                                    WindowCompat.getInsetsController(window, window.decorView)
+                                        .apply {
+                                            isAppearanceLightStatusBars = !color.isLight
+                                            window.statusBarColor = color.toArgb()
+                                        }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color = it.cover.value.toColor())
+                                )
+                            }
+
+                            else -> {}
                         }
 
-                        Box(
+                        BoardScreen(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(color = it.cover.value.toColor())
+                                .padding(paddingValues),
+                            boardData = it,
+                            onListTitleChanged = viewModel::updateListName,
+                            onCardReordered = viewModel::updateCardOrder,
+                            onListReordered = viewModel::updateListOrder,
+                            navigateToCardScreen = navigateToCardScreen,
+                            addList = viewModel::addList,
+                            addCard = viewModel::addCard,
+                            addPhoto = viewModel::addPhoto,
+                            listReorderState = listReorderState,
+                            cardReorderState = cardReorderState,
                         )
                     }
-
-                    else -> {}
                 }
-
-                BoardScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    boardData = it,
-                    onListTitleChanged = viewModel::updateListName,
-                    onCardReordered = viewModel::updateCardOrder,
-                    onListReordered = viewModel::updateListOrder,
-                    navigateToCardScreen = navigateToCardScreen,
-                    addList = viewModel::addList,
-                    addCard = viewModel::addCard,
-                    addPhoto = viewModel::addPhoto
-                )
             }
-        } ?: LoadingScreen()
+        }
     }
 
     if (isFilterScreenShow) BoardSearchScreen(viewModel.boardSearchController) {
@@ -165,14 +180,14 @@ private fun BoardScreen(
     addList: (String) -> Unit,
     addCard: (Long, String) -> Unit,
     addPhoto: () -> Unit,
+    listReorderState: ReorderState<ListData> = rememberReorderState(dragAfterLongPress = true),
+    cardReorderState: ReorderState<ReorderCardData> = rememberReorderState(dragAfterLongPress = true)
 ) {
     val scope = rememberCoroutineScope()
 
-    val listReorderState = rememberReorderState<ListData>(dragAfterLongPress = true)
     var listCollection by remember(boardData.listCollection) { mutableStateOf(boardData.listCollection) }
     val listLazyListState = rememberLazyListState()
 
-    val cardReorderState = rememberReorderState<ReorderCardData>(dragAfterLongPress = true)
     val cardCollections = remember(listCollection) {
         mutableStateMapOf<Long, MutableState<List<ReorderCardData>>>().apply {
             listCollection.forEach { listData ->
@@ -183,93 +198,89 @@ private fun BoardScreen(
         }
     }
 
-    ReorderContainer(state = listReorderState) {
-        ReorderContainer(state = cardReorderState) {
-            LazyRow(
-                state = listLazyListState,
-                horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(vertical = PaddingDefault),
-                contentPadding = PaddingValues(horizontal = PaddingDefault)
-            ) {
-                items(listCollection, key = { it.id }) { listData ->
-                    ReorderableItem(
-                        requireFirstDownUnconsumed = true,
-                        state = listReorderState,
-                        key = listData.id,
-                        data = listData,
-                        dropStrategy = DropStrategy.CenterDistance,
-                        draggableContent = {
-                            ListItemShell(
-                                modifier = Modifier
-                                    .alpha(0.7f),
-                                title = listData.name,
-                                isWatching = listData.isWatching,
-                                cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
-                            )
-                        },
-                        onDragEnter = { state ->
-                            listCollection = listCollection.toMutableList().apply {
-                                val index = indexOf(listData)
-                                if (index == -1) return@apply
+    LazyRow(
+        state = listLazyListState,
+        horizontalArrangement = Arrangement.spacedBy(PaddingDefault),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(vertical = PaddingDefault),
+        contentPadding = PaddingValues(horizontal = PaddingDefault)
+    ) {
+        items(listCollection, key = { it.id }) { listData ->
+            ReorderableItem(
+                requireFirstDownUnconsumed = true,
+                state = listReorderState,
+                key = listData.id,
+                data = listData,
+                dropStrategy = DropStrategy.CenterDistance,
+                draggableContent = {
+                    ListItemShell(
+                        modifier = Modifier
+                            .alpha(0.7f),
+                        title = listData.name,
+                        isWatching = listData.isWatching,
+                        cards = listData.cardCollection.map { it.toReorderCardData(listData.id) }
+                    )
+                },
+                onDragEnter = { state ->
+                    listCollection = listCollection.toMutableList().apply {
+                        val index = indexOf(listData)
+                        if (index == -1) return@apply
 
-                                remove(state.data)
-                                add(index, state.data)
+                        remove(state.data)
+                        add(index, state.data)
 
-                                scope.launch {
-                                    handleLazyListScrollToCenter(
-                                        lazyListState = listLazyListState,
-                                        dropIndex = index,
-                                    )
-                                }
-                            }
-                        },
-                        onDrop = { state ->
-                            val listId = state.data.id
-                            val index = listCollection.indexOf(state.data)
-                            val prevCardId = if (index <= 0) null else listCollection[index - 1].id
-                            val nextCardId =
-                                if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
-                            onListReordered(listId, prevCardId, nextCardId)
-                        },
-                    ) {
-                        ListItem(
-                            modifier = Modifier
-                                .graphicsLayer { alpha = if (isDragging) 0f else 1f }
-                                .shadow(
-                                    if (isDragging) ElevationLarge else 0.dp,
-                                    shape = RoundedCornerShape(CornerMedium),
-                                ),
-                            listData = listData,
-                            reorderState = cardReorderState,
-                            cardCollections = cardCollections,
-                            onTitleChange = { onListTitleChanged(listData.id, it) },
-                            onCardReordered = onCardReordered,
-                            navigateToCardScreen = { id -> navigateToCardScreen(id) },
-                            addCard = addCard,
-                            addPhoto = addPhoto,
-                            onFocus = { listId ->
-                                scope.launch {
-                                    handleLazyListScrollToCenter(
-                                        lazyListState = listLazyListState,
-                                        dropIndex = listCollection.indexOfFirst { it.id == listId },
-                                    )
-                                }
-                            },
-                        )
-                    }
-                }
-
-                item {
-                    AddListButton(addList = addList) {
                         scope.launch {
                             handleLazyListScrollToCenter(
                                 lazyListState = listLazyListState,
-                                dropIndex = listCollection.size,
+                                dropIndex = index,
                             )
                         }
                     }
+                },
+                onDrop = { state ->
+                    val listId = state.data.id
+                    val index = listCollection.indexOf(state.data)
+                    val prevCardId = if (index <= 0) null else listCollection[index - 1].id
+                    val nextCardId =
+                        if (index < 0 || index >= listCollection.size - 1) null else listCollection[index + 1].id
+                    onListReordered(listId, prevCardId, nextCardId)
+                },
+            ) {
+                ListItem(
+                    modifier = Modifier
+                        .graphicsLayer { alpha = if (isDragging) 0f else 1f }
+                        .shadow(
+                            if (isDragging) ElevationLarge else 0.dp,
+                            shape = RoundedCornerShape(CornerMedium),
+                        ),
+                    listData = listData,
+                    reorderState = cardReorderState,
+                    cardCollections = cardCollections,
+                    onTitleChange = { onListTitleChanged(listData.id, it) },
+                    onCardReordered = onCardReordered,
+                    navigateToCardScreen = { id -> navigateToCardScreen(id) },
+                    addCard = addCard,
+                    addPhoto = addPhoto,
+                    onFocus = { listId ->
+                        scope.launch {
+                            handleLazyListScrollToCenter(
+                                lazyListState = listLazyListState,
+                                dropIndex = listCollection.indexOfFirst { it.id == listId },
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        item {
+            AddListButton(addList = addList) {
+                scope.launch {
+                    handleLazyListScrollToCenter(
+                        lazyListState = listLazyListState,
+                        dropIndex = listCollection.size,
+                    )
                 }
             }
         }
@@ -317,6 +328,6 @@ private fun BoardScreenPreview() {
         navigateToCardScreen = {},
         addList = {},
         addCard = { _, _ -> },
-        addPhoto = {}
+        addPhoto = {},
     )
 }

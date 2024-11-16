@@ -18,13 +18,13 @@ data class CardData(
     val myOrder: Long = 0L,
     val isArchived: Boolean = false,
 
-    val isWatching: Boolean,
-    val isSynced: Boolean,
+    val isWatching: Boolean = false,
+    val isSynced: Boolean = true,
 
-    val cardLabels: List<CardLabelWithLabelDTO>,
-    val cardMembers: List<MemberResponseDTO>,
-    val attachment: Boolean,
-    val replyCount: Int,
+    val cardLabels: List<CardLabelWithLabelDTO> = emptyList(),
+    val cardMembers: List<MemberResponseDTO> = emptyList(),
+    val attachment: Boolean = false,
+    val replyCount: Int = 0,
 )
 
 object CardDataMapper {
