@@ -14,11 +14,11 @@
 
    4) DB 접속 정보 등 프로젝트(ERD)에 활용되는 주요 계정 및 프로퍼티가 정의된 파일 목록  
     - Postgresql: 
-
-    - MongoDB: S11P12D201:gnghldjqtdlgkwk@ssafy.ngivl.mongodb.net/S11P12D201?authSource=admin
-        - user: S11P12D201
-        - password: gnghldjqtdlgkwk
-        
+        - user: 
+        - password:
+    - MongoDB: 
+        - user: 
+        - password:
     - Redis: 
 
 
@@ -30,7 +30,7 @@
 
 
 3. DB 덤프 파일 최신본  
-    - [dump1.zip]() : 스키마 전체 dml + ddl 압축 파일
+    - [dump.zip](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/master/exec/dump.zip) : 스키마 전체 dml + ddl 압축 파일
 
 4. 시연 시나리오  
-   [시연시나리오]() 파일에 따로 작성
+   [시연시나리오](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/master/exec/시연시나리오.md) 파일에 따로 작성
