@@ -77,7 +77,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                         try {
                             alarmService.sendAddCardMemberAlarm(manOfAction, cardMember);
                         } catch (FirebaseMessagingException e) {
-                            log.info("알람에러: sendAddCardMemberAlarm");
+                            log.info("알람에러: sendAddCardMemberAlarm \n" + e.getMessage());
                         }
                     } else {
                         boardOffsetService.saveDeleteCardMember(cardMember);
@@ -86,7 +86,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                         try {
                             alarmService.sendDeleteCardMemberAlarm(manOfAction, cardMember);
                         } catch (FirebaseMessagingException e) {
-                            log.info("알람에러: sendAddCardMemberAlarm");
+                            log.info("알람에러: sendAddCardMemberAlarm \n" + e.getMessage());
                         }
                     }
 
