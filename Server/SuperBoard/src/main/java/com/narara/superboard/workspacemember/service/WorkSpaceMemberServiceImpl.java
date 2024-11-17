@@ -118,7 +118,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
     @Transactional
     @Override
-    public WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority)
+    public WorkSpaceMember addMember(Member manOfAction, Long workspaceId, Long memberId, Authority authority)
             throws FirebaseMessagingException {
         WorkSpace workSpace = workSpaceRepository.findByIdAndIsDeletedFalse(workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("워크스페이스가 존재하지 않습니다"));
@@ -151,7 +151,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
         //[알림]
-        alarmService.sendAddWorkspaceMemberAlarm(member, workSpaceMember);
+        alarmService.sendAddWorkspaceMemberAlarm(manOfAction, workSpaceMember);
 
         return workSpaceMember;
     }
