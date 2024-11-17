@@ -149,7 +149,7 @@ class WorkSpaceMemberServiceTest {
 //                .willReturn(workSpaceMember);
 
         // when
-        WorkSpaceMember result = workSpaceMemberService.addMember(WORKSPACE_ID_1, MEMBER_ID_1, Authority.MEMBER);
+        WorkSpaceMember result = workSpaceMemberService.addMember(member, WORKSPACE_ID_1, MEMBER_ID_1, Authority.MEMBER);
 
         // then
         assertThat(result.getMember().getId()).isEqualTo(MEMBER_ID_1);
@@ -196,7 +196,7 @@ class WorkSpaceMemberServiceTest {
                 .willReturn(Optional.of(workSpaceMember));
 
         // when
-        WorkSpaceMember result = workSpaceMemberService.addMember(WORKSPACE_ID_1, MEMBER_ID_1, Authority.MEMBER);
+        WorkSpaceMember result = workSpaceMemberService.addMember(member, WORKSPACE_ID_1, MEMBER_ID_1, Authority.MEMBER);
 
         // then
         assertThat(result).isEqualTo(workSpaceMember);
