@@ -49,7 +49,8 @@ class SuperBoardFcmService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        handleMessage(remoteMessage)
+        runCatching { handleMessage(remoteMessage) }
+            .onFailure { it.printStackTrace() }
     }
 
     private fun handleMessage(remoteMessage: RemoteMessage) {
