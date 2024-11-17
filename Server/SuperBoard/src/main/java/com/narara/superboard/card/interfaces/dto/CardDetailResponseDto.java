@@ -15,7 +15,7 @@ public record CardDetailResponseDto(
         CoverDto cover
 ) {
     public static CardDetailResponseDto from(Card card) {
-        return from(card, null, null);
+        return from(card, (String) card.getCover().get("type"), (String) card.getCover().get("value"));
     }
 
     public static CardDetailResponseDto from(Card card, String coverType, String coverValue) {
