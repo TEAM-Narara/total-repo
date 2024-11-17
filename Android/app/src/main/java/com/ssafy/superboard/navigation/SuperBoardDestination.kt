@@ -1,5 +1,7 @@
 package com.ssafy.superboard.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -77,7 +79,9 @@ fun SuperBoardNavHost(
     NavHost(
         navController = navController,
         startDestination = if (direction == StartDirection.LOGIN) LogIn else Home(),
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
     ) {
 
         loginScreen(
