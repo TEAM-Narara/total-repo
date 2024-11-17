@@ -82,7 +82,7 @@ interface ListDao {
         WHERE boardId = :boardId 
             AND isStatus != 'DELETE'
             AND isArchived = 0
-        ORDER BY myOrder DESC
+        ORDER BY myOrder DESC, id DESC
         LIMIT 1
     """)
     fun getListInBoardToBottom(boardId: Long): ListEntity?

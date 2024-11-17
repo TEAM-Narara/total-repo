@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.list
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.CardDao
@@ -66,16 +67,21 @@ class ListRepositoryImpl @Inject constructor(
         if (isConnected) {
             listDataSource.createList(createListRequestDto).map { it.listId }
         } else {
+            val board = boardDao.getBoard(createListRequestDto.boardId) ?: throw Exception("존재하지 않는 보드 입니다.")
             val localListId = negativeIdGenerator.getNextNegativeId(LocalTable.LIST)
+            val lastListOrder = board.lastListOrder + LARGE_INCREMENT
 
             listDao.insertList(
                 ListEntity(
                     id = localListId,
                     name = createListRequestDto.listName,
                     boardId = createListRequestDto.boardId,
-                    isStatus = DataStatus.CREATE
+                    isStatus = DataStatus.CREATE,
+                    myOrder = lastListOrder
                 )
             )
+
+            boardDao.updateBoard(board.copy(lastListOrder = lastListOrder))
 
             createListMember(
                 listId = localListId,

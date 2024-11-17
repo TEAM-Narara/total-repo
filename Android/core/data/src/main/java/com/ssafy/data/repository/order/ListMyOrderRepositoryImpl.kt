@@ -64,7 +64,7 @@ class ListMyOrderRepositoryImpl @Inject constructor(
         val bottomList = listDao.getListInBoardToBottom(boardId = board.id)
 
         // 이미 최하단
-        if (bottomList != null && targetList.myOrder == bottomList.myOrder) {
+        if (bottomList != null && targetList.id == bottomList.id) {
             return ListMoveResult.ReorderedListMove(
                 listOf(
                     ListMoveResponseDto(

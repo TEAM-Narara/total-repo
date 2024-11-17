@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.card
 
 import com.ssafy.data.di.IoDispatcher
+import com.ssafy.data.repository.order.MoveConst.LARGE_INCREMENT
 import com.ssafy.database.dao.AttachmentDao
 import com.ssafy.database.dao.BoardDao
 import com.ssafy.database.dao.CardDao
@@ -74,7 +75,9 @@ class CardRepositoryImpl @Inject constructor(
         if (isConnected) {
             cardDataSource.createCard(cardRequestDto).map { it.cardSimpleResponseDto.cardId }
         } else {
+            val list = listDao.getList(cardRequestDto.listId) ?: throw Exception("존재하지 않는 리스트 입니다.")
             val localCardId = negativeIdGenerator.getNextNegativeId(LocalTable.CARD)
+            val lastCardOrder = list.lastCardOrder + LARGE_INCREMENT
 
             cardDao.insertCard(
                 CardEntity(
@@ -84,8 +87,11 @@ class CardRepositoryImpl @Inject constructor(
                     isStatus = DataStatus.CREATE,
                     coverType = CoverType.NONE.name,
                     coverValue = "NONE",
+                    myOrder = lastCardOrder
                 )
             )
+
+            listDao.updateList(list.copy(lastCardOrder = lastCardOrder))
 
             createCardMember(
                 cardId = localCardId,
@@ -160,7 +166,10 @@ class CardRepositoryImpl @Inject constructor(
         isConnected: Boolean
     ): Flow<Unit> = withContext(ioDispatcher) {
         if (isConnected) {
-            cardDataSource.moveCard(targetListId, CardMoveUpdateListRequestDTO(cardMoveUpdateRequestDTO))
+            cardDataSource.moveCard(
+                targetListId,
+                CardMoveUpdateListRequestDTO(cardMoveUpdateRequestDTO)
+            )
         } else {
             val recalculatedListId = mutableSetOf<Long>()
 
