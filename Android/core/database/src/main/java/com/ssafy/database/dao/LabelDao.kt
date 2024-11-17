@@ -55,7 +55,7 @@ interface LabelDao {
     suspend fun getLocalOperationLabels(): List<LabelEntity>
 
     // 로컬에서 생성
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLabel(label: LabelEntity): Long
 
     // 서버 변경사항 동기화

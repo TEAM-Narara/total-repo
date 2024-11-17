@@ -16,6 +16,6 @@ data class ListEntity(
 //    val version: Long = 0L,
 
     val isStatus: DataStatus = DataStatus.STAY,
-    val lastCardOrder: Long = 0L,
+    val lastCardOrder: Long = 4000000000000000000L,
     val columnUpdate: Long = 0L
 )

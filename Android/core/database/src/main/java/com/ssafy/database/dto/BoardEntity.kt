@@ -19,7 +19,7 @@ data class BoardEntity(
 //    val offset: Long = 0L,
 //    val version: Long = 0L
 
-    val lastListOrder: Long = 0L,
+    val lastListOrder: Long = 4000000000000000000L,
     val isStatus: DataStatus = DataStatus.STAY,
     val columnUpdate: Long = 0L,
 )

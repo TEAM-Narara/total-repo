@@ -3,12 +3,14 @@ package com.ssafy.data.socket.workspace
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.socket.BaseStompManager
 import com.ssafy.data.socket.workspace.service.WorkspaceService
+import com.ssafy.network.socket.StompMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,24 +33,27 @@ class WorkspaceStomp @Inject constructor(
 
         _job = CoroutineScope(ioDispatcher).launch {
             runCatching {
-                stomp.subscribe("workspace/$workspaceId").produceIn(CoroutineScope(ioDispatcher)).receiveAsFlow().buffer().collect {
-                    when (it.action) {
-                        "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(it.data)
-                        "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(it.data)
-                        "ADD_WORKSPACE_MEMBER" -> workspaceService.addMember(it.data)
-                        "DELETE_WORKSPACE_MEMBER" -> workspaceService.deleteMember(it.data)
-                        "EDIT_WORKSPACE_MEMBER" -> workspaceService.editMember(it.data)
-                        "ADD_BOARD" -> workspaceService.addBoard(it.data)
-                        "EDIT_BOARD" -> workspaceService.editBoard(it.data)
-                        "DELETE_BOARD" -> workspaceService.deleteBoard(it.data)
-                        "EDIT_ARCHIVE_BOARD" -> workspaceService.editArchivedBoard(it.data)
-                        else -> {}
+                stomp.subscribe("workspace/$workspaceId").buffer(Channel.BUFFERED).produceIn(this)
+                    .consumeEach { message ->
+                        handleMessage(message)
                     }
-                }
             }.onFailure { e ->
                 e.printStackTrace()
             }
         }
+    }
+
+    private suspend fun handleMessage(message: StompMessage) = when (message.action) {
+        "DELETE_WORKSPACE" -> workspaceService.deleteWorkSpace(message.data)
+        "EDIT_WORKSPACE" -> workspaceService.editWorkSpace(message.data)
+        "ADD_WORKSPACE_MEMBER" -> workspaceService.addMember(message.data)
+        "DELETE_WORKSPACE_MEMBER" -> workspaceService.deleteMember(message.data)
+        "EDIT_WORKSPACE_MEMBER" -> workspaceService.editMember(message.data)
+        "ADD_BOARD" -> workspaceService.addBoard(message.data)
+        "EDIT_BOARD" -> workspaceService.editBoard(message.data)
+        "DELETE_BOARD" -> workspaceService.deleteBoard(message.data)
+        "EDIT_ARCHIVE_BOARD" -> workspaceService.editArchivedBoard(message.data)
+        else -> {}
     }
 
     fun disconnect() {

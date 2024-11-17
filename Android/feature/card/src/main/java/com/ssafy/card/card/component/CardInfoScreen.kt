@@ -121,7 +121,7 @@ fun LazyListScope.cardInfoScreen(
         )
     }
 
-    item(key = cardDTO.content + isContentFocus) {
+    item(key = cardDTO.content) {
         EditableMarkDownText(
             modifier = modifier,
             icon = Icons.AutoMirrored.Default.Notes,

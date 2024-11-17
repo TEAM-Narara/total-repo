@@ -17,7 +17,6 @@ import com.ssafy.network.socket.StompMessage
 import com.ssafy.network.socket.StompResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -79,7 +78,6 @@ class BaseStompManager @Inject constructor(
                                 response.data,
                                 object : TypeToken<List<StompFetchMessage>>() {}.type
                             ).forEach {
-                                delay(50)
                                 emit(it.message)
                             }
                         }
