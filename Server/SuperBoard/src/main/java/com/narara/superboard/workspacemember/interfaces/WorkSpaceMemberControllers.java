@@ -78,9 +78,9 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Operation(summary = "워크스페이스 멤버 추가")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'ADMIN')") //WORKSPACE의 ADMIN만 추가가능
     @PostMapping("/{workspaceId}/members")
-    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> addWorkspaceMember(@PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto)
+    public ResponseEntity<DefaultResponse<WorkspaceMemberDto>> addWorkspaceMember(@AuthenticationPrincipal Member member, @PathVariable Long workspaceId, @RequestBody WorkspaceMemberRequest requestDto)
             throws FirebaseMessagingException {
-        WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(workspaceId, requestDto.memberId(),
+        WorkSpaceMember workSpaceMember = workSpaceMemberService.addMember(member, workspaceId, requestDto.memberId(),
                 requestDto.authority());
 
         return ResponseEntity.ok(
