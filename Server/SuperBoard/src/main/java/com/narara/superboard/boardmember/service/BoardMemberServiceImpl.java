@@ -158,7 +158,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         boardHistoryRepository.save(boardHistory);
 
         //[알림]
-        alarmService.sendAddBoardMemberAlarm(member, boardMember);
+        alarmService.sendAddBoardMemberAlarm(member, newBoardMember);
 
         return newBoardMember;
     }
