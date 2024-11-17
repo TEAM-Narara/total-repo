@@ -67,15 +67,6 @@ fun SuperBoardNavHost(
     val authEvent by viewModel.authEvent.collectAsStateWithLifecycle(false)
     val connectingEvent by ConnectManager.connectingEvent.collectAsStateWithLifecycle(false)
 
-    if (authEvent) {
-        navController.navigate(LogIn) { popUpAll(navController) }
-        ErrorScreen(errorMessage = AuthManager.NO_AUTH)
-    }
-
-    if (connectingEvent) {
-        LoadingScreen(text = ConnectManager.CONNECTING)
-    }
-
     NavHost(
         navController = navController,
         startDestination = if (direction == StartDirection.LOGIN) LogIn else Home(),
@@ -252,6 +243,15 @@ fun SuperBoardNavHost(
                 }
             }
         }
+    }
+
+    if (authEvent) {
+        navController.navigate(LogIn) { popUpAll(navController) }
+        ErrorScreen(errorMessage = AuthManager.NO_AUTH)
+    }
+
+    if (connectingEvent) {
+        LoadingScreen(text = ConnectManager.CONNECTING)
     }
 
 }
