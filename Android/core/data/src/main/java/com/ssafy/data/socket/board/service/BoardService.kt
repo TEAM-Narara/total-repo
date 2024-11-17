@@ -1,5 +1,6 @@
 package com.ssafy.data.socket.board.service
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.ssafy.data.image.ImageStorage
@@ -34,6 +35,7 @@ class BoardService @Inject constructor(
         val dto = gson.fromJson(data, AddBoardMemberRequestDto::class.java)
 
         if (memberDao.getMember(dto.memberId) == null) imageStorage.saveAll(key = dto.profileImgUrl) { path ->
+            Log.d("TAG", "addBoardMember: $path")
             memberDao.insertMember(
                 MemberEntity(
                     id = dto.memberId,

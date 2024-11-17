@@ -46,6 +46,7 @@ class BoardStomp @Inject constructor(
             runCatching {
                 stomp.subscribe("board/$boardId").buffer(Channel.BUFFERED).produceIn(this)
                     .consumeEach { message ->
+                        Log.d("TAG", "consumeEach: $message")
                         handleMessage(message)
                     }
             }.onFailure { e ->

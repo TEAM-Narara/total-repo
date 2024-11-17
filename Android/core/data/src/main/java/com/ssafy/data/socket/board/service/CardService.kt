@@ -62,7 +62,7 @@ class CardService @Inject constructor(
         val dto = gson.fromJson(data, EditCardRequestDto::class.java)
         val before = cardDao.getCard(dto.cardId) ?: throw Exception("존재하지 않는 카드입니다.")
 
-        if(dto.coverType == CoverType.IMAGE.type){
+        if (dto.coverType == CoverType.IMAGE.type) {
             imageStorage.saveAll(key = dto.coverValue) { path ->
                 cardDao.updateCard(
                     before.copy(
@@ -78,7 +78,7 @@ class CardService @Inject constructor(
                     )
                 )
             }
-        }else{
+        } else {
             cardDao.updateCard(
                 before.copy(
                     name = dto.name,
@@ -133,10 +133,21 @@ class CardService @Inject constructor(
     suspend fun deleteCardMember(data: JsonObject) {
         val dto = gson.fromJson(data, DeleteCardMemberRequestDto::class.java)
         val before = cardMemberDao.getCardMember(dto.cardId, dto.memberId)
-            ?: throw Exception("존재하지 않는 사용자 입니다.")
-        cardMemberDao.updateCardMember(
-            before.copy(isRepresentative = false, isStatus = DataStatus.STAY)
-        )
+
+        if (before != null) {
+            cardMemberDao.updateCardMember(
+                before.copy(isRepresentative = false, isStatus = DataStatus.STAY)
+            )
+        } else {
+            cardMemberDao.insertCardMember(
+                CardMemberEntity(
+                    id = dto.cardMemberId,
+                    cardId = dto.cardId,
+                    memberId = dto.memberId,
+                    isRepresentative = false,
+                )
+            )
+        }
     }
 
     suspend fun addCardLabel(data: JsonObject) {

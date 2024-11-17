@@ -78,6 +78,7 @@ class BaseStompManager @Inject constructor(
                                 response.data,
                                 object : TypeToken<List<StompFetchMessage>>() {}.type
                             ).forEach {
+                                Log.d("TAG", "onDataReleased: ${it.message}")
                                 emit(it.message)
                             }
                         }

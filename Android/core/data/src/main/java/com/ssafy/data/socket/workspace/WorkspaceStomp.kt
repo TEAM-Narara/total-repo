@@ -1,5 +1,6 @@
 package com.ssafy.data.socket.workspace
 
+import android.util.Log
 import com.ssafy.data.di.IoDispatcher
 import com.ssafy.data.socket.BaseStompManager
 import com.ssafy.data.socket.workspace.service.WorkspaceService
@@ -35,6 +36,7 @@ class WorkspaceStomp @Inject constructor(
             runCatching {
                 stomp.subscribe("workspace/$workspaceId").buffer(Channel.BUFFERED).produceIn(this)
                     .consumeEach { message ->
+                        Log.d("TAG", "consumeEach: $message")
                         handleMessage(message)
                     }
             }.onFailure { e ->
