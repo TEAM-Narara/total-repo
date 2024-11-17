@@ -56,7 +56,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,7 +138,7 @@ public class BoardServiceImpl implements BoardService {
         CreateBoardInfo createBoardInfo = new CreateBoardInfo(board.getId(), board.getName(), workSpace.getName());
 
         BoardHistory<CreateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CREATE,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), board, EventType.CREATE,
                 EventData.BOARD, createBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -167,7 +167,7 @@ public class BoardServiceImpl implements BoardService {
                 board.getWorkSpace().getName());
 
         BoardHistory<DeleteBoardInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.DELETE,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), board, EventType.DELETE,
                 EventData.BOARD, deleteBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -206,7 +206,7 @@ public class BoardServiceImpl implements BoardService {
         BoardHistory<UpdateBoardInfo> boardHistory = BoardHistory.createBoardHistory(
                 memberRepository.findByIdAndIsDeletedFalse(memberId)
                         .orElseThrow(() -> new NotFoundEntityException(memberId, "멤버")),
-                LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
+                LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)),
                 updatedBoard, EventType.UPDATE, EventData.BOARD, updateBoardInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -233,7 +233,7 @@ public class BoardServiceImpl implements BoardService {
                 board.getIsArchived());
 
         BoardHistory<ArchiveStatusChangeInfo> boardHistory = BoardHistory.createBoardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), board, EventType.CLOSE,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), board, EventType.CLOSE,
                 EventData.BOARD, archiveStatusChangeInfo);
 
         boardHistoryRepository.save(boardHistory);

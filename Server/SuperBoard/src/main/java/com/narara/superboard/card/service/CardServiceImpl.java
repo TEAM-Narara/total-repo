@@ -39,7 +39,8 @@ import com.narara.superboard.reply.interfaces.dto.ReplyInfo;
 import com.narara.superboard.websocket.constant.Action;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
@@ -95,7 +96,7 @@ public class CardServiceImpl implements CardService {
                 savedCard.getName());
 
         CardHistory<CreateCardInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), list.getBoard(), savedCard,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), list.getBoard(), savedCard,
                 EventType.CREATE, EventData.CARD, createCardInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -125,7 +126,7 @@ public class CardServiceImpl implements CardService {
                 card.getId(), card.getName());
 
         CardHistory<DeleteCardInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(),
                 card,
                 EventType.DELETE, EventData.CARD, deleteCardInfo);
 
@@ -156,7 +157,7 @@ public class CardServiceImpl implements CardService {
                 updatedCard.getList().getName(), updatedCard.getId(), updatedCard.getName());
 
         CardHistory<UpdateCardInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)),
                 updatedCard.getList().getBoard(), updatedCard,
                 EventType.UPDATE, EventData.CARD, updateCardInfo);
 
@@ -197,7 +198,7 @@ public class CardServiceImpl implements CardService {
                 card.getIsArchived());
 
         CardHistory<ArchiveStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(),
                 card,
                 EventType.ARCHIVE, EventData.CARD, archiveStatusChangeInfo);
 
