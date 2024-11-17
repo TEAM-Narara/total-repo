@@ -102,12 +102,6 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     }
 
     private FcmToken getFcmToken(Member member) {
-        System.out.println("getFcmToken");
-        System.out.println(member.getId());
-        System.out.println(member.getNickname());
-        System.out.println(member.getEmail());
-        System.out.println(fcmTokenRepository.findFirstByMemberId(member.getId()).get());
-        System.out.println("end");
         return fcmTokenRepository.findFirstByMemberId(member.getId())
                 .orElseThrow(() -> new NotFoundException("fcm토큰", "토큰"));
     }
