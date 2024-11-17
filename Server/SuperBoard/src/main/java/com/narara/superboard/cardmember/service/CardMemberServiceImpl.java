@@ -65,6 +65,8 @@ public class CardMemberServiceImpl implements CardMemberService {
         Card card = validateCardExists(updateCardMemberRequestDto.cardId());
         Member inviteMember = validateMemberExists(updateCardMemberRequestDto.memberId());
 
+        System.out.println("요청한 사람 : " + manOfAction.getNickname());
+        System.out.println("요청한 사람 : " + manOfAction.getEmail());
         return cardMemberRepository.findByCardIdAndMemberId(
                         updateCardMemberRequestDto.cardId(), updateCardMemberRequestDto.memberId())
                 .map(cardMember -> {
