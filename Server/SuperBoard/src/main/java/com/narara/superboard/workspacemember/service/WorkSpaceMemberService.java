@@ -13,7 +13,7 @@ public interface WorkSpaceMemberService {
     WorkSpaceListResponseDto getMemberWorkspaceList(Member member);
 
     WorkSpaceMember editAuthority(Long memberId, Long workspaceId, Authority authority);
-    WorkSpaceMember addMember(Long workspaceId, Long memberId, Authority authority) throws FirebaseMessagingException;
+    WorkSpaceMember addMember(Member member, Long workspaceId, Long memberId, Authority authority) throws FirebaseMessagingException;
     WorkSpaceMember deleteMember(Member member, Long workspaceId, Long memberId) throws FirebaseMessagingException;
 
     List<WorkSpaceMember> getWorkspaceMember(Long workspaceId);
