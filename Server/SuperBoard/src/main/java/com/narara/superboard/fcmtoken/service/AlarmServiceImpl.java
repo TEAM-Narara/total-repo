@@ -440,6 +440,7 @@ public class AlarmServiceImpl implements AlarmService {
                 fcmTokenService.sendMessage(toMember, title, "", data);
             }
         }
+        fcmTokenService.sendMessage(cardMember.getMember(),title,"",data);
     }
 
     @Override
