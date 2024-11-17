@@ -434,13 +434,16 @@ public class AlarmServiceImpl implements AlarmService {
 
         for (Member toMember : cardAndBoardMembers) {
             saveMongo(toMember, title, "", data);
-
+            System.out.println("보내는 멤버 :" + toMember.getNickname());
+            System.out.println("보내는 멤버 :" + toMember.getEmail());
             if (!toMember.getId().equals(manOfAction.getId())) {
                 //내가 한 짓은 알림이 오지 않아야함
                 fcmTokenService.sendMessage(toMember, title, "", data);
             }
         }
         fcmTokenService.sendMessage(cardMember.getMember(),title,"",data);
+        System.out.println("보내는 멤버 :" + cardMember.getMember().getNickname());
+        System.out.println("보내는 멤버 :" + cardMember.getMember().getEmail());
     }
 
     @Override
@@ -571,7 +574,15 @@ public class AlarmServiceImpl implements AlarmService {
         Set<Member> allMemberByBoardAndWatchTrue = boardMemberRepository.findAllMemberByBoardAndWatchTrue(
                 board.getId());
         Set<Member> allMemberByCardAndWatchTrue = cardMemberRepository.findAllMemberByCardAndWatchTrue(card.getId());
-
+        for (Member member : allMemberByCardAndWatchTrue) {
+            System.out.println("보드 와치 트루 멤버: " + member.getNickname());
+            System.out.println("보드 와치 트루 멤버: " + member.getEmail());
+        }
+        for (Member member : allMemberByCardAndWatchTrue) {
+            System.out.println("카드 와치 트루 멤버: " + member.getNickname());
+            System.out.println("카드 와치 트루 멤버: " + member.getEmail());
+        }
+        System.out.println("그래서 누구한테 보내냐??");
         return Stream.concat(
                 allMemberByBoardAndWatchTrue.stream(),
                 allMemberByCardAndWatchTrue.stream()
