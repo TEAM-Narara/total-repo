@@ -467,7 +467,7 @@ public class AlarmServiceImpl implements AlarmService {
 
         //여창민님이 백엔드 보드의 알림만들기 카드에서 나를 삭제하였습니다.
         String title = String.format(
-                "*%s*님이 *%s* 보드의 *%s* 카드에서 *%s*를 삭제하였습니다",
+                "*%s*님이 *%s* 보드의 *%s* 카드에서 *%s*(을)를 삭제하였습니다",
                 manOfAction.getNickname(),
                 board.getName(),
                 card.getName(),
