@@ -151,7 +151,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
         workspaceOffsetService.saveAddMemberDiff(workSpaceMember);
 
         //[알림]
-        alarmService.sendAddWorkspaceMemberAlarm(member, workspaceMember);
+        alarmService.sendAddWorkspaceMemberAlarm(member, workSpaceMember);
 
         return workSpaceMember;
     }
