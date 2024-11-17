@@ -91,6 +91,7 @@ fun TopAppBar(
         )
 
         if (listReorderState.draggedItem?.data != null) ReorderableItem(
+            enabled = false,
             modifier = Modifier.align(Alignment.Center),
             state = listReorderState,
             key = "List Archive Item",
@@ -105,6 +106,7 @@ fun TopAppBar(
         }
 
         if (cardReorderState.draggedItem?.data != null) ReorderableItem(
+            enabled = false,
             modifier = Modifier.align(Alignment.Center),
             state = cardReorderState,
             key = "Card Archive Item",

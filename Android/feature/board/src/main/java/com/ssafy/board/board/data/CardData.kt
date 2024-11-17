@@ -7,9 +7,9 @@ import com.ssafy.model.with.CoverType
 import com.ssafy.model.with.DataStatus
 
 data class CardData(
-    val id: Long,
-    val listId: Long,
-    val name: String,
+    val id: Long = 0,
+    val listId: Long = 0,
+    val name: String = "",
     val description: String? = null,
     val startAt: Long? = null,
     val endAt: Long? = null,
