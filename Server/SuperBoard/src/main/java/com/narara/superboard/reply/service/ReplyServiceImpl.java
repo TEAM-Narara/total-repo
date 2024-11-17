@@ -23,7 +23,7 @@ import com.narara.superboard.reply.interfaces.dto.ReplyUpdateRequestDto;
 import com.narara.superboard.websocket.enums.ReplyAction;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -68,7 +68,7 @@ public class ReplyServiceImpl implements ReplyService{
         ReplyInfo createReplyInfo = new ReplyInfo(card.getId(), card.getName(), reply.getId(), reply.getContent());
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(), card,
                 EventType.CREATE, EventData.COMMENT, createReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -106,7 +106,7 @@ public class ReplyServiceImpl implements ReplyService{
         ReplyInfo updateReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(), reply.getId(), reply.getContent());
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.UPDATE, EventData.COMMENT, updateReplyInfo);
 
         cardHistoryRepository.save(cardHistory);
@@ -127,7 +127,7 @@ public class ReplyServiceImpl implements ReplyService{
         ReplyInfo deleteReplyInfo = new ReplyInfo(reply.getCard().getId(), reply.getCard().getName(),reply.getId(), reply.getContent());
 
         CardHistory<ReplyInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), reply.getCard().getList().getBoard(), reply.getCard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), reply.getCard().getList().getBoard(), reply.getCard(),
                 EventType.DELETE, EventData.COMMENT, deleteReplyInfo);
 
         cardHistoryRepository.save(cardHistory);

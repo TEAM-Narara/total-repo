@@ -16,12 +16,13 @@ import com.narara.superboard.common.exception.NotFoundEntityException;
 import com.narara.superboard.fcmtoken.service.AlarmService;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.member.infrastructure.MemberRepository;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Slf4j
 @Service
@@ -94,7 +95,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                             inviteMember.getId(), inviteMember.getNickname(), card.getId(), card.getName(), cardMember.isRepresentative());
 
                     CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
-                            inviteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                            inviteMember, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(), card,
                             EventType.UPDATE, EventData.CARD_MANAGER, repStatusChangeInfo);
 
                     cardHistoryRepository.save(cardHistory);
@@ -117,7 +118,7 @@ public class CardMemberServiceImpl implements CardMemberService {
                 member.getId(), member.getNickname(), card.getId(), card.getName(),newCardMember.isRepresentative());
 
         CardHistory<RepresentativeStatusChangeInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(), card,
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(), card,
                 EventType.ADD, EventData.CARD_MANAGER, newRepCardMemberInfo);
 
         cardHistoryRepository.save(cardHistory);

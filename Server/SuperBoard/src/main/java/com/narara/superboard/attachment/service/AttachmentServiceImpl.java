@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 
 @Slf4j
@@ -56,7 +56,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 isCover);
 
         CardHistory<AddAttachmentInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(),
                 card,
                 EventType.CREATE, EventData.ATTACHMENT, addAttachmentInfo);
 
@@ -89,7 +89,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 card.getId(), card.getName(), attachmentId, attachment.getUrl(), attachment.getIsCover());
 
         CardHistory<DeleteAttachmentInfo> cardHistory = CardHistory.createCardHistory(
-                member, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond(), card.getList().getBoard(),
+                member, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)), card.getList().getBoard(),
                 card,
                 EventType.DELETE, EventData.ATTACHMENT, deleteAttachmentInfo);
 

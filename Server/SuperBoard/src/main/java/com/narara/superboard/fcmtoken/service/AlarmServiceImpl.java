@@ -16,7 +16,7 @@ import com.narara.superboard.reply.entity.Reply;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +81,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAddWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember)
             throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_ADD_WORKSPACE_MEMBER");
@@ -111,7 +111,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendDeleteWorkspaceMemberAlarm(Member manOfAction, WorkSpaceMember workSpaceMember)
             throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "ME_REMOVE_WORKSPACE_MEMBER");
@@ -138,7 +138,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendArchiveBoard(Member manOfAction, Board board) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         HashMap<String, String> data = new HashMap<>();
         data.put("type", "CLOSE_BOARD");
@@ -164,7 +164,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddBoardMemberAlarm(Member manOfAction, BoardMember boardMember) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = boardMember.getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -198,7 +198,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendDeleteBoardMemberAlarm(Member manOfAction, BoardMember boardMember)
             throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = boardMember.getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -230,7 +230,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -287,7 +287,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendMoveCardAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -327,7 +327,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public void sendAddCardAttachmentAlarm(Member manOfAction, Attachment attachment)
             throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Card card = attachment.getCard();
         Board board = card.getList().getBoard();
@@ -366,7 +366,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddReplyAlarm(Member manOfAction, Reply reply) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Card card = reply.getCard();
         Board board = card.getList().getBoard();
@@ -405,7 +405,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Card card = cardMember.getCard();
         Board board = card.getList().getBoard();
@@ -444,7 +444,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendDeleteCardMemberAlarm(Member manOfAction, CardMember cardMember) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Card card = cardMember.getCard();
         Board board = card.getList().getBoard();
@@ -483,7 +483,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendArchiveCard(Member manOfAction, Card card) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
@@ -530,7 +530,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void sendAddCardDueDateAlarm(Member manOfAction, Card card) throws FirebaseMessagingException {
-        String createdAt = String.valueOf(LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond());
+        String createdAt = String.valueOf(LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9)));
 
         Board board = card.getList().getBoard();
         WorkSpace workSpace = board.getWorkSpace();
