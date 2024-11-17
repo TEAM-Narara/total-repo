@@ -92,8 +92,9 @@ public class AlarmServiceImpl implements AlarmService {
 
         //주효림이 당신을 날아라 워크스페이스에 admin으로 추가하였습니다
         String title = String.format(
-                "*%s*님이 당신을 *%s* 워크스페이스에 %s 권한으로 추가하였습니다",
+                "*%s*님이 *%s*을 *%s* 워크스페이스에 %s 권한으로 추가하였습니다",
                 manOfAction.getNickname(),
+                workSpaceMember.getMember().getNickname(),
                 workSpaceMember.getWorkSpace().getName(),
                 workSpaceMember.getAuthority().name()
         );
@@ -106,6 +107,14 @@ public class AlarmServiceImpl implements AlarmService {
             //내가 한 짓은 알림이 오지 않아야함
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
+
+        title = String.format(
+                "*%s*님이 당신을 *%s* 워크스페이스에 %s 권한으로 추가하였습니다",
+                manOfAction.getNickname(),
+                workSpaceMember.getWorkSpace().getName(),
+                workSpaceMember.getAuthority().name()
+        );
+        fcmTokenService.sendMessage(workSpaceMember.getMember(), title, "", data);
     }
 
     @Override
@@ -179,8 +188,9 @@ public class AlarmServiceImpl implements AlarmService {
 
         //주효림이 당신을 백엔드 보드에 admin으로 추가하였습니다.
         String title = String.format(
-                "*%s*님이 당신을 *%s* 보드에 %s 권한으로 추가하였습니다",
+                "*%s*님이 *%s*을 *%s* 보드에 %s 권한으로 추가하였습니다",
                 manOfAction.getNickname(),
+                boardMember.getMember().getNickname(),
                 board.getName(),
                 boardMember.getAuthority().name()
         );
@@ -193,6 +203,13 @@ public class AlarmServiceImpl implements AlarmService {
             //내가 한 짓은 알림이 오지 않아야함
             fcmTokenService.sendMessage(toMember, title, "", data);
         }
+        title = String.format(
+                "*%s*님이 당신을 *%s* 보드에 %s 권한으로 추가하였습니다",
+                manOfAction.getNickname(),
+                board.getName(),
+                boardMember.getAuthority().name()
+        );
+        fcmTokenService.sendMessage(boardMember.getMember(), title, "", data);
     }
 
     @Override
@@ -213,8 +230,9 @@ public class AlarmServiceImpl implements AlarmService {
 
         //주효림이 당신을 백엔드 보드에서 삭제하였습니다
         String title = String.format(
-                "*%s*님이 당신을 *%s* 보드에서 삭제하였습니다",
+                "*%s*님이 *%s*을 *%s* 보드에서 삭제하였습니다",
                 manOfAction.getNickname(),
+                boardMember.getMember().getNickname(),
                 board.getName()
         );
 
@@ -440,7 +458,7 @@ public class AlarmServiceImpl implements AlarmService {
                 fcmTokenService.sendMessage(toMember, title, "", data);
             }
         }
-        fcmTokenService.sendMessage(cardMember.getMember(),title,"",data);
+        fcmTokenService.sendMessage(cardMember.getMember(), title, "", data);
     }
 
     @Override
