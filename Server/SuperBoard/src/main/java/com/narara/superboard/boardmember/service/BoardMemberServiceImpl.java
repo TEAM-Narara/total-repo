@@ -14,7 +14,7 @@ import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 
 import com.narara.superboard.fcmtoken.service.AlarmService;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -152,7 +152,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         AddBoardMemberInfo addBoardMemberInfo = new AddBoardMemberInfo(inviteMember.getId(), inviteMember.getNickname(), boardId, board.getName());
 
         BoardHistory<AddBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
-                inviteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                inviteMember, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9))
                 , board, EventType.ADD, EventData.BOARD_MEMBER, addBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
@@ -201,7 +201,7 @@ public class BoardMemberServiceImpl implements BoardMemberService {
         DeleteBoardMemberInfo deleteBoardMemberInfo = new DeleteBoardMemberInfo(deleteMember.getId(), deleteMember.getNickname(), boardId, board.getName());
 
         BoardHistory<DeleteBoardMemberInfo> boardHistory = BoardHistory.createBoardHistory(
-                deleteMember, LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toEpochSecond()
+                deleteMember, LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(9))
                 , board, EventType.DELETE, EventData.BOARD_MEMBER, deleteBoardMemberInfo);
 
         boardHistoryRepository.save(boardHistory);
