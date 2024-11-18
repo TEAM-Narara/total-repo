@@ -3,5 +3,5 @@
 	url = https://lab.ssafy.com/si4018/s107-secret-value.git
 
 [submodule "Server/config-s107"]
-	path = Server/SuperBoard/config-s107
+	path = Server/config-s107
 	url = https://lab.ssafy.com/si4018/config-s107.git
