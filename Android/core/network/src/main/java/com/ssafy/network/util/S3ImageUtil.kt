@@ -131,7 +131,21 @@ class S3ImageUtil @Inject constructor(
             .withExpiration(date)
 
         val url = s3Client.generatePresignedUrl(generatedUrlRequest).toString()
-        val file = File(imageDirectory, key)
+        val file = if (key.contains("/")) {
+            // 마지막 "/" 위치를 찾아 디렉토리 경로와 파일명 분리
+            val lastSeparatorIndex = key.lastIndexOf("/")
+            val directory = key.substring(0, lastSeparatorIndex)
+            val filename = key.substring(lastSeparatorIndex + 1)
+
+            // 디렉토리 생성
+            val dir = File(imageDirectory, directory)
+            dir.mkdirs()
+
+            // 파일 객체 생성
+            File(dir, filename)
+        } else {
+            File(imageDirectory, key)
+        }
 
         URL(url).openStream().use { input ->
             FileOutputStream(file).use { output ->
