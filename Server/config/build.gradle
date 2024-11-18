@@ -43,11 +43,11 @@ dependencyManagement {
     }
 }
 
-//tasks.register('copyTestYML', Copy) {
-//    from '../SuperBoard/s107-secret-value'
-//    include "application-test.yml"  // 복사할 파일 지정
-//    into 'src/test/resources'       // 테스트 리소스 위치로 복사
-//}
+tasks.register('copyTestYML', Copy) {
+    from '../SuperBoard/s107-secret-value'
+    include "application-test.yml"  // 복사할 파일 지정
+    into 'src/test/resources'       // 테스트 리소스 위치로 복사
+}
 
 tasks.register('copyYML', Copy) {
     from '../config-s107'
