@@ -76,7 +76,7 @@ fun ManagerItem(
             .fillMaxWidth()
             .clickable {
                 isManager = !isManager
-                onClick(!isManager)
+                onClick(isManager)
             }
             .padding(vertical = PaddingDefault),
     ) {

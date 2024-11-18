@@ -6,12 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.ssafy.database.dto.BoardMemberEntity
 import com.ssafy.database.dto.CardMemberAlarmEntity
 import com.ssafy.database.dto.CardMemberEntity
 import com.ssafy.database.dto.with.CardMemberWithMemberInfo
 import com.ssafy.database.dto.with.MemberWithRepresentative
-import com.ssafy.model.board.MemberResponseDTO
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -101,7 +99,7 @@ interface CardMemberDao {
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM card_member cm 
-                    WHERE cm.memberId = m.id AND cm.isRepresentative = 1 AND cm.isStatus != 'DELETE'
+                    WHERE cm.memberId = m.id AND cm.cardId = :cardId AND cm.isRepresentative = 1 AND cm.isStatus != 'DELETE'
                 ) THEN 1 
                 ELSE 0 
             END AS isRepresentative
