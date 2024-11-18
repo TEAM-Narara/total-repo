@@ -31,6 +31,7 @@ import com.ssafy.model.with.WorkspaceInBoardDTO
 import com.ssafy.model.workspace.WorkSpaceDTO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -207,7 +208,12 @@ class SyncRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncAll() = withContext(ioDispatcher) {
-        memberRepository.addMember(dataStoreRepository.getUser())
+        with(dataStoreRepository.getUser()) {
+            memberRepository.getMember(memberId).firstOrNull() ?: run {
+                memberRepository.addMember(user = this)
+            }
+        }
+
         syncMemberBackgroundList()
         syncWorkspaceList()
         syncBoardList()
