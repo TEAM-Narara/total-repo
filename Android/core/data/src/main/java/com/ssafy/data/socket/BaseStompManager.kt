@@ -114,6 +114,8 @@ class BaseStompManager @Inject constructor(
                     "/topic/$topic/member/$memberId",
                 ).collect(dataHandler::handleSocketData)
 
+                is ConnectionState.Error -> connect()
+
                 else -> {}
             }
         }
@@ -122,18 +124,19 @@ class BaseStompManager @Inject constructor(
     init {
         CoroutineScope(Dispatchers.IO).launch {
             NetworkState.isConnected.collect {
-                if (it) {
-                    stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
-                        Log.i("TAG", "subscribe: Socket is connected")
-                        ConnectManager.sendConnectingEvent(true)
-                        syncRepository.syncAll()
-                        Log.i("TAG", "subscribe: Sync all")
-                        ConnectManager.sendConnectingEvent(false)
-                    }
-                } else {
-                    stompClientManager.disconnect(SOCKET_ID)
-                }
+                if (it) connect()
+                else stompClientManager.disconnect(SOCKET_ID)
             }
+        }
+    }
+
+    private suspend fun connect() {
+        stompClientManager.connect(SOCKET_ID, SOCKET_URL) {
+            Log.i("TAG", "subscribe: Socket is connected")
+            ConnectManager.sendConnectingEvent(true)
+            syncRepository.syncAll()
+            Log.i("TAG", "subscribe: Sync all")
+            ConnectManager.sendConnectingEvent(false)
         }
     }
 
