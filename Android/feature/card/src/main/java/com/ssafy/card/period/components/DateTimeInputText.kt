@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ssafy.designsystem.formatTimestamp
+import com.ssafy.designsystem.formatTimestampMill
 import com.ssafy.designsystem.values.Transparent
 
 @Composable
@@ -34,7 +34,7 @@ fun DateTimeInputText(
         ) { isDateTimePickerShow = true }
     ) {
         OutlinedTextField(
-            value = initialSelectedDateMillis?.formatTimestamp() ?: "",
+            value = initialSelectedDateMillis?.formatTimestampMill() ?: "",
             onValueChange = { },
             label = { Text(label) },
             readOnly = true,

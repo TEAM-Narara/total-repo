@@ -32,8 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ssafy.designsystem.R
-import com.ssafy.designsystem.formatRangeTimeStamp
-import com.ssafy.designsystem.formatTimestamp
+import com.ssafy.designsystem.formatRangeTimeStampMill
+import com.ssafy.designsystem.formatTimestampMill
 import com.ssafy.designsystem.values.CornerMedium
 import com.ssafy.designsystem.values.ElevationDefault
 import com.ssafy.designsystem.values.IconSmall
@@ -101,12 +101,12 @@ fun CardItem(
                 if (startTime != null && endTime != null) {
                     IconText(
                         icon = Icons.Default.AccessTime,
-                        text = formatRangeTimeStamp(startTime, endTime)
+                        text = formatRangeTimeStampMill(startTime, endTime)
                     )
                 } else if (startTime != null) {
-                    IconText(icon = Icons.Default.AccessTime, text = startTime.formatTimestamp())
+                    IconText(icon = Icons.Default.AccessTime, text = startTime.formatTimestampMill())
                 } else if (endTime != null) {
-                    IconText(icon = Icons.Default.AccessTime, text = endTime.formatTimestamp())
+                    IconText(icon = Icons.Default.AccessTime, text = endTime.formatTimestampMill())
                 }
                 if (description) Icon(
                     imageVector = Icons.AutoMirrored.Filled.Subject,

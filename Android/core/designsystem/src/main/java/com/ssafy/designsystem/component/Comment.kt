@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.ssafy.designsystem.formatTimestamp
+import com.ssafy.designsystem.formatTimestampSec
 import com.ssafy.designsystem.values.DarkGray
 import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.PaddingMedium
@@ -53,7 +53,7 @@ fun Comment(
                 .padding(start = PaddingMedium)
         ) {
             Text(text = nickname, fontSize = TextMedium)
-            Text(text = date.formatTimestamp(), fontSize = TextSmall, color = DarkGray)
+            Text(text = date.formatTimestampSec(), fontSize = TextSmall, color = DarkGray)
             if (hasAuth) {
                 EditableMarkDownText(
                     content = content,

@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.ssafy.designsystem.component.EditableMarkDownText
 import com.ssafy.designsystem.component.EditableText
-import com.ssafy.designsystem.formatTimestamp
-import com.ssafy.designsystem.formatUnixTimeStamp
+import com.ssafy.designsystem.formatRangeTimeStampMill
+import com.ssafy.designsystem.formatTimestampMill
 import com.ssafy.designsystem.values.LabelHeight
 import com.ssafy.designsystem.values.LabelWidth
 import com.ssafy.designsystem.values.PaddingMedium
@@ -109,13 +109,13 @@ fun LazyListScope.cardInfoScreen(
                 val endDate = cardDTO.endDate
                 when {
                     startDate != null && endDate != null ->
-                        Text(text = formatUnixTimeStamp(startDate, endDate))
+                        Text(text = formatRangeTimeStampMill(startDate, endDate))
 
                     startDate != null ->
-                        Text(text = startDate.formatTimestamp())
+                        Text(text = startDate.formatTimestampMill())
 
                     endDate != null ->
-                        Text(text = endDate.formatTimestamp())
+                        Text(text = endDate.formatTimestampMill())
                 }
             }
         )

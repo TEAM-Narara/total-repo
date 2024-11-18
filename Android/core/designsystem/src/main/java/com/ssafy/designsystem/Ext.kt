@@ -17,14 +17,15 @@ fun Long.millisecondsToZonedDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
 fun Long.secondsToZonedDateTime(): LocalDateTime =
-    LocalDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
+    LocalDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.of("CST"))
 
 fun LocalDateTime.formatDefault(formatter: DateTimeFormatter = BaseDateFormatter): String =
     format(formatter)
 
-fun Long.formatTimestamp(): String = millisecondsToZonedDateTime().formatDefault()
+fun Long.formatTimestampMill(): String = millisecondsToZonedDateTime().formatDefault()
+fun Long.formatTimestampSec(): String = secondsToZonedDateTime().formatDefault()
 
-fun formatRangeTimeStamp(start: Long, end: Long): String {
+fun formatRangeTimeStampMill(start: Long, end: Long): String {
     val startDate = start.millisecondsToZonedDateTime()
     val endDate = end.millisecondsToZonedDateTime()
     val startFormatter = DateTimeFormatter.ofPattern(

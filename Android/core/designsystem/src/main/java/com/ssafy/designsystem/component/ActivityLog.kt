@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.ssafy.designsystem.formatTimestamp
+import com.ssafy.designsystem.formatTimestampSec
 import com.ssafy.designsystem.values.IconLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.PaddingSmall
@@ -46,7 +46,7 @@ fun ActivityLog(
 
         Column {
             Text(text = content, fontSize = TextMedium)
-            Text(text = editDate.formatTimestamp(), fontSize = TextSmall, color = Color.Gray)
+            Text(text = editDate.formatTimestampSec(), fontSize = TextSmall, color = Color.Gray)
         }
     }
 }

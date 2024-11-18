@@ -23,7 +23,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.designsystem.R
-import com.ssafy.designsystem.formatTimestamp
+import com.ssafy.designsystem.formatTimestampSec
 import com.ssafy.designsystem.values.DarkGray
 import com.ssafy.designsystem.values.IconXLarge
 import com.ssafy.designsystem.values.PaddingDefault
@@ -56,7 +56,7 @@ fun NotificationItem(
         Spacer(modifier = Modifier.width(PaddingDefault))
         Column {
             Text(content, fontSize = TextMedium)
-            Text(date.formatTimestamp(), fontSize = TextSmall, color = DarkGray)
+            Text(date.formatTimestampSec(), fontSize = TextSmall, color = DarkGray)
         }
     }
 }
