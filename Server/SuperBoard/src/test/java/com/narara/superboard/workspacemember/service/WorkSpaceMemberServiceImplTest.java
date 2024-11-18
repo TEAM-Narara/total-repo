@@ -1,13 +1,14 @@
 package com.narara.superboard.workspacemember.service;
 
 import com.narara.superboard.MockSuperBoardUnitTests;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.constant.enums.Authority;
 import com.narara.superboard.member.entity.Member;
 import com.narara.superboard.workspace.entity.WorkSpace;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceNameHolder;
+import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
@@ -31,9 +32,12 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
 
     @Mock
     private WorkSpaceMemberRepository workSpaceMemberRepository;
+
     @Mock
     private WorkSpaceValidator workSpaceValidator;
 
+    @Mock
+    private BoardMemberRepository boardMemberRepository;
 
     @Test
     @DisplayName("멤버의 워크스페이스 리스트 조회 성공 테스트")
@@ -56,12 +60,12 @@ class WorkSpaceMemberServiceImplTest implements MockSuperBoardUnitTests {
         when(workSpaceMemberRepository.findAllByMember(member)).thenReturn(mockWorkSpaceMemberList);
 
         // when
-        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(member);
+        List<WorkSpaceResponseDto> result = workSpaceMemberService.getMemberWorkspaceList(member);
 
         // then
-        assertEquals(2, result.workSpaceResponseDtoList().size());
-        assertEquals("워크스페이스 1", result.workSpaceResponseDtoList().get(0).name());
-        assertEquals("워크스페이스 2", result.workSpaceResponseDtoList().get(1).name());
+        assertEquals(2, result.size());
+        assertEquals("워크스페이스 1", result.get(0).name());
+        assertEquals("워크스페이스 2", result.get(1).name());
 
         // workSpaceValidator의 validateNameIsPresent 메서드가 호출되었는지 확인
         verify(workSpaceValidator, times(2)).validateNameIsPresent(any(WorkSpaceNameHolder.class));

@@ -14,7 +14,6 @@ import com.narara.superboard.common.interfaces.response.DefaultResponse;
 import com.narara.superboard.common.interfaces.response.ResponseMessage;
 import com.narara.superboard.common.interfaces.response.StatusCode;
 import com.narara.superboard.member.entity.Member;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -49,10 +48,10 @@ public class WorkSpaceMemberControllers implements WorkSpaceMemberAPI {
     @Override
     public ResponseEntity<DefaultResponse<List<WorkSpaceResponseDto>>> getMemberWorkspaceList(
             @AuthenticationPrincipal Member member) {
-        WorkSpaceListResponseDto responseDto = workSpaceMemberService.getMemberWorkspaceList(member);
+        List<WorkSpaceResponseDto> responseDto = workSpaceMemberService.getMemberWorkspaceList(member);
 
         return new ResponseEntity<>(DefaultResponse.res(
-                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto.workSpaceResponseDtoList())
+                StatusCode.OK, ResponseMessage.MEMBER_WORKSPACE_LIST_FETCH_SUCCESS, responseDto)
                 , HttpStatus.OK);
     }
 
