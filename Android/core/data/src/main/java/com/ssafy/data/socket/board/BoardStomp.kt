@@ -34,10 +34,7 @@ class BoardStomp @Inject constructor(
     private var _boardID: Long? = null
 
     fun connect(boardId: Long) {
-        if(_boardID == boardId) return
-
-        Log.d("TAG", "connect: $boardId")
-
+        if (_boardID == boardId) return
         _boardID = boardId
 
         disconnect()

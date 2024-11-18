@@ -74,6 +74,7 @@ class StompClientManager @Inject constructor(
                 data = it.bodyAsText
             )
         }.catch { exception ->
+            Log.e(TAG, "StompClientManager: Exception $exception")
             exception.printStackTrace()
             sessions.remove(id)
             updateConnectionState(id, ConnectionState.Error(exception))
