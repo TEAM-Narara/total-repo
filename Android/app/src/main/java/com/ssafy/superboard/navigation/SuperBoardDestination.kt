@@ -55,7 +55,6 @@ import com.ssafy.splash.StartDirection
 import com.ssafy.superboard.MainViewModel
 import com.ssafy.ui.safetype.coverType
 import com.ssafy.ui.uistate.ErrorScreen
-import com.ssafy.ui.uistate.LoadingScreen
 
 @Composable
 fun SuperBoardNavHost(
@@ -249,11 +248,6 @@ fun SuperBoardNavHost(
         navController.navigate(LogIn) { popUpAll(navController) }
         ErrorScreen(errorMessage = AuthManager.NO_AUTH)
     }
-
-    if (connectingEvent) {
-        LoadingScreen(text = ConnectManager.CONNECTING)
-    }
-
 }
 
 private fun NavOptionsBuilder.popUpAll(navController: NavController) {
