@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import coil3.compose.AsyncImage
 import com.ssafy.designsystem.R
 import com.ssafy.designsystem.component.BoardItem
+import com.ssafy.designsystem.values.IconLegendLarge
 import com.ssafy.designsystem.values.PaddingDefault
 import com.ssafy.designsystem.values.Yellow
 import com.ssafy.designsystem.values.toColor
@@ -44,6 +46,7 @@ fun HomeBodyScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .widthIn(max = IconLegendLarge)
                     .padding(vertical = PaddingDefault),
                 contentScale = ContentScale.Crop
             )
