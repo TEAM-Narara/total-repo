@@ -114,7 +114,7 @@ class BaseStompManager @Inject constructor(
                     "/topic/$topic/member/$memberId",
                 ).collect(dataHandler::handleSocketData)
 
-                is ConnectionState.Error -> connect()
+                is ConnectionState.Error -> if (NetworkState.isConnected.value) connect()
 
                 else -> {}
             }
