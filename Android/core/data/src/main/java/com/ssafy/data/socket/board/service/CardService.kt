@@ -66,6 +66,7 @@ class CardService @Inject constructor(
             imageStorage.saveAll(key = dto.coverValue) { path ->
                 cardDao.updateCard(
                     before.copy(
+                        listId = dto.listId,
                         name = dto.name,
                         description = dto.description,
                         startAt = dto.startAt,
@@ -81,6 +82,7 @@ class CardService @Inject constructor(
         } else {
             cardDao.updateCard(
                 before.copy(
+                    listId = dto.listId,
                     name = dto.name,
                     description = dto.description,
                     startAt = dto.startAt,
