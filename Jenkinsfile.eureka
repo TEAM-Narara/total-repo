@@ -43,7 +43,8 @@ pipeline {
 	    }
 
         // 백엔드 빌드 단계
-        stage('BE-Build') {
+        try{
+            stage('BE-Build') {
             steps {
                 dir("./Server/eureka") {
                     // Gradle 빌드 실행
@@ -52,6 +53,12 @@ pipeline {
                 }
             }
         }
+        } catch (Exception e) {
+        echo 'Build failed. Checking logs...'
+        sh 'cat ./Server/eureka/build/reports/tests/test/index.html'
+        throw e
+        }
+        
 
         // 백엔드 Docker 이미지 빌드 및 컨테이너 실행
         stage('Build BE Docker Image') {
