@@ -37,7 +37,11 @@ class WorkspaceStomp @Inject constructor(
                 stomp.subscribe("workspace/$workspaceId").buffer(Channel.BUFFERED).produceIn(this)
                     .consumeEach { message ->
                         Log.d("TAG", "consumeEach: $message")
-                        handleMessage(message)
+                        runCatching {
+                            handleMessage(message)
+                        }.onFailure { e ->
+                            e.printStackTrace()
+                        }
                     }
             }.onFailure { e ->
                 e.printStackTrace()
