@@ -16,6 +16,9 @@ val BaseDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MÏõî dÏù
 fun Long.millisecondsToZonedDateTime(): LocalDateTime =
     LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
+fun Long.secondsToZonedDateTime(): LocalDateTime =
+    LocalDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
+
 fun LocalDateTime.formatDefault(formatter: DateTimeFormatter = BaseDateFormatter): String =
     format(formatter)
 
