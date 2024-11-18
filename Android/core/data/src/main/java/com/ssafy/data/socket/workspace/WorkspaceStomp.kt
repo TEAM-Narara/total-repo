@@ -34,7 +34,7 @@ class WorkspaceStomp @Inject constructor(
 
         _job = CoroutineScope(ioDispatcher).launch {
             runCatching {
-                stomp.subscribe("workspace/$workspaceId").buffer(Channel.BUFFERED).produceIn(this)
+                stomp.subscribe("workspace/$workspaceId").buffer(Channel.UNLIMITED).produceIn(this)
                     .consumeEach { message ->
                         Log.d("TAG", "consumeEach: $message")
                         runCatching {

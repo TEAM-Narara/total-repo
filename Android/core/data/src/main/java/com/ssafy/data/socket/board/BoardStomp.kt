@@ -41,7 +41,7 @@ class BoardStomp @Inject constructor(
 
         _job = CoroutineScope(ioDispatcher).launch {
             runCatching {
-                stomp.subscribe("board/$boardId").buffer(Channel.BUFFERED)
+                stomp.subscribe("board/$boardId").buffer(Channel.UNLIMITED)
                     .produceIn(this)
                     .consumeEach { message ->
                         Log.d("TAG", "consumeEach: $message")
