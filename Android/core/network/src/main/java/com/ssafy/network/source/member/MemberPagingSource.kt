@@ -9,10 +9,12 @@ import javax.inject.Inject
 
 class MemberPagingSource @Inject constructor(
     private val memberDataSource: MemberDataSource,
+    private val keyToUrl: (String) -> String,
     private val keyword: String,
     private val sort: List<String>,
     private val filterList: List<Long>,
 ) : PagingSource<Int, User>() {
+
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, User> {
         val page = params.key ?: 1
@@ -27,7 +29,11 @@ class MemberPagingSource @Inject constructor(
                 }
 
                 val userList: List<User> = response.searchMemberResponseDtoList
-                val filteredRepos = userList.filterNot { it.memberId in filterList }
+                val filteredRepos = userList.filterNot { it.memberId in filterList }.map {
+
+                    val profileUrl = it.profileImgUrl?.let(keyToUrl)
+                    it.copy(profileImgUrl = profileUrl)
+                }
 
                 val prevKey = if (page == 1) null else page - 1
                 val nextKey = if (response.totalPages <= page) null else page + 1

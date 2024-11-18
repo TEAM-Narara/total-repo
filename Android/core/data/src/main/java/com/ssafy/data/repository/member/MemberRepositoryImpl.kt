@@ -17,6 +17,7 @@ import com.ssafy.model.user.User
 import com.ssafy.model.with.DataStatus
 import com.ssafy.network.source.member.MemberDataSource
 import com.ssafy.network.source.member.MemberPagingSource
+import com.ssafy.network.util.S3ImageUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -33,6 +34,7 @@ class MemberRepositoryImpl @Inject constructor(
     private val memberDao: MemberDao,
     private val memberBackgroundDao: MemberBackgroundDao,
     private val imageStorage: ImageStorage,
+    private val s3ImageUtil: S3ImageUtil,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MemberRepository {
 
@@ -102,7 +104,8 @@ class MemberRepositoryImpl @Inject constructor(
                 memberDataSource = memberDataSource,
                 keyword = keyword,
                 sort = sort,
-                filterList = filterList
+                filterList = filterList,
+                keyToUrl = s3ImageUtil::downloadUrl
             )
         }
     ).flow.flowOn(ioDispatcher)

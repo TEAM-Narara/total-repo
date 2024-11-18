@@ -131,7 +131,7 @@ class S3ImageUtil @Inject constructor(
             .withExpiration(date)
 
         val url = s3Client.generatePresignedUrl(generatedUrlRequest).toString()
-        val file = File(imageDirectory, key.split("/").last())
+        val file = File(imageDirectory, key)
 
         URL(url).openStream().use { input ->
             FileOutputStream(file).use { output ->
@@ -140,6 +140,17 @@ class S3ImageUtil @Inject constructor(
         }
 
         return file.path
+    }
+
+    fun downloadUrl(key: String): String{
+        val date = Date().apply {
+            time += 1000 * 3600
+        }
+        val generatedUrlRequest = GeneratePresignedUrlRequest(BUCKET_NAME, key)
+            .withMethod(HttpMethod.GET)
+            .withExpiration(date)
+
+        return s3Client.generatePresignedUrl(generatedUrlRequest).toString()
     }
 
     companion object {

@@ -28,10 +28,8 @@ import com.ssafy.designsystem.values.PaddingLarge
 import com.ssafy.designsystem.values.Primary
 import com.ssafy.designsystem.values.START
 import com.ssafy.designsystem.values.START_WITH_SUPER_BOARD
-import com.ssafy.designsystem.values.TextMedium
 import com.ssafy.designsystem.values.TextTitle
 import com.ssafy.designsystem.values.TextXLarge
-import com.ssafy.designsystem.values.White
 
 @Composable
 fun HomeEmptyScreen(
@@ -96,15 +94,7 @@ fun HomeEmptyScreen(
                     .fillMaxWidth()
                     .background(color = Primary)
                     .weight(1f)
-            ) {
-                // TODO : 여기에는 캡쳐한 사진들을 넣습니다.
-                Text(
-                    text = "여기에는 캡쳐한 사진들을 넣습니다.",
-                    color = White,
-                    fontSize = TextMedium,
-                    modifier = Modifier.padding(PaddingDefault)
-                )
-            }
+            )
         }
     }
 }
