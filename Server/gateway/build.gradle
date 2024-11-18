@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.joyride'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2023.0.3")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.cloud:spring-cloud-config-server'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.register('copyTestYML', Copy) {
+    from '../SuperBoard/s107-secret-value'
+    include "application-test.yml"  // 복사할 파일 지정
+    into 'src/test/resources'       // 테스트 리소스 위치로 복사
+}
+
+tasks.register('copyYML', Copy) {
+    from '../config-s107'
+    include "gateway-dev.yml"  // 원하는 YML 파일만 복사
+    into 'src/main/resources'  // 파일을 복사할 위치
+    rename 'gateway-dev.yml', 'application.yml'  // 파일명 변경
+}
+
+// build 작업 전에 copyYML 작업을 실행하도록 설정
+tasks.named('build') {
+    dependsOn('copyYML')
+}
+
+tasks.named('test') {
+    dependsOn('copyTestYML')
+    useJUnitPlatform()
+}
+
+tasks.named('processResources') {
+    dependsOn('copyYML')
+}
+
+tasks.named('processTestResources') {
+    dependsOn 'copyTestYML' // processTestResources가 copyTestYML에 의존성을 가지도록 설정
+}
