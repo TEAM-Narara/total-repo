@@ -1,6 +1,7 @@
 package com.narara.superboard.workspacemember.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
@@ -17,6 +18,7 @@ import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +61,9 @@ class WorkSpaceMemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private BoardMemberRepository boardMemberRepository;
 
     @Mock
     private AlarmService alarmService;
@@ -115,11 +120,11 @@ class WorkSpaceMemberServiceTest {
                 .willReturn(Arrays.asList(workSpaceMember));
 
         // when
-        WorkSpaceListResponseDto result = workSpaceMemberService.getMemberWorkspaceList(member);
+        List<WorkSpaceResponseDto> result = workSpaceMemberService.getMemberWorkspaceList(member);
 
         // then
-        assertThat(result.workSpaceResponseDtoList()).hasSize(1);
-        WorkSpaceResponseDto dto = result.workSpaceResponseDtoList().get(0);
+        assertThat(result).hasSize(1);
+        WorkSpaceResponseDto dto = result.get(0);
         assertThat(dto.name()).isEqualTo("Test WorkSpace");
     }
 
