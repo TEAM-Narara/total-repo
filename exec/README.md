@@ -7,7 +7,8 @@
    2) 빌드 시 사용되는 환경 변수 등의 내용 상세 기재 (링크 참조)
    - Server 설정 : [build.gradle](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/BE/develop/Server/SuperBoard/build.gradle?ref_type=heads) 
    및 [Server/SuperBoard 아래의 .gradle](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/BE/develop/Server/SuperBoard/?ref_type=heads)에 기재
-   - Android 설정 : [프로젝트 파일]("https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/build.gradle.kts?ref_type=heads") + [어플리케이션 빌드 파일]("https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/app/build.gradle.kts?ref_type=heads") +  [버전 관리]("https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/gradle/libs.versions.toml?ref_type=heads") 
+   - Android 설정: 
+[프로젝트 파일](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/build.gradle.kts?ref_type=heads) + [어플리케이션 빌드 파일](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/app/build.gradle.kts?ref_type=heads) + [버전 관리](https://lab.ssafy.com/s11-final/S11P31S107/-/blob/main/Android/gradle/libs.versions.toml?ref_type=heads)
 
    3) 배포 시 특이사항 기재  
     - 스프링 백서버가 nginx 80포트를 중심으로 설정되어 있습니다.
