@@ -1,6 +1,8 @@
 package com.narara.superboard.workspacemember.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.narara.superboard.boardmember.entity.BoardMember;
+import com.narara.superboard.boardmember.infrastructure.BoardMemberRepository;
 import com.narara.superboard.boardmember.interfaces.dto.MemberCollectionResponseDto;
 import com.narara.superboard.boardmember.interfaces.dto.MemberResponseDto;
 import com.narara.superboard.common.application.kafka.KafkaConsumerService;
@@ -11,13 +13,14 @@ import com.narara.superboard.member.exception.MemberNotFoundException;
 import com.narara.superboard.member.infrastructure.MemberRepository;
 import com.narara.superboard.workspace.entity.WorkSpace;
 import com.narara.superboard.workspace.infrastructure.WorkSpaceRepository;
-import com.narara.superboard.workspace.interfaces.dto.WorkSpaceListResponseDto;
 import com.narara.superboard.workspace.interfaces.dto.WorkSpaceResponseDto;
 import com.narara.superboard.workspace.service.kafka.WorkspaceOffsetService;
 import com.narara.superboard.workspace.service.validator.WorkSpaceValidator;
 import com.narara.superboard.workspacemember.entity.WorkSpaceMember;
 import com.narara.superboard.workspacemember.exception.EmptyWorkspaceMemberException;
 import com.narara.superboard.workspacemember.infrastructure.WorkSpaceMemberRepository;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,7 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     private final WorkspaceOffsetService workspaceOffsetService;
 
     private final AlarmService alarmService;
+    private final BoardMemberRepository boardMemberRepository;
 
     @Override
     public MemberCollectionResponseDto getWorkspaceMemberCollectionResponseDto(Long workspaceId) {
@@ -64,10 +68,11 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
     }
 
     @Override
-    public WorkSpaceListResponseDto getMemberWorkspaceList(Member member) {
+    public List<WorkSpaceResponseDto> getMemberWorkspaceList(Member member) {
         List<WorkSpaceMember> workSpaceMemberList = workSpaceMemberRepository.findAllByMember(member);
 
         List<WorkSpaceResponseDto> workSpaceResponseDtoList = new ArrayList<>();
+        Set<Long> workspaceIdSet = new HashSet<>();
 
         for (WorkSpaceMember workSpaceMember : workSpaceMemberList) {
             if (!workSpaceMember.getWorkSpace().getIsDeleted()) {
@@ -80,11 +85,29 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
                 workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
 
                 workSpaceResponseDtoList.add(workSpaceResponseDto);
+                workspaceIdSet.add(workSpace.getId());
             }
         }
 
-        return WorkSpaceListResponseDto.builder()
-                .workSpaceResponseDtoList(workSpaceResponseDtoList).build();
+        List<BoardMember> boardMemberList = boardMemberRepository.findByMemberId(member.getId());
+
+        for (BoardMember boardMember : boardMemberList) {
+            WorkSpace workSpace = boardMember.getBoard().getWorkSpace();
+
+            if (!workspaceIdSet.contains(workSpace.getId())) {
+                WorkSpaceResponseDto workSpaceResponseDto = WorkSpaceResponseDto.builder()
+                        .workspaceId(workSpace.getId())
+                        .name(workSpace.getName())
+                        .authority(Authority.MEMBER)
+                        .build();
+                workSpaceValidator.validateNameIsPresent(workSpaceResponseDto);
+
+                workSpaceResponseDtoList.add(workSpaceResponseDto);
+                workspaceIdSet.add(workSpace.getId());
+            }
+        }
+
+        return workSpaceResponseDtoList;
     }
 
     @Transactional
@@ -158,7 +181,8 @@ public class WorkSpaceMemberServiceImpl implements WorkSpaceMemberService {
 
     @Transactional
     @Override
-    public WorkSpaceMember deleteMember(Member member, Long workspaceId, Long deleteMemberId) throws FirebaseMessagingException {
+    public WorkSpaceMember deleteMember(Member member, Long workspaceId, Long deleteMemberId)
+            throws FirebaseMessagingException {
         WorkSpaceMember workSpaceMember = getWorkSpaceMember(workspaceId, deleteMemberId);
         WorkSpace workSpace = workSpaceMember.getWorkSpace();
 
