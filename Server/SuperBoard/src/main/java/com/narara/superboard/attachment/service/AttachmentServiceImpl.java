@@ -5,6 +5,7 @@ import com.narara.superboard.attachment.entity.Attachment;
 import com.narara.superboard.attachment.infrastructure.AttachmentRepository;
 import com.narara.superboard.board.service.kafka.BoardOffsetService;
 import com.narara.superboard.card.document.CardHistory;
+import com.narara.superboard.card.document.CardInfo;
 import com.narara.superboard.card.entity.Card;
 import com.narara.superboard.card.infrastructure.CardHistoryRepository;
 import com.narara.superboard.card.infrastructure.CardRepository;
@@ -194,7 +195,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             Long attachmentId,
             String url,
             boolean isCover
-    ) implements AttachmentInfo{
+    ) implements AttachmentInfo, CardInfo {
     }
 
     // 첨부 파일 삭제 관련 정보
@@ -204,6 +205,6 @@ public class AttachmentServiceImpl implements AttachmentService {
             Long attachmentId,
             String url,
             boolean isCover
-    ) implements AttachmentInfo{
+    ) implements AttachmentInfo, CardInfo{
     }
 }

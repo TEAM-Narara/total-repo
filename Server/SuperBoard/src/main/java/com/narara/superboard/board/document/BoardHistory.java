@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "board_historys")
-public class BoardHistory<T> {
+public class BoardHistory<T extends BoardInfo> {
 
     @Id
     private String id;
@@ -28,7 +28,7 @@ public class BoardHistory<T> {
     private EventData eventData; // 데이터 유형 (CARD, BOARD, LABEL 등) // 어떻게
     private T target; // 기타 등등...
 
-    public static <T> BoardHistory<T> createBoardHistory(Member member, Long when, Board board, EventType eventType, EventData eventData, T target) {
+    public static <T extends BoardInfo> BoardHistory<T> createBoardHistory(Member member, Long when, Board board, EventType eventType, EventData eventData, T target) {
         return BoardHistory.<T>builder()
                 .who(Who.of(member))
                 .when(when)

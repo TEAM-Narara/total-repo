@@ -20,7 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "card_historys")
-public class CardHistory<T>{
+public class CardHistory<T extends CardInfo>{
     @Id
     private String id;
     private Who who; // 누가
@@ -30,7 +30,7 @@ public class CardHistory<T>{
     private EventData eventData; // 데이터 유형 (CARD, BOARD, LABEL 등) // 어떻게
     private T target; // 기타 등등...
 
-    public static <T> CardHistory<T> createCardHistory(Member member, Long when, Board board, Card card, EventType eventType, EventData eventData, T target) {
+    public static <T extends CardInfo> CardHistory<T> createCardHistory(Member member, Long when, Board board, Card card, EventType eventType, EventData eventData, T target) {
         return CardHistory.<T>builder()
                 .who(Who.of(member))
                 .when(when)
