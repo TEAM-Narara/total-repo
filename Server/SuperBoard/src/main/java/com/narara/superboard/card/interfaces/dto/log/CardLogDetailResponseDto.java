@@ -1,6 +1,7 @@
 package com.narara.superboard.card.interfaces.dto.log;
 
 import com.narara.superboard.card.document.CardHistory;
+import com.narara.superboard.card.document.CardInfo;
 import com.narara.superboard.common.constant.enums.EventData;
 import com.narara.superboard.common.constant.enums.EventType;
 import com.narara.superboard.common.document.Who;
@@ -13,7 +14,7 @@ public record CardLogDetailResponseDto<T>(
         EventData eventData,
         T target
 ) {
-    public static <T> CardLogDetailResponseDto<T> createLogDetailResponseDto(
+    public static <T extends CardInfo> CardLogDetailResponseDto<T> createLogDetailResponseDto(
             CardHistory<T> cardHistory
     ) {
         return new CardLogDetailResponseDto<>(
